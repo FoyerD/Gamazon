@@ -1,4 +1,4 @@
-package Infrastructure;
+package Domain.ExternalServices;
 
 import java.util.Date;
 

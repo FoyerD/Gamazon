@@ -14,9 +14,9 @@ import Domain.Store.Item;
 import Domain.Store.ShoppingBasket;
 import Domain.User.IUser;
 import Domain.User.IUserFacade;
-import Infrastructure.INotificationService;
-import Infrastructure.IPaymentService;
-import Infrastructure.ISupplyService;
+import Domain.ExternalServices.INotificationService;
+import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.ISupplyService;
 
 public class MarketFacade implements IMarketFacade {
     private IPaymentService paymentService;

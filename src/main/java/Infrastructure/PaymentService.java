@@ -1,9 +1,9 @@
-package Domain.ExternalServices;
+package Infrastructure;
 
 import java.util.Date;
 
 import Application.Responses.Response;
-import Infrastructure.IPaymentService;
+import Domain.ExternalServices.IPaymentService;
 
 public class PaymentService implements IPaymentService {
     

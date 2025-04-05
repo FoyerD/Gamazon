@@ -1,4 +1,4 @@
-package Infrastructure;
+package Domain.ExternalServices;
 
 public interface INotificationService {
 

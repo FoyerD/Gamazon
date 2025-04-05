@@ -1,6 +1,6 @@
-package Domain.ExternalServices;
+package Infrastructure;
 
-import Infrastructure.INotificationService;
+import Domain.ExternalServices.INotificationService;
 
 public class NotificationService implements INotificationService {
     

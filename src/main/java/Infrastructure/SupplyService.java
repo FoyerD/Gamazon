@@ -1,10 +1,10 @@
-package Domain.ExternalServices;
+package Infrastructure;
 
 import java.util.List;
 
 import Domain.Store.IStore;
 import Domain.Store.Item;
-import Infrastructure.ISupplyService;
+import Domain.ExternalServices.ISupplyService;
 
 public class SupplyService implements ISupplyService {
     @Override
