@@ -2,7 +2,7 @@ package Infrastructure;
 
 import java.util.List;
 
-import Domain.Store.IStore;
+import Domain.Store.Store;
 import Domain.Store.Item;
 import Domain.ExternalServices.ISupplyService;
 
@@ -20,7 +20,7 @@ public class SupplyService implements ISupplyService {
     }
 
     @Override
-    public void placeOrder(IStore store, String deliveryAddress, List<Item> items) {
+    public void placeOrder(Store store, String deliveryAddress, List<Item> items) {
         // Implementation for placing an order
         System.out.println("Placing order to be delivered at: " + deliveryAddress);
     }

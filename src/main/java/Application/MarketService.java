@@ -1,8 +1,8 @@
 package Application;
 
 import Domain.IMarketFacade;
-import Domain.User.IUser;
-import Domain.User.IUserFacade;
+import Domain.User.User;
+import Domain.User.IUserRepository;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
@@ -13,23 +13,23 @@ import java.util.List;
 import java.util.Map;
 import Application.Responses.Response;
 import Application.Responses.ResponseT;
-import Domain.Store.IStoreFacade;
-import Domain.Store.IShoppingBasket;
+import Domain.Store.IStoreRepository;
+import Domain.Shopping.IShoppingBasket;
 import Domain.Store.Item;
 
 public class MarketService {
 
     private final IMarketFacade marketFacade;
-    private final IUserFacade userFacade;
+    private final IUserRepository userFacade;
 
-    public MarketService(IMarketFacade marketFacade, IUserFacade userFacade) {
+    public MarketService(IMarketFacade marketFacade, IUserRepository userFacade) {
         this.marketFacade = marketFacade;
         this.userFacade = userFacade;
     }
 
     public Response pay(String sessionId, String card_owner, String card_number, Date expiry_date, String cvv, double price, String deliveryAddress) {
         try {
-            IUser user = userFacade.getUser(sessionId);
+            User user = userFacade.getUser(sessionId);
             marketFacade.purchase(card_owner, card_number, expiry_date, cvv, deliveryAddress, user, user.getUserShoppingCart());
             return new Response();
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class MarketService {
 
     public ResponseT<Double> calculateCartPrice(String sessionId) {
         try {
-            IUser user = userFacade.getUser(sessionId);
+            User user = userFacade.getUser(sessionId);
             return new ResponseT<>(marketFacade.calculateCartPrice(user.getUserShoppingCart()));
         } catch (Exception e) {
             return new ResponseT<>(e.getMessage());
@@ -131,7 +131,7 @@ public class MarketService {
         }
     }
 
-    public Response initFacades(IUserFacade userFacade, IStoreFacade storeFacade) {
+    public Response initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
         try {
             marketFacade.initFacades(userFacade, storeFacade);
             return new Response();
@@ -165,7 +165,7 @@ public class MarketService {
         }
     }
 
-    public ResponseT<IStoreFacade> getStoreFacade() {
+    public ResponseT<IStoreRepository> getStoreFacade() {
         try {
             return new ResponseT<>(marketFacade.getStoreFacade());
         } catch (Exception e) {

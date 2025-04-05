@@ -1,8 +1,8 @@
 package Domain.User;
 
-public class IUserFacade {
+public class IUserRepository {
 
-    public IUser getUser(String sessionId) {
+    public User getUser(String sessionId) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getUser'");
     }

@@ -1,4 +1,4 @@
-package Domain.Store;
+package Domain.Shopping;
 
 import java.util.List;
 

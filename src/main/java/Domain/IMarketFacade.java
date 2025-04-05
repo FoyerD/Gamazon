@@ -8,11 +8,11 @@ import java.util.Map;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
-import Domain.User.IUserFacade;
-import Domain.User.IUser;
-import Domain.Store.IStoreFacade;
-import Domain.Store.IShoppingBasket;
-import Domain.Store.IShoppingCart;
+import Domain.User.IUserRepository;
+import Domain.User.User;
+import Domain.Store.IStoreRepository;
+import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.IShoppingCart;
 import Domain.Store.Item;
 
 public interface IMarketFacade {
@@ -24,7 +24,7 @@ public interface IMarketFacade {
     void updateSupplyService(ISupplyService supplyService);
 
     void purchase(String card_owner, String card_number, Date expiry_date, String cvv,
-                        String deliveryAddress, IUser user,
+                        String deliveryAddress, User user,
                         IShoppingCart cart);
 
     double calculateCartPrice(IShoppingCart cart); 
@@ -45,7 +45,7 @@ public interface IMarketFacade {
 
     void addShoppingBasket(IShoppingBasket basket, String userName, double price);
 
-    void initFacades(IUserFacade userFacade, IStoreFacade storeFacade);
+    void initFacades(IUserRepository userFacade, IStoreRepository storeFacade);
 
     int getShoppingBasketCount();
 
@@ -53,7 +53,7 @@ public interface IMarketFacade {
     
     INotificationService getNotificationService();
 
-    IStoreFacade getStoreFacade();
+    IStoreRepository getStoreFacade();
 
     List<IShoppingBasket> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

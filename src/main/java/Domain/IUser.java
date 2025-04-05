@@ -1,6 +1,6 @@
 package Domain;
 
-import Domain.Store.IShoppingCart;
+import Domain.Shopping.IShoppingCart;
 
 public class IUser {
 

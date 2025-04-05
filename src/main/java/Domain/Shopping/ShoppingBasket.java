@@ -1,15 +1,18 @@
-package Domain.Store;
+package Domain.Shopping;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import Domain.Store.IStoreRepository;
+import Domain.Store.Item;
+
 // TODO: Auto-generated Code
 public class ShoppingBasket implements IShoppingBasket {
     private IShoppingCart shoppingCart;
-    private IStoreFacade storeFacade;
+    private IStoreRepository storeFacade;
 
-    public ShoppingBasket(IShoppingCart shoppingCart, IStoreFacade storeFacade) {
+    public ShoppingBasket(IShoppingCart shoppingCart, IStoreRepository storeFacade) {
         this.shoppingCart = shoppingCart;
         this.storeFacade = storeFacade;
     }
@@ -32,11 +35,11 @@ public class ShoppingBasket implements IShoppingBasket {
         this.shoppingCart = shoppingCart;
     }
 
-    public IStoreFacade getStoreFacade() {
+    public IStoreRepository getStoreFacade() {
         return storeFacade;
     }
 
-    public void setStoreFacade(IStoreFacade storeFacade) {
+    public void setStoreFacade(IStoreRepository storeFacade) {
         this.storeFacade = storeFacade;
     }
 
@@ -94,7 +97,6 @@ public class ShoppingBasket implements IShoppingBasket {
         return null;
     }
 
-    @Override
     public List<Item> getItems() {
         // TODO Auto-generated method stub
         return null;

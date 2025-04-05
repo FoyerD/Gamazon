@@ -1,8 +1,8 @@
 package Domain.User;
 
-import Domain.Store.IShoppingCart;
+import Domain.Shopping.IShoppingCart;
 
-public class IUser {
+public class User {
 
     public IShoppingCart getUserShoppingCart() {
         // TODO Auto-generated method stub

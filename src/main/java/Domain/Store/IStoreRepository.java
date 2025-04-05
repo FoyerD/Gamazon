@@ -2,7 +2,10 @@ package Domain.Store;
 
 import java.util.Map;
 
-public interface IStoreFacade {
+import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.IShoppingCart;
+
+public interface IStoreRepository {
 
     void checkProductsExist(int storeId, Map<Integer, Item> products);
 
@@ -12,6 +15,6 @@ public interface IStoreFacade {
 
     void addCartQuantity(IShoppingCart cart);
 
-    IStore getStore(Object storeId);
+    Store getStore(Object storeId);
 
 }

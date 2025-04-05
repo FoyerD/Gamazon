@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import Application.Responses.Response;
-import Domain.Store.IShoppingBasket;
-import Domain.Store.IShoppingCart;
-import Domain.Store.IStore;
-import Domain.Store.IStoreFacade;
+import Domain.Store.IStoreRepository;
+import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.IShoppingCart;
+import Domain.Shopping.ShoppingBasket;
+import Domain.Store.Store;
 import Domain.Store.Item;
-import Domain.Store.ShoppingBasket;
-import Domain.User.IUser;
-import Domain.User.IUserFacade;
+import Domain.User.User;
+import Domain.User.IUserRepository;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
@@ -22,8 +22,8 @@ public class MarketFacade implements IMarketFacade {
     private IPaymentService paymentService;
     private ISupplyService supplyService;
     private INotificationService notificationService;
-    private IUserFacade userFacade;
-    private IStoreFacade storeFacade;
+    private IUserRepository userFacade;
+    private IStoreRepository storeFacade;
     private IShoppingBasket shoppingBasket;
     private AtomicLong paymentID = new AtomicLong(0);
 
@@ -43,18 +43,17 @@ public class MarketFacade implements IMarketFacade {
         return supplyService; 
     }
 
-    public IUserFacade getUserFacade() { 
+    public IUserRepository getUserFacade() { 
         return userFacade; 
     }
 
-    public IStoreFacade getStoreFacade() { 
+    public IStoreRepository getStoreFacade() { 
         return storeFacade; 
     }
 
     private MarketFacade() {}
 
-    public synchronized void initFacades(IUserFacade userFacade,
-                                            IStoreFacade storeFacade) {
+    public synchronized void initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
         this.storeFacade = storeFacade;
         this.userFacade = userFacade;
         this.shoppingBasket = new ShoppingBasket();
@@ -89,7 +88,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     public void purchase(String card_owner, String card_number, Date expiry_date, String cvv,
-                        String deliveryAddress, IUser user,
+                        String deliveryAddress, User user,
                         IShoppingCart cart) {
         String sessionId = user.getSessionId();
         String name = userFacade.userIsMember(sessionId) ? user.getUserName() : sessionId;
@@ -106,7 +105,7 @@ public class MarketFacade implements IMarketFacade {
         }
         storeFacade.addCartQuantity(cart);
         for (IShoppingBasket basket : cart.getStoreBaskets()) {
-            IStore store = storeFacade.getStore(basket.getStoreId());
+            Store store = storeFacade.getStore(basket.getStoreId());
             notificationService.sendNotification(name, "Your order has been placed successfully. Order ID: " + paymentID.get(), deliveryAddress);
             supplyService.placeOrder(store, deliveryAddress, basket.getItems());
             shoppingBasket.addShoppingBasket(basket, name, storeFacade.calculateBasketPrice(basket));

@@ -1,5 +1,5 @@
 package Domain.Store;
 
-public class IStore {
+public class Store {
 
 }
