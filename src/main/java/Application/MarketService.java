@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import Application.Responses.Response;
-import Application.Responses.ResponseT;
+
 import Domain.Store.IStoreRepository;
 import Domain.Shopping.IShoppingBasket;
 import Domain.Store.Item;
@@ -27,157 +26,157 @@ public class MarketService {
         this.userFacade = userFacade;
     }
 
-    public Response pay(String sessionId, String card_owner, String card_number, Date expiry_date, String cvv, double price, String deliveryAddress) {
+    public Response<Void> pay(String sessionId, String card_owner, String card_number, Date expiry_date, String cvv, double price, String deliveryAddress) {
         try {
             User user = userFacade.getUser(sessionId);
             marketFacade.purchase(card_owner, card_number, expiry_date, cvv, deliveryAddress, user, user.getUserShoppingCart());
-            return new Response();
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
-    
-    public Response updatePaymentService(IPaymentService paymentService) {
+
+    public Response<Void> updatePaymentService(IPaymentService paymentService) {
         try {
             marketFacade.updatePaymentService(paymentService);
-            return new Response();
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public Response updateNotificationService(INotificationService notificationService) {
+    public Response<Void> updateNotificationService(INotificationService notificationService) {
         try {
             marketFacade.updateNotificationService(notificationService);
-            return new Response();
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public Response updateSupplyService(ISupplyService supplyService) {
+    public Response<Void> updateSupplyService(ISupplyService supplyService) {
         try {
             marketFacade.updateSupplyService(supplyService);
-            return new Response();
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<Double> calculateCartPrice(String sessionId) {
+    public Response<Double> calculateCartPrice(String sessionId) {
         try {
             User user = userFacade.getUser(sessionId);
-            return new ResponseT<>(marketFacade.calculateCartPrice(user.getUserShoppingCart()));
+            return new Response<>(marketFacade.calculateCartPrice(user.getUserShoppingCart()));
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public Response updatePaymentServiceURL(String url) {
+    public Response<Void> updatePaymentServiceURL(String url) {
         try {
             marketFacade.updatePaymentServiceURL(url);
-            return new Response();
+            return new Response<>(null);
         } catch (IOException e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<Map<Integer, IShoppingBasket>> getShoppingBaskets() {
+    public Response<Map<Integer, IShoppingBasket>> getShoppingBaskets() {
         try {
-            return new ResponseT<>(marketFacade.getShoppingBaskets());
+            return new Response<>(marketFacade.getShoppingBaskets());
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<IShoppingBasket> getShoppingBasket(int id) {
+    public Response<IShoppingBasket> getShoppingBasket(int id) {
         try {
-            return new ResponseT<>(marketFacade.getShoppingBasket(id));
+            return new Response<>(marketFacade.getShoppingBasket(id));
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<List<IShoppingBasket>> getStoreShoppingBaskets(int storeId) {
+    public Response<List<IShoppingBasket>> getStoreShoppingBaskets(int storeId) {
         try {
-            return new ResponseT<>(marketFacade.getStoreShoppingBaskets(storeId));
+            return new Response<>(marketFacade.getStoreShoppingBaskets(storeId));
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<List<IShoppingBasket>> getUserShoppingBaskets(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Response<List<IShoppingBasket>> getUserShoppingBaskets(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         try {
-            return new ResponseT<>(marketFacade.getUserShoppingBaskets(userName, startDateTime, endDateTime));
+            return new Response<>(marketFacade.getUserShoppingBaskets(userName, startDateTime, endDateTime));
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<List<IShoppingBasket>> getUserShoppingBasketsBetween(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Response<List<IShoppingBasket>> getUserShoppingBasketsBetween(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         try {
-            return new ResponseT<>(marketFacade.getUserShoppingBasketsBetween(userName, startDateTime, endDateTime));
+            return new Response<>(marketFacade.getUserShoppingBasketsBetween(userName, startDateTime, endDateTime));
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public Response addShoppingBasket(IShoppingBasket basket, String userName, double price) {
+    public Response<Void> addShoppingBasket(IShoppingBasket basket, String userName, double price) {
         try {
             marketFacade.addShoppingBasket(basket, userName, price);
-            return new Response();
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public Response initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
+    public Response<Void> initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
         try {
             marketFacade.initFacades(userFacade, storeFacade);
-            return new Response();
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<Integer> getShoppingBasketCount() {
+    public Response<Integer> getShoppingBasketCount() {
         try {
-            return new ResponseT<>(marketFacade.getShoppingBasketCount());
+            return new Response<>(marketFacade.getShoppingBasketCount());
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public Response checkProductsExist(int storeId, Map<Integer, Item> productsId) {
+    public Response<Void> checkProductsExist(int storeId, Map<Integer, Item> productsId) {
         try {
             marketFacade.checkProductsExist(storeId, productsId);
-            return new Response();
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<INotificationService> getNotificationService() {
+    public Response<INotificationService> getNotificationService() {
         try {
-            return new ResponseT<>(marketFacade.getNotificationService());
+            return new Response<>(marketFacade.getNotificationService());
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<IStoreRepository> getStoreFacade() {
+    public Response<IStoreRepository> getStoreFacade() {
         try {
-            return new ResponseT<>(marketFacade.getStoreFacade());
+            return new Response<>(marketFacade.getStoreFacade());
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 
-    public ResponseT<List<IShoppingBasket>> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Response<List<IShoppingBasket>> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         try {
-            return new ResponseT<>(marketFacade.getMyShoppingBasketHistory(sessionId, startDateTime, endDateTime));
+            return new Response<>(marketFacade.getMyShoppingBasketHistory(sessionId, startDateTime, endDateTime));
         } catch (Exception e) {
-            return new ResponseT<>(e.getMessage());
+            return new Response<>(e.getMessage());
         }
     }
 }

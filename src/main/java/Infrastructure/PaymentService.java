@@ -2,7 +2,7 @@ package Infrastructure;
 
 import java.util.Date;
 
-import Application.Responses.Response;
+import Application.Response;
 import Domain.ExternalServices.IPaymentService;
 
 public class PaymentService implements IPaymentService {
@@ -23,10 +23,10 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public Response processPayment(String card_owner, String card_number, Date expiry_date, String cvv, double price,
+    public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv, double price,
             long andIncrement, String name, String deliveryAddress) {
         // Implementation for processing payment with additional parameters
         System.out.println("Processing payment for " + name + " at " + deliveryAddress);
-        return new Response();
+        return new Response<Boolean>();
     }
 } 

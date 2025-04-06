@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-import Application.Responses.Response;
+import Application.Response;
 import Domain.Store.IStoreRepository;
 import Domain.Shopping.IShoppingBasket;
 import Domain.Shopping.IShoppingCart;
@@ -98,7 +98,7 @@ public class MarketFacade implements IMarketFacade {
         } catch (Exception e) {
             throw e;
         }
-        Response res = paymentService.processPayment(card_owner, card_number, expiry_date, cvv, price, paymentID.getAndIncrement(), name, deliveryAddress);
+        Response<Boolean> res = paymentService.processPayment(card_owner, card_number, expiry_date, cvv, price, paymentID.getAndIncrement(), name, deliveryAddress);
 
         if (res.errorOccurred()) {
             throw new RuntimeException("Payment failed: " + res.getErrorMessage());
