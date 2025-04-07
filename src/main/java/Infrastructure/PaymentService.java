@@ -29,4 +29,9 @@ public class PaymentService implements IPaymentService {
         System.out.println("Processing payment for " + name + " at " + deliveryAddress);
         return new Response<Boolean>();
     }
+
+    public void initialize() {
+        // Initialization logic for the payment service
+        System.out.println("Payment service initialized with URL: " + paymentServiceURL);
+    }
 } 

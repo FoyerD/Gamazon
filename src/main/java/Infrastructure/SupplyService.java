@@ -24,5 +24,10 @@ public class SupplyService implements ISupplyService {
         // Implementation for placing an order
         System.out.println("Placing order to be delivered at: " + deliveryAddress);
     }
+
+    public void initialize() {
+        // Initialization logic for the supply service
+        System.out.println("Supply service initialized.");
+    }
     
 } 

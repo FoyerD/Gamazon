@@ -4,4 +4,6 @@ public interface INotificationService {
 
     void sendNotification(String name, String string, String deliveryAddress);
 
+    void initialize();
+
 }

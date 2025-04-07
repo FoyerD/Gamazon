@@ -24,4 +24,9 @@ public class User {
         throw new UnsupportedOperationException("Unimplemented method 'removeUserCart'");
     }
 
+    public String getEmail() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getEmail'");
+    }
+
 }
