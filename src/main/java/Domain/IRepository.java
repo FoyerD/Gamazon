@@ -1,3 +1,5 @@
+package Domain;
+
 public interface IRepository<T, K> {
     // Generic methods for repository
     // T - the type of the item

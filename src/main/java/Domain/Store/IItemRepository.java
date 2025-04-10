@@ -1,5 +1,8 @@
 package Domain.Store;
-import javafx.util.Pair;
+import Domain.IRepository;
+import Domain.Pair;
+
+
 
 public interface IItemRepository extends IRepository<Item, Pair<String, String>>{
     Item getByName(String name);
