@@ -1,5 +1,5 @@
 package Domain.Store;
 
-public interface IOrderRepository {
+public interface IOrderRepository extends IRepository<Order, String> {
     
 }

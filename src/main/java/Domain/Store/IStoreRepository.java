@@ -5,7 +5,7 @@ import java.util.Map;
 import Domain.Shopping.IShoppingBasket;
 import Domain.Shopping.IShoppingCart;
 
-public interface IStoreRepository {
+public interface IStoreRepository extends IRepository<Store, String> {
 
     void checkProductsExist(int storeId, Map<Integer, Item> products);
 
@@ -17,6 +17,6 @@ public interface IStoreRepository {
 
     Store getStore(Object storeId);
 
-    void closeStore(int storeId);
+    void closeStore(String storeId);
 
 }
