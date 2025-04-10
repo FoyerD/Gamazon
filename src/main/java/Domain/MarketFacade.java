@@ -22,8 +22,8 @@ public class MarketFacade implements IMarketFacade {
     private IPaymentService paymentService;
     private ISupplyService supplyService;
     private INotificationService notificationService;
-    private IUserRepository userFacade;
-    private IStoreRepository storeFacade;
+    private IUserRepository userRepository;
+    private IStoreRepository storeRepository;
     private IShoppingBasket shoppingBasket;
     private AtomicLong paymentID = new AtomicLong(0);
 
@@ -44,18 +44,18 @@ public class MarketFacade implements IMarketFacade {
     }
 
     public IUserRepository getUserFacade() { 
-        return userFacade; 
+        return userRepository; 
     }
 
     public IStoreRepository getStoreFacade() { 
-        return storeFacade; 
+        return storeRepository; 
     }
 
     private MarketFacade() {}
 
-    public synchronized void initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
-        this.storeFacade = storeFacade;
-        this.userFacade = userFacade;
+    public synchronized void initFacades(IUserRepository userRepository, IStoreRepository storeRepository) {
+        this.storeRepository = storeRepository;
+        this.userRepository = userRepository;
         this.shoppingBasket = new ShoppingBasket();
     }
 
@@ -68,7 +68,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     public void checkProductsExist(int storeId, Map<Integer, Item> products) {
-        storeFacade.checkProductsExist(storeId, products);
+        storeRepository.checkProductsExist(storeId, products);
     }
 
     public synchronized void updatePaymentService(IPaymentService paymentService) {
@@ -91,10 +91,10 @@ public class MarketFacade implements IMarketFacade {
                         String deliveryAddress, User user,
                         IShoppingCart cart) {
         String sessionId = user.getSessionId();
-        String name = userFacade.userIsMember(sessionId) ? user.getUserName() : sessionId;
+        String name = userRepository.userIsMember(sessionId) ? user.getUserName() : sessionId;
         double price = calculateCartPrice(cart);
         try {
-            storeFacade.removeCartQuantity(cart);
+            storeRepository.removeCartQuantity(cart);
         } catch (Exception e) {
             throw e;
         }
@@ -103,12 +103,12 @@ public class MarketFacade implements IMarketFacade {
         if (res.errorOccurred()) {
             throw new RuntimeException("Payment failed: " + res.getErrorMessage());
         }
-        storeFacade.addCartQuantity(cart);
+        storeRepository.addCartQuantity(cart);
         for (IShoppingBasket basket : cart.getStoreBaskets()) {
-            Store store = storeFacade.getStore(basket.getStoreId());
+            Store store = storeRepository.getStore(basket.getStoreId());
             notificationService.sendNotification(name, "Your order has been placed successfully. Order ID: " + paymentID.get(), deliveryAddress);
             supplyService.placeOrder(store, deliveryAddress, basket.getItems());
-            shoppingBasket.addShoppingBasket(basket, name, storeFacade.calculateBasketPrice(basket));
+            shoppingBasket.addShoppingBasket(basket, name, storeRepository.calculateBasketPrice(basket));
         }
         user.removeUserCart();
     }
@@ -117,7 +117,7 @@ public class MarketFacade implements IMarketFacade {
         double price = 0;
         for (IShoppingBasket basket : cart.getStoreBaskets()) {
             try {
-                price += storeFacade.calculateBasketPrice(basket);
+                price += storeRepository.calculateBasketPrice(basket);
             } catch (Exception e) {
                 throw e;
             }
@@ -162,7 +162,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     public List<IShoppingBasket> getMyShoppingBasketHistory(String sessionId, LocalDateTime StartDateTime, LocalDateTime EndDateTime) {
-        String userName = userFacade.getMemberUserName(sessionId);
+        String userName = userRepository.getMemberUserName(sessionId);
         try {
             return shoppingBasket.getUserShoppingBasketsInRange(userName, StartDateTime, EndDateTime);
         } catch (Exception e) {
@@ -192,11 +192,76 @@ public class MarketFacade implements IMarketFacade {
             throw e;
         }
     }
+
     public List<IShoppingBasket> getUserShoppingBasketsBetween(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         try {
             return shoppingBasket.getUserShoppingBasketsInRange(userName, startDateTime, endDateTime);
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    public void closeStore(int storeId) {
+        try {
+            if (userRepository == null) {
+                throw new IllegalStateException("User repository is not initialized.");
+            }
+    
+            if (notificationService == null) {
+                throw new IllegalStateException("Notification service is not initialized.");
+            }
+    
+            Store store = storeRepository.getStore(storeId);
+            if (store == null) {
+                throw new IllegalArgumentException("Store with ID " + storeId + " does not exist.");
+            }
+    
+            // Notify store owners and managers
+            List<User> storeOwnersAndManagers = store.getOwnersAndManagers();
+            for (User user : storeOwnersAndManagers) {
+                notificationService.sendNotification(
+                    user.getUserName(),
+                    "The store with ID " + storeId + " has been closed.",
+                    user.getEmail()
+                );
+            }
+    
+            store.cancelSubscriptions();
+            storeRepository.closeStore(storeId);
+            System.out.println("Store with ID " + storeId + " has been successfully closed.");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to close the store: " + e.getMessage(), e);
+        }
+    }
+
+    public void openMarket() {
+        try {
+            if (paymentService == null) {
+                throw new IllegalStateException("Payment service is not initialized.");
+            }
+            paymentService.initialize();
+    
+            if (supplyService == null) {
+                throw new IllegalStateException("Supply service is not initialized.");
+            }
+            supplyService.initialize();
+    
+            if (notificationService == null) {
+                throw new IllegalStateException("Notification service is not initialized.");
+            }
+            notificationService.initialize();
+    
+            if (userRepository == null) {
+                throw new IllegalStateException("User repository is not initialized.");
+            }
+            User marketManager = userRepository.getMarketManager();
+            if (marketManager == null) {
+                throw new IllegalStateException("Market manager is not assigned.");
+            }
+    
+            System.out.println("Market has been successfully opened, all services are initialized, and the market manager is assigned.");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to open the market: " + e.getMessage(), e);
         }
     }
 }

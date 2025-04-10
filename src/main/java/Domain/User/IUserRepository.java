@@ -17,4 +17,9 @@ public class IUserRepository {
         throw new UnsupportedOperationException("Unimplemented method 'userIsMember'");
     }
 
+    public User getMarketManager() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMarketManager'");
+    }
+
 }

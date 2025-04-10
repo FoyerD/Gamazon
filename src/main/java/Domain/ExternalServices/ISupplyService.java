@@ -12,4 +12,6 @@ public interface ISupplyService {
     void supplyItem(String itemId, int quantity);
 
     void checkSupplyStatus(String itemId);
+
+    void initialize();
 } 

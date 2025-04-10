@@ -56,4 +56,8 @@ public interface IMarketFacade {
     IStoreRepository getStoreFacade();
 
     List<IShoppingBasket> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    void closeStore(int storeId);
+
+    void openMarket();
 }

@@ -179,4 +179,24 @@ public class MarketService {
             return new Response<>(e.getMessage());
         }
     }
+
+    // implement function closeStore(int storeId) in MarketFacade
+    public Response<Void> closeStore(int storeId) {
+        try {
+            marketFacade.closeStore(storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(e.getMessage());
+        }
+    }
+
+    // implement function open market in MarketFacade
+    public Response<Void> openMarket() {
+        try {
+            marketFacade.openMarket();
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(e.getMessage());
+        }
+    }
 }

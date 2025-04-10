@@ -10,4 +10,8 @@ public class NotificationService implements INotificationService {
         System.out.println("Notification sent to " + name + ": " + string + " at " + deliveryAddress);
     }
 
+    public void initialize() {
+        // Initialization logic for the notification service
+        System.out.println("Notification service initialized.");
+    }
 }

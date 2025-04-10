@@ -17,4 +17,6 @@ public interface IStoreRepository {
 
     Store getStore(Object storeId);
 
+    void closeStore(int storeId);
+
 }
