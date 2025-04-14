@@ -10,7 +10,6 @@ public class Product {
     private String name;
     private Set<Category> categories;
 
-    public class Category {}
     public Product(String productId, String name, Set<Category> categories){
         this.productId = productId;
         this.name = name;

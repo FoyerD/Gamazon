@@ -2,6 +2,7 @@ package Domain.Store;
 
 import java.util.Map;
 
+import Domain.IRepository;
 import Domain.Shopping.IShoppingBasket;
 import Domain.Shopping.IShoppingCart;
 

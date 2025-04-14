@@ -4,16 +4,28 @@ import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
 public class StoreService {
     
-    public boolean addItem(int storeId, int productId){
-        throw new NotImplementedException("Not implemented.");
+    public Response<Boolean> addItem(int storeId, int productId){
+        try {
+            throw new NotImplementedException("Not implemented.");
+        } catch (NotImplementedException ex) {
+        }
+        return new Response<>(false);
     }
 
-    public boolean removeItem(int storeId, int productId){
-        throw new NotImplementedException("Not implemented.");
+    public Response<Boolean> removeItem(int storeId, int productId){
+        try {
+            throw new NotImplementedException("Not implemented.");
+        } catch (NotImplementedException ex) {
+        }
+        return new Response<>(false);
     }    
 
-    public boolean closeStore(int storeId){
-        throw new NotImplementedException("Not implemented.");
+    public Response<Boolean> closeStore(int storeId){
+        try {
+            throw new NotImplementedException("Not implemented.");
+        } catch (NotImplementedException ex) {
+        }
+        return new Response<>(false);
     }
     
 }

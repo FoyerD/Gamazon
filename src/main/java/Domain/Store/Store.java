@@ -5,7 +5,7 @@ import java.util.List;
 import Domain.User.User;
 
 public class Store {
-
+        
     public List<User> getOwnersAndManagers() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getOwnersAndManagers'");
