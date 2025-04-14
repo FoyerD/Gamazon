@@ -105,9 +105,9 @@ public class MarketService {
         }
     }
 
-    public Response<List<IShoppingBasket>> getUserShoppingBaskets(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Response<List<IShoppingBasket>> getUserShoppingBaskets(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime, int storeId, User user) {
         try {
-            return new Response<>(marketFacade.getUserShoppingBaskets(userName, startDateTime, endDateTime));
+            return new Response<>(marketFacade.getUserShoppingBaskets(userName, startDateTime, endDateTime, storeId, user));
         } catch (Exception e) {
             return new Response<>(e.getMessage());
         }
@@ -172,18 +172,18 @@ public class MarketService {
         }
     }
 
-    public Response<List<IShoppingBasket>> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Response<List<IShoppingBasket>> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime, int storeId, User user) {
         try {
-            return new Response<>(marketFacade.getMyShoppingBasketHistory(sessionId, startDateTime, endDateTime));
+            return new Response<>(marketFacade.getMyShoppingBasketHistory(sessionId, startDateTime, endDateTime, storeId, user));
         } catch (Exception e) {
             return new Response<>(e.getMessage());
         }
     }
 
     // implement function closeStore(int storeId) in MarketFacade
-    public Response<Void> closeStore(int storeId) {
+    public Response<Void> closeStore(int storeId,  User user) {
         try {
-            marketFacade.closeStore(storeId);
+            marketFacade.closeStore(storeId, user);
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(e.getMessage());
