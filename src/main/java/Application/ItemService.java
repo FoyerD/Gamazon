@@ -51,6 +51,14 @@ public class ItemService {
        return new Response<>();
    }
 
+   public Response<List<Item>> getItemsByName(String name){
+       try {
+           throw new NotImplementedException("Not Implemented.");
+       } catch (NotImplementedException ex) {
+       }
+       return new Response<>();
+   }
+
    public Response<List<Item>> getAvailableItems(String productId){
        try {
            throw new NotImplementedException("Not Implemented.");
@@ -58,4 +66,6 @@ public class ItemService {
        }
        return new Response<>();
    }
+
+
 }

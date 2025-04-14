@@ -8,9 +8,10 @@ public class Item {
     private float price;
     private int amount;
     private String description;
+    private float rating;
 
 
-    public Item(String storeId, String productId, float price, int amount, String description) {
+    public Item(String storeId, String productId, float price, int amount, float rating,  String description) {
         this.storeId = storeId;
         this.productId = productId;
         this.price = price;
