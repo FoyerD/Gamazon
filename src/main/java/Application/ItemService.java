@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import Domain.Store.Item;
+import Domain.Store.ItemFilter;
 import Domain.Store.Store;
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
@@ -26,6 +27,14 @@ public class ItemService {
        return new Response<>();
    }
    
+   public Response<List<Item>> filterItems(ItemFilter filter){
+       try {
+           throw new NotImplementedException("Not Implemented.");
+       } catch (NotImplementedException ex) {
+       }
+       return new Response<>();
+   }
+
    public Response<Item> getItem(String storeId, String productId){
        try {
            throw new NotImplementedException("Not Implemented.");

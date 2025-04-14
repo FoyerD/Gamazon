@@ -37,7 +37,7 @@ public class Item {
     public String getDescription() {
         return description;
     }
-
+    
     public void setAmount(int amount) {
         if (amount < 0) {
             throw new IllegalArgumentException("Amount cannot be negative");
