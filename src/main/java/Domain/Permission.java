@@ -40,7 +40,7 @@ public class Permission {
     public Permission(String permissionGiverName, String member) {
         this.permissionGiverName = permissionGiverName;
         this.member = member;
-        this.role = RoleType.STORE_MANAGER;
+        this.role = null;
         this.permissions = new HashSet<>();
     }
 
@@ -75,12 +75,20 @@ public class Permission {
         return permissions.contains(permissionType);
     }
 
-    public int permissionsBitMap() {
-        int bitmap = 0;
-        for (PermissionType perm : permissions) {
-            bitmap |= perm.ordinal(); // optional: use a custom number if desired
-        }
-        return bitmap;
+    public Set<PermissionType> getPermissions() {
+        return new HashSet<>(permissions);
+    }
+
+    public void addPermission(PermissionType permission) {
+        permissions.add(permission);
+    }
+
+    public void removePermission(PermissionType permission) {
+        permissions.remove(permission);
+    }
+
+    public void clearPermissions() {
+        permissions.clear();
     }
 
     public boolean isStoreOwner() {
@@ -101,39 +109,5 @@ public class Permission {
 
     public String getMember() {
         return member;
-    }
-
-    public Set<PermissionType> getPermissions() {
-        return new HashSet<>(permissions);
-    }
-
-    public void addPermission(PermissionType permission) {
-        permissions.add(permission);
-    }
-    
-    public void removePermission(PermissionType permission) {
-        permissions.remove(permission);
-    }
-
-    public void clearPermissions() {
-        permissions.clear();
-    }
-
-    public boolean hasAnyPermission(Set<PermissionType> permissionTypes) {
-        for (PermissionType permission : permissionTypes) {
-            if (permissions.contains(permission)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasAllPermissions(Set<PermissionType> permissionTypes) {
-        for (PermissionType permission : permissionTypes) {
-            if (!permissions.contains(permission)) {
-                return false;
-            }
-        }
-        return true;
     }
 }
