@@ -7,7 +7,7 @@ import Domain.Shopping.IShoppingCart;
 
 public interface IStoreRepository {
 
-    Store getStore(Object storeId);
+    Store getStore(int storeId);
 
     void closeStore(String storeId);
 

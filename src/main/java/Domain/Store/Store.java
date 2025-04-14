@@ -26,6 +26,7 @@ public class Store {
         throw new UnsupportedOperationException("Unimplemented method 'respondToMessage'");
     }
 
+    // TODO: It will be removed and we'll use the PastItems class instead
     public List<IShoppingBasket> getStorePurchaseHistory(LocalDateTime from, LocalDateTime to) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getStorePurchaseHistory'");
