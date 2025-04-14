@@ -1,11 +1,20 @@
 package Domain.User;
 
 public abstract class User {
-    public String getName() {
-        throw new UnsupportedOperationException("Not implemented!!");
+    private String username;
+
+    boolean isLoggedIn;
+
+    public User(String username) {
+        this.username = username;
+        isLoggedIn = true;
     }
 
-    public boolean login(String password) {
-        throw new UnsupportedOperationException("Mot implemented!!");
+    public String getName() {
+        return username;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
     }
 }

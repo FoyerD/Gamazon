@@ -12,12 +12,20 @@ public class Response<T> {
         this.errorMessage = "";
         this.value = null;
     }
+    
 
     public Response(String errorMessage) {
         this.errorMessage = errorMessage;
         this.value = null;
     }
 
+    public static <T> Response<T> error(String errorMessage) {
+        return new Response<>(errorMessage);
+    }
+
+    public static <T> Response<T> success(T value) {
+        return new Response<>(value);
+    }
 
     public String getErrorMessage() {
         return errorMessage;

@@ -1,5 +1,7 @@
 package Application;
 
+import Domain.User.User;
+
 public class UserDTO {
     
     private String username;
@@ -9,6 +11,7 @@ public class UserDTO {
         this.username = username;
         this.sessionToken = sessionToken;
     }
+
 
     public String getUsername() {
         return username;
