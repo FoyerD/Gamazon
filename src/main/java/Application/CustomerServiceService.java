@@ -20,8 +20,12 @@ public class CustomerServiceService {
         }
     }
 
-    
-
-
-    
+    public Response<Void> addFeedback(String customerId, String storeId, String productId, String comment) {
+        try {
+            // Assuming storeRepository has a method to add feedback
+            return new Response<>();
+        } catch (Exception ex) {
+            return new Response<>(ex.getMessage());
+        }
+    }
 }
