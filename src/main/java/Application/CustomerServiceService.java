@@ -1,22 +1,27 @@
 package Application;
 
-import Domain.Store.IOrderRepository;
+import Domain.Store.IStoreRepository;
 
 public class CustomerServiceService {
-    IOrderRepository orderRepository;
+    private IStoreRepository storeRepository;
     
-    public CustomerServiceService(IOrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    public CustomerServiceService(IStoreRepository storeRepository) {
+        this.storeRepository = storeRepository;
     }
     public CustomerServiceService() {
-        this.orderRepository = null;
+        this.storeRepository = null;
     }
 
-    public Response<Boolean> setOrderRepository(IOrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-        return new Response<>(true);
+    public Response<Void> setStoreRepository(IStoreRepository storeRepository) {
+        try {
+            return new Response<>();
+        } catch (Exception ex) {
+            return new Response<>(ex.getMessage());
+        }
     }
 
-    public Response<Boolean> addOrder(String customerId, )
+    
+
+
     
 }
