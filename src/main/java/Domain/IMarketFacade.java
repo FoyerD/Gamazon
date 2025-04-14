@@ -37,8 +37,7 @@ public interface IMarketFacade {
 
     List<IShoppingBasket> getStoreShoppingBaskets(int storeId);
 
-    List<IShoppingBasket> getUserShoppingBaskets(String userName, LocalDateTime startDateTime,
-                             LocalDateTime endDateTime);
+    List<IShoppingBasket> getUserShoppingBaskets(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime, int storeId, User requester);
 
     List<IShoppingBasket> getUserShoppingBasketsBetween(String userName, LocalDateTime startDateTime,
                              LocalDateTime endDateTime);
@@ -55,9 +54,9 @@ public interface IMarketFacade {
 
     IStoreRepository getStoreFacade();
 
-    List<IShoppingBasket> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    List<IShoppingBasket> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime, int storeId, User requester);
 
-    void closeStore(int storeId);
+    void closeStore(int storeId, User user);
 
     void openMarket();
 }
