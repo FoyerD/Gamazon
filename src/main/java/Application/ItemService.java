@@ -67,5 +67,13 @@ public class ItemService {
        return new Response<>();
    }
 
+   public Response<Void> addRating(String storeId, String productId, float rating){
+       try {
+           throw new NotImplementedException("Not Implemented.");
+       } catch (NotImplementedException ex) {
+       }
+       return new Response<>();
+    }
+   
 
 }

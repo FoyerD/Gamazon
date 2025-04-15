@@ -6,6 +6,7 @@ public class Response<T> {
 
     public Response(T value) {
         this.value = value;
+        this.errorMessage = null;
     }
 
     public Response() {
