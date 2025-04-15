@@ -33,7 +33,7 @@ public class MarketService {
             marketFacade.updatePaymentService(paymentService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -42,7 +42,7 @@ public class MarketService {
             marketFacade.updateNotificationService(notificationService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -51,7 +51,7 @@ public class MarketService {
             marketFacade.updateSupplyService(supplyService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -60,7 +60,7 @@ public class MarketService {
             marketFacade.updatePaymentServiceURL(url);
             return new Response<>(null);
         } catch (IOException e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -69,7 +69,7 @@ public class MarketService {
             marketFacade.initFacades(userFacade, storeFacade);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -77,7 +77,7 @@ public class MarketService {
         try {
             return new Response<>(marketFacade.getNotificationService());
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -86,7 +86,7 @@ public class MarketService {
             marketFacade.manageStoreInventory(storeId, productQuantities);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -95,7 +95,7 @@ public class MarketService {
             marketFacade.appointStoreManager(appointerUsername, appointeeUsername, storeId);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -104,7 +104,7 @@ public class MarketService {
             marketFacade.removeStoreManager(removerUsername, managerUsername, storeId);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -113,7 +113,7 @@ public class MarketService {
             marketFacade.appointStoreOwner(appointerUsername, appointeeUsername, storeId);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -122,7 +122,7 @@ public class MarketService {
             marketFacade.changeManagerPermissions(ownerUsername, managerUsername, storeId, newPermissions);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -131,7 +131,7 @@ public class MarketService {
             marketFacade.closeStore(storeId, user);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -140,7 +140,7 @@ public class MarketService {
             marketFacade.marketCloseStore(storeId, user);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -148,7 +148,7 @@ public class MarketService {
         try {
             return new Response<>(marketFacade.getManagersPermissions(storeId));
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -157,7 +157,7 @@ public class MarketService {
             marketFacade.respondToUserMessage(storeId, messageId, response);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -165,7 +165,7 @@ public class MarketService {
         try {
             return new Response<>(marketFacade.getStorePurchaseHistory(storeId, from, to));
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -174,7 +174,7 @@ public class MarketService {
             marketFacade.openMarket();
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 }

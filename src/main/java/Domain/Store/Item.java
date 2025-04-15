@@ -47,4 +47,9 @@ public class Item {
         }
         this.amount = amount;
     }
+
+    public void setQuantity(Integer value) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setQuantity'");
+    }
 }

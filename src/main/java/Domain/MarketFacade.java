@@ -72,7 +72,7 @@ public class MarketFacade implements IMarketFacade {
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Item item = store.getItemById(entry.getKey());
             if (item != null) 
-                item.setQuantity(entry.getValue());
+                item.setAmount(entry.getValue());
         }
     }
 
