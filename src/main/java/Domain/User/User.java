@@ -1,11 +1,32 @@
 package Domain.User;
 
-public abstract class User {
-    public String getName() {
-        throw new UnsupportedOperationException("Not implemented!!");
+import Domain.Shopping.IShoppingCart;
+
+public class User {
+
+    public IShoppingCart getUserShoppingCart() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUserShoppingCart'");
     }
 
-    public boolean login(String password) {
-        throw new UnsupportedOperationException("Mot implemented!!");
+    public String getSessionId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSessionId'");
     }
+
+    public String getUserName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUserName'");
+    }
+
+    public void removeUserCart() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'removeUserCart'");
+    }
+
+    public String getEmail() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getEmail'");
+    }
+
 }
