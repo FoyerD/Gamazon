@@ -41,6 +41,18 @@ public class PermissionTest {
     }
 
     @Test
+    public void testInitTradingManager() {
+        permission.initTradingManager();
+        assertFalse(permission.isStoreManager());
+        assertFalse(permission.isStoreOwner());
+        assertFalse(permission.isStoreFounder());
+        assertTrue(permission.hasPermission(PermissionType.HANDLE_INVENTORY));
+        assertTrue(permission.hasPermission(PermissionType.EDIT_STORE_POLICIES));
+        assertTrue(permission.hasPermission(PermissionType.VIEW_EMPLOYEE_INFO));
+        assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
+    }
+
+    @Test
     public void testInitStoreOwner() {
         permission.initStoreOwner();
         assertFalse(permission.isStoreManager());
@@ -150,5 +162,47 @@ public class PermissionTest {
         permission.initStoreOwner();
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+    }
+
+    // add test which includes setting new permissions and checking if the permission is set correctly and switching between permissions
+    @Test
+    public void testSwitchPermissions() {
+        permission.initStoreManager();
+        assertTrue(permission.isStoreManager());
+        assertFalse(permission.isStoreOwner());
+        permission.initStoreOwner();
+        assertFalse(permission.isStoreManager());
+        assertTrue(permission.isStoreOwner());
+        permission.initStoreFounder();
+        assertFalse(permission.isStoreManager());
+        assertFalse(permission.isStoreOwner());
+        assertTrue(permission.isStoreFounder());
+        permission.initTradingManager();
+        assertFalse(permission.isStoreManager());
+        assertFalse(permission.isStoreOwner());
+        assertFalse(permission.isStoreFounder());
+        assertTrue(permission.hasPermission(PermissionType.HANDLE_INVENTORY));
+        assertTrue(permission.hasPermission(PermissionType.EDIT_STORE_POLICIES));
+        assertTrue(permission.hasPermission(PermissionType.VIEW_EMPLOYEE_INFO));
+        assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
+        assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+        permission.setPermissions(Set.of(
+            PermissionType.SUPERVISE_MANAGERS,
+            PermissionType.ASSIGN_OR_REMOVE_OWNERS,
+            PermissionType.MODIFY_OWNER_RIGHTS,
+            PermissionType.HANDLE_INVENTORY,
+            PermissionType.EDIT_STORE_POLICIES,
+            PermissionType.VIEW_EMPLOYEE_INFO,
+            PermissionType.ACCESS_PURCHASE_RECORDS,
+            PermissionType.ADMINISTER_STORE,
+            PermissionType.OVERSEE_OFFERS,
+            PermissionType.CONTROL_CONTRACTS
+        ));
+        assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
+        assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+
+        assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
+        permission.removePermission(PermissionType.SUPERVISE_MANAGERS);
+        assertFalse(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
     }
 }
