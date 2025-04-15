@@ -1,6 +1,5 @@
 package Domain.Store;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,4 +32,11 @@ public class StoreRepositoryMemory implements IStoreRepository{
         return this.stores.put(id, store);
     }
 
+    @Override
+    public Store getStoreByName(String name) {
+        for (Store store : stores.values()) {
+            if (store.getName().equals(name)) return store;
+        }
+        return null;
+    }
 }

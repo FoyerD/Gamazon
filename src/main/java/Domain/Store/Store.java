@@ -16,6 +16,7 @@ public class Store {
     private String foudnerId;
     private Set<String> owners;
     private Set<String> managers;
+    private boolean isOpen;
 
     public Store(){
         this.id = null;
@@ -24,7 +25,9 @@ public class Store {
         this.foudnerId = null;
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
+        this.isOpen = true;
     }
+    
     public Store(String id, String name, String descripsion, String foudnerId) {
         this.id = id;
         this.name = name;
@@ -32,6 +35,7 @@ public class Store {
         this.foudnerId = foudnerId;
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
+        this.isOpen = true;
     }
 
     public String getId() {
@@ -76,5 +80,18 @@ public class Store {
         return this.managers.add(userId);
     }
 
+    public boolean isOpen() {
+        return isOpen;
+    }
+    public void setOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+    
+    public boolean removeOwner(String userId) {
+        return this.owners.remove(userId);
+    }
+    public boolean removeManager(String userId) {
+        return this.managers.remove(userId);
+    }
 
 }
