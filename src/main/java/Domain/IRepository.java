@@ -1,10 +1,11 @@
 package Domain;
 
-public interface IRepository<T, K> {
+public interface IRepository<V, K> {
     // Generic methods for repository
-    // T - the type of the item
+    // V - the type of the value
     // K - the type of the key (ID)
-    void add(T item);
-    void remove(K id);
-    T get(K id);
+    boolean add(K key, V value);
+    V remove(K id);
+    V get(K id);
+    V update(K id, V value);
 }

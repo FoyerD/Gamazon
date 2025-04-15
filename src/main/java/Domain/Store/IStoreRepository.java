@@ -8,16 +8,16 @@ import Domain.Shopping.IShoppingCart;
 
 public interface IStoreRepository extends IRepository<Store, String> {
 
-    void checkProductsExist(int storeId, Map<Integer, Item> products);
+    //void checkProductsExist(int storeId, Map<Integer, Item> products);
 
-    double calculateBasketPrice(IShoppingBasket basket);
+    //double calculateBasketPrice(IShoppingBasket basket);
 
-    void removeCartQuantity(IShoppingCart cart);
+    //void removeCartQuantity(IShoppingCart cart);
 
-    void addCartQuantity(IShoppingCart cart);
+    //void addCartQuantity(IShoppingCart cart);
 
-    Store getStore(Object storeId);
+    //Store getStore(Object storeId);
 
-    void closeStore(int storeId);
+    //void closeStore(int storeId);
 
 }
