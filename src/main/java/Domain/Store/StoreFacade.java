@@ -1,7 +1,5 @@
 package Domain.Store;
 
-import Application.Response;
-
 public class StoreFacade {
     private IStoreRepository storeRepository;
 
@@ -27,5 +25,16 @@ public class StoreFacade {
     }
     public Store getStoreByName(String name) {
         return storeRepository.getStoreByName(name);
+    }
+
+    public boolean openStore(String storeId){
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found.");
+        if(store.isOpen()) throw new RuntimeException("Store is already open.");
+
+        store.setOpen(true);
+        Store newStore = this.storeRepository.update(storeId, store);
+        if(!store.equals(newStore)) throw new RuntimeException("Store not updated.");
+        return true;
     }
 }

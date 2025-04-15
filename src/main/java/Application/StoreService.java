@@ -21,24 +21,28 @@ public class StoreService {
         try {
             if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
             
-            //session logic
+            //TODO!: session logic
             String userId = sessionId; // Assuming sessionId is the userId
             Store store = storeFacade.addStore(name, description, userId);
             return new Response<>(store != null);
 
         } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
         }
-        return new Response<>(false);
     }
 
 
 
     public Response<Boolean> openStore(String storeId, String founderId){
         try {
-            throw new NotImplementedException("Not implemented.");
-        } catch (NotImplementedException ex) {
+            if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
+
+            //TODO!: session logic
+            boolean result = this.storeFacade.openStore(storeId);
+            return new Response<>(result);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
         }
-        return new Response<>(false);
     }
 
 }
