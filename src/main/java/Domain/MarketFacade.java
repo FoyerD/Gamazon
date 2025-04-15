@@ -165,7 +165,7 @@ public class MarketFacade implements IMarketFacade {
         notificationService.initialize();
         User manager = userRepository.getMarketManager();
         Permission founder = new Permission("system", manager.getUserName());
-        founder.initStoreFounder();
+        founder.initTradingManager();
         storePermissions.computeIfAbsent(-1, x -> new HashMap<>()).put(manager.getUserName(), founder);
         System.out.println("Market opened.");
     }

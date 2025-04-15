@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class Permission {
 
-    // Store founder according to Section 4
+    // Store owner according to Section 4
     public static final Set<PermissionType> OWNER_PERMISSIONS = Set.of(
         PermissionType.SUPERVISE_MANAGERS,
         PermissionType.ASSIGN_OR_REMOVE_OWNERS,
@@ -16,15 +16,30 @@ public class Permission {
         PermissionType.ACCESS_PURCHASE_RECORDS,
         PermissionType.ADMINISTER_STORE,
         PermissionType.OVERSEE_OFFERS,
-        PermissionType.CONTROL_CONTRACTS,
-        PermissionType.DEACTIVATE_STORE
+        PermissionType.CONTROL_CONTRACTS
+    );
+
+    // Manages the trading system according to Section 4
+    public static final Set<PermissionType> FOUNDER_PERMISSIONS = Set.of(
+        PermissionType.ASSIGN_OR_REMOVE_OWNERS,
+        PermissionType.SUPERVISE_MANAGERS,
+        PermissionType.DEACTIVATE_STORE,
+        PermissionType.HANDLE_INVENTORY,
+        PermissionType.EDIT_STORE_POLICIES,
+        PermissionType.MODIFY_OWNER_RIGHTS,
+        PermissionType.VIEW_EMPLOYEE_INFO,
+        PermissionType.ACCESS_PURCHASE_RECORDS,
+        PermissionType.ADMINISTER_STORE,
+        PermissionType.OVERSEE_OFFERS,
+        PermissionType.CONTROL_CONTRACTS
     );
 
     // Manages a store according to Section 5
     public static final Set<PermissionType> MANAGER_PERMISSIONS = Set.of(PermissionType.ACCESS_PURCHASE_RECORDS);    
-    
-    // Manages the trading system according to Section 6
-    public static final Set<PermissionType> FOUNDER_PERMISSIONS = Set.of(
+
+    // Trading system manager according to Section 6
+
+    public static final Set<PermissionType> TRADING_PERMISSIONS = Set.of(
         PermissionType.ASSIGN_OR_REMOVE_OWNERS,
         PermissionType.SUPERVISE_MANAGERS,
         PermissionType.DEACTIVATE_STORE,
@@ -63,6 +78,11 @@ public class Permission {
     public void initStoreFounder() {
         this.role = RoleType.STORE_FOUNDER;
         this.permissions = new HashSet<>(FOUNDER_PERMISSIONS);
+    }
+
+    public void initTradingManager() {
+        this.role = RoleType.TRADING_MANAGER;
+        this.permissions = new HashSet<>(TRADING_PERMISSIONS);
     }
 
     public void setPermissions(Set<PermissionType> permissionTypes) {
