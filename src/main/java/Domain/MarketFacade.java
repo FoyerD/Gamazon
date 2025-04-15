@@ -115,7 +115,6 @@ public class MarketFacade implements IMarketFacade {
         Store store = storeRepository.getStore(storeId);
         if (store == null) 
             throw new IllegalArgumentException("Store not found.");
-        store.cancelSubscriptions();
         storeRepository.closeStore(String.valueOf(storeId));
         notificationService.sendNotification(user.getUserName(), "Store " + storeId + " has been closed.");
     }
@@ -126,6 +125,7 @@ public class MarketFacade implements IMarketFacade {
         Store store = storeRepository.getStore(storeId);
         if (store == null) 
             throw new IllegalArgumentException("Store not found.");
+        store.cancelSubscriptions();
         storeRepository.closeStore(String.valueOf(storeId));
         notificationService.sendNotification(user.getUserName(), "Store " + storeId + " has been closed.");
     }
