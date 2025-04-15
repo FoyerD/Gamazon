@@ -2,6 +2,8 @@ package Domain.Store;
 
 import java.util.List;
 
+import Domain.Pair;
+
 public class ItemFacade {
     private IItemRepository itemRepository;
 
@@ -29,5 +31,17 @@ public class ItemFacade {
     
     public List<Item> getAvailableItems(){
         return itemRepository.getAvailabeItems();
+    }
+
+    public void update(Pair<String, String> id, Item item) {
+        itemRepository.update(id, item);
+    }
+    
+    public boolean add(Pair<String, String> id, Item item) {
+        return itemRepository.add(id, item);
+    }
+
+    public Item remove(Pair<String, String> id) {
+        return itemRepository.remove(id);
     }
 }

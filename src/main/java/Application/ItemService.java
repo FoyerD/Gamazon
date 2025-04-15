@@ -2,6 +2,7 @@ package Application;
 
 import java.util.List;
 
+import Domain.Pair;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
@@ -73,4 +74,33 @@ public class ItemService {
             return new Response<>(new Error(ex.getMessage()));
         }
    }
+
+    public Response<Void> update(Pair<String, String> id, Item item) {
+        try {
+            itemFacade.update(id, item);
+            return new Response<>();
+        }
+        catch(Exception ex){
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<Boolean> add(Pair<String, String> id, Item item) {
+        try {
+            return new Response<>(itemFacade.add(id, item));
+        }
+        catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+
+    public Response<Item> remove(Pair<String, String> id) {
+        try {
+            return new Response<>(itemFacade.remove(id));
+        } 
+        catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
 }
