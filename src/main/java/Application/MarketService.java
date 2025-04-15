@@ -135,6 +135,15 @@ public class MarketService {
         }
     }
 
+    public Response<Void> marketCloseStore(int storeId, User user) {
+        try {
+            marketFacade.marketCloseStore(storeId, user);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(e.getMessage());
+        }
+    }
+
     public Response<Map<String, List<PermissionType>>> getManagersPermissions(int storeId) {
         try {
             return new Response<>(marketFacade.getManagersPermissions(storeId));

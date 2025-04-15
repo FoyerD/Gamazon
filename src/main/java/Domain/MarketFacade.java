@@ -121,6 +121,16 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
+    public void marketCloseStore(int storeId, User user) {
+        checkPermission(user.getUserName(), storeId, PermissionType.DEACTIVATE_STORE);
+        Store store = storeRepository.getStore(storeId);
+        if (store == null) 
+            throw new IllegalArgumentException("Store not found.");
+        storeRepository.closeStore(String.valueOf(storeId));
+        notificationService.sendNotification(user.getUserName(), "Store " + storeId + " has been closed.");
+    }
+
+    @Override
     public Map<String, List<PermissionType>> getManagersPermissions(int storeId) {
         Map<String, List<PermissionType>> result = new HashMap<>();
         Map<String, Permission> storeMap = storePermissions.get(storeId);

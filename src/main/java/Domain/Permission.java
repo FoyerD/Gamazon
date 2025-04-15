@@ -5,31 +5,37 @@ import java.util.Set;
 
 public class Permission {
 
-    public static final Set<PermissionType> MANAGER_PERMISSIONS = Set.of(PermissionType.ACCESS_PURCHASE_RECORDS);
+    // Store founder according to Section 4
     public static final Set<PermissionType> OWNER_PERMISSIONS = Set.of(
-            PermissionType.SUPERVISE_MANAGERS,
-            PermissionType.ASSIGN_OR_REMOVE_OWNERS,
-            PermissionType.MODIFY_OWNER_RIGHTS,
-            PermissionType.HANDLE_INVENTORY,
-            PermissionType.EDIT_STORE_POLICIES,
-            PermissionType.VIEW_EMPLOYEE_INFO,
-            PermissionType.ACCESS_PURCHASE_RECORDS,
-            PermissionType.ADMINISTER_STORE,
-            PermissionType.OVERSEE_OFFERS,
-            PermissionType.CONTROL_CONTRACTS
+        PermissionType.SUPERVISE_MANAGERS,
+        PermissionType.ASSIGN_OR_REMOVE_OWNERS,
+        PermissionType.MODIFY_OWNER_RIGHTS,
+        PermissionType.HANDLE_INVENTORY,
+        PermissionType.EDIT_STORE_POLICIES,
+        PermissionType.VIEW_EMPLOYEE_INFO,
+        PermissionType.ACCESS_PURCHASE_RECORDS,
+        PermissionType.ADMINISTER_STORE,
+        PermissionType.OVERSEE_OFFERS,
+        PermissionType.CONTROL_CONTRACTS,
+        PermissionType.DEACTIVATE_STORE
     );
+
+    // Manages a store according to Section 5
+    public static final Set<PermissionType> MANAGER_PERMISSIONS = Set.of(PermissionType.ACCESS_PURCHASE_RECORDS);    
+    
+    // Manages the trading system according to Section 6
     public static final Set<PermissionType> FOUNDER_PERMISSIONS = Set.of(
-            PermissionType.ASSIGN_OR_REMOVE_OWNERS,
-            PermissionType.SUPERVISE_MANAGERS,
-            PermissionType.DEACTIVATE_STORE,
-            PermissionType.HANDLE_INVENTORY,
-            PermissionType.EDIT_STORE_POLICIES,
-            PermissionType.MODIFY_OWNER_RIGHTS,
-            PermissionType.VIEW_EMPLOYEE_INFO,
-            PermissionType.ACCESS_PURCHASE_RECORDS,
-            PermissionType.ADMINISTER_STORE,
-            PermissionType.OVERSEE_OFFERS,
-            PermissionType.CONTROL_CONTRACTS
+        PermissionType.ASSIGN_OR_REMOVE_OWNERS,
+        PermissionType.SUPERVISE_MANAGERS,
+        PermissionType.DEACTIVATE_STORE,
+        PermissionType.HANDLE_INVENTORY,
+        PermissionType.EDIT_STORE_POLICIES,
+        PermissionType.MODIFY_OWNER_RIGHTS,
+        PermissionType.VIEW_EMPLOYEE_INFO,
+        PermissionType.ACCESS_PURCHASE_RECORDS,
+        PermissionType.ADMINISTER_STORE,
+        PermissionType.OVERSEE_OFFERS,
+        PermissionType.CONTROL_CONTRACTS
     );
 
     private final String member;
