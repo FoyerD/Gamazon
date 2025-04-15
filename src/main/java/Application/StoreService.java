@@ -23,13 +23,7 @@ public class StoreService {
         return new Response<>(false);
     }
 
-    public Response<Boolean> closeStore(String sessionId, String storeId){
-        try {
-            throw new NotImplementedException("Not implemented.");
-        } catch (NotImplementedException ex) {
-        }
-        return new Response<>(false);
-    }
+
 
     public Response<Boolean> openStore(String storeId, String founderId){
         try {

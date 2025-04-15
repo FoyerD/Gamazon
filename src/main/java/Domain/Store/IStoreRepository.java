@@ -18,6 +18,6 @@ public interface IStoreRepository extends IRepository<Store, String> {
 
     Store getStore(Object storeId);
 
-    void closeStore(String storeId);
+    void closeStore(int storeId);
 
 }
