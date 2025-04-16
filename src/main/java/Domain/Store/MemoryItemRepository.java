@@ -36,8 +36,8 @@ public class MemoryItemRepository implements IItemRepository{
     }
 
     @Override
-    public void update(Pair<String, String> id, Item item) {
-        items.computeIfPresent(id, (k, v) -> item);
+    public Item update(Pair<String, String> id, Item item) {
+        return items.computeIfPresent(id, (k, v) -> item);
     }
 
     @Override

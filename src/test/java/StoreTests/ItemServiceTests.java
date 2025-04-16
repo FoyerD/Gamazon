@@ -13,7 +13,9 @@ import org.junit.Test;
 import Application.ItemService;
 import Application.Response;
 import Domain.Store.Item;
+import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
+import Domain.Store.MemoryItemRepository;
 
 public class ItemServiceTests {
 
@@ -21,7 +23,7 @@ public class ItemServiceTests {
 
     @Before
     public void setUp() {
-        itemService = new ItemService(); // In real use, you would inject test repositories
+        itemService = new ItemService(new ItemFacade(new MemoryItemRepository())); // In real use, you would inject test repositories
     }
 
     @Test
@@ -115,7 +117,7 @@ public class ItemServiceTests {
 
     @Test
     public void testChangePrice_positiveCase() {
-        Response<Boolean> response = itemService.changePrice(1, 101, 199.99f);
+        Response<Boolean> response = itemService.changePrice("1", "101", 199.99f);
 
         assertFalse("Expected successful price change", response.errorOccurred());
         assertTrue("Price change should return true", Boolean.TRUE.equals(response.getValue()));
@@ -123,7 +125,7 @@ public class ItemServiceTests {
 
     @Test
     public void testChangePrice_negativeCase_invalidPrice() {
-        Response<Boolean> response = itemService.changePrice(1, 101, -50.0f);
+        Response<Boolean> response = itemService.changePrice("1", "101", -50.0f);
 
         assertTrue("Expected error on negative price", response.errorOccurred());
         assertNotNull(response.getErrorMessage());

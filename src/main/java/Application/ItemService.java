@@ -75,26 +75,15 @@ public class ItemService {
         }
    }
 
-<<<<<<< HEAD
    public Response<Void> addRating(String storeId, String productId, float rating){
        try {
-           throw new NotImplementedException("Not Implemented.");
-       } catch (NotImplementedException ex) {
+           throw new UnsupportedOperationException("Not Implemented.");
+       } catch (UnsupportedOperationException ex) {
        }
        return new Response<>();
     }
    
-=======
-    public Response<Void> update(Pair<String, String> id, Item item) {
-        try {
-            itemFacade.update(id, item);
-            return new Response<>();
-        }
-        catch(Exception ex){
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
->>>>>>> v1
+
 
     public Response<Boolean> add(Pair<String, String> id, Item item) {
         try {
