@@ -15,7 +15,7 @@ public class StoreService {
         this.storeRepository = storeRepository;
     }
 
-    public Response<Boolean> addStore(String sessionId, String name, String address, String description) {
+    public Response<Boolean> addStore(String sessionId, String name, String description) {
         try {
             throw new NotImplementedException("Not implemented.");
         } catch (NotImplementedException ex) {
@@ -25,7 +25,7 @@ public class StoreService {
 
 
 
-    public Response<Boolean> openStore(String storeId, String founderId){
+    public Response<Boolean> openStore(String sessionId, String storeId){
         try {
             throw new NotImplementedException("Not implemented.");
         } catch (NotImplementedException ex) {

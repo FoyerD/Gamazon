@@ -12,7 +12,7 @@ public class CustomerServiceService {
         this.storeRepository = null;
     }
 
-    public Response<Void> setStoreRepository(IStoreRepository storeRepository) {
+    public Response<Boolean> setStoreRepository(IStoreRepository storeRepository) {
         try {
             return new Response<>();
         } catch (Exception ex) {
@@ -20,7 +20,7 @@ public class CustomerServiceService {
         }
     }
 
-    public Response<Void> addFeedback(String customerId, String storeId, String productId, String comment) {
+    public Response<Boolean> addFeedback(String customerId, String storeId, String productId, String comment) {
         try {
             // Assuming storeRepository has a method to add feedback
             return new Response<>();
