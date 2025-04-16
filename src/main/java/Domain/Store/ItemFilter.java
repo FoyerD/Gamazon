@@ -7,10 +7,11 @@ import java.util.Set;
 
 public class ItemFilter {
     private final Set<Category> categories; 
-    private final float minPrice;
-    private final float maxPrice;
-    private final float maxRating;
-    private final float minRating;
+    private final double minPrice;
+    private final double maxPrice;
+    private final double maxRating;
+    private final double minRating;
+    private final String itemName;
 
     private ItemFilter(Builder builder) {
         this.categories = builder.categories;
@@ -18,14 +19,16 @@ public class ItemFilter {
         this.maxPrice = builder.maxPrice;
         this.maxRating = builder.maxRating;
         this.minRating = builder.minRating;
+        this.itemName = builder.itemName;
     }
 
     public boolean matchesFilter(Item item){
-        // if (minPrice >= 0 && item.getPrice() < minPrice) return false;
-        // if (maxPrice >= 0 && item.getPrice() > maxPrice) return false;
-        // if (minRating >= 0 && item.getRating() < minRating) return false;
-        // if (maxRating >= 0 && item.getRating() > maxRating) return false;
-        // if (!categories.isEmpty() && !categories.contains(item.getCategory())) return false;
+        if (minPrice >= 0 && item.getPrice() < minPrice) return false;
+        if (maxPrice >= 0 && item.getPrice() > maxPrice) return false;
+        if (minRating >= 0 && item.getRating() < minRating) return false;
+        if (maxRating >= 0 && item.getRating() > maxRating) return false;
+        if (!categories.isEmpty() && !categories.containsAll(item.getCategories())) return false;
+        if (!itemName.equals("") && !item.getProductName().contains(itemName)) return false;
         return true;
     }
 
@@ -33,29 +36,33 @@ public class ItemFilter {
         return categories;
     }
 
-    public float getMinPrice() {
+    public double getMinPrice() {
         return minPrice;
     }
 
-    public float getMaxPrice() {
+    public double getMaxPrice() {
         return maxPrice;
     }
 
-    public float getMinRating() {
+    public double getMinRating() {
         return minRating;
     }
 
-    public float getMaxRating() {
+    public double getMaxRating() {
         return maxRating;
+    }
+    public String getItemName(){
+        return itemName;
     }
 
     // --- Builder class ---
     public static class Builder {
         private Set<Category> categories = Collections.synchronizedSet(new HashSet<>());
-        private float minPrice = -1;
-        private float maxPrice = -1;
-        private float minRating = -1;
-        private float maxRating = -1;
+        private double minPrice = -1;
+        private double maxPrice = -1;
+        private double minRating = -1;
+        private double maxRating = -1;
+        private String itemName = "";
 
         public Builder addCategory(Category c) {
             categories.add(c);
@@ -67,23 +74,28 @@ public class ItemFilter {
             return this;
         }
 
-        public Builder minPrice(float minPrice) {
+        public Builder minPrice(double minPrice) {
             this.minPrice = minPrice;
             return this;
         }
 
-        public Builder maxPrice(float maxPrice) {
+        public Builder maxPrice(double maxPrice) {
             this.maxPrice = maxPrice;
             return this;
         }
 
-        public Builder minRating(float minRating) {
+        public Builder minRating(double minRating) {
             this.minRating = minRating;
             return this;
         }
 
-        public Builder maxRating(float maxRating) {
+        public Builder maxRating(double maxRating) {
             this.maxRating = maxRating;
+            return this;
+        }
+
+        public Builder itemName(String itemName){
+            this.itemName = itemName;
             return this;
         }
 

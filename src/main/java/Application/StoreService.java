@@ -1,36 +1,46 @@
 package Application;
 
-import Domain.Store.IStoreRepository;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
+import Domain.Store.Store;
+import Domain.Store.StoreFacade;
 
 public class StoreService {
 
-    private IStoreRepository storeRepository;
+    private StoreFacade storeFacade;
 
     public StoreService() {
-        this.storeRepository = null;
+        this.storeFacade = null;
     }
 
-    public StoreService(IStoreRepository storeRepository) {
-        this.storeRepository = storeRepository;
+    public StoreService(StoreFacade storeFacade) {
+        this.storeFacade = storeFacade;
     }
 
-    public Response<Boolean> addStore(String sessionId, String name, String address, String description) {
+    public Response<Boolean> addStore(String sessionId, String name, String description) {
         try {
-            throw new NotImplementedException("Not implemented.");
-        } catch (NotImplementedException ex) {
+            if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
+            
+            //TODO!: session logic
+            String userId = sessionId; // Assuming sessionId is the userId
+            Store store = storeFacade.addStore(name, description, userId);
+            return new Response<>(store != null);
+
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
         }
-        return new Response<>(false);
     }
 
 
 
-    public Response<Boolean> openStore(String storeId, String founderId){
+    public Response<Boolean> openStore(String sessionId, String storeId){
         try {
-            throw new NotImplementedException("Not implemented.");
-        } catch (NotImplementedException ex) {
+            if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
+
+            //TODO!: session logic
+            boolean result = this.storeFacade.openStore(storeId);
+            return new Response<>(result);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
         }
-        return new Response<>(false);
     }
 
 }
