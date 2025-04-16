@@ -8,5 +8,10 @@ public class Guest extends User{
         return new Guest();
     }
 
+    @Override
+    public void visitExit(LoginManager loginManager) {
+        super.visitExit(loginManager);
+        loginManager.exit(this);
+    }
 
 }

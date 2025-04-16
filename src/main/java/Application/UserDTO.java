@@ -1,7 +1,5 @@
 package Application;
 
-import Domain.User.User;
-
 public class UserDTO {
     
     private String username;
