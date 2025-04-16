@@ -7,6 +7,7 @@ import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.PermissionType;
+import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Shopping.IShoppingBasket;
 import Domain.Store.Item;
@@ -64,9 +65,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
+    public Response<Void> initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
         try {
-            marketFacade.initFacades(userFacade, storeFacade);
+            marketFacade.initFacades(userFacade, storeFacade, itemFacade);
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -126,18 +127,18 @@ public class MarketService {
         }
     }
 
-    public Response<Void> closeStore(int storeId, User user) {
+    public Response<Void> closeStore(int storeId) {
         try {
-            marketFacade.closeStore(storeId, user);
+            marketFacade.closeStore(storeId);
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<Void> marketCloseStore(int storeId, User user) {
+    public Response<Void> marketCloseStore(int storeId) {
         try {
-            marketFacade.marketCloseStore(storeId, user);
+            marketFacade.marketCloseStore(storeId);
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));

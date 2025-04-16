@@ -10,6 +10,7 @@ import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.User.IUserRepository;
 import Domain.User.User;
+import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Shopping.IShoppingBasket;
 import Domain.Shopping.IShoppingCart;
@@ -33,7 +34,7 @@ public interface IMarketFacade {
 
     INotificationService getNotificationService();
 
-    void initFacades(IUserRepository userFacade, IStoreRepository storeFacade);
+    void initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade);
     
     // Section 4
     // 4.1 Manage product inventory
@@ -53,7 +54,7 @@ public interface IMarketFacade {
                                       List<PermissionType> newPermissions);
     
     // 4.9 Close a store 
-    void closeStore(int storeId, User user);
+    void closeStore(int storeId);
 
     // 4.11 Get info about manager permissions in a store
     Map<String, List<PermissionType>> getManagersPermissions(int storeId);
@@ -66,6 +67,6 @@ public interface IMarketFacade {
     
     // Section 6
     // 6.1 Close a store in the market without cancelling subscriptions
-    void marketCloseStore(int storeId, User user);
+    void marketCloseStore(int storeId);
 
 }

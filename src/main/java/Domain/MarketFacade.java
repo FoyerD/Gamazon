@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import javax.print.DocFlavor.STRING;
+
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.IShoppingBasket;
+import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
 import Domain.Store.Store;
@@ -21,6 +24,7 @@ public class MarketFacade implements IMarketFacade {
     private INotificationService notificationService;
     private IUserRepository userRepository;
     private IStoreRepository storeRepository;
+    private IItemRepository itemRepository; // Assuming this is defined somewhere in your code
 
     // In-memory permissions store: storeId -> (username -> Permission)
     private final Map<Integer, Map<String, Permission>> storePermissions = new HashMap<>();
@@ -34,9 +38,10 @@ public class MarketFacade implements IMarketFacade {
     private MarketFacade() {}
 
     @Override
-    public void initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
+    public void initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
         this.userRepository = userFacade;
         this.storeRepository = storeFacade;
+        this.itemRepository = itemFacade;
     }
 
     @Override
@@ -66,14 +71,22 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public void manageStoreInventory(int storeId, Map<Integer, Integer> productQuantities) {
-        Store store = storeRepository.getStore(storeId);
-        if (store == null) 
-            throw new IllegalArgumentException("Store not found.");
-        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-            Item item = store.getItemById(entry.getKey());
-            if (item != null) 
-                item.setAmount(entry.getValue());
+        String storeIdStr = String.valueOf(storeId);
+        Store store = storeRepository.get(storeIdStr);
+        if (store == null) {
+            throw new IllegalArgumentException("Store with ID " + storeId + " does not exist.");
         }
+        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+            Integer productId = entry.getKey();
+            Integer quantity = entry.getValue();
+            Item item = itemRepository.getItem(storeIdStr, String.valueOf(productId));
+            if (item == null) {
+                throw new IllegalArgumentException("Product with ID " + productId + " does not exist in store " + storeId);
+            }
+            item.setAmount(quantity);
+            itemRepository.update(new Pair<>(storeIdStr, String.valueOf(productId)), item);
+        }
+        System.out.println("Inventory for store " + storeId + " has been successfully updated.");
     }
 
     @Override
@@ -110,24 +123,43 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void closeStore(int storeId, User user) {
-        checkPermission(user.getUserName(), storeId, PermissionType.DEACTIVATE_STORE);
-        Store store = storeRepository.getStore(storeId);
-        if (store == null) 
+    public void closeStore(int storeId) {
+        User marketManager = userRepository.getMarketManager();
+        if (marketManager == null) {
+            throw new IllegalStateException("Market manager is not assigned.");
+        }
+        checkPermission(marketManager.getName(), storeId, PermissionType.DEACTIVATE_STORE);
+        Store store = storeRepository.get(String.valueOf(storeId));
+        if (store == null) {
             throw new IllegalArgumentException("Store not found.");
-        storeRepository.closeStore(String.valueOf(storeId));
-        notificationService.sendNotification(user.getUserName(), "Store " + storeId + " has been closed.");
+        }
+        store.setOpen(false);
+        notificationService.sendNotification(
+            marketManager.getName(),
+            "Store " + storeId + " has been closed."
+        );
+        System.out.println("Store " + storeId + " has been successfully closed by the market manager.");
     }
 
     @Override
-    public void marketCloseStore(int storeId, User user) {
-        checkPermission(user.getUserName(), storeId, PermissionType.DEACTIVATE_STORE);
-        Store store = storeRepository.getStore(storeId);
-        if (store == null) 
+    public void marketCloseStore(int storeId) {
+        User marketManager = userRepository.getMarketManager();
+        if (marketManager == null) {
+            throw new IllegalStateException("Market manager is not assigned.");
+        }
+        checkPermission(marketManager.getName(), storeId, PermissionType.DEACTIVATE_STORE);
+        Store store = storeRepository.get(String.valueOf(storeId));
+        if (store == null) {
             throw new IllegalArgumentException("Store not found.");
+        }
+        // TODO: Amit should do it?
         store.cancelSubscriptions();
-        storeRepository.closeStore(String.valueOf(storeId));
-        notificationService.sendNotification(user.getUserName(), "Store " + storeId + " has been closed.");
+        store.setOpen(false);
+        notificationService.sendNotification(
+            marketManager.getName(),
+            "Store " + storeId + " has been closed."
+        );
+        System.out.println("Store " + storeId + " has been successfully closed by the market manager.");
     }
 
     @Override
@@ -146,13 +178,15 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public void respondToUserMessage(int storeId, int messageId, String response) {
-        Store store = storeRepository.getStore(storeId);
+        Store store = storeRepository.get(String.valueOf(storeId));
+        // TODO: Amit should do it?
         store.respondToMessage(messageId, response);
     }
 
     @Override
     public List<IShoppingBasket> getStorePurchaseHistory(int storeId, LocalDateTime from, LocalDateTime to) {
-        return storeRepository.getStore(storeId).getStorePurchaseHistory(from, to);
+        // TODO: Amit or Aviad should do it?
+        return storeRepository.get(String.valueOf(storeId)).getStorePurchaseHistory(from, to);
     }
 
     @Override
@@ -164,9 +198,9 @@ public class MarketFacade implements IMarketFacade {
         supplyService.initialize();
         notificationService.initialize();
         User manager = userRepository.getMarketManager();
-        Permission founder = new Permission("system", manager.getUserName());
+        Permission founder = new Permission("system", manager.getName());
         founder.initTradingManager();
-        storePermissions.computeIfAbsent(-1, x -> new HashMap<>()).put(manager.getUserName(), founder);
+        storePermissions.computeIfAbsent(-1, x -> new HashMap<>()).put(manager.getName(), founder);
         System.out.println("Market opened.");
     }
 
