@@ -1,9 +1,7 @@
 package Application;
 
-import Domain.Store.IStoreRepository;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
 public class StoreService {
 
@@ -33,7 +31,7 @@ public class StoreService {
 
 
 
-    public Response<Boolean> openStore(String storeId, String founderId){
+    public Response<Boolean> openStore(String sessionId, String storeId){
         try {
             if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
 
