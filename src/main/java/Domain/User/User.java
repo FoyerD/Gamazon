@@ -1,5 +1,6 @@
 package Domain.User;
 import java.util.UUID;
+import Domain.Shopping.IShoppingCart;
 
 public abstract class User {
 
@@ -29,4 +30,21 @@ public abstract class User {
     public void visitExit(LoginManager loginManager) {
         this.isLoggedIn = false;
     }
+
+
+    public IShoppingCart getUserShoppingCart() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUserShoppingCart'");
+    }
+
+    public void removeUserCart() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'removeUserCart'");
+    }
+
+    public String getEmail() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getEmail'");
+    }
+
 }
