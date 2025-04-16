@@ -16,7 +16,7 @@ public class CustomerServiceService {
         try {
             return new Response<>();
         } catch (Exception ex) {
-            return new Response<>(ex.getMessage());
+            return Response.error(ex.getMessage());
         }
     }
 
@@ -25,7 +25,7 @@ public class CustomerServiceService {
             // Assuming storeRepository has a method to add feedback
             return new Response<>();
         } catch (Exception ex) {
-            return new Response<>(ex.getMessage());
+            return Response.error(ex.getMessage());
         }
     }
 }
