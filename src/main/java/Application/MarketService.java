@@ -21,11 +21,9 @@ import java.util.Map;
 public class MarketService {
 
     private final IMarketFacade marketFacade;
-    private final IUserRepository userFacade;
 
-    public MarketService(IMarketFacade marketFacade, IUserRepository userFacade) {
+    public MarketService(IMarketFacade marketFacade) {
         this.marketFacade = marketFacade;
-        this.userFacade = userFacade;
     }
 
 
