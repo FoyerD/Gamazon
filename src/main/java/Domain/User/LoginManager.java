@@ -44,7 +44,8 @@ public class LoginManager {
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encoded = passwordEncoder.encode(password);
-        Member member = new Member(username, encoded);
+
+        Member member = new Member(guest);
         if (!userRepository.add(member.getId(), member)) {
             throw new IllegalStateException("Failed to add member to repository");
         }

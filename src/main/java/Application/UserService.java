@@ -50,8 +50,8 @@ public class UserService {
         }
 
         String id = tokenService.extractId(sessionToken);
+        // TODO: Continue register
 
-        
         try {
             loginManager.register(id, username, password); // Validate the session token
             return Response.success(userDto);
