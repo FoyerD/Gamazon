@@ -94,11 +94,33 @@ public class MarketService {
         }
     }
 
-    public Response<Void> manageStoreInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> addProductsToInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.manageStoreInventory(storeId, productQuantities);
+            marketFacade.addProductsToInventory(storeId, productQuantities);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> updateProductQuantities(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.updateProductQuantities(storeId, productQuantities);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> removeProductsFromInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.removeProductsFromInventory(storeId, productQuantities);
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));

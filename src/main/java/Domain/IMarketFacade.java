@@ -38,8 +38,10 @@ public interface IMarketFacade {
     
     // Section 4
     // 4.1 Manage product inventory
-    void manageStoreInventory(String storeId, Map<Integer, Integer> productQuantities);
-
+    void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities);
+    void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities);
+    void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities);
+    
     // 4.3 Appoint a store manager
     void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId);
     

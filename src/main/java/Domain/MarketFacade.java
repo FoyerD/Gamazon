@@ -70,22 +70,47 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void manageStoreInventory(String storeId, Map<Integer, Integer> productQuantities) {
-        Store store = storeRepository.get(storeId);
-        if (store == null) {
-            throw new IllegalArgumentException("Store with ID " + storeId + " does not exist.");
-        }
+    public void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities) {
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Integer productId = entry.getKey();
             Integer quantity = entry.getValue();
-            Item item = itemRepository.getItem(storeId, String.valueOf(productId));
-            if (item == null) {
-                throw new IllegalArgumentException("Product with ID " + productId + " does not exist in store " + storeId);
+    
+            // Check if the product already exists
+            Item existingItem = itemRepository.getItem(storeId, String.valueOf(productId));
+            if (existingItem == null) {
+                // Create a new item and add it to the repository
+                Item newItem = new Item(storeId, String.valueOf(productId), 0, quantity, "New product");
+                itemRepository.add(new Pair<>(storeId, String.valueOf(productId)), newItem);
+                System.out.println("Added product " + productId + " with quantity " + quantity + " to store " + storeId);
             }
-            item.setAmount(quantity);
-            itemRepository.update(new Pair<>(storeId, String.valueOf(productId)), item);
         }
-        System.out.println("Inventory for store " + storeId + " has been successfully updated.");
+    }
+    
+    @Override
+    public void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities) {
+        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+            Integer productId = entry.getKey();
+            Integer quantity = entry.getValue();    
+            Item existingItem = itemRepository.getItem(storeId, String.valueOf(productId));
+            if (existingItem != null) {
+                existingItem.setAmount(quantity);
+                itemRepository.update(new Pair<>(storeId, String.valueOf(productId)), existingItem);
+                System.out.println("Updated product " + productId + " with new quantity " + quantity + " in store " + storeId);
+            }
+        }
+    }
+    
+    @Override
+    public void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities) {
+        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+            Integer productId = entry.getKey();
+            Integer quantity = entry.getValue();
+            Item existingItem = itemRepository.getItem(storeId, String.valueOf(productId));
+            if (existingItem != null && quantity > 0) {
+                itemRepository.remove(new Pair<>(storeId, String.valueOf(productId)));
+                System.out.println("Removed product " + productId + " from store " + storeId);
+            }
+        }
     }
 
     @Override
