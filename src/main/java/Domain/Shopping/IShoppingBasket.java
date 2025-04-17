@@ -1,7 +1,8 @@
 package Domain.Shopping;
 
+import java.util.Map;
+
 public interface IShoppingBasket {
-    int getProduct(); // returns product quanity.
     void removeItem(String productId, int quantity);
     void addItem(String productId, int quantity); 
     void clear();
@@ -16,10 +17,5 @@ public interface IShoppingBasket {
 
     Map<Integer, IShoppingBasket> getShoppingBaskets(); // Weird to have it here
     void addShoppingBasket(IShoppingBasket basket, String userName, double price); // Weird to have it here
-
-    Map<String, Integer> getItems();
-
-
-
 
 }

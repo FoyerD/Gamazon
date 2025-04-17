@@ -1,5 +1,8 @@
 package Domain.Shopping;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ShoppingBasketRepository implements IShoppingBasketRepository{
     
     private Map<Pair, ShoppingBasket> shoppingBaskets;

@@ -1,6 +1,7 @@
 package Domain.Shopping;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ShoppingCartRepository implements IShoppingCartRepository {
@@ -12,12 +13,20 @@ public class ShoppingCartRepository implements IShoppingCartRepository {
     }
 
     @Override
-    public IShoppingCart getCart(String clientId) {
-        return carts.get(clientId);
+    public IShoppingCart get(String clientId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'get'");
     }
 
     @Override
-    public void saveCart(IShoppingCart cart) {
-        carts.put(cart.getClientId(), cart);
+    public void add(IShoppingCart shoppingCart) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'add'");
+    }
+
+    @Override
+    public void remove(IShoppingCart shoppingCart) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'remove'");
     }
 }

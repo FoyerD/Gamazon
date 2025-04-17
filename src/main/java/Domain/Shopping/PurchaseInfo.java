@@ -1,5 +1,4 @@
 package Domain.Shopping;
-import java.util.*;
 
 public class PurchaseInfo {
     private final String clientId;

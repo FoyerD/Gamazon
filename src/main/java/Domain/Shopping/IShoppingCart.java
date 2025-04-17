@@ -1,5 +1,7 @@
 package Domain.Shopping;
 
+import java.util.Set;
+
 public interface IShoppingCart {
     void Checkout();
     void addItem(String shopId, String productId, int quantity);  

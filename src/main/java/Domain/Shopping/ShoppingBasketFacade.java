@@ -8,22 +8,12 @@ class ShoppingBasketFacade implements IShoppingBasketFacade {
     }
 
     @Override
-    public boolean hasSufficientInventory(String productId, int quantity) {
-        return basketRepo.getInventory(productId) >= quantity;
-    }
-
-    @Override
     public void decreaseInventory(String productId, int quantity) {
-        int stock = basketRepo.getInventory(productId);
-        if (stock < quantity) {
-            throw new RuntimeException("Insufficient inventory");
-        }
-        basketRepo.updateInventory(productId, stock - quantity);
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void addInventory(String productId, int quantity) {
-        int stock = basketRepo.getInventory(productId);
-        basketRepo.updateInventory(productId, stock + quantity);
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

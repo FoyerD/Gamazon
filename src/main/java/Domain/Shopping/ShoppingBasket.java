@@ -1,5 +1,8 @@
 package Domain.Shopping;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ShoppingBasket implements IShoppingBasket {
     
     private String clientId;
@@ -21,7 +24,7 @@ public class ShoppingBasket implements IShoppingBasket {
     }
 
     public Map<String, Integer> getProducts() {
-        return products.clone();
+        return new HashMap<>(products);
     }
 
     public void addItem(String productId, int quantity) {
@@ -47,12 +50,29 @@ public class ShoppingBasket implements IShoppingBasket {
         products.clear();
     }
 
-    
-    // Returns the quantity of a specific product in the basket
-    // If the product is not in the basket, it returns 0
+        
     @Override
-    public int getProduct(String productId) {
-        return products.getOrDefault(productId, 0);
+    public Map<String, Integer> getItems() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getItems'");
+    }
+
+    @Override
+    public boolean areIdentical(IShoppingBasket storeBasket) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'areIdentical'");
+    }
+
+    @Override
+    public Map<Integer, IShoppingBasket> getShoppingBaskets() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getShoppingBaskets'");
+    }
+
+    @Override
+    public void addShoppingBasket(IShoppingBasket basket, String userName, double price) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'addShoppingBasket'");
     }
 
 
