@@ -1,3 +1,5 @@
+package Domain.Shopping;
+
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
 

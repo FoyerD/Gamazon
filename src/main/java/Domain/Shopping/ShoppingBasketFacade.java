@@ -1,4 +1,6 @@
-public class ShoppingBasketFacade implements IShoppingBasketFacade {
+package Domain.Shopping;
+
+class ShoppingBasketFacade implements IShoppingBasketFacade {
     private final IShoppingBasketRepository basketRepo;
 
     public ShoppingBasketFacade(IShoppingBasketRepository basketRepo) {

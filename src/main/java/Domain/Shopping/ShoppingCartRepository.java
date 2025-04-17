@@ -1,8 +1,15 @@
+package Domain.Shopping;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class ShoppingCartRepository implements IShoppingCartRepository {
-    private final Map<String, IShoppingCart> carts = new ConcurrentHashMap<>();
+    private final Map<String, IShoppingCart> carts = new HashMap<>();
+    private final IShoppingBasketRepository basketRepo;
+
+    public ShoppingCartRepository(IShoppingBasketRepository basketRepo) {
+        this.basketRepo = basketRepo;
+    }
 
     @Override
     public IShoppingCart getCart(String clientId) {

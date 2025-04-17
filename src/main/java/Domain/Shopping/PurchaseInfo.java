@@ -1,4 +1,7 @@
-public class PurchaseRequest {
+package Domain.Shopping;
+import java.util.*;
+
+public class PurchaseInfo {
     private final String clientId;
     private final String storeId;
     private final String productId; 
@@ -6,7 +9,7 @@ public class PurchaseRequest {
     private double bidPrice; // optional, relevant for bid/auction/lottery
     private String paymentDetails; // optional, relevant for immediate purchase
 
-    public PurchaseRequest(String clientId, String storeId, String productId, int quantity) {
+    public PurchaseInfo(String clientId, String storeId, String productId, int quantity) {
         this.clientId = clientId;
         this.storeId = storeId;
         this.productId = productId;

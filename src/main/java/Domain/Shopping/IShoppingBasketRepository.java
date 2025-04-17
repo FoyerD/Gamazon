@@ -1,7 +1,9 @@
 package Domain.Shopping;
 
 public interface IShoppingBasketRepository {
-    public IShoppingBasket getById(int id); 
+    public IShoppingBasket get(String clientId, String storeId); 
     public void add(IShoppingBasket shoppingBasket);
-    public void remove(IShoppingBasket shoppingBasket);
+    public IShoppingBasket remove(String clientId, String storeId);
+    public boolean contains(String clientId, String storeId);
+    public void clear();
 }
