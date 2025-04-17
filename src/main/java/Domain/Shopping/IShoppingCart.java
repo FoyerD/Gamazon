@@ -10,4 +10,5 @@ public interface IShoppingCart {
     double getTotalPrice();
     int getTotalItems();
     boolean isEmpty();
+    Set<IShoppingBasket> getStoreBaskets(); // returns a set of all the store baskets in the shopping cart.
 }
