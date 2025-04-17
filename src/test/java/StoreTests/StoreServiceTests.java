@@ -45,7 +45,7 @@ public class StoreServiceTests {
         String storeName = "ExistingStore";
         Integer storeId = 1234;
         storeService.addStore(sessionToken, storeName, "A new store");
-        marketService.closeStore(sessionToken, storeId.toString());
+        marketService.closeStore(storeId.toString());
         Response<Boolean> result = storeService.openStore(sessionToken, storeId.toString());
         assertTrue(result.getValue());
     }
