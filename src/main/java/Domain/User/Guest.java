@@ -14,4 +14,5 @@ public class Guest extends User{
         loginManager.exit(this);
     }
 
+
 }

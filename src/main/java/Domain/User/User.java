@@ -27,6 +27,10 @@ public abstract class User {
         return id.toString();
     }
 
+    public void setToken(UUID token) {
+        
+    }
+
     public void visitExit(LoginManager loginManager) {
         this.isLoggedIn = false;
     }

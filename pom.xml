@@ -46,6 +46,16 @@
       <artifactId>spring-boot-starter</artifactId>
       <version>3.1.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.passay</groupId>
+      <artifactId>passay</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+      <version>6.1.4</version> <!-- Matches Spring Boot 3.1.4 -->
+    </dependency>
   </dependencies>
 
 
