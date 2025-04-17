@@ -5,31 +5,52 @@ import java.util.Set;
 
 public class Permission {
 
-    public static final Set<PermissionType> MANAGER_PERMISSIONS = Set.of(PermissionType.ACCESS_PURCHASE_RECORDS);
+    // Store owner according to Section 4
     public static final Set<PermissionType> OWNER_PERMISSIONS = Set.of(
-            PermissionType.SUPERVISE_MANAGERS,
-            PermissionType.ASSIGN_OR_REMOVE_OWNERS,
-            PermissionType.MODIFY_OWNER_RIGHTS,
-            PermissionType.HANDLE_INVENTORY,
-            PermissionType.EDIT_STORE_POLICIES,
-            PermissionType.VIEW_EMPLOYEE_INFO,
-            PermissionType.ACCESS_PURCHASE_RECORDS,
-            PermissionType.ADMINISTER_STORE,
-            PermissionType.OVERSEE_OFFERS,
-            PermissionType.CONTROL_CONTRACTS
+        PermissionType.SUPERVISE_MANAGERS,
+        PermissionType.ASSIGN_OR_REMOVE_OWNERS,
+        PermissionType.MODIFY_OWNER_RIGHTS,
+        PermissionType.HANDLE_INVENTORY,
+        PermissionType.EDIT_STORE_POLICIES,
+        PermissionType.VIEW_EMPLOYEE_INFO,
+        PermissionType.ACCESS_PURCHASE_RECORDS,
+        PermissionType.ADMINISTER_STORE,
+        PermissionType.OVERSEE_OFFERS,
+        PermissionType.CONTROL_CONTRACTS
     );
+
+    // Manages the trading system according to Section 4
     public static final Set<PermissionType> FOUNDER_PERMISSIONS = Set.of(
-            PermissionType.ASSIGN_OR_REMOVE_OWNERS,
-            PermissionType.SUPERVISE_MANAGERS,
-            PermissionType.DEACTIVATE_STORE,
-            PermissionType.HANDLE_INVENTORY,
-            PermissionType.EDIT_STORE_POLICIES,
-            PermissionType.MODIFY_OWNER_RIGHTS,
-            PermissionType.VIEW_EMPLOYEE_INFO,
-            PermissionType.ACCESS_PURCHASE_RECORDS,
-            PermissionType.ADMINISTER_STORE,
-            PermissionType.OVERSEE_OFFERS,
-            PermissionType.CONTROL_CONTRACTS
+        PermissionType.ASSIGN_OR_REMOVE_OWNERS,
+        PermissionType.SUPERVISE_MANAGERS,
+        PermissionType.DEACTIVATE_STORE,
+        PermissionType.HANDLE_INVENTORY,
+        PermissionType.EDIT_STORE_POLICIES,
+        PermissionType.MODIFY_OWNER_RIGHTS,
+        PermissionType.VIEW_EMPLOYEE_INFO,
+        PermissionType.ACCESS_PURCHASE_RECORDS,
+        PermissionType.ADMINISTER_STORE,
+        PermissionType.OVERSEE_OFFERS,
+        PermissionType.CONTROL_CONTRACTS
+    );
+
+    // Manages a store according to Section 5
+    public static final Set<PermissionType> MANAGER_PERMISSIONS = Set.of(PermissionType.ACCESS_PURCHASE_RECORDS);    
+
+    // Trading system manager according to Section 6
+
+    public static final Set<PermissionType> TRADING_PERMISSIONS = Set.of(
+        PermissionType.ASSIGN_OR_REMOVE_OWNERS,
+        PermissionType.SUPERVISE_MANAGERS,
+        PermissionType.DEACTIVATE_STORE,
+        PermissionType.HANDLE_INVENTORY,
+        PermissionType.EDIT_STORE_POLICIES,
+        PermissionType.MODIFY_OWNER_RIGHTS,
+        PermissionType.VIEW_EMPLOYEE_INFO,
+        PermissionType.ACCESS_PURCHASE_RECORDS,
+        PermissionType.ADMINISTER_STORE,
+        PermissionType.OVERSEE_OFFERS,
+        PermissionType.CONTROL_CONTRACTS
     );
 
     private final String member;
@@ -40,7 +61,7 @@ public class Permission {
     public Permission(String permissionGiverName, String member) {
         this.permissionGiverName = permissionGiverName;
         this.member = member;
-        this.role = RoleType.STORE_MANAGER;
+        this.role = null;
         this.permissions = new HashSet<>();
     }
 
@@ -59,6 +80,11 @@ public class Permission {
         this.permissions = new HashSet<>(FOUNDER_PERMISSIONS);
     }
 
+    public void initTradingManager() {
+        this.role = RoleType.TRADING_MANAGER;
+        this.permissions = new HashSet<>(TRADING_PERMISSIONS);
+    }
+
     public void setPermissions(Set<PermissionType> permissionTypes) {
         this.permissions = new HashSet<>(permissionTypes);
     }
@@ -75,12 +101,20 @@ public class Permission {
         return permissions.contains(permissionType);
     }
 
-    public int permissionsBitMap() {
-        int bitmap = 0;
-        for (PermissionType perm : permissions) {
-            bitmap |= perm.ordinal(); // optional: use a custom number if desired
-        }
-        return bitmap;
+    public Set<PermissionType> getPermissions() {
+        return new HashSet<>(permissions);
+    }
+
+    public void addPermission(PermissionType permission) {
+        permissions.add(permission);
+    }
+
+    public void removePermission(PermissionType permission) {
+        permissions.remove(permission);
+    }
+
+    public void clearPermissions() {
+        permissions.clear();
     }
 
     public boolean isStoreOwner() {
@@ -101,39 +135,5 @@ public class Permission {
 
     public String getMember() {
         return member;
-    }
-
-    public Set<PermissionType> getPermissions() {
-        return new HashSet<>(permissions);
-    }
-
-    public void addPermission(PermissionType permission) {
-        permissions.add(permission);
-    }
-    
-    public void removePermission(PermissionType permission) {
-        permissions.remove(permission);
-    }
-
-    public void clearPermissions() {
-        permissions.clear();
-    }
-
-    public boolean hasAnyPermission(Set<PermissionType> permissionTypes) {
-        for (PermissionType permission : permissionTypes) {
-            if (permissions.contains(permission)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasAllPermissions(Set<PermissionType> permissionTypes) {
-        for (PermissionType permission : permissionTypes) {
-            if (!permissions.contains(permission)) {
-                return false;
-            }
-        }
-        return true;
     }
 }
