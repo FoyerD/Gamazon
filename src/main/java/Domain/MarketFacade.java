@@ -153,7 +153,7 @@ public class MarketFacade implements IMarketFacade {
             throw new IllegalArgumentException("Store not found.");
         }
         // TODO: Amit should do it?
-        store.cancelSubscriptions();
+        //store.cancelSubscriptions();
         store.setOpen(false);
         notificationService.sendNotification(
             marketManager.getName(),
@@ -180,13 +180,14 @@ public class MarketFacade implements IMarketFacade {
     public void respondToUserMessage(int storeId, int messageId, String response) {
         Store store = storeRepository.get(String.valueOf(storeId));
         // TODO: Amit should do it?
-        store.respondToMessage(messageId, response);
+        //store.respondToMessage(messageId, response);
     }
 
     @Override
     public List<IShoppingBasket> getStorePurchaseHistory(int storeId, LocalDateTime from, LocalDateTime to) {
         // TODO: Amit or Aviad should do it?
-        return storeRepository.get(String.valueOf(storeId)).getStorePurchaseHistory(from, to);
+        //return storeRepository.get(String.valueOf(storeId)).getStorePurchaseHistory(from, to);
+        return null; // Placeholder for actual implementation
     }
 
     @Override
