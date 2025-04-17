@@ -1,34 +1,11 @@
 package Domain.Shopping;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import Domain.Store.Item;
-
 public interface IShoppingBasket {
-
-    boolean areIdentical(IShoppingBasket storeBasket);
-
-    int getShoppingBasketCount();
-
-    Map<Integer, IShoppingBasket> getShoppingBaskets();
-
-    IShoppingBasket getShoppingBasket(int id);
-
-    void clean();
-
-    void addShoppingBasket(IShoppingBasket basket, String userName, double price);
-
-    List<IShoppingBasket> getUserShoppingBasketsInRange(String userName, LocalDateTime startDateTime,
-            LocalDateTime endDateTime);
-
-    List<IShoppingBasket> getStoreShoppingBaskets(int storeId);
-
-    List<IShoppingBasket> getStoreShoppingBasketsInRange(int storeId, LocalDateTime startDateTime,
-            LocalDateTime endDateTime);
-
-    int getStoreId();
-
-    List<Item> getItems();
+    int getProduct(); // returns product quanity.
+    void removeItem(String productId, int quantity);
+    void addItem(String productId, int quantity); 
+    void clear();
+    // double getTotalPrice(); // Really needed? Isn't the price calculated somewhere else?
+    boolean isEmpty();
+    Map<String, Integer> getItems(); // returns a map of productId and quantity.
 }
