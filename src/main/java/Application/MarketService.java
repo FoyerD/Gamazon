@@ -6,15 +6,17 @@ import Domain.User.IUserRepository;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
+import Domain.PermissionType;
+import Domain.Store.IItemRepository;
+import Domain.Store.IStoreRepository;
+import Domain.Shopping.IShoppingBasket;
+import Domain.Store.Item;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import Domain.Store.IStoreRepository;
-import Domain.Shopping.IShoppingBasket;
-import Domain.Store.Item;
 
 public class MarketService {
 
@@ -26,22 +28,13 @@ public class MarketService {
         this.userFacade = userFacade;
     }
 
-    public Response<Void> pay(String sessionId, String card_owner, String card_number, Date expiry_date, String cvv, double price, String deliveryAddress) {
-        try {
-            User user = userFacade.getUser(sessionId);
-            marketFacade.purchase(card_owner, card_number, expiry_date, cvv, deliveryAddress, user, user.getUserShoppingCart());
-            return new Response<>(null);
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
 
     public Response<Void> updatePaymentService(IPaymentService paymentService) {
         try {
             marketFacade.updatePaymentService(paymentService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -50,7 +43,7 @@ public class MarketService {
             marketFacade.updateNotificationService(notificationService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -59,16 +52,7 @@ public class MarketService {
             marketFacade.updateSupplyService(supplyService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Double> calculateCartPrice(String sessionId) {
-        try {
-            User user = userFacade.getUser(sessionId);
-            return new Response<>(marketFacade.calculateCartPrice(user.getUserShoppingCart()));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -77,82 +61,16 @@ public class MarketService {
             marketFacade.updatePaymentServiceURL(url);
             return new Response<>(null);
         } catch (IOException e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<Map<Integer, IShoppingBasket>> getShoppingBaskets() {
+    public Response<Void> initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
         try {
-            return new Response<>(marketFacade.getShoppingBaskets());
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<IShoppingBasket> getShoppingBasket(int id) {
-        try {
-            return new Response<>(marketFacade.getShoppingBasket(id));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<List<IShoppingBasket>> getStoreShoppingBaskets(int storeId) {
-        try {
-            return new Response<>(marketFacade.getStoreShoppingBaskets(storeId));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<List<IShoppingBasket>> getUserShoppingBaskets(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        try {
-            return new Response<>(marketFacade.getUserShoppingBaskets(userName, startDateTime, endDateTime));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<List<IShoppingBasket>> getUserShoppingBasketsBetween(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        try {
-            return new Response<>(marketFacade.getUserShoppingBasketsBetween(userName, startDateTime, endDateTime));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Void> addShoppingBasket(IShoppingBasket basket, String userName, double price) {
-        try {
-            marketFacade.addShoppingBasket(basket, userName, price);
+            marketFacade.initFacades(userFacade, storeFacade, itemFacade);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Void> initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
-        try {
-            marketFacade.initFacades(userFacade, storeFacade);
-            return new Response<>(null);
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Integer> getShoppingBasketCount() {
-        try {
-            return new Response<>(marketFacade.getShoppingBasketCount());
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Void> checkProductsExist(int storeId, Map<Integer, Item> productsId) {
-        try {
-            marketFacade.checkProductsExist(storeId, productsId);
-            return new Response<>(null);
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
@@ -160,43 +78,104 @@ public class MarketService {
         try {
             return new Response<>(marketFacade.getNotificationService());
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<IStoreRepository> getStoreFacade() {
+    public Response<Void> manageStoreInventory(int storeId, Map<Integer, Integer> productQuantities) {
         try {
-            return new Response<>(marketFacade.getStoreFacade());
+            marketFacade.manageStoreInventory(storeId, productQuantities);
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<List<IShoppingBasket>> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Response<Void> appointStoreManager(String appointerUsername, String appointeeUsername, int storeId) {
         try {
-            return new Response<>(marketFacade.getMyShoppingBasketHistory(sessionId, startDateTime, endDateTime));
+            marketFacade.appointStoreManager(appointerUsername, appointeeUsername, storeId);
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    // implement function closeStore(int storeId) in MarketFacade
+    public Response<Void> removeStoreManager(String removerUsername, String managerUsername, int storeId) {
+        try {
+            marketFacade.removeStoreManager(removerUsername, managerUsername, storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> appointStoreOwner(String appointerUsername, String appointeeUsername, int storeId) {
+        try {
+            marketFacade.appointStoreOwner(appointerUsername, appointeeUsername, storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> changeManagerPermissions(String ownerUsername, String managerUsername, int storeId, List<PermissionType> newPermissions) {
+        try {
+            marketFacade.changeManagerPermissions(ownerUsername, managerUsername, storeId, newPermissions);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
     public Response<Void> closeStore(int storeId) {
         try {
             marketFacade.closeStore(storeId);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    // implement function open market in MarketFacade
+    public Response<Void> marketCloseStore(int storeId) {
+        try {
+            marketFacade.marketCloseStore(storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Map<String, List<PermissionType>>> getManagersPermissions(int storeId) {
+        try {
+            return new Response<>(marketFacade.getManagersPermissions(storeId));
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> respondToUserMessage(int storeId, int messageId, String response) {
+        try {
+            marketFacade.respondToUserMessage(storeId, messageId, response);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<List<IShoppingBasket>> getStorePurchaseHistory(int storeId, LocalDateTime from, LocalDateTime to) {
+        try {
+            return new Response<>(marketFacade.getStorePurchaseHistory(storeId, from, to));
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
     public Response<Void> openMarket() {
         try {
             marketFacade.openMarket();
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 }
