@@ -1,7 +1,6 @@
 package Application;
 
 import Domain.IMarketFacade;
-import Domain.User.User;
 import Domain.User.IUserRepository;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
@@ -10,26 +9,29 @@ import Domain.PermissionType;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Shopping.IShoppingBasket;
-import Domain.Store.Item;
-
+import Domain.TokenService;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class MarketService {
 
     private final IMarketFacade marketFacade;
-    private final IUserRepository userFacade;
+    private final TokenService tokenService;
 
-    public MarketService(IMarketFacade marketFacade, IUserRepository userFacade) {
+    public MarketService(IMarketFacade marketFacade, TokenService tokenService) {
         this.marketFacade = marketFacade;
-        this.userFacade = userFacade;
+        this.tokenService = tokenService;
     }
 
+    private boolean isInvalid(String sessionToken) {
+        return !tokenService.validateToken(sessionToken);
+    }
 
-    public Response<Void> updatePaymentService(IPaymentService paymentService) {
+    public Response<Void> updatePaymentService(String sessionToken, IPaymentService paymentService) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updatePaymentService(paymentService);
             return new Response<>(null);
@@ -38,7 +40,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> updateNotificationService(INotificationService notificationService) {
+    public Response<Void> updateNotificationService(String sessionToken, INotificationService notificationService) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updateNotificationService(notificationService);
             return new Response<>(null);
@@ -47,7 +51,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> updateSupplyService(ISupplyService supplyService) {
+    public Response<Void> updateSupplyService(String sessionToken, ISupplyService supplyService) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updateSupplyService(supplyService);
             return new Response<>(null);
@@ -56,7 +62,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> updatePaymentServiceURL(String url) {
+    public Response<Void> updatePaymentServiceURL(String sessionToken, String url) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updatePaymentServiceURL(url);
             return new Response<>(null);
@@ -65,7 +73,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
+    public Response<Void> initFacades(String sessionToken, IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.initFacades(userFacade, storeFacade, itemFacade);
             return new Response<>(null);
@@ -74,7 +84,9 @@ public class MarketService {
         }
     }
 
-    public Response<INotificationService> getNotificationService() {
+    public Response<INotificationService> getNotificationService(String sessionToken) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             return new Response<>(marketFacade.getNotificationService());
         } catch (Exception e) {
@@ -82,7 +94,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> manageStoreInventory(int storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> manageStoreInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.manageStoreInventory(storeId, productQuantities);
             return new Response<>(null);
@@ -91,7 +105,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> appointStoreManager(String appointerUsername, String appointeeUsername, int storeId) {
+    public Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.appointStoreManager(appointerUsername, appointeeUsername, storeId);
             return new Response<>(null);
@@ -100,7 +116,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> removeStoreManager(String removerUsername, String managerUsername, int storeId) {
+    public Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.removeStoreManager(removerUsername, managerUsername, storeId);
             return new Response<>(null);
@@ -109,7 +127,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> appointStoreOwner(String appointerUsername, String appointeeUsername, int storeId) {
+    public Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.appointStoreOwner(appointerUsername, appointeeUsername, storeId);
             return new Response<>(null);
@@ -118,7 +138,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> changeManagerPermissions(String ownerUsername, String managerUsername, int storeId, List<PermissionType> newPermissions) {
+    public Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.changeManagerPermissions(ownerUsername, managerUsername, storeId, newPermissions);
             return new Response<>(null);
@@ -127,7 +149,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> closeStore(int storeId) {
+    public Response<Void> closeStore(String sessionToken, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.closeStore(storeId);
             return new Response<>(null);
@@ -136,7 +160,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> marketCloseStore(int storeId) {
+    public Response<Void> marketCloseStore(String sessionToken, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.marketCloseStore(storeId);
             return new Response<>(null);
@@ -145,7 +171,9 @@ public class MarketService {
         }
     }
 
-    public Response<Map<String, List<PermissionType>>> getManagersPermissions(int storeId) {
+    public Response<Map<String, List<PermissionType>>> getManagersPermissions(String sessionToken, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             return new Response<>(marketFacade.getManagersPermissions(storeId));
         } catch (Exception e) {
@@ -153,7 +181,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> respondToUserMessage(int storeId, int messageId, String response) {
+    public Response<Void> respondToUserMessage(String sessionToken, String storeId, int messageId, String response) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.respondToUserMessage(storeId, messageId, response);
             return new Response<>(null);
@@ -162,7 +192,9 @@ public class MarketService {
         }
     }
 
-    public Response<List<IShoppingBasket>> getStorePurchaseHistory(int storeId, LocalDateTime from, LocalDateTime to) {
+    public Response<List<IShoppingBasket>> getStorePurchaseHistory(String sessionToken, String storeId, LocalDateTime from, LocalDateTime to) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             return new Response<>(marketFacade.getStorePurchaseHistory(storeId, from, to));
         } catch (Exception e) {
@@ -170,7 +202,9 @@ public class MarketService {
         }
     }
 
-    public Response<Void> openMarket() {
+    public Response<Void> openMarket(String sessionToken) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.openMarket();
             return new Response<>(null);

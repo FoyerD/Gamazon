@@ -38,35 +38,35 @@ public interface IMarketFacade {
     
     // Section 4
     // 4.1 Manage product inventory
-    void manageStoreInventory(int storeId, Map<Integer, Integer> productQuantities);
+    void manageStoreInventory(String storeId, Map<Integer, Integer> productQuantities);
 
     // 4.3 Appoint a store manager
-    void appointStoreManager(String appointerUsername, String appointeeUsername, int storeId);
+    void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId);
     
     // 4.4 Remove a store manager
-    void removeStoreManager(String removerUsername, String managerUsername, int storeId);
+    void removeStoreManager(String removerUsername, String managerUsername, String storeId);
     
     // 4.6 Appoint a store owner
-    void appointStoreOwner(String appointerUsername, String appointeeUsername, int storeId);
+    void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId);
     
     // 4.7 Change a manager's permissions
-    void changeManagerPermissions(String ownerUsername, String managerUsername, int storeId,
+    void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId,
                                       List<PermissionType> newPermissions);
     
     // 4.9 Close a store 
-    void closeStore(int storeId);
+    void closeStore(String storeId);
 
     // 4.11 Get info about manager permissions in a store
-    Map<String, List<PermissionType>> getManagersPermissions(int storeId);
+    Map<String, List<PermissionType>> getManagersPermissions(String storeId);
     
     // 4.12 Respond to user messages
-    void respondToUserMessage(int storeId, int messageId, String response);
+    void respondToUserMessage(String storeId, int messageId, String response);
     
     // 4.13 View store purchase history
-    List<IShoppingBasket> getStorePurchaseHistory(int storeId, LocalDateTime from, LocalDateTime to);
+    List<IShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to);
     
     // Section 6
     // 6.1 Close a store in the market without cancelling subscriptions
-    void marketCloseStore(int storeId);
+    void marketCloseStore(String storeId);
 
 }
