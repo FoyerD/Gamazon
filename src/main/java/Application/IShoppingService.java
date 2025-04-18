@@ -1,3 +1,6 @@
+package Application;
+import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.IShoppingCart;
 import Domain.Shopping.PurchaseInfo;
 
 public interface IShoppingService {

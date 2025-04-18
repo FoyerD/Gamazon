@@ -1,6 +1,17 @@
+package Application;
+import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.IShoppingBasketFacade;
+import Domain.Shopping.IShoppingBasketRepository;
+import Domain.Shopping.IShoppingCart;
+import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.IShoppingCartRepository;
+import Domain.Shopping.PurchaseInfo;
+import Domain.Shopping.ShoppingCartFacade;
+import Domain.Shopping.ShoppingBasketFacade;
+
 public class ShoppingService implements IShoppingService {
-    private final IShoppingCartFacade;
-    private final IShoppingBasketFacade;
+    private final IShoppingCartFacade cartFacade;
+    private final IShoppingBasketFacade basketFacade;
 
     
     public ShoppingService(IShoppingBasketRepository basketRepository, IShoppingCartRepository cartRepository) {
@@ -42,7 +53,7 @@ public class ShoppingService implements IShoppingService {
         }
 
         basketFacade.decreaseInventory(info.getProductId(), info.getQuantity());
-        basket.removeItem(info.getProductId());
+        basket.removeItem(info.getProductId(), info.getQuantity());
 
         System.out.println("Purchase complete for client " + info.getClientId() + 
                            " of " + info.getQuantity() + " units of product " + info.getProductId());
