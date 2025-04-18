@@ -44,17 +44,17 @@ public class UserService {
         return Response.success(null);
     }
 
-    public Response<UserDTO> register(String sessionToken, String username, String password) {
+    public Response<UserDTO> register(String sessionToken, String username, String password, String email) {
         if (!tokenService.validateToken(sessionToken)) {
             return Response.error("Invalid token");
         }
 
         String id = tokenService.extractId(sessionToken);
-        // TODO: Continue register
 
         try {
-            loginManager.register(id, username, password); // Validate the session token
-            return Response.success(userDto);
+            Member member = loginManager.register(id, username, password, email);
+            
+            return Response.success(new UserDTO(member.getName(), sessionToken));
         } catch (IllegalStateException e) {
             return Response.error("Failed to register user: " + e.getMessage());
         }
@@ -70,7 +70,16 @@ public class UserService {
     }
 
     public Response<UserDTO> login(String username, String password) {
-        // Logic to authenticate a user
-        throw new UnsupportedOperationException("Not implemented yet");
+        try {
+            Member member = loginManager.login(username, password);
+            String token = tokenService.generateToken(member.getId());
+            return Response.success(new UserDTO(member.getName(), token));
+        } catch (IllegalArgumentException e) {
+            return Response.error("Invalid username or password: " + e.getMessage());
+        } catch (NoSuchElementException e) {
+            return Response.error("User not found: " + e.getMessage());
+        } catch (Exception e) {
+            return Response.error("An unexpected error occurred: " + e.getMessage());
+        }
     }
 }

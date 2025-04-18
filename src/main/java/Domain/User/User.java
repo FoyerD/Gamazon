@@ -4,13 +4,19 @@ import Domain.Shopping.IShoppingCart;
 
 public abstract class User {
 
-    private UUID id;
+    protected UUID id;
     private String username;
 
     boolean isLoggedIn;
 
     public User(String username) {
         this.id = UUID.randomUUID();
+        this.username = username;
+        isLoggedIn = true;
+    }
+
+    public User(UUID id, String username) {
+        this.id = id;
         this.username = username;
         isLoggedIn = true;
     }
@@ -23,16 +29,22 @@ public abstract class User {
         return isLoggedIn;
     }
 
+    public void login() {
+        this.isLoggedIn = true;
+    }
+
+    public void logout() {
+        this.isLoggedIn = false;
+    }
+
     public String getId() {
         return id.toString();
     }
 
-    public void setToken(UUID token) {
-        
-    }
+    public abstract Member register(String username, String password, String email);
 
     public void visitExit(LoginManager loginManager) {
-        this.isLoggedIn = false;
+        this.logout();
     }
 
 

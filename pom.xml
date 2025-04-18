@@ -56,6 +56,11 @@
       <artifactId>spring-security-crypto</artifactId>
       <version>6.1.4</version> <!-- Matches Spring Boot 3.1.4 -->
     </dependency>
+    <dependency>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
+      <version>1.7</version>
+    </dependency>
   </dependencies>
 
 
