@@ -71,14 +71,12 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities) {
+        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.HANDLE_INVENTORY);
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Integer productId = entry.getKey();
             Integer quantity = entry.getValue();
-    
-            // Check if the product already exists
             Item existingItem = itemRepository.getItem(storeId, String.valueOf(productId));
             if (existingItem == null) {
-                // Create a new item and add it to the repository
                 Item newItem = new Item(storeId, String.valueOf(productId), 0, quantity, "New product");
                 itemRepository.add(new Pair<>(storeId, String.valueOf(productId)), newItem);
                 System.out.println("Added product " + productId + " with quantity " + quantity + " to store " + storeId);
@@ -88,6 +86,7 @@ public class MarketFacade implements IMarketFacade {
     
     @Override
     public void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities) {
+        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.HANDLE_INVENTORY);
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Integer productId = entry.getKey();
             Integer quantity = entry.getValue();    
@@ -102,6 +101,7 @@ public class MarketFacade implements IMarketFacade {
     
     @Override
     public void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities) {
+        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.HANDLE_INVENTORY);
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Integer productId = entry.getKey();
             Integer quantity = entry.getValue();
@@ -157,7 +157,8 @@ public class MarketFacade implements IMarketFacade {
         if (store == null) {
             throw new IllegalArgumentException("Store not found.");
         }
-        store.setOpen(false);
+        // TODO: Amit should do it?
+        //store.closeStore(); // Assuming Store has a method to close itself
         notificationService.sendNotification(
             marketManager.getName(),
             "Store " + storeId + " has been closed."
@@ -178,7 +179,7 @@ public class MarketFacade implements IMarketFacade {
         }
         // TODO: Amit should do it?
         //store.cancelSubscriptions();
-        store.setOpen(false);
+        //store.closeStore();
         notificationService.sendNotification(
             marketManager.getName(),
             "Store " + storeId + " has been closed."
@@ -188,6 +189,7 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public Map<String, List<PermissionType>> getManagersPermissions(String storeId) {
+        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.VIEW_EMPLOYEE_INFO);
         Map<String, List<PermissionType>> result = new HashMap<>();
         Map<String, Permission> storeMap = storePermissions.get(storeId);
         if (storeMap != null) {
@@ -203,12 +205,18 @@ public class MarketFacade implements IMarketFacade {
     @Override
     public void respondToUserMessage(String storeId, int messageId, String response) {
         Store store = storeRepository.get(storeId);
-        // TODO: Amit should do it?
+        if (store == null) {
+            throw new IllegalArgumentException("Store not found.");
+        }
+        User marketManager = userRepository.getMarketManager();
+        checkPermission(marketManager.getName(), storeId, PermissionType.RESPOND_TO_INQUIRIES);
+        // TODO: Amit should do it? 
         //store.respondToMessage(messageId, response);
     }
 
     @Override
     public List<IShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to) {
+        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
         // TODO: Amit or Aviad should do it?
         //return storeRepository.get(storeId).getStorePurchaseHistory(from, to);
         return null; // Placeholder for actual implementation
