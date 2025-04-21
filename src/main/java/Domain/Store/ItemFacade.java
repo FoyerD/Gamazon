@@ -1,6 +1,7 @@
 package Domain.Store;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import Domain.Pair;
 
@@ -38,10 +39,40 @@ public class ItemFacade {
     }
     
     public boolean add(Pair<String, String> id, Item item) {
+        if (itemRepository.get(id) != null) {
+            return false; // Item already exists
+        }
+
+        // Lambdas that ignore input and always use item's productId
+        item.setCategoryFetcher(() ->
+            itemRepository.getByProductId(item.getProductId()).stream()
+                .flatMap(i -> i.getCategories().stream())
+                .collect(Collectors.toSet())
+        );
+
+        item.setNameFetcher(() ->
+            itemRepository.getByProductId(item.getProductId()).stream()
+                .findFirst()
+                .map(i -> {
+                    // Temporarily set nameFetcher to avoid recursion
+                    i.setNameFetcher(() -> ""); 
+                    return i.getProductName();
+                })
+                .orElse("Unknown Product")
+        );
+
         return itemRepository.add(id, item);
     }
 
     public Item remove(Pair<String, String> id) {
         return itemRepository.remove(id);
+    }
+
+    public void increaseAmount(Pair<String, String> id, int amount) {
+        itemRepository.get(id).increaseAmount(amount);
+    }
+
+    public void decreaseAmount(Pair<String, String> id, int amount) {
+        itemRepository.get(id).decreaseAmount(amount);
     }
 }
