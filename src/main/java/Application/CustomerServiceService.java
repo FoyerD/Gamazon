@@ -37,4 +37,17 @@ public class CustomerServiceService {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+
+    public Response<String> getFeedback(String customerId, String storeId, String productId) {
+        try {
+            Feedback feedback = this.feedbackFacade.getFeedback(storeId, productId, customerId);
+            if (feedback != null) {
+                return new Response<>(feedback.getComment());
+            } else {
+                throw new Exception("Feedback not found");
+            }
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
 }
