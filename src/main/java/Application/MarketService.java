@@ -1,202 +1,237 @@
 package Application;
 
 import Domain.IMarketFacade;
-import Domain.User.User;
 import Domain.User.IUserRepository;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import Domain.PermissionType;
+import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Shopping.IShoppingBasket;
-import Domain.Store.Item;
+import Domain.TokenService;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public class MarketService {
 
     private final IMarketFacade marketFacade;
-    private final IUserRepository userFacade;
+    private final TokenService tokenService;
 
-    public MarketService(IMarketFacade marketFacade, IUserRepository userFacade) {
+    public MarketService(IMarketFacade marketFacade, TokenService tokenService) {
         this.marketFacade = marketFacade;
-        this.userFacade = userFacade;
+        this.tokenService = tokenService;
     }
 
-    public Response<Void> pay(String sessionId, String card_owner, String card_number, Date expiry_date, String cvv, double price, String deliveryAddress) {
-        try {
-            User user = userFacade.getUser(sessionId);
-            marketFacade.purchase(card_owner, card_number, expiry_date, cvv, deliveryAddress, user, user.getUserShoppingCart());
-            return new Response<>(null);
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
+    private boolean isInvalid(String sessionToken) {
+        return !tokenService.validateToken(sessionToken);
     }
 
-    public Response<Void> updatePaymentService(IPaymentService paymentService) {
+    public Response<Void> updatePaymentService(String sessionToken, IPaymentService paymentService) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updatePaymentService(paymentService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<Void> updateNotificationService(INotificationService notificationService) {
+    public Response<Void> updateNotificationService(String sessionToken, INotificationService notificationService) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updateNotificationService(notificationService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<Void> updateSupplyService(ISupplyService supplyService) {
+    public Response<Void> updateSupplyService(String sessionToken, ISupplyService supplyService) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updateSupplyService(supplyService);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<Double> calculateCartPrice(String sessionId) {
-        try {
-            User user = userFacade.getUser(sessionId);
-            return new Response<>(marketFacade.calculateCartPrice(user.getUserShoppingCart()));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Void> updatePaymentServiceURL(String url) {
+    public Response<Void> updatePaymentServiceURL(String sessionToken, String url) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.updatePaymentServiceURL(url);
             return new Response<>(null);
         } catch (IOException e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<Map<Integer, IShoppingBasket>> getShoppingBaskets() {
+    public Response<Void> initFacades(String sessionToken, IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
-            return new Response<>(marketFacade.getShoppingBaskets());
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<IShoppingBasket> getShoppingBasket(int id) {
-        try {
-            return new Response<>(marketFacade.getShoppingBasket(id));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<List<IShoppingBasket>> getStoreShoppingBaskets(int storeId) {
-        try {
-            return new Response<>(marketFacade.getStoreShoppingBaskets(storeId));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<List<IShoppingBasket>> getUserShoppingBaskets(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        try {
-            return new Response<>(marketFacade.getUserShoppingBaskets(userName, startDateTime, endDateTime));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<List<IShoppingBasket>> getUserShoppingBasketsBetween(String userName, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        try {
-            return new Response<>(marketFacade.getUserShoppingBasketsBetween(userName, startDateTime, endDateTime));
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Void> addShoppingBasket(IShoppingBasket basket, String userName, double price) {
-        try {
-            marketFacade.addShoppingBasket(basket, userName, price);
+            marketFacade.initFacades(userFacade, storeFacade, itemFacade);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<Void> initFacades(IUserRepository userFacade, IStoreRepository storeFacade) {
-        try {
-            marketFacade.initFacades(userFacade, storeFacade);
-            return new Response<>(null);
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Integer> getShoppingBasketCount() {
-        try {
-            return new Response<>(marketFacade.getShoppingBasketCount());
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<Void> checkProductsExist(int storeId, Map<Integer, Item> productsId) {
-        try {
-            marketFacade.checkProductsExist(storeId, productsId);
-            return new Response<>(null);
-        } catch (Exception e) {
-            return new Response<>(e.getMessage());
-        }
-    }
-
-    public Response<INotificationService> getNotificationService() {
+    public Response<INotificationService> getNotificationService(String sessionToken) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             return new Response<>(marketFacade.getNotificationService());
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<IStoreRepository> getStoreFacade() {
+    public Response<Void> addProductsToInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
-            return new Response<>(marketFacade.getStoreFacade());
+            marketFacade.addProductsToInventory(storeId, productQuantities);
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    public Response<List<IShoppingBasket>> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Response<Void> updateProductQuantities(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
-            return new Response<>(marketFacade.getMyShoppingBasketHistory(sessionId, startDateTime, endDateTime));
+            marketFacade.updateProductQuantities(storeId, productQuantities);
+            return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    // implement function closeStore(int storeId) in MarketFacade
-    public Response<Void> closeStore(int storeId) {
+    public Response<Void> removeProductsFromInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.removeProductsFromInventory(storeId, productQuantities);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.appointStoreManager(appointerUsername, appointeeUsername, storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.removeStoreManager(removerUsername, managerUsername, storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.appointStoreOwner(appointerUsername, appointeeUsername, storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.changeManagerPermissions(ownerUsername, managerUsername, storeId, newPermissions);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> closeStore(String sessionToken, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.closeStore(storeId);
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 
-    // implement function open market in MarketFacade
-    public Response<Void> openMarket() {
+    public Response<Void> marketCloseStore(String sessionToken, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.marketCloseStore(storeId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Map<String, List<PermissionType>>> getManagersPermissions(String sessionToken, String storeId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            return new Response<>(marketFacade.getManagersPermissions(storeId));
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> respondToUserMessage(String sessionToken, String storeId, int messageId, String response) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            marketFacade.respondToUserMessage(storeId, messageId, response);
+            return new Response<>(null);
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<List<IShoppingBasket>> getStorePurchaseHistory(String sessionToken, String storeId, LocalDateTime from, LocalDateTime to) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            return new Response<>(marketFacade.getStorePurchaseHistory(storeId, from, to));
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Void> openMarket(String sessionToken) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
         try {
             marketFacade.openMarket();
             return new Response<>(null);
         } catch (Exception e) {
-            return new Response<>(e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
         }
     }
 }
