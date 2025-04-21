@@ -30,8 +30,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             basket.addOrder(productId, quantity);
         }
         cart.addItem(storeId, productId, quantity);
-        //cartRepo.saveCart(cart);
-        //basketRepo.savebasket(basket);
+        cartRepo.add(cart);
+        basketRepo.add(basket);
     }
 
 
@@ -45,8 +45,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
         cart.removeItem(storeId, productId, quantity);
         
-        //cartRepo.saveCart(cart);
-        //basketRepo.savebasket(basket);
+        cartRepo.add(cart);
+        basketRepo.add(basket);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         }
 
         cart.removeItem(storeId, productId);
-        //cartRepo.saveCart(cart);
-        //basketRepo.savebasket(basket);
+        cartRepo.add(cart);
+        basketRepo.add(basket);
     }
 
     @Override
