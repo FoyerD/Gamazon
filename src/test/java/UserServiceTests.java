@@ -18,7 +18,7 @@ public class UserServiceTests {
     @Before
     public void setUp() {
         // Initialize service and obtain a guest session token
-        userService = new UserService(new LoginManager(new Memory()), new TokenService());
+        userService = new UserService(new LoginManager(new MemoryUserRepository()), new TokenService());
         Response<UserDTO> guestResp = userService.guestEntry();
         assertFalse("Guest entry should succeed", guestResp.errorOccurred());
         guestToken = guestResp.getValue().getSessionToken();

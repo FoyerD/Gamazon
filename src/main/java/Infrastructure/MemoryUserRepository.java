@@ -5,9 +5,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import Domain.User.IUserRepository;
 import Domain.User.User;
 
-class MemoryItemRepository implements IUserRepository {
+public class MemoryUserRepository implements IUserRepository {
     Map<String, User> users;
-    public MemoryItemRepository() {
+    public MemoryUserRepository() {
         this.users = new ConcurrentHashMap<String, User>();
     }
     @Override
