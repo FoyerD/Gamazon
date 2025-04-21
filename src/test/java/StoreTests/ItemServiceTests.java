@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import Application.ItemService;
 import Application.Response;
+import Domain.Pair;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
@@ -130,4 +131,46 @@ public class ItemServiceTests {
         assertTrue("Expected error on negative price", response.errorOccurred());
         assertNotNull(response.getErrorMessage());
     }
+
+    @Test
+    public void GivenExistingItem_WhenIncreaseAmount_ThenAmountIsIncreased() {
+    Pair<String, String> id = new Pair<>("1", "101");
+    Response<Item> original = itemService.getItem("1", "101");
+    int originalAmount = original.getValue().getAmount();
+
+    Response<Void> response = itemService.increaseAmount(id, 5);
+
+    assertFalse("Expected increase amount to succeed", response.errorOccurred());
+
+    Response<Item> updated = itemService.getItem("1", "101");
+    assertEquals("Expected amount to increase", originalAmount + 5, updated.getValue().getAmount());
+    }
+
+    @Test
+    public void GivenExistingItem_WhenDecreaseAmount_ThenAmountIsDecreased() {
+    Pair<String, String> id = new Pair<>("1", "101");
+    Response<Item> original = itemService.getItem("1", "101");
+    int originalAmount = original.getValue().getAmount();
+
+    Response<Void> response = itemService.decreaseAmount(id, 2);
+
+    assertFalse("Expected decrease amount to succeed", response.errorOccurred());
+
+    Response<Item> updated = itemService.getItem("1", "101");
+    assertEquals("Expected amount to decrease", originalAmount - 2, updated.getValue().getAmount());
+    }
+
+    @Test
+    public void GivenItemWithLowStock_WhenDecreaseTooMuch_ThenReturnError() {
+        Pair<String, String> id = new Pair<>("1", "101");
+        Response<Item> item = itemService.getItem("1", "101");
+
+        int currentAmount = item.getValue().getAmount();
+        Response<Void> response = itemService.decreaseAmount(id, currentAmount + 10); // too much
+
+        assertTrue("Expected error when decreasing below zero", response.errorOccurred());
+        assertNotNull("Error message should be present", response.getErrorMessage());
+    }
+
+    
 }
