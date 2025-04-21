@@ -86,4 +86,19 @@ public class Item {
     public double getRating() {
         return IntStream.range(0, rates.length).map(i -> (i+1) * rates[i]).sum() / (Arrays.stream(rates).sum() + 0.0);
     }
+    public void decreaseAmount(int amount) {
+        if (amount < 0) 
+            throw new IllegalArgumentException("Amount cannot be negative");
+        
+        if (this.amount - amount < 0) 
+            throw new IllegalArgumentException("Not enough items in stock");
+        
+        this.amount -= amount;
+    }
+    public void increaseAmount(int amount) {
+        if (amount < 0) 
+            throw new IllegalArgumentException("Amount cannot be negative");
+        
+        this.amount += amount;
+    }
 }

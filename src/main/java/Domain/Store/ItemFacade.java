@@ -44,4 +44,12 @@ public class ItemFacade {
     public Item remove(Pair<String, String> id) {
         return itemRepository.remove(id);
     }
+
+    public void increaseAmount(Pair<String, String> id, int amount) {
+        itemRepository.get(id).increaseAmount(amount);
+    }
+
+    public void decreaseAmount(Pair<String, String> id, int amount) {
+        itemRepository.get(id).decreaseAmount(amount);
+    }
 }
