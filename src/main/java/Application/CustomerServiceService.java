@@ -1,29 +1,38 @@
 package Application;
 
+import Domain.Store.Feedback;
+import Domain.Store.FeedbackFacade;
 import Domain.Store.IStoreRepository;
+import Domain.Store.StoreFacade;
 
 public class CustomerServiceService {
-    private IStoreRepository storeRepository;
+    private StoreFacade storeFacade;
+    private FeedbackFacade feedbackFacade;
     
-    public CustomerServiceService(IStoreRepository storeRepository) {
-        this.storeRepository = storeRepository;
+    public CustomerServiceService(StoreFacade storeFacade, FeedbackFacade feedbackFacade) {
+        this.storeFacade = storeFacade;
+        this.feedbackFacade = feedbackFacade;
     }
     public CustomerServiceService() {
-        this.storeRepository = null;
+        this.storeFacade = null;
+        this.feedbackFacade = null;
+    }
+    public void setStoreFacade(StoreFacade storeFacade) {
+        this.storeFacade = storeFacade;
+    }
+    public void setFeedbackFacade(FeedbackFacade feedbackFacade) {
+        this.feedbackFacade = feedbackFacade;
+    }
+    public boolean isInitialized() {
+        return this.storeFacade != null && this.feedbackFacade != null;
     }
 
-    public Response<Boolean> setStoreRepository(IStoreRepository storeRepository) {
-        try {
-            return new Response<>();
-        } catch (Exception ex) {
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
 
     public Response<Boolean> addFeedback(String customerId, String storeId, String productId, String comment) {
         try {
             // Assuming storeRepository has a method to add feedback
-            return new Response<>();
+            boolean result = this.feedbackFacade.addFeedback(storeId, productId, customerId, comment);
+            return new Response<>(result);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
         }
