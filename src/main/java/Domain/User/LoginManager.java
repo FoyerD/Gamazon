@@ -9,7 +9,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 public class LoginManager {
     private IUserRepository userRepository;
 
-    private LoginManager(IUserRepository userRepository) {
+    public LoginManager(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
