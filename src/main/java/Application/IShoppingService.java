@@ -1,11 +1,13 @@
-import Domain.Shopping.PurchaseInfo;
+package Application;
+
+import Domain.Store.Item;
 
 public interface IShoppingService {
-    void addProductToCart(PurchaseInfo request);
-    IShoppingCart getCart(String clientId);
-    IShoppingBasket getBasket(String clientId, String storeId);
-    void immediatePurchase(PurchaseInfo request);
-    void makeBid(PurchaseInfo request);
-    void joinAuction(PurchaseInfo request);
-    void joinLottery(PurchaseInfo request);
+    void addProductToCart(String clientId, Item item);
+    void removeProductFromCart(String clientId, Item item);
+    //IShoppingCart getCart(String clientId);
+    void immediatePurchase(Item item);
+    void makeBid(Item item);
+    void joinAuction(Item item);
+    void joinLottery(Item item);
 }

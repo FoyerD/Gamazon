@@ -1,6 +1,9 @@
 package Domain.Shopping;
 
-public class ShoppingBasketRepository implements IShoppingBasketRepository{
+import java.util.HashMap;
+import java.util.Map;
+
+public class ShoppingBasketRepository implements IShoppingBasketRepository {
     
     private Map<Pair, ShoppingBasket> shoppingBaskets;
 
@@ -9,22 +12,22 @@ public class ShoppingBasketRepository implements IShoppingBasketRepository{
         this.shoppingBaskets = new HashMap<>();
     }
 
-    public IShoppingBasket get(String clientId, String storeId) {
+    public ShoppingBasket get(String clientId, String storeId) {
 
         return shoppingBaskets.get(new Pair(clientId, storeId));
     }
 
-    public IShoppingBasket remove(String clientId, String storeId) {
+    public ShoppingBasket remove(String clientId, String storeId) {
         return shoppingBaskets.remove(new Pair(clientId, storeId));
     }
 
-    public void add(IShoppingBasket shoppingBasket) {
+    public void add(ShoppingBasket shoppingBasket) {
         if (shoppingBasket == null) {
             throw new IllegalArgumentException("Shopping basket cannot be null");
         }
-        String clientId = shoppingBasket.getClientId();
-        String storeId = shoppingBasket.getStoreId();
-        shoppingBaskets.put(new Pair(clientId, storeId), (ShoppingBasket) shoppingBasket);
+        //String clientId = shoppingBasket.getClientId();
+        //String storeId = shoppingBasket.getStoreId();
+        //shoppingBaskets.put(new Pair(clientId, storeId), (ShoppingBasket) shoppingBasket);
     }
 
     public boolean contains(String clientId, String storeId) {
@@ -62,4 +65,12 @@ public class ShoppingBasketRepository implements IShoppingBasketRepository{
         }
 
     }
+
+
+    @Override
+    public void update(ShoppingBasket shoppingBasket) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
 }

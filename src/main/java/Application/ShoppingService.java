@@ -1,6 +1,9 @@
+package Application;
+import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.IShoppingCart;
+
 public class ShoppingService implements IShoppingService {
-    private final IShoppingCartFacade;
-    private final IShoppingBasketFacade;
+    private final IShoppingCartFacade shoppingCartFacade;
 
     
     public ShoppingService(IShoppingBasketRepository basketRepository, IShoppingCartRepository cartRepository) {
@@ -18,13 +21,13 @@ public class ShoppingService implements IShoppingService {
 
     @Override
     public IShoppingCart getCart(String clientId) {
-        return cartFacade.getCart(clientId);
+        return cartFacade.get(clientId);
     }
 
-    @Override
-    public IShoppingBasket getBasket(String clientId, String storeId) {
-        return cartFacade.getBasket(clientId, storeId);
-    }
+    // @Override
+    // public IShoppingBasket getBasket(String clientId, String storeId) {
+    //     return cartFacade.getBasket(clientId, storeId);
+    // }
 
     @Override
     public void immediatePurchase(PurchaseInfo info) {

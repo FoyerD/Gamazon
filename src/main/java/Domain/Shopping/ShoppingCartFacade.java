@@ -1,38 +1,70 @@
 package Domain.Shopping;
 
+import Domain.Store.Item;
+
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
+    private final IShoppingBasketRepository basketRepo;
 
     public ShoppingCartFacade(IShoppingCartRepository cartRepo) {
         this.cartRepo = cartRepo;
+        this.basketRepo = new ShoppingBasketRepository();
     }
 
     @Override
     public IShoppingCart getCart(String clientId) {
-        IShoppingCart cart = cartRepo.getCart(clientId);
+        IShoppingCart cart = cartRepo.get(clientId);
         if (cart == null) {
             cart = new ShoppingCart(clientId);
-            cartRepo.saveCart(cart);
         }
         return cart;
     }
 
+
     @Override
-    public IShoppingBasket getBasket(String clientId, String storeId) {
-        IShoppingCart cart = cartRepo.getCart(clientId);
-        if (cart == null) return null;
-        return cart.getBasketByStoreId(storeId);
+    public void addProductToCart(String storeId, String clientId, String productId, int quantity) {
+        IShoppingCart cart = getCart(clientId);
+        ShoppingBasket basket = cart.getBasket(storeId);
+        if (basket == null) {
+            basket = new ShoppingBasket();
+            basket.addOrder(productId, quantity);
+        }
+        cart.addItem(storeId, productId, quantity);
+        //cartRepo.saveCart(cart);
+        //basketRepo.savebasket(basket);
+    }
+
+
+    @Override
+    public void removeProductFromCart(String storeId, String clientId, String productId, int quantity) {
+        IShoppingCart cart = getCart(clientId);
+        ShoppingBasket basket = cart.getBasket(storeId);
+        if (basket == null) {
+            throw new IllegalArgumentException("No orders in this store");
+        }
+
+        cart.removeItem(storeId, productId, quantity);
+        
+        //cartRepo.saveCart(cart);
+        //basketRepo.savebasket(basket);
     }
 
     @Override
-    public void addProductToCart(PurchaseInfo info) {
-        IShoppingCart cart = getCart(info.getClientId());
-        IShoppingBasket basket = cart.getBasketByStoreId(info.getStoreId());
+    public void removeProductFromCart(String storeId, String clientId, String productId) {
+        IShoppingCart cart = getCart(clientId);
+        ShoppingBasket basket = cart.getBasket(storeId);
         if (basket == null) {
-            basket = new ShoppingBasket(info.getStoreId());
-            cart.addBasket(basket);
+            throw new IllegalArgumentException("No orders in this store");
         }
-        basket.addItem(info.getProductId(), info.getQuantity());
-        cartRepo.saveCart(cart);
+
+        cart.removeItem(storeId, productId);
+        //cartRepo.saveCart(cart);
+        //basketRepo.savebasket(basket);
+    }
+
+    @Override
+    public void checkout(String clientId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'checkout'");
     }
 }
