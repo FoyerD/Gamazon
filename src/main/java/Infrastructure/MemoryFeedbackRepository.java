@@ -1,0 +1,59 @@
+package Infrastructure;
+
+import Domain.Store.IFeedbackRepository;
+import Domain.Store.Feedback;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import Domain.Pair; 
+public class MemoryFeedbackRepository implements IFeedbackRepository{
+    private Map<Pair<Pair<String, String>, String>, Feedback> feedbacks;
+
+    public MemoryFeedbackRepository() {
+        this.feedbacks = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public Feedback get(String storeId, String productId, String userId) {
+        return this.get(new Pair<>(new Pair<>(storeId, productId), userId));
+    }
+
+    @Override
+    public boolean add(String storeId, String productId, String userId, Feedback item) {
+        return this.add(new Pair<>(new Pair<>(storeId, productId), userId), item);
+    }
+
+    @Override
+    public Feedback remove(String storeId, String productId, String userId) {
+        return this.remove(new Pair<>(new Pair<>(storeId, productId), userId));
+    }
+
+    public Feedback update(String storeId, String productId, String userId, Feedback item) {
+        return this.update(new Pair<>(new Pair<>(storeId, productId), userId), item);
+    }
+
+
+    @Override
+    public Feedback remove(Pair<Pair<String, String>, String> id) {
+        return feedbacks.remove(id);
+    }
+
+    @Override
+    public Feedback get(Pair<Pair<String, String>, String> id) {
+        return this.feedbacks.get(id);
+    }
+
+    @Override
+    public Feedback update(Pair<Pair<String, String>, String> id, Feedback item) {
+        if (!this.feedbacks.containsKey(id)) throw new IllegalArgumentException("Item with this ID does not exist");
+        return this.feedbacks.put(id, item);
+    }
+
+    @Override
+    public boolean add(Pair<Pair<String, String>, String> id, Feedback item) {
+        if (this.feedbacks.containsKey(id)) throw new IllegalArgumentException("Item with this ID already exists");
+        return this.feedbacks.put(id, item) == null;
+    }
+    
+}
