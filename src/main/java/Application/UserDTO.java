@@ -10,6 +10,7 @@ public class UserDTO {
         this.sessionToken = sessionToken;
     }
 
+
     public String getUsername() {
         return username;
     }
