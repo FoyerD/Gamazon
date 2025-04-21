@@ -98,7 +98,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.addProductsToInventory(storeId, productQuantities);
+            marketFacade.addProductsToInventory(storeId, productQuantities, tokenService.extractId(sessionToken));
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -109,7 +109,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.updateProductQuantities(storeId, productQuantities);
+            marketFacade.updateProductQuantities(storeId, productQuantities, tokenService.extractId(sessionToken));
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -120,7 +120,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.removeProductsFromInventory(storeId, productQuantities);
+            marketFacade.removeProductsFromInventory(storeId, productQuantities, tokenService.extractId(sessionToken));
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -175,7 +175,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.closeStore(storeId);
+            marketFacade.closeStore(storeId, tokenService.extractId(sessionToken));
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -186,7 +186,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.marketCloseStore(storeId);
+            marketFacade.marketCloseStore(storeId, tokenService.extractId(sessionToken));
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -197,7 +197,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            return new Response<>(marketFacade.getManagersPermissions(storeId));
+            return new Response<>(marketFacade.getManagersPermissions(storeId, tokenService.extractId(sessionToken)));
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
         }
@@ -207,7 +207,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.respondToUserMessage(storeId, messageId, response);
+            marketFacade.respondToUserMessage(storeId, messageId, response, tokenService.extractId(sessionToken));
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -218,7 +218,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            return new Response<>(marketFacade.getStorePurchaseHistory(storeId, from, to));
+            return new Response<>(marketFacade.getStorePurchaseHistory(storeId, from, to, tokenService.extractId(sessionToken)));
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
         }
@@ -228,7 +228,7 @@ public class MarketService {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.openMarket();
+            marketFacade.openMarket(tokenService.extractId(sessionToken));
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));

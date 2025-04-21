@@ -129,6 +129,10 @@ public class Permission {
         return role == RoleType.STORE_FOUNDER;
     }
 
+    public boolean isTradingManager() {
+        return role == RoleType.TRADING_MANAGER;
+    }
+
     public String getPermissionGiverName() {
         return permissionGiverName;
     }

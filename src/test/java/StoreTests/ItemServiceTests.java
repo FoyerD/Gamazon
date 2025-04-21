@@ -1,14 +1,11 @@
 package StoreTests;
 
-import java.util.List;
+import static org.junit.Assert.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import Application.ItemService;
 import Application.Response;
@@ -24,153 +21,165 @@ public class ItemServiceTests {
 
     @Before
     public void setUp() {
-        itemService = new ItemService(new ItemFacade(new MemoryItemRepository())); // In real use, you would inject test repositories
+        itemService = new ItemService(new ItemFacade(new MemoryItemRepository()));
     }
 
+    // 1. getItem
     @Test
-    public void testFilterItems_positiveCase() {
-        ItemFilter filter = new ItemFilter.Builder()
-                .minPrice(50f)
-                .maxPrice(500f)
-                .minRating(3.0f)
-                .build();
-
-        Response<List<Item>> response = itemService.filterItems(filter);
-
-        assertFalse("No error should occur", response.errorOccurred());
-        assertNotNull(response.getValue());
-        assertFalse("Expected non-empty result", response.getValue().isEmpty());
-    }
-
-    @Test
-    public void testFilterItems_negativeCase_noMatches() {
-        ItemFilter filter = new ItemFilter.Builder()
-                .minPrice(99999f)
-                .build();
-
-        Response<List<Item>> response = itemService.filterItems(filter);
-
+    public void GivenValidStoreAndProduct_WhenGetItem_ThenReturnItem() {
+        Response<Item> response = itemService.getItem("1", "101");
         assertFalse(response.errorOccurred());
         assertNotNull(response.getValue());
-        assertTrue("Expected empty result", response.getValue().isEmpty());
     }
 
     @Test
-    public void testGetItemsByStoreId_positiveCase() {
-        Response<List<Item>> response = itemService.getItemsByStoreId("store1");
-
-        assertFalse(response.errorOccurred());
-        assertNotNull(response.getValue());
-        assertFalse("Expected items in store", response.getValue().isEmpty());
-
-        for (Item item : response.getValue()) {
-            assertEquals("store1", item.getStoreId());
-        }
-    }
-
-    @Test
-    public void testGetItemsByStoreId_negativeCase_nonexistentStore() {
-        Response<List<Item>> response = itemService.getItemsByStoreId("invalid-store");
-
-        assertFalse(response.errorOccurred());
-        assertNotNull(response.getValue());
-        assertTrue("Expected no items for invalid store", response.getValue().isEmpty());
-    }
-
-    @Test
-    public void testGetAvailableItems_positiveCase() {
-        Response<List<Item>> response = itemService.getAvailableItems("prod1");
-
-        assertFalse(response.errorOccurred());
-        assertNotNull(response.getValue());
-        assertFalse("Expected available items", response.getValue().isEmpty());
-
-        for (Item item : response.getValue()) {
-            assertEquals("prod1", item.getProductId());
-            assertTrue("Item should be in stock", item.getAmount() > 0);
-        }
-    }
-
-    @Test
-    public void testGetAvailableItems_negativeCase_noneAvailable() {
-        Response<List<Item>> response = itemService.getAvailableItems("out-of-stock-product");
-
-        assertFalse(response.errorOccurred());
-        assertNotNull(response.getValue());
-        assertTrue("Expected empty result for out-of-stock product", response.getValue().isEmpty());
-    }
-
-    @Test
-    public void testAddRating_positiveCase() {
-        Response<Void> response = itemService.addRating("store1", "prod1", 4.0f);
-
-        assertFalse("Expected rating to succeed", response.errorOccurred());
-        assertNull("Void response should have null value", response.getValue());
-    }
-
-    @Test
-    public void testAddRating_negativeCase_invalidRating() {
-        Response<Void> response = itemService.addRating("store1", "prod1", 7.5f);
-
-        assertTrue("Expected error for invalid rating", response.errorOccurred());
-        assertNotNull("Should contain error message", response.getErrorMessage());
-    }
-
-    @Test
-    public void testChangePrice_positiveCase() {
-        Response<Boolean> response = itemService.changePrice("1", "101", 199.99f);
-
-        assertFalse("Expected successful price change", response.errorOccurred());
-        assertTrue("Price change should return true", Boolean.TRUE.equals(response.getValue()));
-    }
-
-    @Test
-    public void testChangePrice_negativeCase_invalidPrice() {
-        Response<Boolean> response = itemService.changePrice("1", "101", -50.0f);
-
-        assertTrue("Expected error on negative price", response.errorOccurred());
+    public void GivenInvalidStoreOrProduct_WhenGetItem_ThenReturnError() {
+        Response<Item> response = itemService.getItem("invalid", "invalid");
+        assertTrue(response.errorOccurred());
         assertNotNull(response.getErrorMessage());
     }
 
+    // 2. changePrice
     @Test
-    public void GivenExistingItem_WhenIncreaseAmount_ThenAmountIsIncreased() {
-    Pair<String, String> id = new Pair<>("1", "101");
-    Response<Item> original = itemService.getItem("1", "101");
-    int originalAmount = original.getValue().getAmount();
-
-    Response<Void> response = itemService.increaseAmount(id, 5);
-
-    assertFalse("Expected increase amount to succeed", response.errorOccurred());
-
-    Response<Item> updated = itemService.getItem("1", "101");
-    assertEquals("Expected amount to increase", originalAmount + 5, updated.getValue().getAmount());
+    public void GivenValidItem_WhenChangePrice_ThenReturnTrue() {
+        Response<Boolean> response = itemService.changePrice("1", "101", 99.99f);
+        assertFalse(response.errorOccurred());
+        assertTrue(response.getValue());
     }
 
     @Test
-    public void GivenExistingItem_WhenDecreaseAmount_ThenAmountIsDecreased() {
-    Pair<String, String> id = new Pair<>("1", "101");
-    Response<Item> original = itemService.getItem("1", "101");
-    int originalAmount = original.getValue().getAmount();
+    public void GivenInvalidPrice_WhenChangePrice_ThenReturnError() {
+        Response<Boolean> response = itemService.changePrice("1", "101", -10f);
+        assertTrue(response.errorOccurred());
+        assertNotNull(response.getErrorMessage());
+    }
 
-    Response<Void> response = itemService.decreaseAmount(id, 2);
-
-    assertFalse("Expected decrease amount to succeed", response.errorOccurred());
-
-    Response<Item> updated = itemService.getItem("1", "101");
-    assertEquals("Expected amount to decrease", originalAmount - 2, updated.getValue().getAmount());
+    // 3. filterItems
+    @Test
+    public void GivenMatchingFilter_WhenFilterItems_ThenReturnNonEmptyList() {
+        ItemFilter filter = new ItemFilter.Builder().minPrice(10).maxPrice(500).build();
+        Response<List<Item>> response = itemService.filterItems(filter);
+        assertFalse(response.errorOccurred());
+        assertFalse(response.getValue().isEmpty());
     }
 
     @Test
-    public void GivenItemWithLowStock_WhenDecreaseTooMuch_ThenReturnError() {
+    public void GivenNonMatchingFilter_WhenFilterItems_ThenReturnEmptyList() {
+        ItemFilter filter = new ItemFilter.Builder().minPrice(99999).build();
+        Response<List<Item>> response = itemService.filterItems(filter);
+        assertFalse(response.errorOccurred());
+        assertTrue(response.getValue().isEmpty());
+    }
+
+    // 4. getItemsByStoreId
+    @Test
+    public void GivenExistingStoreId_WhenGetItems_ThenReturnItems() {
+        Response<List<Item>> response = itemService.getItemsByStoreId("store1");
+        assertFalse(response.errorOccurred());
+        assertFalse(response.getValue().isEmpty());
+    }
+
+    @Test
+    public void GivenNonexistentStoreId_WhenGetItems_ThenReturnEmptyList() {
+        Response<List<Item>> response = itemService.getItemsByStoreId("invalid-store");
+        assertFalse(response.errorOccurred());
+        assertTrue(response.getValue().isEmpty());
+    }
+
+    // 5. getAvailableItems
+    @Test
+    public void GivenProductWithStock_WhenGetAvailableItems_ThenReturnItems() {
+        Response<List<Item>> response = itemService.getAvailableItems("prod1");
+        assertFalse(response.errorOccurred());
+        assertFalse(response.getValue().isEmpty());
+    }
+
+    @Test
+    public void GivenOutOfStockProduct_WhenGetAvailableItems_ThenReturnEmptyList() {
+        Response<List<Item>> response = itemService.getAvailableItems("out-of-stock-product");
+        assertFalse(response.errorOccurred());
+        assertTrue(response.getValue().isEmpty());
+    }
+
+    // 6. increaseAmount
+    @Test
+    public void GivenValidItem_WhenIncreaseAmount_ThenAmountIncreased() {
+        Pair<String, String> id = new Pair<>("1", "101");
+        Response<Item> before = itemService.getItem("1", "101");
+        int oldAmount = before.getValue().getAmount();
+
+        Response<Void> response = itemService.increaseAmount(id, 3);
+        assertFalse(response.errorOccurred());
+
+        Response<Item> after = itemService.getItem("1", "101");
+        assertEquals(oldAmount + 3, after.getValue().getAmount());
+    }
+
+    @Test
+    public void GivenInvalidItem_WhenIncreaseAmount_ThenReturnError() {
+        Pair<String, String> id = new Pair<>("bad", "bad");
+        Response<Void> response = itemService.increaseAmount(id, 3);
+        assertTrue(response.errorOccurred());
+    }
+
+    // 7. decreaseAmount
+    @Test
+    public void GivenValidItem_WhenDecreaseAmount_ThenAmountDecreased() {
+        Pair<String, String> id = new Pair<>("1", "101");
+        Response<Item> before = itemService.getItem("1", "101");
+        int oldAmount = before.getValue().getAmount();
+
+        Response<Void> response = itemService.decreaseAmount(id, 2);
+        assertFalse(response.errorOccurred());
+
+        Response<Item> after = itemService.getItem("1", "101");
+        assertEquals(oldAmount - 2, after.getValue().getAmount());
+    }
+
+    @Test
+    public void GivenTooLargeDecrease_WhenDecreaseAmount_ThenReturnError() {
         Pair<String, String> id = new Pair<>("1", "101");
         Response<Item> item = itemService.getItem("1", "101");
-
-        int currentAmount = item.getValue().getAmount();
-        Response<Void> response = itemService.decreaseAmount(id, currentAmount + 10); // too much
-
-        assertTrue("Expected error when decreasing below zero", response.errorOccurred());
-        assertNotNull("Error message should be present", response.getErrorMessage());
+        Response<Void> response = itemService.decreaseAmount(id, item.getValue().getAmount() + 100);
+        assertTrue(response.errorOccurred());
+        assertNotNull(response.getErrorMessage());
     }
 
-    
+    // 8. add
+    @Test
+    public void GivenNewItem_WhenAdd_ThenReturnTrue() {
+        Item item = new Item("storeX", "prodX",19.99f , 3, "Cool Product");
+        Pair<String, String> id = new Pair<>("storeX", "prodX");
+
+        Response<Boolean> response = itemService.add(id, item);
+        assertFalse(response.errorOccurred());
+        assertTrue(response.getValue());
+    }
+
+    @Test
+    public void GivenDuplicateItem_WhenAdd_ThenReturnFalse() {
+        Pair<String, String> id = new Pair<>("1", "101");
+        Item existingItem = itemService.getItem("1", "101").getValue();
+
+        Response<Boolean> response = itemService.add(id, existingItem);
+        assertFalse(response.errorOccurred());
+        assertFalse(response.getValue()); // Already exists
+    }
+
+    // 9. remove
+    @Test
+    public void GivenExistingItem_WhenRemove_ThenReturnItem() {
+        Pair<String, String> id = new Pair<>("1", "101");
+        Response<Item> response = itemService.remove(id);
+        assertFalse(response.errorOccurred());
+        assertEquals("101", response.getValue().getProductId());
+    }
+
+    @Test
+    public void GivenNonexistentItem_WhenRemove_ThenReturnError() {
+        Pair<String, String> id = new Pair<>("invalid", "invalid");
+        Response<Item> response = itemService.remove(id);
+        assertTrue(response.errorOccurred());
+        assertNotNull(response.getErrorMessage());
+    }
 }

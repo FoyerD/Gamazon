@@ -70,8 +70,8 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities) {
-        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.HANDLE_INVENTORY);
+    public void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Integer productId = entry.getKey();
             Integer quantity = entry.getValue();
@@ -85,8 +85,8 @@ public class MarketFacade implements IMarketFacade {
     }
     
     @Override
-    public void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities) {
-        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.HANDLE_INVENTORY);
+    public void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Integer productId = entry.getKey();
             Integer quantity = entry.getValue();    
@@ -100,8 +100,8 @@ public class MarketFacade implements IMarketFacade {
     }
     
     @Override
-    public void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities) {
-        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.HANDLE_INVENTORY);
+    public void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
         for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
             Integer productId = entry.getKey();
             Integer quantity = entry.getValue();
@@ -147,17 +147,16 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void closeStore(String storeId) {
-        User marketManager = userRepository.getMarketManager();
+    public void closeStore(String storeId, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
+        User marketManager = userRepository.getUserByUsername(userRepository.get(userId).getName());
         if (marketManager == null) {
             throw new IllegalStateException("Market manager is not assigned.");
         }
-        checkPermission(marketManager.getName(), storeId, PermissionType.DEACTIVATE_STORE);
         Store store = storeRepository.get(storeId);
         if (store == null) {
             throw new IllegalArgumentException("Store not found.");
         }
-        // TODO: Amit should do it?
         //store.closeStore(); // Assuming Store has a method to close itself
         notificationService.sendNotification(
             marketManager.getName(),
@@ -167,29 +166,40 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void marketCloseStore(String storeId) {
-        User marketManager = userRepository.getMarketManager();
+    public void marketCloseStore(String storeId, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
+        User marketManager = userRepository.getUserByUsername(userRepository.get(userId).getName());
         if (marketManager == null) {
             throw new IllegalStateException("Market manager is not assigned.");
         }
-        checkPermission(marketManager.getName(), storeId, PermissionType.DEACTIVATE_STORE);
         Store store = storeRepository.get(storeId);
         if (store == null) {
             throw new IllegalArgumentException("Store not found.");
         }
-        // TODO: Amit should do it?
-        //store.cancelSubscriptions();
-        //store.closeStore();
+        // Remove all users from the store permissions
+        for (Map.Entry<String, Permission> entry : storePermissions.get(storeId).entrySet()) {
+            String username = entry.getKey();
+            Permission permission = entry.getValue();
+            if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
+                // Remove permissions for store managers and owners
+                permission.setPermissions(Set.of());
+                permission.setRole(null);
+            }
+            notificationService.sendNotification(
+                username,
+                "Store " + storeId + " has been closed."
+            );
+        }
+        //store.closeStore(); // Assuming Store has a method to close itself
         notificationService.sendNotification(
             marketManager.getName(),
             "Store " + storeId + " has been closed."
         );
-        System.out.println("Store " + storeId + " has been successfully closed by the market manager.");
     }
 
     @Override
-    public Map<String, List<PermissionType>> getManagersPermissions(String storeId) {
-        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.VIEW_EMPLOYEE_INFO);
+    public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.SUPERVISE_MANAGERS);
         Map<String, List<PermissionType>> result = new HashMap<>();
         Map<String, Permission> storeMap = storePermissions.get(storeId);
         if (storeMap != null) {
@@ -203,38 +213,37 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void respondToUserMessage(String storeId, int messageId, String response) {
+    public void respondToUserMessage(String storeId, int messageId, String response, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.RESPOND_TO_INQUIRIES);
         Store store = storeRepository.get(storeId);
         if (store == null) {
             throw new IllegalArgumentException("Store not found.");
         }
-        User marketManager = userRepository.getMarketManager();
-        checkPermission(marketManager.getName(), storeId, PermissionType.RESPOND_TO_INQUIRIES);
         // TODO: Amit should do it? 
         //store.respondToMessage(messageId, response);
     }
 
     @Override
-    public List<IShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to) {
-        checkPermission(userRepository.getMarketManager().getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
+    public List<IShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
         // TODO: Amit or Aviad should do it?
         //return storeRepository.get(storeId).getStorePurchaseHistory(from, to);
         return null; // Placeholder for actual implementation
     }
 
     @Override
-    public void openMarket() {
+    public void openMarket(String userId) {
         if (paymentService == null || supplyService == null || notificationService == null || userRepository == null) {
             throw new IllegalStateException("Services not initialized.");
         }
         paymentService.initialize();
         supplyService.initialize();
         notificationService.initialize();
-        User manager = userRepository.getMarketManager();
-        Permission founder = new Permission("system", manager.getName());
+        User marketManager = userRepository.getUserByUsername(userId);        
+        Permission founder = new Permission("system", marketManager.getName());
         founder.initTradingManager();
         storePermissions.putIfAbsent("market", new HashMap<>());
-        storePermissions.get("market").put(manager.getName(), founder);
+        storePermissions.get("market").put(marketManager.getName(), founder);
         System.out.println("Market opened.");
     }
 
