@@ -42,5 +42,15 @@ public class StoreService {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+    public Response<Boolean> closeStore(String sessionId, String storeId){
+        try {
+            if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
 
+            //TODO!: session logic
+            boolean result = this.storeFacade.closeStore(storeId);
+            return new Response<>(result);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
 }
