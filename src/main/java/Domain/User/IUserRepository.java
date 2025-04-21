@@ -12,5 +12,4 @@ public interface IUserRepository extends IRepository<User, String> {
 
     public String getMemberUsername(String id);
     public boolean userIsMember(String id);
-    public User getMarketManager();
 }
