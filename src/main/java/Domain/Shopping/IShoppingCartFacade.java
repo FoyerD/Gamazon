@@ -1,7 +1,15 @@
 package Domain.Shopping;
 
+
 public interface IShoppingCartFacade {
     IShoppingCart getCart(String clientId);
-    IShoppingBasket getBasket(String clientId, String storeId);
-    void addProductToCart(PurchaseInfo info);
+    ShoppingBasket getBasket(String clientId, String storeId);
+    boolean addProductToCart(String storeId, String clientId, String productId, int quantity);
+    boolean checkout(String clientId);
+    boolean removeProductFromCart(String storeId, String clientId, String productId, int quantity);
+    boolean removeProductFromCart(String storeId, String clientId, String productId);
+    int getTotalItems(String clientId);
+    boolean isEmpty(String clientId);
+    boolean clearCart(String clientId);
+    boolean clearBasket(String clientId, String storeId);
 }

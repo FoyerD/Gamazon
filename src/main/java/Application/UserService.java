@@ -54,7 +54,7 @@ public class UserService {
         try {
             Member member = loginManager.register(id, username, password, email);
             
-            return Response.success(new UserDTO(member.getName(), sessionToken));
+            return Response.success(new UserDTO(member.getName(), sessionToken, email));
         } catch (IllegalStateException e) {
             return Response.error("Failed to register user: " + e.getMessage());
         }

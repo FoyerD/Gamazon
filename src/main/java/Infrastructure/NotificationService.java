@@ -5,9 +5,9 @@ import Domain.ExternalServices.INotificationService;
 public class NotificationService implements INotificationService {
     
     @Override
-    public void sendNotification(String name, String string, String deliveryAddress) {
+    public void sendNotification(String name, String content) {
         // Implementation for sending notification with additional parameters
-        System.out.println("Notification sent to " + name + ": " + string + " at " + deliveryAddress);
+        System.out.println("Notification sent to " + name + ": " + content);
     }
 
     public void initialize() {

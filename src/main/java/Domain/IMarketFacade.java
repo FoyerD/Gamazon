@@ -10,54 +10,65 @@ import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.User.IUserRepository;
 import Domain.User.User;
+import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
-import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.IShoppingCart;
 import Domain.Store.Item;
 
 public interface IMarketFacade {
     
+    // Section 1
+    // 1.1 Open the whole market system
+    void openMarket(String userId);
+
+    // 1.2 Payment service
     void updatePaymentService(IPaymentService paymentService);
-
-    void updateNotificationService(INotificationService notificationService);
-
-    void updateSupplyService(ISupplyService supplyService);
-
-    void purchase(String card_owner, String card_number, Date expiry_date, String cvv,
-                        String deliveryAddress, User user,
-                        IShoppingCart cart);
-
-    double calculateCartPrice(IShoppingCart cart); 
 
     void updatePaymentServiceURL(String url) throws IOException;
 
-    Map<Integer, IShoppingBasket> getShoppingBaskets();
+    // 1.3 Supply service
+    void updateSupplyService(ISupplyService supplyService);
 
-    IShoppingBasket getShoppingBasket(int id);
+    void updateNotificationService(INotificationService notificationService);
 
-    List<IShoppingBasket> getStoreShoppingBaskets(int storeId);
-
-    List<IShoppingBasket> getUserShoppingBaskets(String userName, LocalDateTime startDateTime,
-                             LocalDateTime endDateTime);
-
-    List<IShoppingBasket> getUserShoppingBasketsBetween(String userName, LocalDateTime startDateTime,
-                             LocalDateTime endDateTime);
-
-    void addShoppingBasket(IShoppingBasket basket, String userName, double price);
-
-    void initFacades(IUserRepository userFacade, IStoreRepository storeFacade);
-
-    int getShoppingBasketCount();
-
-    void checkProductsExist(int storeId, Map<Integer, Item> productsId);
-    
     INotificationService getNotificationService();
 
-    IStoreRepository getStoreFacade();
+    void initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade);
+    
+    // Section 4
+    // 4.1 Manage product inventory
+    void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantitiesm, String userId);
+    void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    
+    // 4.3 Appoint a store manager
+    void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId);
+    
+    // 4.4 Remove a store manager
+    void removeStoreManager(String removerUsername, String managerUsername, String storeId);
+    
+    // 4.6 Appoint a store owner
+    void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId);
+    
+    // 4.7 Change a manager's permissions
+    void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId,
+                                      List<PermissionType> newPermissions);
+    
+    // 4.9 Close a store 
+    void closeStore(String storeId, String userId);
 
-    List<IShoppingBasket> getMyShoppingBasketHistory(String sessionId, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    // 4.11 Get info about manager permissions in a store
+    Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId);
+    
+    // 4.12 Respond to user messages
+    void respondToUserMessage(String storeId, int messageId, String response, String userId);
+    
+    // 4.13 View store purchase history
+    List<ShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId);
+    
+    // Section 6
+    // 6.1 Close a store in the market without cancelling subscriptions
+    void marketCloseStore(String storeId, String userId);
 
-    void closeStore(int storeId);
-
-    void openMarket();
 }
