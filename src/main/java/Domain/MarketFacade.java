@@ -4,16 +4,14 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import javax.print.DocFlavor.STRING;
-
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.ShoppingBasket;
+import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
-import Domain.Store.Store;
+import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.User;
 
@@ -23,8 +21,8 @@ public class MarketFacade implements IMarketFacade {
     private ISupplyService supplyService;
     private INotificationService notificationService;
     private IUserRepository userRepository;
-    private IStoreRepository storeRepository;
-    private IItemRepository itemRepository; // Assuming this is defined somewhere in your code
+    private IItemRepository itemRepository; 
+    private StoreFacade storeFacade; 
 
     // In-memory permissions store: storeId -> (username -> Permission)
     private final Map<String, Map<String, Permission>> storePermissions = new HashMap<>();
@@ -38,10 +36,10 @@ public class MarketFacade implements IMarketFacade {
     private MarketFacade() {}
 
     @Override
-    public void initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
-        this.userRepository = userFacade;
-        this.storeRepository = storeFacade;
-        this.itemRepository = itemFacade;
+    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade) {
+        this.userRepository = userRepository;
+        this.itemRepository = itemRepository;
+        this.storeFacade = storeFacade;
     }
 
     @Override
@@ -153,11 +151,7 @@ public class MarketFacade implements IMarketFacade {
         if (marketManager == null) {
             throw new IllegalStateException("Market manager is not assigned.");
         }
-        Store store = storeRepository.get(storeId);
-        if (store == null) {
-            throw new IllegalArgumentException("Store not found.");
-        }
-        //store.closeStore(); // Assuming Store has a method to close itself
+        storeFacade.closeStore(storeId); 
         notificationService.sendNotification(
             marketManager.getName(),
             "Store " + storeId + " has been closed."
@@ -171,10 +165,6 @@ public class MarketFacade implements IMarketFacade {
         User marketManager = userRepository.getUserByUsername(userRepository.get(userId).getName());
         if (marketManager == null) {
             throw new IllegalStateException("Market manager is not assigned.");
-        }
-        Store store = storeRepository.get(storeId);
-        if (store == null) {
-            throw new IllegalArgumentException("Store not found.");
         }
         // Remove all users from the store permissions
         for (Map.Entry<String, Permission> entry : storePermissions.get(storeId).entrySet()) {
@@ -190,7 +180,7 @@ public class MarketFacade implements IMarketFacade {
                 "Store " + storeId + " has been closed."
             );
         }
-        //store.closeStore(); // Assuming Store has a method to close itself
+        storeFacade.closeStore(storeId); 
         notificationService.sendNotification(
             marketManager.getName(),
             "Store " + storeId + " has been closed."
@@ -213,20 +203,21 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void respondToUserMessage(String storeId, int messageId, String response, String userId) {
+    public boolean respondToUserMessage(String storeId, String productId, String userId, String response) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.RESPOND_TO_INQUIRIES);
-        Store store = storeRepository.get(storeId);
-        if (store == null) {
-            throw new IllegalArgumentException("Store not found.");
-        }
-        // TODO: Amit should do it? 
-        //store.respondToMessage(messageId, response);
+        return storeFacade.addFeedback(storeId, productId, userId, response);
+    }
+
+    @Override
+    public Feedback getUserMessage(String storeId, String productId, String userId) {
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OVERSEE_OFFERS);
+        return storeFacade.getFeedback(storeId, productId, userId);
     }
 
     @Override
     public List<ShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
-        // TODO: Amit or Aviad should do it?
+        // TODO: Aviad should do it
         //return storeRepository.get(storeId).getStorePurchaseHistory(from, to);
         return null; // Placeholder for actual implementation
     }

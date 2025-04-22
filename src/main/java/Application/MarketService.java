@@ -6,8 +6,9 @@ import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.PermissionType;
+import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
+import Domain.Store.StoreFacade;
 import Domain.Shopping.ShoppingBasket;
 import Domain.TokenService;
 import java.io.IOException;
@@ -73,11 +74,11 @@ public class MarketService {
         }
     }
 
-    public Response<Void> initFacades(String sessionToken, IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade) {
+    public Response<Void> initFacades(String sessionToken, IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade) {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.initFacades(userFacade, storeFacade, itemFacade);
+            marketFacade.initFacades(userRepository, itemRepository, storeFacade);
             return new Response<>(null);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -203,12 +204,21 @@ public class MarketService {
         }
     }
 
-    public Response<Void> respondToUserMessage(String sessionToken, String storeId, int messageId, String response) {
+    public Response<Boolean> respondToUserMessage(String sessionToken, String storeId, String productId, String userId, String comment) {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
-            marketFacade.respondToUserMessage(storeId, messageId, response, tokenService.extractId(sessionToken));
-            return new Response<>(null);
+            return new Response<>(marketFacade.respondToUserMessage(storeId, productId, userId, comment));
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Feedback> getUserMessage(String sessionToken, String storeId, String productId, String userId) {
+        if (isInvalid(sessionToken)) 
+            return new Response<>(new Error("Invalid session token"));
+        try {
+            return new Response<>(marketFacade.getUserMessage(storeId, productId, userId));
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
         }
