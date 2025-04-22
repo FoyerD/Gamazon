@@ -3,15 +3,18 @@ package Domain.Store;
 public class StoreFacade {
     private IStoreRepository storeRepository;
     private IFeedbackRepository feedbackRepository;
+    private IProductRepository productRepository;
 
 
-    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository) {
+    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IProductRepository productRepository) {
+        this.productRepository = productRepository;
         this.storeRepository = storeRepository;
         this.feedbackRepository = feedbackRepository;
     }
     public StoreFacade() {
         this.storeRepository = null;
         this.feedbackRepository = null;
+        this.productRepository = null;
     }
     public void setStoreRepository(IStoreRepository storeRepository) {
         this.storeRepository = storeRepository;
@@ -19,9 +22,12 @@ public class StoreFacade {
     public void setFeedbackRepository(IFeedbackRepository feedbackRepository) {
         this.feedbackRepository = feedbackRepository;
     }
+    public void setProductRepository(IProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     public boolean isInitialized() {
-        return this.storeRepository != null && this.feedbackRepository != null;
+        return this.storeRepository != null && this.feedbackRepository != null && this.productRepository != null;
     }
 
     public Store getStore(String storeId) {
@@ -53,7 +59,7 @@ public class StoreFacade {
 
 
     public Feedback getFeedback(String storeId, String productId, String userId) {
-        assert isInitialized() : "Store and feedback repositories must be initialized.";
+        assert isInitialized() : "Facade must be initialized";
         assert storeId != null && productId != null && userId != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !storeId.isEmpty() && !productId.isEmpty() && !userId.isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";
 
@@ -61,18 +67,19 @@ public class StoreFacade {
     }
 
     public boolean addFeedback(String storeId, String productId, String userId, String comment) {
-        assert isInitialized() : "Store and feedback repositories must be initialized.";
+        assert isInitialized() : "Facade must be initialized";
         assert storeId != null && productId != null && userId != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !storeId.isEmpty() && !productId.isEmpty() && !userId.isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";
-        assert this.storeRepository.get(storeId) != null : "Store not found.";
         assert comment != null && !comment.isEmpty() : "Feedback cannot be null.";
+        assert this.storeRepository.get(storeId) != null : "Store not found.";
+        assert this.productRepository.get(productId) != null : "Product not found.";
         
         Feedback feedback = new Feedback(storeId, productId, userId, comment);
         return feedbackRepository.add(storeId, productId, userId, feedback);
     }
 
     public Feedback removeFeedback(String storeId, String productId, String userId) {
-        assert isInitialized() : "Store and feedback repositories must be initialized.";
+        assert isInitialized() : "Facade must be initialized";
         assert storeId != null && productId != null && userId != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !storeId.isEmpty() && !productId.isEmpty() && !userId.isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";
 
@@ -80,7 +87,7 @@ public class StoreFacade {
     }
 
     public Feedback updateFeedback(Feedback feedback) {
-        assert isInitialized() : "Store and feedback repositories must be initialized.";
+        assert isInitialized() : "Facade must be initialized";
         assert feedback != null : "Feedback cannot be null.";
         assert feedback.getStoreId() != null && feedback.getProductId() != null && feedback.getCustomerId() != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !feedback.getStoreId().isEmpty() && !feedback.getProductId().isEmpty() && !feedback.getCustomerId().isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";
