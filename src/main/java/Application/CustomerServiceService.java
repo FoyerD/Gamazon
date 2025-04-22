@@ -1,37 +1,30 @@
 package Application;
 
 import Domain.Store.Feedback;
-import Domain.Store.FeedbackFacade;
-import Domain.Store.IStoreRepository;
 import Domain.Store.StoreFacade;
 
 public class CustomerServiceService {
     private StoreFacade storeFacade;
-    private FeedbackFacade feedbackFacade;
     
-    public CustomerServiceService(StoreFacade storeFacade, FeedbackFacade feedbackFacade) {
+    public CustomerServiceService(StoreFacade storeFacade) {
         this.storeFacade = storeFacade;
-        this.feedbackFacade = feedbackFacade;
     }
     public CustomerServiceService() {
         this.storeFacade = null;
-        this.feedbackFacade = null;
     }
     public void setStoreFacade(StoreFacade storeFacade) {
         this.storeFacade = storeFacade;
     }
-    public void setFeedbackFacade(FeedbackFacade feedbackFacade) {
-        this.feedbackFacade = feedbackFacade;
-    }
+
     public boolean isInitialized() {
-        return this.storeFacade != null && this.feedbackFacade != null;
+        return this.storeFacade != null && this.storeFacade != null;
     }
 
 
     public Response<Boolean> addFeedback(String customerId, String storeId, String productId, String comment) {
         try {
             // Assuming storeRepository has a method to add feedback
-            boolean result = this.feedbackFacade.addFeedback(storeId, productId, customerId, comment);
+            boolean result = this.storeFacade.addFeedback(storeId, productId, customerId, comment);
             return new Response<>(result);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
@@ -40,7 +33,7 @@ public class CustomerServiceService {
 
     public Response<String> getFeedback(String customerId, String storeId, String productId) {
         try {
-            Feedback feedback = this.feedbackFacade.getFeedback(storeId, productId, customerId);
+            Feedback feedback = this.storeFacade.getFeedback(storeId, productId, customerId);
             if (feedback != null) {
                 return new Response<>(feedback.getComment());
             } else {
