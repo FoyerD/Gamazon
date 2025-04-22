@@ -59,4 +59,25 @@ public class StoreServiceTests {
         Response<Boolean> result = storeService.openStore(sessionToken, storeId.toString());
         assertFalse(result.getValue());
     }
+    @Test
+    public void GivenOpenStore_WhenCloseStore_ThenReturnTrue() {
+        String sessionToken = "validSessionToken";
+        String storeName = "StoreToClose";
+        Integer storeId = 1235;
+        storeService.addStore(sessionToken, storeName, "Temporary store");
+        Response<Boolean> result = storeService.closeStore(sessionToken, storeId.toString());
+        assertTrue("Expected store to close successfully", result.getValue());
+    }
+    @Test
+    public void GivenClosedStore_WhenCloseStore_ThenReturnFalse() {
+        String sessionToken = "validSessionToken";
+        String storeName = "AlreadyClosedStore";
+        Integer storeId = 1236;
+        storeService.addStore(sessionToken, storeName, "Store to test double close");
+        storeService.closeStore(sessionToken, storeId.toString());
+        Response<Boolean> result = storeService.closeStore(sessionToken, storeId.toString());
+        assertFalse("Expected store to not be closed again", result.getValue());
+    }
+
+    
 }

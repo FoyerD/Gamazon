@@ -13,6 +13,7 @@ public class Store {
     private Set<String> owners;
     private Set<String> managers;
     private boolean isOpen;
+    
 
     public Store(){
         this.id = null;

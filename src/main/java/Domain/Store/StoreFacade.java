@@ -105,4 +105,15 @@ public class StoreFacade {
 
         return feedbackRepository.update(feedback.getStoreId(), feedback.getProductId(), feedback.getCustomerId(), feedback);
     }
+
+    public boolean closeStore(String storeId){
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found.");
+        if(!store.isOpen()) throw new RuntimeException("Store is already closed.");
+
+        store.setOpen(false);
+        Store newStore = this.storeRepository.update(storeId, store);
+        if(!store.equals(newStore)) throw new RuntimeException("Store not updated.");
+        return true;
+    }
 }
