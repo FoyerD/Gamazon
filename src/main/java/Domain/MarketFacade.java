@@ -14,6 +14,7 @@ import Domain.Store.Item;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.User;
+import Domain.User.Member;
 
 public class MarketFacade implements IMarketFacade {
 
@@ -147,7 +148,7 @@ public class MarketFacade implements IMarketFacade {
     @Override
     public void closeStore(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
-        User marketManager = userRepository.getUserByUsername(userRepository.get(userId).getName());
+        Member marketManager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
         if (marketManager == null) {
             throw new IllegalStateException("Market manager is not assigned.");
         }
@@ -162,7 +163,7 @@ public class MarketFacade implements IMarketFacade {
     @Override
     public void marketCloseStore(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
-        User marketManager = userRepository.getUserByUsername(userRepository.get(userId).getName());
+        Member marketManager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
         if (marketManager == null) {
             throw new IllegalStateException("Market manager is not assigned.");
         }
@@ -230,7 +231,7 @@ public class MarketFacade implements IMarketFacade {
         paymentService.initialize();
         supplyService.initialize();
         notificationService.initialize();
-        User marketManager = userRepository.getUserByUsername(userId);        
+        Member marketManager = userRepository.getMemberByUsername(userId);        
         Permission founder = new Permission("system", marketManager.getName());
         founder.initTradingManager();
         storePermissions.putIfAbsent("market", new HashMap<>());

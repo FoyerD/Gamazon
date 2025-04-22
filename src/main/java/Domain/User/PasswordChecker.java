@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.passay.*;
 
 public class PasswordChecker {
-    public static void check(String password) {
+    public static void check(String password) throws IllegalStateException {
         PasswordValidator validator = new PasswordValidator(Arrays.asList(
             new LengthRule(8, 64),
             new CharacterRule(EnglishCharacterData.UpperCase, 1),

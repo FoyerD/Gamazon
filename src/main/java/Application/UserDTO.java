@@ -6,13 +6,13 @@ public class UserDTO {
     private String sessionToken;
     private String email;
 
-    public UserDTO(String username, String sessionToken) {
+    public UserDTO(String sessionToken, String username) {
         this.username = username;
         this.sessionToken = sessionToken;
         this.email = ""; 
     }
 
-    public UserDTO(String username, String sessionToken, String email) {
+    public UserDTO(String sessionToken, String username, String email) {
         this.username = username;
         this.sessionToken = sessionToken;
         this.email = email;
