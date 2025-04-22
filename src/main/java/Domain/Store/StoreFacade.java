@@ -20,6 +20,9 @@ public class StoreFacade {
         this.feedbackRepository = feedbackRepository;
     }
 
+    public boolean isInitialized() {
+        return this.storeRepository != null && this.feedbackRepository != null;
+    }
 
     public Store getStore(String storeId) {
         return storeRepository.get(storeId);
@@ -50,7 +53,7 @@ public class StoreFacade {
 
 
     public Feedback getFeedback(String storeId, String productId, String userId) {
-        assert this.feedbackRepository != null : "Feedback repository is not initialized.";
+        assert isInitialized() : "Store and feedback repositories must be initialized.";
         assert storeId != null && productId != null && userId != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !storeId.isEmpty() && !productId.isEmpty() && !userId.isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";
 
@@ -58,9 +61,10 @@ public class StoreFacade {
     }
 
     public boolean addFeedback(String storeId, String productId, String userId, String comment) {
-        assert this.feedbackRepository != null : "Feedback repository is not initialized.";
+        assert isInitialized() : "Store and feedback repositories must be initialized.";
         assert storeId != null && productId != null && userId != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !storeId.isEmpty() && !productId.isEmpty() && !userId.isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";
+        assert this.storeRepository.get(storeId) != null : "Store not found.";
         assert comment != null && !comment.isEmpty() : "Feedback cannot be null.";
         
         Feedback feedback = new Feedback(storeId, productId, userId, comment);
@@ -68,7 +72,7 @@ public class StoreFacade {
     }
 
     public Feedback removeFeedback(String storeId, String productId, String userId) {
-        assert this.feedbackRepository != null : "Feedback repository is not initialized.";
+        assert isInitialized() : "Store and feedback repositories must be initialized.";
         assert storeId != null && productId != null && userId != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !storeId.isEmpty() && !productId.isEmpty() && !userId.isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";
 
@@ -76,7 +80,7 @@ public class StoreFacade {
     }
 
     public Feedback updateFeedback(Feedback feedback) {
-        assert this.feedbackRepository != null : "Feedback repository is not initialized.";
+        assert isInitialized() : "Store and feedback repositories must be initialized.";
         assert feedback != null : "Feedback cannot be null.";
         assert feedback.getStoreId() != null && feedback.getProductId() != null && feedback.getCustomerId() != null : "Store ID, Product ID, and User ID cannot be null.";
         assert !feedback.getStoreId().isEmpty() && !feedback.getProductId().isEmpty() && !feedback.getCustomerId().isEmpty() : "Store ID, Product ID, and User ID cannot be empty.";

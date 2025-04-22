@@ -3,8 +3,10 @@ package Infrastructure;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.Feedback;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import Domain.Pair; 
 public class MemoryFeedbackRepository implements IFeedbackRepository{
@@ -54,6 +56,27 @@ public class MemoryFeedbackRepository implements IFeedbackRepository{
     public boolean add(Pair<Pair<String, String>, String> id, Feedback item) {
         if (this.feedbacks.containsKey(id)) throw new IllegalArgumentException("Item with this ID already exists");
         return this.feedbacks.put(id, item) == null;
+    }
+
+    @Override
+    public List<Feedback> getAllFeedbacksByStoreId(String storeId) {
+        return this.feedbacks.values().stream()
+                .filter(feedback -> feedback.getStoreId().equals(storeId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Feedback> getAllFeedbacksByProductId(String productId) {
+        return this.feedbacks.values().stream()
+                .filter(feedback -> feedback.getProductId().equals(productId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Feedback> getAllFeedbacksByUserId(String userId) {
+        return this.feedbacks.values().stream()
+                .filter(feedback -> feedback.getCustomerId().equals(userId))
+                .collect(Collectors.toList());
     }
     
 }
