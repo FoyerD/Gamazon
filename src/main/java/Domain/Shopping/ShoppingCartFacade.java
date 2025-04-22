@@ -87,4 +87,35 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'checkout'");
     }
+
+    @Override
+    public int getTotalItems(String clientId) {
+        IShoppingCart cart = getCart(clientId);
+
+        int total = 0;
+        for(String storeId : cart.getCart()){
+            ShoppingBasket basket = basketRepo.get(clientId, storeId);
+            if (basket == null) {
+                continue; // Skip if basket is not found
+            }
+            total += basket.getQuantity();
+        }
+        return total;
+    }
+
+    @Override
+    public boolean isEmpty(String clientId) {
+        IShoppingCart cart = getCart(clientId);
+        if (cart == null || cart.isEmpty()) {
+            return true;
+        }
+        return getTotalItems(clientId) == 0;
+    }
+
+    @Override
+    public void clearCart(String clientId) {
+        IShoppingCart cart = getCart(clientId);
+        cart.clear();
+        cartRepo.update(cart);
+    }
 }

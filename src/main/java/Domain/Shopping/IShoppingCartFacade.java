@@ -6,6 +6,9 @@ interface IShoppingCartFacade {
     ShoppingBasket getBasket(String clientId, String storeId);
     void addProductToCart(String storeId, String clientId, String productId, int quantity);
     void checkout(String clientId);
-    public void removeProductFromCart(String storeId, String clientId, String productId, int quantity);
-    public void removeProductFromCart(String storeId, String clientId, String productId);
+    void removeProductFromCart(String storeId, String clientId, String productId, int quantity);
+    void removeProductFromCart(String storeId, String clientId, String productId);
+    int getTotalItems(String clientId);
+    boolean isEmpty(String clientId);
+    void clearCart(String clientId);
 }
