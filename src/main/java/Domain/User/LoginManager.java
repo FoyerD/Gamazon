@@ -9,7 +9,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 public class LoginManager {
     private IUserRepository userRepository;
 
-    private LoginManager(IUserRepository userRepository) {
+    public LoginManager(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -63,8 +63,8 @@ public class LoginManager {
         return member;
     }
 
-    public Member login(String id, String password) throws NoSuchElementException, IllegalStateException {
-        User user = userRepository.get(id);
+    public Member login(String username, String password) throws NoSuchElementException, IllegalStateException {
+        User user = userRepository.getUserByUsername(username);
         if (user == null) {
             throw new NoSuchElementException("User not found");
         }

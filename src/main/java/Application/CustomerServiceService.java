@@ -1,31 +1,45 @@
 package Application;
 
-import Domain.Store.IStoreRepository;
+import Domain.Store.Feedback;
+import Domain.Store.StoreFacade;
 
 public class CustomerServiceService {
-    private IStoreRepository storeRepository;
+    private StoreFacade storeFacade;
     
-    public CustomerServiceService(IStoreRepository storeRepository) {
-        this.storeRepository = storeRepository;
+    public CustomerServiceService(StoreFacade storeFacade) {
+        this.storeFacade = storeFacade;
     }
     public CustomerServiceService() {
-        this.storeRepository = null;
+        this.storeFacade = null;
+    }
+    public void setStoreFacade(StoreFacade storeFacade) {
+        this.storeFacade = storeFacade;
     }
 
-    public Response<Boolean> setStoreRepository(IStoreRepository storeRepository) {
-        try {
-            return new Response<>();
-        } catch (Exception ex) {
-            return Response.error(ex.getMessage());
-        }
+    public boolean isInitialized() {
+        return this.storeFacade != null;
     }
 
     public Response<Boolean> addFeedback(String customerId, String storeId, String productId, String comment) {
         try {
             // Assuming storeRepository has a method to add feedback
-            return new Response<>();
+            boolean result = this.storeFacade.addFeedback(storeId, productId, customerId, comment);
+            return new Response<>(result);
         } catch (Exception ex) {
-            return Response.error(ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<String> getFeedback(String customerId, String storeId, String productId) {
+        try {
+            Feedback feedback = this.storeFacade.getFeedback(storeId, productId, customerId);
+            if (feedback != null) {
+                return new Response<>(feedback.getComment());
+            } else {
+                throw new Exception("Feedback not found");
+            }
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
         }
     }
 }

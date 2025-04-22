@@ -1,11 +1,15 @@
 package Domain.Shopping;
+
+import Domain.Pair;
 import Domain.Store.Item;
 
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
+    private final IShoppingBasketRepository basketRepo;
 
     public ShoppingCartFacade(IShoppingCartRepository cartRepo) {
         this.cartRepo = cartRepo;
+        this.basketRepo = new ShoppingBasketRepository();
     }
 
     @Override
@@ -13,54 +17,131 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         IShoppingCart cart = cartRepo.get(clientId);
         if (cart == null) {
             cart = new ShoppingCart(clientId);
-            cartRepo.saveCart(cart);
+            cartRepo.add(clientId, cart);
         }
         return cart;
     }
 
     @Override
-    public IShoppingBasket getBasket(String clientId, String storeId) {
-        IShoppingCart cart = cartRepo.get(clientId);
-        if (cart == null) return null;
-        return cart.getBasketByStoreId(storeId);
-    }
-
-    @Override
-    public void addProductToCart(Item item) {
-        IShoppingCart cart = getCart(info.getClientId());
-        IShoppingBasket basket = cart.getBasketByStoreId(info.getStoreId());
+    public ShoppingBasket getBasket(String clientId, String storeId) {
+        ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
         if (basket == null) {
-            basket = new ShoppingBasket(info.getStoreId());
-            cart.addBasket(basket);
+            basket = new ShoppingBasket(storeId, clientId);
+            basketRepo.add(new Pair<>(clientId, storeId), basket);
         }
-        basket.addItem(info.getProductId(), info.getQuantity());
-        cartRepo.saveCart(cart);
+        return basket;
     }
-
-    public void addProductToCart(String clientId, Item item) {
-        IShoppingCart cart = getCart(clientId);
-        cart.removeItem(item.getStoreId(), item.getProductId(), item.getAmount());
-        cartRepo.saveCart(cart);
-    }
-
+    
     @Override
-    public void removeProductFromCart(String clientId, Item item) {
+    public boolean addProductToCart(String storeId, String clientId, String productId, int quantity) {
         IShoppingCart cart = getCart(clientId);
-        cart.removeItem(item.getStoreId(), item.getProductId(), item.getAmount());
-        cartRepo.saveCart(cart);
-    }
-}
-
-    @Override
-    public void makeImmediatePurchase(String clientId, Item item) {
-        IShoppingCart cart = getCart(clientId);
-        IShoppingBasket basket = cart.getBasketByStoreId(item.getStoreId());
+        ShoppingBasket basket = getBasket(clientId, storeId);
         if (basket == null) {
-            basket = new ShoppingBasket(item.getStoreId());
-            cart.addBasket(basket);
+            basket = new ShoppingBasket(storeId, clientId);
         }
-        basket.addItem(item.getProductId(), item.getAmount());
-        cartRepo.saveCart(cart);
-        cart.checkout(item.getStoreId(), item.getProductId(), item.getAmount());
+        basket.addOrder(productId, quantity);
+        basketRepo.update(new Pair<>(clientId, storeId), basket);
+
+        if (!cart.hasStore(storeId)) {
+            cart.addStore(storeId);
+            cartRepo.add(clientId, cart);
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public boolean removeProductFromCart(String storeId, String clientId, String productId, int quantity) {
+        IShoppingCart cart = getCart(clientId);
+        if (!cart.hasStore(storeId)) {
+            throw new RuntimeException("Store not found in cart");
+        }
+        
+        ShoppingBasket basket = getBasket(clientId, storeId);
+        basket.removeItem(productId, quantity);
+        basketRepo.add(new Pair<>(clientId, storeId), basket);
+        
+        if (basket.isEmpty()) {
+            cart.removeStore(storeId);
+            cartRepo.update(clientId, cart);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean removeProductFromCart(String storeId, String clientId, String productId) {
+        IShoppingCart cart = getCart(clientId);
+        if (!cart.hasStore(storeId)) {
+            throw new RuntimeException("Store not found in cart");
+        }
+        
+        ShoppingBasket basket = getBasket(clientId, storeId);
+        basket.removeItem(productId);
+        basketRepo.add(new Pair<>(clientId, storeId), basket);
+        
+        if (basket.isEmpty()) {
+            cart.removeStore(storeId);
+            cartRepo.update(clientId, cart);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean checkout(String clientId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'checkout'");
+    }
+
+    @Override
+    public int getTotalItems(String clientId) {
+        IShoppingCart cart = getCart(clientId);
+
+        int total = 0;
+        for(String storeId : cart.getCart()){
+            ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+            if (basket == null) {
+                continue; // Skip if basket is not found
+            }
+            total += basket.getQuantity();
+        }
+        return total;
+    }
+
+    @Override
+    public boolean isEmpty(String clientId) {
+        IShoppingCart cart = getCart(clientId);
+        if (cart == null || cart.isEmpty()) {
+            return true;
+        }
+        return getTotalItems(clientId) == 0;
+    }
+
+    @Override
+    public boolean clearCart(String clientId) {
+        IShoppingCart cart = getCart(clientId);
+        if (cart != null) {
+            cart.clear();
+            cartRepo.update(clientId, cart);
+        
+            return true;
+        }
+        
+        return false;
+    }
+
+    @Override
+    public boolean clearBasket(String clientId, String storeId) {
+        ShoppingBasket basket = getBasket(clientId, storeId);
+        if (basket != null) {
+            basket.clear();
+            basketRepo.update(new Pair<>(clientId, storeId), basket);
+
+            return true;
+        }
+
+        return false;
     }
 }
