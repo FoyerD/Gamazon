@@ -2,13 +2,7 @@ package Domain.Store;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-
-import Domain.PermissionType;
-import Domain.Shopping.IShoppingBasket;
-import Domain.User.User;
 
 public class Store {
     
