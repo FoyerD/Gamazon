@@ -31,16 +31,21 @@ public class LoginManager {
 
     public Member register(String id, String username, String password, String email) throws IllegalStateException {
 
-        User guest = userRepository.get(id);
+        Guest guest = userRepository.getGuest(id);
         if (guest == null) {
             throw new NoSuchElementException("Guest not found");
         }
 
-        if (userRepository.getUserByUsername(username) != null) {
+        if (username.equals(Guest.NAME)) {
+            throw new IllegalArgumentException("Cannot register with username " + Guest.NAME);
+        }
+
+        if (userRepository.getMemberByUsername(username) != null) {
             throw new IllegalArgumentException("Username already exists");
         }
 
         PasswordChecker.check(password);
+        
         if (!EmailValidator.getInstance().isValid(email)) {
             throw new IllegalArgumentException("Invalid email format");
         }
@@ -48,12 +53,10 @@ public class LoginManager {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encoded = passwordEncoder.encode(password);
 
-
         Member member = guest.register(username, encoded, email);
         member.login();
 
-
-        if (userRepository.remove(guest.getId()) == null) {
+        if (userRepository.remove(id) == null) {
             throw new IllegalStateException("Failed to remove guest from repository");
         }
 
@@ -64,27 +67,22 @@ public class LoginManager {
     }
 
     public Member login(String username, String password) throws NoSuchElementException, IllegalStateException {
-        User user = userRepository.getUserByUsername(username);
-        if (user == null) {
-            throw new NoSuchElementException("User not found");
+        Member member = userRepository.getMemberByUsername(username);
+        if (member == null) {
+            throw new NoSuchElementException("Member not found");
         }
 
-        if (user.isLoggedIn()) {
+        if (member.isLoggedIn()) {
             throw new IllegalStateException("User is already logged in");
         }
-
-        if (user instanceof Member) {
-            Member member = (Member) user;
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            if (passwordEncoder.matches(password, member.getPassword())) {
-                member.login();
-                return member;
-            } else {
-                throw new IllegalArgumentException("Invalid password");
-            }
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (passwordEncoder.matches(password, member.getPassword())) {
+            member.login();
+            return member;
         } else {
-            throw new IllegalStateException("User is not a member");
+            throw new IllegalArgumentException("Invalid password");
         }
+
     }
 
     
@@ -96,7 +94,7 @@ public class LoginManager {
             throw new NoSuchElementException("User not found");
         }
         
-        user.visitExit(this);
+        user.logout(this);
     }
 
     public void exit(Guest guest) throws IllegalStateException {

@@ -2,7 +2,9 @@ package Infrastructure;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import Domain.User.Guest;
 import Domain.User.IUserRepository;
+import Domain.User.Member;
 import Domain.User.User;
 
 public class MemoryUserRepository implements IUserRepository {
@@ -30,21 +32,43 @@ public class MemoryUserRepository implements IUserRepository {
     public User get(String id) {
         return users.get(id); // Returns null if user not found
     }
+
+    @Override
+    public Member getMember(String id) {
+        User user = users.get(id);
+        if (user instanceof Member)
+            return (Member) user;
+        return null;
+    }
+
+    @Override
+    public Guest getGuest(String id) {
+        User user = users.get(id);
+        if (user instanceof Guest)
+            return (Guest) user;
+        return null;
+    }
+
     @Override
     public User update(String id, User user) {
         if (users.containsKey(id)) {
-            users.put(id, user); // User updated successfully
+            users.put(id, user); 
             return user;
         }
-        return null; // User not found
+        return null;
     }
+    
     @Override
-    public User getUserByUsername(String username) {
+    public Member getMemberByUsername(String username) {
+        if (username.equals(Guest.NAME)) {
+            return null;
+        }
         for (User user : users.values()) {
-            if (user.getName().equals(username)) {
-                return user; // User found
+            if (user instanceof Member && user.getName().equals(username)) {
+                return (Member)user; // User found
             }
         }
+        
         return null; // User not found
     }
     @Override

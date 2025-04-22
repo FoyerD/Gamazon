@@ -1,21 +1,21 @@
 package Domain.User;
 
 public class Guest extends User{
+    public static final String NAME = "Guest";
     private Guest() {
-        super("Guest");
+        super(NAME);
     }
     public static Guest createGuest() {
         return new Guest();
     }
 
-    @Override
     public Member register(String username, String password, String email) {
         return new Member(this.id, username, password, email);
     }
 
     @Override
-    public void visitExit(LoginManager loginManager) {
-        super.visitExit(loginManager);
+    public void logout(LoginManager loginManager) {
+        super.logout(loginManager);
         loginManager.exit(this);
     }
 
