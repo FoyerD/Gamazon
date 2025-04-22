@@ -9,7 +9,7 @@ import javax.print.DocFlavor.STRING;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
-import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.ShoppingBasket;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
@@ -224,7 +224,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public List<IShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId) {
+    public List<ShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
         // TODO: Amit or Aviad should do it?
         //return storeRepository.get(storeId).getStorePurchaseHistory(from, to);

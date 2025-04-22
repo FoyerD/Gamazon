@@ -12,7 +12,7 @@ import Domain.User.IUserRepository;
 import Domain.User.User;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
-import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.IShoppingCart;
 import Domain.Store.Item;
 
@@ -65,7 +65,7 @@ public interface IMarketFacade {
     void respondToUserMessage(String storeId, int messageId, String response, String userId);
     
     // 4.13 View store purchase history
-    List<IShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId);
+    List<ShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId);
     
     // Section 6
     // 6.1 Close a store in the market without cancelling subscriptions

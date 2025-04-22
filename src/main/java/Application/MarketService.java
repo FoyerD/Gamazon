@@ -8,7 +8,7 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.PermissionType;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
-import Domain.Shopping.IShoppingBasket;
+import Domain.Shopping.ShoppingBasket;
 import Domain.TokenService;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -214,7 +214,7 @@ public class MarketService {
         }
     }
 
-    public Response<List<IShoppingBasket>> getStorePurchaseHistory(String sessionToken, String storeId, LocalDateTime from, LocalDateTime to) {
+    public Response<List<ShoppingBasket>> getStorePurchaseHistory(String sessionToken, String storeId, LocalDateTime from, LocalDateTime to) {
         if (isInvalid(sessionToken)) 
             return new Response<>(new Error("Invalid session token"));
         try {
