@@ -18,6 +18,7 @@ public class CustomerServiceService {
 
     public boolean isInitialized() {
         return this.storeFacade != null;
+    }
 
     public Response<Boolean> addFeedback(String customerId, String storeId, String productId, String comment) {
         try {
