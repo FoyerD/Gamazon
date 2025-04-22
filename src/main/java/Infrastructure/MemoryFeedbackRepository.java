@@ -17,7 +17,9 @@ public class MemoryFeedbackRepository implements IFeedbackRepository{
     }
 
     private boolean isIdValid(Pair<Pair<String, String>, String> id) {
-        return id != null && id.getFirst() != null && id.getFirst().getFirst() != null && id.getFirst().getSecond() != null && id.getSecond() != null;
+        return id != null && id.getFirst() != null &&
+               id.getFirst().getFirst() != null && id.getFirst().getSecond() != null && id.getSecond() != null &&
+               !id.getFirst().getFirst().trim().isEmpty() && !id.getFirst().getSecond().trim().isEmpty() && !id.getSecond().trim().isEmpty();
     }
 
     private Pair<Pair<String, String>, String> getId(Feedback feedback) {
@@ -80,7 +82,7 @@ public class MemoryFeedbackRepository implements IFeedbackRepository{
             throw new IllegalArgumentException("Item with this ID already exists");
         if (!id.equals(this.getId(item)))
             throw new IllegalArgumentException("ID does not match the feedback ID");
-            
+
         return this.feedbacks.put(id, item) == null;
     }
 
