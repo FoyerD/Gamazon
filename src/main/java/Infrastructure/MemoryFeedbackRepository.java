@@ -16,6 +16,10 @@ public class MemoryFeedbackRepository implements IFeedbackRepository{
         this.feedbacks = new ConcurrentHashMap<>();
     }
 
+    private Pair<Pair<String, String>, String> getId(Feedback feedback) {
+        return new Pair<>(new Pair<>(feedback.getStoreId(), feedback.getProductId()), feedback.getCustomerId());
+    }
+
     @Override
     public Feedback get(String storeId, String productId, String userId) {
         return this.get(new Pair<>(new Pair<>(storeId, productId), userId));
@@ -49,12 +53,18 @@ public class MemoryFeedbackRepository implements IFeedbackRepository{
     @Override
     public Feedback update(Pair<Pair<String, String>, String> id, Feedback item) {
         if (!this.feedbacks.containsKey(id)) throw new IllegalArgumentException("Item with this ID does not exist");
+        if (!id.equals(this.getId(item))) {
+            throw new IllegalArgumentException("ID does not match the feedback ID");
+        }
         return this.feedbacks.put(id, item);
     }
 
     @Override
     public boolean add(Pair<Pair<String, String>, String> id, Feedback item) {
         if (this.feedbacks.containsKey(id)) throw new IllegalArgumentException("Item with this ID already exists");
+        if (!id.equals(this.getId(item))) {
+            throw new IllegalArgumentException("ID does not match the feedback ID");
+        }
         return this.feedbacks.put(id, item) == null;
     }
 
