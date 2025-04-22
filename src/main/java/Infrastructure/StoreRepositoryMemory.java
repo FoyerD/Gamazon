@@ -15,7 +15,9 @@ public class StoreRepositoryMemory implements IStoreRepository{
 
     @Override
     public boolean add(String storeId, Store store) {
+        if (!storeId.equals(store.getId())) throw new IllegalArgumentException("ID does not match the store ID");
         if (this.stores.containsKey(storeId)) throw new IllegalArgumentException("Item with this ID already exists");
+
         return this.stores.put(storeId, store) == null;
     }
 
@@ -32,6 +34,7 @@ public class StoreRepositoryMemory implements IStoreRepository{
     @Override
     public Store update(String id, Store store) {
         if (!this.stores.containsKey(id)) throw new IllegalArgumentException("Item with this ID does not exist");
+        if (!id.equals(store.getId())) throw new IllegalArgumentException("ID does not match the store ID");
         return this.stores.put(id, store);
     }
 
