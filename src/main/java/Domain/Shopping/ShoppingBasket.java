@@ -3,14 +3,16 @@ package Domain.Shopping;
 import java.util.HashMap;
 import java.util.Map;
 
-import Domain.Shopping.IShoppingCart;
-import Domain.Shopping.IShoppingCartRepository;
 
 class ShoppingBasket {
     
     private Map<String, Integer> orders;
+    private String storeId;
+    private String clientId;
 
-    public ShoppingBasket() {
+    public ShoppingBasket(String storeId, String clientId) {
+        this.storeId = storeId;
+        this.clientId = clientId;
         this.orders = new HashMap<>();
     }
 
@@ -62,5 +64,11 @@ class ShoppingBasket {
         return total;
     }
 
+    public String getStoreId() {
+        return storeId;
+    }
 
+    public String getClientId() {
+        return clientId;
+    }
 }

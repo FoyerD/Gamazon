@@ -16,50 +16,70 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         IShoppingCart cart = cartRepo.get(clientId);
         if (cart == null) {
             cart = new ShoppingCart(clientId);
+            cartRepo.add(cart);
         }
         return cart;
     }
 
-
+    @Override
+    public ShoppingBasket getBasket(String clientId, String storeId) {
+        ShoppingBasket basket = basketRepo.get(clientId, storeId);
+        if (basket == null) {
+            basket = new ShoppingBasket(storeId, clientId);
+            basketRepo.add(basket);
+        }
+        return basket;
+    }
+    
     @Override
     public void addProductToCart(String storeId, String clientId, String productId, int quantity) {
         IShoppingCart cart = getCart(clientId);
-        ShoppingBasket basket = cart.getBasket(storeId);
+        ShoppingBasket basket = getBasket(clientId, storeId);
         if (basket == null) {
-            basket = new ShoppingBasket();
-            basket.addOrder(productId, quantity);
+            basket = new ShoppingBasket(storeId, clientId);
         }
-        cart.addItem(storeId, productId, quantity);
-        cartRepo.add(cart);
-        basketRepo.add(basket);
+        basket.addOrder(productId, quantity);
+        basketRepo.update(basket);
+
+        if (!cart.hasStore(storeId)) {
+            cart.addStore(storeId);
+            cartRepo.add(cart);
+        }
     }
 
 
     @Override
     public void removeProductFromCart(String storeId, String clientId, String productId, int quantity) {
         IShoppingCart cart = getCart(clientId);
-        ShoppingBasket basket = cart.getBasket(storeId);
-        if (basket == null) {
+        if (!cart.hasStore(storeId)) {
             throw new IllegalArgumentException("No orders in this store");
         }
-
-        cart.removeItem(storeId, productId, quantity);
         
-        cartRepo.add(cart);
+        ShoppingBasket basket = getBasket(clientId, storeId);
+        basket.removeItem(productId, quantity);
         basketRepo.add(basket);
+        
+        if (basket.isEmpty()) {
+            cart.removeStore(storeId);
+            cartRepo.update(cart);
+        }
     }
 
     @Override
     public void removeProductFromCart(String storeId, String clientId, String productId) {
         IShoppingCart cart = getCart(clientId);
-        ShoppingBasket basket = cart.getBasket(storeId);
-        if (basket == null) {
+        if (!cart.hasStore(storeId)) {
             throw new IllegalArgumentException("No orders in this store");
         }
-
-        cart.removeItem(storeId, productId);
-        cartRepo.add(cart);
+        
+        ShoppingBasket basket = getBasket(clientId, storeId);
+        basket.removeItem(productId);
         basketRepo.add(basket);
+        
+        if (basket.isEmpty()) {
+            cart.removeStore(storeId);
+            cartRepo.update(cart);
+        }
     }
 
     @Override
