@@ -13,24 +13,35 @@ public class StoreRepositoryMemory implements IStoreRepository{
         this.stores = new ConcurrentHashMap<>();
     }
 
+    private boolean isIdValid(String id) {
+        return id != null && !id.trim().isEmpty();
+    }
+
     @Override
     public boolean add(String storeId, Store store) {
+        if (!isIdValid(storeId)) throw new IllegalArgumentException("ID cannot be null");
+        if (!storeId.equals(store.getId())) throw new IllegalArgumentException("ID does not match the store ID");
         if (this.stores.containsKey(storeId)) throw new IllegalArgumentException("Item with this ID already exists");
+
         return this.stores.put(storeId, store) == null;
     }
 
     @Override
     public Store remove(String id) {
+        if (!isIdValid(id)) throw new IllegalArgumentException("ID cannot be null");
         return stores.remove(id);
     }
 
     @Override
     public Store get(String id) {
+        if (!isIdValid(id)) throw new IllegalArgumentException("ID cannot be null");
         return this.stores.get(id);
     }
 
     @Override
     public Store update(String id, Store store) {
+        if (!isIdValid(id)) throw new IllegalArgumentException("ID cannot be null");
+        if (!id.equals(store.getId())) throw new IllegalArgumentException("ID does not match the store ID");
         if (!this.stores.containsKey(id)) throw new IllegalArgumentException("Item with this ID does not exist");
         return this.stores.put(id, store);
     }
