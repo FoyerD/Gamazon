@@ -1,10 +1,7 @@
 package Domain.Shopping;
 
-public interface IShoppingCartRepository {
-    public IShoppingCart get(String clientId); 
-    public void add(IShoppingCart shoppingCart);
-    public IShoppingCart remove(String clientId);
-    public boolean contains(String clientId);
+import Domain.IRepository;
+
+public interface IShoppingCartRepository extends IRepository<IShoppingCart, String> {
     public void clear();
-    public void update(IShoppingCart shoppingCart);
 }

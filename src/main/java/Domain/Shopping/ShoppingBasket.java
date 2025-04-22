@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-class ShoppingBasket {
+public class ShoppingBasket {
     
     private Map<String, Integer> orders;
     private String storeId;

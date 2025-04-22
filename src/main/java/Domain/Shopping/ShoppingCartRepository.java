@@ -1,37 +1,52 @@
 package Domain.Shopping;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
 class ShoppingCartRepository implements IShoppingCartRepository {
     private final Map<String, IShoppingCart> carts = new HashMap<>();
-    private final IShoppingBasketRepository basketRepo;
 
-    public ShoppingCartRepository(IShoppingBasketRepository basketRepo) {
-        this.basketRepo = basketRepo;
+    public ShoppingCartRepository() {
     }
 
     @Override
-    public IShoppingCart get(String clientId) {
-        return carts.get(clientId);
-    }
-
-    public void save(IShoppingCart cart) {
-        carts.put(cart.getClientId(), cart);
-    }
-
-    // Removed duplicate method 'get(String clientId)'
-
-    @Override
-    public void add(IShoppingCart shoppingCart) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'add'");
+    public boolean add(String id, IShoppingCart value) {
+        if (carts.containsKey(id)) {
+            return false;
+        }
+        carts.put(id, value);
+        return true;
     }
 
     @Override
-    public void remove(IShoppingCart shoppingCart) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'remove'");
+    public IShoppingCart remove(String id) {
+        if (!carts.containsKey(id)) {
+            return null;
+        }
+        return carts.remove(id); 
     }
+
+    @Override
+    public IShoppingCart get(String id) {
+        if (!carts.containsKey(id)) {
+            return null; 
+        }
+        return carts.get(id); 
+    }
+
+    @Override
+    public IShoppingCart update(String id, IShoppingCart value) {
+        if (!carts.containsKey(id)) {
+            return null;
+        }
+        carts.put(id, value);
+        return value;
+    }
+
+    @Override
+    public void clear() {
+        carts.clear(); 
+    }
+
+    
 }

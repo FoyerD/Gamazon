@@ -1,7 +1,10 @@
-package Domain.Store;
+package Infrastructure;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import Domain.Store.IStoreRepository;
+import Domain.Store.Store;
 
 public class StoreRepositoryMemory implements IStoreRepository{
     private Map<String, Store> stores;

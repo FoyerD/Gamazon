@@ -2,7 +2,7 @@ package Domain.Store;
 
 import java.util.Arrays;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public class Item {
@@ -14,8 +14,8 @@ public class Item {
     private String description;
 
     private int[] rates;
-    private Function<String, Set<Category>> categoryFetcher;
-    private Function<String, String> nameFetcher;
+    private Supplier<Set<Category>> categoryFetcher;
+    private Supplier<String> nameFetcher;
 
     public Item(String storeId, String productId, double price, int amount,  String description) {
         this.storeId = storeId;
@@ -46,22 +46,26 @@ public class Item {
         return description;
     }
 
-    public void setCategoryFetcher(Function<String, Set<Category>> fetcher) {
+    public void setCategoryFetcher(Supplier<Set<Category>> fetcher) {
         this.categoryFetcher = fetcher;
+    }
+
+    public void setNameFetcher(Supplier<String> fetcher) {
+        this.nameFetcher = fetcher;
     }
 
     public Set<Category> getCategories() {
         if (categoryFetcher == null) {
             throw new IllegalStateException("Category fetcher not set");
         }
-        return categoryFetcher.apply(productId);
+        return categoryFetcher.get();
     }
 
     public String getProductName(){
         if (nameFetcher == null){
             throw new IllegalStateException("Name fetcher not set");
         }
-        return nameFetcher.apply(productId);
+        return nameFetcher.get();
     }
     
     public void setAmount(int amount) {
@@ -85,5 +89,20 @@ public class Item {
 
     public double getRating() {
         return IntStream.range(0, rates.length).map(i -> (i+1) * rates[i]).sum() / (Arrays.stream(rates).sum() + 0.0);
+    }
+    public void decreaseAmount(int amount) {
+        if (amount < 0) 
+            throw new IllegalArgumentException("Amount cannot be negative");
+        
+        if (this.amount - amount < 0) 
+            throw new IllegalArgumentException("Not enough items in stock");
+        
+        this.amount -= amount;
+    }
+    public void increaseAmount(int amount) {
+        if (amount < 0) 
+            throw new IllegalArgumentException("Amount cannot be negative");
+        
+        this.amount += amount;
     }
 }

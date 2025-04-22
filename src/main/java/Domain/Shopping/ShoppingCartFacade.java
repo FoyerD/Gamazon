@@ -1,5 +1,6 @@
 package Domain.Shopping;
 
+import Domain.Pair;
 import Domain.Store.Item;
 
 public class ShoppingCartFacade implements IShoppingCartFacade {
@@ -16,74 +17,80 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         IShoppingCart cart = cartRepo.get(clientId);
         if (cart == null) {
             cart = new ShoppingCart(clientId);
-            cartRepo.add(cart);
+            cartRepo.add(clientId, cart);
         }
         return cart;
     }
 
     @Override
     public ShoppingBasket getBasket(String clientId, String storeId) {
-        ShoppingBasket basket = basketRepo.get(clientId, storeId);
+        ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
         if (basket == null) {
             basket = new ShoppingBasket(storeId, clientId);
-            basketRepo.add(basket);
+            basketRepo.add(new Pair<>(clientId, storeId), basket);
         }
         return basket;
     }
     
     @Override
-    public void addProductToCart(String storeId, String clientId, String productId, int quantity) {
+    public boolean addProductToCart(String storeId, String clientId, String productId, int quantity) {
         IShoppingCart cart = getCart(clientId);
         ShoppingBasket basket = getBasket(clientId, storeId);
         if (basket == null) {
             basket = new ShoppingBasket(storeId, clientId);
         }
         basket.addOrder(productId, quantity);
-        basketRepo.update(basket);
+        basketRepo.update(new Pair<>(clientId, storeId), basket);
 
         if (!cart.hasStore(storeId)) {
             cart.addStore(storeId);
-            cartRepo.add(cart);
+            cartRepo.add(clientId, cart);
         }
+
+        return true;
     }
 
 
     @Override
-    public void removeProductFromCart(String storeId, String clientId, String productId, int quantity) {
+    public boolean removeProductFromCart(String storeId, String clientId, String productId, int quantity) {
         IShoppingCart cart = getCart(clientId);
         if (!cart.hasStore(storeId)) {
-            throw new IllegalArgumentException("No orders in this store");
+            throw new RuntimeException("Store not found in cart");
         }
         
         ShoppingBasket basket = getBasket(clientId, storeId);
         basket.removeItem(productId, quantity);
-        basketRepo.add(basket);
+        basketRepo.add(new Pair<>(clientId, storeId), basket);
         
         if (basket.isEmpty()) {
             cart.removeStore(storeId);
-            cartRepo.update(cart);
+            cartRepo.update(clientId, cart);
         }
+
+        return true;
     }
 
     @Override
-    public void removeProductFromCart(String storeId, String clientId, String productId) {
+    public boolean removeProductFromCart(String storeId, String clientId, String productId) {
         IShoppingCart cart = getCart(clientId);
         if (!cart.hasStore(storeId)) {
-            throw new IllegalArgumentException("No orders in this store");
+            throw new RuntimeException("Store not found in cart");
         }
         
         ShoppingBasket basket = getBasket(clientId, storeId);
         basket.removeItem(productId);
-        basketRepo.add(basket);
+        basketRepo.add(new Pair<>(clientId, storeId), basket);
         
         if (basket.isEmpty()) {
             cart.removeStore(storeId);
-            cartRepo.update(cart);
+            cartRepo.update(clientId, cart);
         }
+
+        return true;
     }
 
     @Override
-    public void checkout(String clientId) {
+    public boolean checkout(String clientId) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'checkout'");
     }
@@ -94,7 +101,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
         int total = 0;
         for(String storeId : cart.getCart()){
-            ShoppingBasket basket = basketRepo.get(clientId, storeId);
+            ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
             if (basket == null) {
                 continue; // Skip if basket is not found
             }
@@ -113,9 +120,28 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     }
 
     @Override
-    public void clearCart(String clientId) {
+    public boolean clearCart(String clientId) {
         IShoppingCart cart = getCart(clientId);
-        cart.clear();
-        cartRepo.update(cart);
+        if (cart != null) {
+            cart.clear();
+            cartRepo.update(clientId, cart);
+        
+            return true;
+        }
+        
+        return false;
+    }
+
+    @Override
+    public boolean clearBasket(String clientId, String storeId) {
+        ShoppingBasket basket = getBasket(clientId, storeId);
+        if (basket != null) {
+            basket.clear();
+            basketRepo.update(new Pair<>(clientId, storeId), basket);
+
+            return true;
+        }
+
+        return false;
     }
 }

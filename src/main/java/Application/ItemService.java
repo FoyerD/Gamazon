@@ -103,4 +103,24 @@ public class ItemService {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+
+    public Response<Void> increaseAmount(Pair<String, String> id, int amount) {
+        try {
+            itemFacade.increaseAmount(id, amount);
+            return new Response<>(null);
+        } 
+        catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+    public Response<Void> decreaseAmount(Pair<String, String> id, int amount) {
+        try {
+            itemFacade.decreaseAmount(id, amount);
+            return new Response<>(null);
+        } 
+        catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+    
 }
