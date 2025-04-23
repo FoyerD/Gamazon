@@ -10,8 +10,8 @@ public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
 
     
-    public ShoppingService(IShoppingCartRepository cartRepository) {
-        cartFacade = new ShoppingCartFacade(cartRepository);
+    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository) {
+        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository);
     }
 
     public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
