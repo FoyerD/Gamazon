@@ -1,15 +1,14 @@
 package Domain.Shopping;
 
 import Domain.Pair;
-import Domain.Store.Item;
 
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;
 
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo) {
         this.cartRepo = cartRepo;
-        this.basketRepo = new ShoppingBasketRepository();
+        this.basketRepo = basketRepo;
     }
 
     @Override
