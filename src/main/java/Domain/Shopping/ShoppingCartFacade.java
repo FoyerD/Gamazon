@@ -1,19 +1,20 @@
 package Domain.Shopping;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import Domain.Pair;
-import Domain.Store.Item;
 
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;
 
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo) {
         this.cartRepo = cartRepo;
-        this.basketRepo = new ShoppingBasketRepository();
+        this.basketRepo = basketRepo;
     }
 
-    @Override
-    public IShoppingCart getCart(String clientId) {
+    private IShoppingCart getCart(String clientId) {
         IShoppingCart cart = cartRepo.get(clientId);
         if (cart == null) {
             cart = new ShoppingCart(clientId);
@@ -22,8 +23,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         return cart;
     }
 
-    @Override
-    public ShoppingBasket getBasket(String clientId, String storeId) {
+    private ShoppingBasket getBasket(String clientId, String storeId) {
         ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
         if (basket == null) {
             basket = new ShoppingBasket(storeId, clientId);
@@ -143,5 +143,22 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         }
 
         return false;
+    }
+
+    @Override
+    public Map<String, Map<String, Integer>> viewCart(String clientId) {
+        IShoppingCart userCart = getCart(clientId);
+        if (userCart == null) {
+            return new HashMap<>(); // Return empty map if cart is not found
+        }
+        Map<String, Map<String, Integer>> viewCart = new HashMap<String,Map<String,Integer>>();
+        for(String storeId : userCart.getCart()) {
+            ShoppingBasket basket = getBasket(clientId, storeId);
+            if (basket == null) {
+                continue; // Skip if basket is not found
+            }
+            viewCart.put(storeId, basket.getOrders());
+        }
+        return viewCart;
     }
 }

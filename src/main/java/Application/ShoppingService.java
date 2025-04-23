@@ -1,17 +1,17 @@
 package Application;
+import java.util.Map;
+
 import Domain.Shopping.IShoppingBasketRepository;
-import Domain.Shopping.IShoppingCart;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
-import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
 
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
 
     
-    public ShoppingService(IShoppingCartRepository cartRepository) {
-        cartFacade = new ShoppingCartFacade(cartRepository);
+    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository) {
+        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository);
     }
 
     public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
@@ -25,27 +25,17 @@ public class ShoppingService{
         }
     }
 
-    public Response<IShoppingCart> getCart(String clientId) {
+    public Response<Map<String,Map<String, Integer>>> viewCart(String clientId) {
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-            IShoppingCart cart = cartFacade.getCart(clientId);
-            return new Response<>(cart);
+            Map<String,Map<String, Integer>> itemsMapPerStore = cartFacade.viewCart(clientId);
+            return new Response<>(itemsMapPerStore);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
-    public Response<ShoppingBasket> getBasket(String clientId, String storeId) {
-        try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
-
-            ShoppingBasket basket = cartFacade.getBasket(clientId, storeId);
-            return new Response<>(basket);
-        } catch (Exception ex) {
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
 
     // public Response<Boolean> immediatePurchase(PurchaseInfo info) {
     //     IShoppingBasket basket = getBasket(info.getClientId(), info.getStoreId());
