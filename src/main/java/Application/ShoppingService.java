@@ -1,17 +1,21 @@
 package Application;
+import java.util.Date;
+
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCart;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
+import Domain.Store.ItemFacade;
+import Domain.ExternalServices.IPaymentService;
 
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
 
     
-    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository) {
-        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository);
+    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade) {
+        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade);
     }
 
     public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
@@ -47,37 +51,90 @@ public class ShoppingService{
         }
     }
 
-    // public Response<Boolean> immediatePurchase(PurchaseInfo info) {
-    //     IShoppingBasket basket = getBasket(info.getClientId(), info.getStoreId());
-    //     if (basket == null || basket.getItems().getOrDefault(info.getProductId(), 0) < info.getQuantity()) {
-    //         throw new RuntimeException("Item not in cart or insufficient quantity");
-    //     }
+    public Response<Boolean> removeProductFromCart(String storeId, String clientId, String productId, int quantity) {
+        try {
+            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-    //     if (!basketFacade.hasSufficientInventory(info.getProductId(), info.getQuantity())) {
-    //         throw new RuntimeException("Insufficient inventory");
-    //     }
+            cartFacade.removeProductFromCart(storeId, clientId, productId, quantity);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
 
-    //     if (info.getPaymentDetails() == null || info.getPaymentDetails().isBlank()) {
-    //         throw new RuntimeException("Invalid payment details");
-    //     }
+    public Response<Boolean> removeProductFromCart(String storeId, String clientId, String productId) {
+        try {
+            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-    //     basketFacade.decreaseInventory(info.getProductId(), info.getQuantity());
-    //     basket.removeItem(info.getProductId(), info.getQuantity());
+            cartFacade.removeProductFromCart(storeId, clientId, productId);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
 
-    //     System.out.println("Purchase complete for client " + info.getClientId() + 
-    //                        " of " + info.getQuantity() + " units of product " + info.getProductId());
-    // }
+    public Response<Boolean> clearCart(String clientId) {
+        try {
+            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-    // public Response<Boolean> makeBid(PurchaseInfo info) {
-    //     System.out.println("Bid submitted: " + info.getBidPrice() + " for product " + info.getProductId());
-    // }
+            cartFacade.clearCart(clientId);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
 
-    // public Response<Boolean> joinAuction(PurchaseInfo info) {
-    //     System.out.println("Joined auction: " + info.getBidPrice() + " for product " + info.getProductId());
-    // }
+    public Response<Boolean> clearBasket(String clientId, String storeId) {
+        try {
+            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-    // public Response<Boolean> joinLottery(PurchaseInfo info) {
-    //     System.out.println("Joined lottery for product " + info.getProductId());
-    // }
+            cartFacade.clearBasket(clientId, storeId);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    // processPayment(String card_owner, String card_number, Date expiry_date, String cvv, double price,
+    //         long andIncrement, String name, String deliveryAddress);
+
+    // Make Immidiate Purchase Use Case 2.5
+    public Response<Boolean> checkout(String cardOwnerID, String cardNumber, Date expiryDate, String cvv, long andIncrement,
+         String clientName, String deliveryAddress) {
+        try {
+            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
+
+
+            //  public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv) {
+
+            cartFacade.checkout(cardOwnerID, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+
+    class MockPaymentService implements IPaymentService {
+        @Override
+        public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv,
+            double price, long andIncrement, String name, String deliveryAddress) {
+            // Mock payment processing logic
+            return new Response<>(true); // Assume payment is always successful for testing
+        }
+
+        @Override
+        public void updatePaymentServiceURL(String url) {
+            // Mock implementation for updating payment service URL
+            System.out.println("Payment service URL updated to: " + url);
+        }
+
+        @Override
+        public void initialize() {
+            // Mock initialization logic
+            System.out.println("MockPaymentService initialized.");
+        }
+
+    }
 
 }
