@@ -53,15 +53,11 @@ public class UserService {
 
         try {
             Member member = loginManager.register(id, username, password, email);
-            
             return Response.success(new UserDTO(member.getName(), sessionToken, email));
         } catch (IllegalStateException e) {
             return Response.error("Failed to register user: " + e.getMessage());
         }
-        catch (IllegalArgumentException e) {
-            return Response.error(e.getMessage());
-        }
-        catch (NoSuchElementException e) {
+        catch (IllegalArgumentException | NoSuchElementException e) {
             return Response.error(e.getMessage());
         }
         catch (Exception e) {
@@ -73,7 +69,7 @@ public class UserService {
         try {
             Member member = loginManager.login(username, password);
             String token = tokenService.generateToken(member.getId());
-            return Response.success(new UserDTO(member.getName(), token));
+            return Response.success(new UserDTO(token, member.getName(), member.getEmail()));
         } catch (IllegalArgumentException e) {
             return Response.error("Invalid username or password: " + e.getMessage());
         } catch (NoSuchElementException e) {

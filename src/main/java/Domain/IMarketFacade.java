@@ -2,19 +2,16 @@ package Domain;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.User.IUserRepository;
-import Domain.User.User;
+import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
 import Domain.Shopping.ShoppingBasket;
-import Domain.Shopping.IShoppingCart;
-import Domain.Store.Item;
+import Domain.Store.StoreFacade;
 
 public interface IMarketFacade {
     
@@ -34,7 +31,7 @@ public interface IMarketFacade {
 
     INotificationService getNotificationService();
 
-    void initFacades(IUserRepository userFacade, IStoreRepository storeFacade, IItemRepository itemFacade);
+    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade);
     
     // Section 4
     // 4.1 Manage product inventory
@@ -62,7 +59,8 @@ public interface IMarketFacade {
     Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId);
     
     // 4.12 Respond to user messages
-    void respondToUserMessage(String storeId, int messageId, String response, String userId);
+    boolean respondToUserMessage(String storeId, String productId, String userId, String comment);
+    Feedback getUserMessage(String storeId, String productId, String userId);
     
     // 4.13 View store purchase history
     List<ShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId);
@@ -70,5 +68,4 @@ public interface IMarketFacade {
     // Section 6
     // 6.1 Close a store in the market without cancelling subscriptions
     void marketCloseStore(String storeId, String userId);
-
 }
