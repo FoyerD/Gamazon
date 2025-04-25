@@ -9,6 +9,8 @@ public interface IItemRepository extends IRepository<Item, Pair<String, String>>
     List<Item> getByStoreId(String storeId);
     List<Item> getByProductId(String productId);
     List<Item> getAvailabeItems();
+    
+    @Override
     Item update(Pair<String, String> id, Item item);
      
 }

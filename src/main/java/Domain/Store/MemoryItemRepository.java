@@ -8,7 +8,7 @@ import Domain.Pair;
 
 public class MemoryItemRepository implements IItemRepository{
 
-    private Map<Pair<String, String>, Item> items;
+    private final Map<Pair<String, String>, Item> items;
 
     public MemoryItemRepository(){
         this.items = new ConcurrentHashMap<>();
@@ -42,7 +42,7 @@ public class MemoryItemRepository implements IItemRepository{
 
     @Override
     public boolean add(Pair<String, String> id, Item item) {
-        return this.items.put(id, item) != null;
+        return this.items.put(id, item) == null;
     }
 
     @Override

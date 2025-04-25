@@ -1,12 +1,13 @@
 package Domain.Store;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import Domain.Pair;
 
 public class ItemFacade {
-    private IItemRepository itemRepository;
+    private final IItemRepository itemRepository;
 
     public ItemFacade(IItemRepository itemRepository){
         this.itemRepository = itemRepository;
@@ -22,7 +23,10 @@ public class ItemFacade {
     }
 
     public Item getItem(String storeId, String productId){
-        return itemRepository.getItem(storeId, productId);
+        Item item = itemRepository.getItem(storeId, productId);
+        if(item == null)
+            throw new NoSuchElementException("Item not found for storeId: " + storeId + ", productId: " + productId);
+        return item;
     }
 
     public List<Item> getItemsByStoreId(String storeId){
@@ -60,12 +64,14 @@ public class ItemFacade {
                 })
                 .orElse("Unknown Product")
         );
-
         return itemRepository.add(id, item);
     }
 
     public Item remove(Pair<String, String> id) {
-        return itemRepository.remove(id);
+        Item item = itemRepository.remove(id); 
+        if(item == null)
+            throw new NoSuchElementException("Now item with id: " + id.toString() + " exists.");
+        return item;
     }
 
     public void increaseAmount(Pair<String, String> id, int amount) {
