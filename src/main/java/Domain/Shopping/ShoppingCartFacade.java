@@ -8,10 +8,12 @@ import Domain.Pair;
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;
-
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo) {
+    private final IReceiptRepository receiptRepo;
+    
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IReceiptRepository receiptRepo) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
+        this.receiptRepo = receiptRepo;
     }
 
     private IShoppingCart getCart(String clientId) {
@@ -91,9 +93,62 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
     @Override
     public boolean checkout(String clientId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'checkout'");
+        // Get the client's shopping cart
+        IShoppingCart cart = cartRepo.get(clientId);
+        if (cart == null || cart.isEmpty()) {
+            return false;
+        }
+        
+        boolean anyPurchaseMade = false;
+        
+        // Process each store's basket
+        for (String storeId : cart.getCart()) {
+            // Get the basket for this store
+            Pair<String, String> basketId = new Pair<>(clientId, storeId);
+            ShoppingBasket basket = basketRepo.get(basketId);
+            
+            if (basket != null && !basket.isEmpty()) {
+                // This would typically involve additional steps like:
+                // 1. Payment processing
+                // 2. Inventory updates
+                // 3. Order creation
+                
+                // Get the products from the basket
+                Map<String, Integer> products = new HashMap<>(basket.getBasketProducts());
+                
+                // Calculate the total price (this is a simplified example)
+                // In a real implementation, you would get prices from a product service
+                double totalPrice = calculateTotalPrice(products, storeId);
+                
+                // Save the purchase record in the receipt repository
+                receiptRepo.savePurchase(clientId, storeId, products, totalPrice);
+                
+                // Clear the basket for this store
+                basket.clear();
+                basketRepo.update(basketId, basket);
+                
+                anyPurchaseMade = true;
+            }
+        }
+        
+        // Clear the entire cart if any purchase was made
+        if (anyPurchaseMade) {
+            cart.clear();
+            cartRepo.update(clientId, cart);
+            return true;
+        }
+        
+        return false;
     }
+    
+    // Simplified method to calculate total price
+    // In a real implementation, you would get prices from a product service
+    private double calculateTotalPrice(Map<String, Integer> products, String storeId) {
+        // This is a placeholder - you would replace with actual price calculation
+        // using a product service or other mechanism to get prices
+        return products.values().stream().mapToDouble(quantity -> quantity * 10.0).sum();
+    }
+
 
     @Override
     public int getTotalItems(String clientId) {
