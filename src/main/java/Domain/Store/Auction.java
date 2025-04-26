@@ -47,11 +47,11 @@ public class Auction {
         this.currentBidderId = null;
     }
 
-    public UUID getAuctionId() {
-        return auctionId;
+    public String getAuctionId() {
+        return auctionId.toString();
     }
-    public void setAuctionId(UUID auctionId) {
-        this.auctionId = auctionId;
+    public void setAuctionId(String auctionId) {
+        this.auctionId = UUID.nameUUIDFromBytes(auctionId.toString().getBytes());
     }
     public Date getAuctionStartDate() {
         return auctionStartDate;
@@ -83,23 +83,23 @@ public class Auction {
     public void setAuctionStatus(AuctionStatus auctionStatus) {
         this.auctionStatus = auctionStatus;
     }
-    public UUID getStoreId() {
-        return storeId;
+    public String getStoreId() {
+        return storeId.toString();
     }
-    public void setStoreId(UUID storeId) {
-        this.storeId = storeId;
+    public void setStoreId(String storeId) {
+        this.storeId = UUID.nameUUIDFromBytes(storeId.toString().getBytes());
     }
-    public UUID getProductId() {
-        return productId;
+    public String getProductId() {
+        return productId.toString();
     }
-    public void setProductId(UUID productId) {
-        this.productId = productId;
+    public void setProductId(String productId) {
+        this.productId = UUID.nameUUIDFromBytes(productId.toString().getBytes());
     }
-    public UUID getCurrentBidderId() {
-        return currentBidderId;
+    public String getCurrentBidderId() {
+        return currentBidderId.toString();
     }
-    public void setCurrentBidderId(UUID currentBidderId) {
-        this.currentBidderId = currentBidderId;
+    public void setCurrentBidderId(String currentBidderId) {
+        this.currentBidderId = UUID.nameUUIDFromBytes(currentBidderId.toString().getBytes());
     }
     
 }
