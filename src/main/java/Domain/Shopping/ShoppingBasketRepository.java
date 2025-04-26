@@ -2,6 +2,7 @@ package Domain.Shopping;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.Pair;
 
@@ -11,7 +12,7 @@ public class ShoppingBasketRepository implements IShoppingBasketRepository {
 
     public ShoppingBasketRepository() {
         
-        this.baskets = new HashMap<>();
+        this.baskets = new ConcurrentHashMap<>();
     }
 
     @Override
