@@ -145,7 +145,7 @@ public class StoreFacade {
         if (startPrice < 0) throw new RuntimeException("Start price must be greater than 0.");
         
         String auctionId = System.currentTimeMillis() + "";
-        Auction auction = new Auction(auctionId, auctionStartDate, auctionEndDateParsed, startPrice, startPrice, AuctionStatus.ACTIVE, storeId, productId);
+        Auction auction = new Auction(auctionId, auctionStartDate, auctionEndDateParsed, startPrice, startPrice, storeId, productId);
         return this.auctionRepository.add(auctionId, auction);
     }
 
