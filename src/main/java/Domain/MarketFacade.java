@@ -43,6 +43,11 @@ public class MarketFacade implements IMarketFacade {
         this.storeFacade = storeFacade;
     }
 
+    // For unit testing
+    public Map<String, Map<String, Permission>> getStorePermissions(){
+        return storePermissions;
+    }
+
     @Override
     public void updatePaymentService(IPaymentService paymentService) {
         this.paymentService = paymentService;
