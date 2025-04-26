@@ -41,7 +41,7 @@ public class StoreFacade {
         this.feedbackRepository = feedbackRepository;
     }
 
-    public void setProductRepository(IItemRepository itemRepository) {
+    public void setItemRepository(IItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
 

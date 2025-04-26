@@ -4,10 +4,10 @@ import java.util.Map;
 
 import Domain.Store.Auction;
 
-public class MemoryAuctionRepositry implements Domain.Store.IAuctionRepository {
+public class MemoryAuctionRepository implements Domain.Store.IAuctionRepository {
     private Map<String, Auction> auctions;
     
-    public MemoryAuctionRepositry() {
+    public MemoryAuctionRepository() {
         this.auctions = new java.util.concurrent.ConcurrentHashMap<>();
     }
 
