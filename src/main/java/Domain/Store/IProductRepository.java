@@ -1,7 +1,7 @@
 package Domain.Store;
 
-import Domain.IRepository;
+import Domain.ILockbasedRepository;
 
-public interface IProductRepository extends IRepository<Product, String> {
+public abstract class IProductRepository extends ILockbasedRepository<Product, String> {
 
 }
