@@ -69,19 +69,19 @@ public class Auction {
         this.currentPrice = currentPrice;
     }
     public String getStoreId() {
-        return storeId.toString();
+        return storeId;
     }
     public void setStoreId(String storeId) {
         this.storeId = storeId.toString();
     }
     public String getProductId() {
-        return productId.toString();
+        return productId;
     }
     public void setProductId(String productId) {
         this.productId = productId;
     }
     public String getCurrentBidderId() {
-        return currentBidderId.toString();
+        return currentBidderId;
     }
     public void setCurrentBidderId(String currentBidderId) {
         this.currentBidderId = currentBidderId;
