@@ -39,10 +39,10 @@ public class Auction {
     }
 
     public String getAuctionId() {
-        return auctionId.toString();
+        return auctionId;
     }
     public void setAuctionId(String auctionId) {
-        this.auctionId = auctionId.toString();
+        this.auctionId = auctionId;
     }
     public Date getAuctionStartDate() {
         return auctionStartDate;
