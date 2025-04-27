@@ -1,7 +1,5 @@
 package Domain.Shopping;
 
-import org.slf4j.ILoggerFactory;
-
 import Domain.ILockbasedRepository;
 import Domain.Pair;
 
