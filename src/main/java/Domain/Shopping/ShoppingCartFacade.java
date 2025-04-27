@@ -188,7 +188,6 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                 String storeId = entry.getKey();
                 Map<String, Object> storePurchase = entry.getValue();
                 
-                @SuppressWarnings("unchecked")
                 Map<String, Integer> products = (Map<String, Integer>) storePurchase.get("products");
                 double storeTotal = (double) storePurchase.get("totalPrice");
                 
