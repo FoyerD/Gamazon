@@ -11,18 +11,21 @@ import java.util.Set;
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Store.ItemFacade;
+import Domain.Store.StoreFacade;
 
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;
     private final IPaymentService paymentService;
     private final ItemFacade itemFacade;
+    private final StoreFacade storeFacade;
 
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IPaymentService paymentService, ItemFacade itemFacade) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
         this.itemFacade = itemFacade;
+        this.storeFacade = storeFacade;
     }
 
     private IShoppingCart getCart(String clientId) {
@@ -101,8 +104,13 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     }
 
 
-    //public void increaseAmount(Pair<String, String> id, int amount);
-    //public void decreaseAmount(Pair<String, String> id, int amount)
+    @Override
+    public boolean makeBid(String auctionId, String clientId, float price) {
+        storeFacade.addBid(auctionId, clientId, price);
+        return true;
+    }
+
+    
 
     @Override
     public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,

@@ -6,6 +6,7 @@ import java.util.Map;
 public interface IShoppingCartFacade {
     // IShoppingCart getCart(String clientId);
     // ShoppingBasket getBasket(String clientId, String storeId);
+    boolean makeBid(String auctionId, String clientId, float price);
     boolean addProductToCart(String storeId, String clientId, String productId, int quantity);
     boolean checkout(String clientId, String card_number, Date expiry_date, String cvv, long andIncrement, String clientName, String deliveryAddress);
     boolean removeProductFromCart(String storeId, String clientId, String productId, int quantity);
