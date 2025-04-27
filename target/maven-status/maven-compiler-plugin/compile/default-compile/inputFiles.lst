@@ -21,6 +21,7 @@
 /root/Sadna/Gamazon/src/main/java/Domain/Shopping/IShoppingBasketRepository.java
 /root/Sadna/Gamazon/src/main/java/Domain/Shopping/ShoppingCartFacade.java
 /root/Sadna/Gamazon/src/main/java/Application/app.java
+/root/Sadna/Gamazon/src/main/java/Domain/Store/IAuctionRepository.java
 /root/Sadna/Gamazon/src/main/java/Domain/Store/MemoryItemRepository.java
 /root/Sadna/Gamazon/src/main/java/Application/MarketService.java
 /root/Sadna/Gamazon/src/main/java/Domain/User/Member.java
@@ -34,6 +35,7 @@
 /root/Sadna/Gamazon/src/main/java/Domain/Store/Item.java
 /root/Sadna/Gamazon/src/main/java/Infrastructure/MemoryFeedbackRepository.java
 /root/Sadna/Gamazon/src/main/java/Domain/Shopping/ShoppingCartRepository.java
+/root/Sadna/Gamazon/src/main/java/Infrastructure/MemoryAuctionRepository.java
 /root/Sadna/Gamazon/src/main/java/Domain/Store/Store.java
 /root/Sadna/Gamazon/src/main/java/Application/Response.java
 /root/Sadna/Gamazon/src/main/java/Domain/Shopping/ReceiptRepository.java
@@ -56,5 +58,6 @@
 /root/Sadna/Gamazon/src/main/java/Domain/TokenService.java
 /root/Sadna/Gamazon/src/main/java/Domain/Shopping/ShoppingBasket.java
 /root/Sadna/Gamazon/src/main/java/Domain/RoleType.java
+/root/Sadna/Gamazon/src/main/java/Domain/Store/Auction.java
 /root/Sadna/Gamazon/src/main/java/Domain/Store/ItemFilter.java
 /root/Sadna/Gamazon/src/main/java/Domain/Shopping/ShoppingCart.java
