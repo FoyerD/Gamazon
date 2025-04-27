@@ -38,17 +38,29 @@ public class Store {
     public String getId() {
         return id;
     }
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
+    public void setDescription(String descripsion) {
+        this.description = descripsion;
+    }
 
     public String getFounderId() {
         return founderId;
+    }
+    public void setFounderId(String founderId) {
+        this.founderId = founderId;
     }
 
     public Set<String> getOwners() {
@@ -61,9 +73,22 @@ public class Store {
     public Set<String> getManagers() {
         return new HashSet<>(this.managers);
     }
+    public boolean addManager(String userId) {
+        return this.managers.add(userId);
+    }
 
     public boolean isOpen() {
         return isOpen;
+    }
+    public void setOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+    
+    public boolean removeOwner(String userId) {
+        return this.owners.remove(userId);
+    }
+    public boolean removeManager(String userId) {
+        return this.managers.remove(userId);
     }
 
 }

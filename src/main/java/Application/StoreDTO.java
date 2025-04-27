@@ -38,55 +38,32 @@ public class StoreDTO {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public String getFounderId() {
         return founderId;
     }
 
-    public void setFounderId(String founderId) {
-        this.founderId = founderId;
-    }
 
     public Set<String> getOwners() {
         return new HashSet<>(owners);
     }
 
-    public void setOwners(Set<String> owners) {
-        this.owners = owners != null ? new HashSet<>(owners) : new HashSet<>();
-    }
 
     public Set<String> getManagers() {
         return new HashSet<>(managers);
     }
 
-    public void setManagers(Set<String> managers) {
-        this.managers = managers != null ? new HashSet<>(managers) : new HashSet<>();
-    }
 
     public boolean isOpen() {
         return isOpen;
     }
 
-    public void setOpen(boolean isOpen) {
-        this.isOpen = isOpen;
-    }
 }
