@@ -8,7 +8,7 @@ public class Store {
     
     private String id;
     private String name;
-    private String descripsion;
+    private String description;
     private String foudnerId;
     private Set<String> owners;
     private Set<String> managers;
@@ -18,17 +18,17 @@ public class Store {
     public Store(){
         this.id = null;
         this.name = null;
-        this.descripsion = null;
+        this.description = null;
         this.foudnerId = null;
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
         this.isOpen = true;
     }
     
-    public Store(String id, String name, String descripsion, String foudnerId) {
+    public Store(String id, String name, String description, String foudnerId) {
         this.id = id;
         this.name = name;
-        this.descripsion = descripsion;
+        this.description = description;
         this.foudnerId = foudnerId;
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
@@ -49,11 +49,11 @@ public class Store {
         this.name = name;
     }
 
-    public String getDescripsion() {
-        return descripsion;
+    public String getDescription() {
+        return description;
     }
-    public void setDescripsion(String descripsion) {
-        this.descripsion = descripsion;
+    public void setDescription(String descripsion) {
+        this.description = descripsion;
     }
 
     public String getFoudnerId() {
