@@ -103,7 +103,7 @@ public class StoreFacade {
     public Feedback removeFeedback(String storeId, String productId, String userId) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
 
-        Object lock = this.storeRepository.getLock(storeId);
+        Object lock = this.feedbackRepository.getLock(Feedback.getPairKey(storeId, productId, userId));
         if (lock == null) throw new RuntimeException("Store not found.");
         synchronized (lock) {
             return feedbackRepository.remove(storeId, productId, userId);
