@@ -9,14 +9,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import Domain.Pair; 
-public class MemoryFeedbackRepository implements IFeedbackRepository{
+public class MemoryFeedbackRepository extends IFeedbackRepository{
     private Map<Pair<Pair<String, String>, String>, Feedback> feedbacks;
 
     public MemoryFeedbackRepository() {
+        super();
         this.feedbacks = new ConcurrentHashMap<>();
     }
 
-    private boolean isIdValid(Pair<Pair<String, String>, String> id) {
+    @Override
+    protected boolean isIdValid(Pair<Pair<String, String>, String> id) {
         return id != null && id.getFirst() != null &&
                id.getFirst().getFirst() != null && id.getFirst().getSecond() != null && id.getSecond() != null &&
                !id.getFirst().getFirst().trim().isEmpty() && !id.getFirst().getSecond().trim().isEmpty() && !id.getSecond().trim().isEmpty();
@@ -46,10 +48,14 @@ public class MemoryFeedbackRepository implements IFeedbackRepository{
     }
 
 
+
+
     @Override
     public Feedback remove(Pair<Pair<String, String>, String> id) {
         if(!this.isIdValid(id))
             throw new IllegalArgumentException("ID cannot be null");
+        
+        this.removeLock(id);
         return feedbacks.remove(id);
     }
 
@@ -80,9 +86,12 @@ public class MemoryFeedbackRepository implements IFeedbackRepository{
             throw new IllegalArgumentException("ID cannot be null");
         if (this.feedbacks.containsKey(id))
             throw new IllegalArgumentException("Item with this ID already exists");
+        if (item == null)
+            throw new IllegalArgumentException("Item cannot be null");
         if (!id.equals(this.getId(item)))
             throw new IllegalArgumentException("ID does not match the feedback ID");
-
+            
+        this.addLock(id);
         return this.feedbacks.put(id, item) == null;
     }
 
