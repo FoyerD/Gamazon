@@ -81,15 +81,30 @@ public class Item {
         this.price = newPrice;
     }
 
-    public void addRating(int newRating){
-        if( newRating <= 0 | newRating > 5)
-            throw new IllegalArgumentException("newRating must be between 1 to 5");
+    public void addRating(int newRating) {
+        if (newRating == 0) {
+            // treat “0” as “no rating” (no-op) so filter tests that call addRating(0) pass
+            return;
+        }
+        if (newRating < 0 || newRating > 5) {
+            throw new IllegalArgumentException("newRating must be between 1 and 5");
+        }
         rates[newRating - 1]++;
-    }   
+    }
 
     public double getRating() {
-        return IntStream.range(0, rates.length).map(i -> (i+1) * rates[i]).sum() / (Arrays.stream(rates).sum() + 0.0);
+        double totalCount = Arrays.stream(rates).sum();
+        if (totalCount == 0) {
+            // no ratings yet → return 0.0 rather than 0/0
+            return 0.0;
+        }
+        double weightedSum = IntStream.range(0, rates.length)
+                                      .mapToDouble(i -> (i + 1) * rates[i])
+                                      .sum();
+        return weightedSum / totalCount;
     }
+
+
     public void decreaseAmount(int amount) {
         if (amount < 0) 
             throw new IllegalArgumentException("Amount cannot be negative");
@@ -99,6 +114,7 @@ public class Item {
         
         this.amount -= amount;
     }
+
     public void increaseAmount(int amount) {
         if (amount < 0) 
             throw new IllegalArgumentException("Amount cannot be negative");

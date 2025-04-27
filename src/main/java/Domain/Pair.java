@@ -17,11 +17,19 @@ public class Pair<T, U> {
         return second;
     }
 
-    public boolean isEquals(Pair<T, U> other) {
-        if (other == null) {
-            return false;
-        }
-        return this.first.equals(other.first) && this.second.equals(other.second);
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        Pair<?, ?> pair = (Pair<?, ?>) other;
+        return first.equals(pair.first) && second.equals(pair.second);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = first != null ? first.hashCode() : 0;
+        result = 31 * result + (second != null ? second.hashCode() : 0);
+        return result;
     }
 
     @Override

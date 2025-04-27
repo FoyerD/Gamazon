@@ -1,14 +1,14 @@
 package Domain.Store;
 import java.util.List;
 
-import Domain.IRepository;
+import Domain.ILockbasedRepository;
 import Domain.Pair;
 
-public interface IItemRepository extends IRepository<Item, Pair<String, String>>{
-    Item getItem(String storeId, String productId);
-    List<Item> getByStoreId(String storeId);
-    List<Item> getByProductId(String productId);
-    List<Item> getAvailabeItems();
-    Item update(Pair<String, String> id, Item item);
-     
+
+public abstract class IItemRepository extends ILockbasedRepository<Item, Pair<String, String>>{
+    abstract public Item getItem(String storeId, String productId);
+    abstract public List<Item> getByStoreId(String storeId);
+    abstract public List<Item> getByProductId(String productId);
+    abstract public List<Item> getAvailabeItems();
+    abstract public Item update(Pair<String, String> id, Item item);
 }
