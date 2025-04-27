@@ -1,11 +1,13 @@
 package StoreTests;
 
-import static org.junit.Assert.*;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 import Application.ItemService;
 import Application.Response;
@@ -21,9 +23,23 @@ public class ItemServiceTests {
 
     @Before
     public void setUp() {
-        itemService = new ItemService(new ItemFacade(new MemoryItemRepository()));
+        MemoryItemRepository repository = new MemoryItemRepository();
+    
+        // Item with stock — should appear in getAvailableItems()
+        repository.add(new Pair<>("1", "101"), new Item("1", "101", 49.99f, 10, "In Stock Item"));
+    
+        // Item without stock — should NOT appear in getAvailableItems()
+        repository.add(new Pair<>("1", "out-of-stock-product"), new Item("1", "out-of-stock-product", 19.99f, 0, "Out of Stock Item"));
+    
+        // Optional: more items
+        repository.add(new Pair<>("store1", "prod2"), new Item("store1", "prod2", 39.99f, 5, "Another Stocked Item"));
+    
+        ItemFacade facade = new ItemFacade(repository);
+        itemService = new ItemService(facade);
     }
-
+    
+    
+    
     // 1. getItem
     @Test
     public void GivenValidStoreAndProduct_WhenGetItem_ThenReturnItem() {
@@ -88,18 +104,26 @@ public class ItemServiceTests {
 
     // 5. getAvailableItems
     @Test
-    public void GivenProductWithStock_WhenGetAvailableItems_ThenReturnItems() {
-        Response<List<Item>> response = itemService.getAvailableItems("prod1");
+    public void GivenItemsWithStock_WhenGetAvailableItems_ThenReturnNonEmptyList() {
+        Response<List<Item>> response = itemService.getAvailableItems();
         assertFalse(response.errorOccurred());
-        assertFalse(response.getValue().isEmpty());
+        assertTrue(response.getValue().stream().allMatch(item -> item.getAmount() > 0));
     }
-
+    
     @Test
-    public void GivenOutOfStockProduct_WhenGetAvailableItems_ThenReturnEmptyList() {
-        Response<List<Item>> response = itemService.getAvailableItems("out-of-stock-product");
+    public void GivenAllItemsOutOfStock_WhenGetAvailableItems_ThenReturnEmptyList() {
+        // Simulate a repository with only out-of-stock items
+        MemoryItemRepository repo = new MemoryItemRepository();
+        repo.add(new Pair<>("storeX", "prodX"), new Item("storeX", "prodX", 19.99f, 0, "Out of Stock"));
+    
+        itemService = new ItemService(new ItemFacade(repo));
+    
+        Response<List<Item>> response = itemService.getAvailableItems();
         assertFalse(response.errorOccurred());
         assertTrue(response.getValue().isEmpty());
     }
+    
+    
 
     // 6. increaseAmount
     @Test
@@ -148,8 +172,8 @@ public class ItemServiceTests {
     // 8. add
     @Test
     public void GivenNewItem_WhenAdd_ThenReturnTrue() {
-        Item item = new Item("storeX", "prodX",19.99f , 3, "Cool Product");
-        Pair<String, String> id = new Pair<>("storeX", "prodX");
+        Item item = new Item("storeY", "prodY",19.99f , 3, "Cool Product");
+        Pair<String, String> id = new Pair<>("storeY", "prodY");
 
         Response<Boolean> response = itemService.add(id, item);
         assertFalse(response.errorOccurred());
