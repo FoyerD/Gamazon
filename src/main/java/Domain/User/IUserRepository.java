@@ -1,17 +1,17 @@
 package Domain.User;
 
-import Domain.IRepository;
+import Domain.ILockbasedRepository;
 
-public interface IUserRepository extends IRepository<User, String> {
-    public boolean add(String id, User user);
-    public User remove(String id);
-    public User get(String id);
-    public Guest getGuest(String id);
-    public Member getMember(String id);
-    public User update(String id, User user);
+public abstract class IUserRepository extends ILockbasedRepository<User, String> {
+    abstract public boolean add(String id, User user);
+    abstract public User remove(String id);
+    abstract public User get(String id);
+    abstract public Guest getGuest(String id);
+    abstract public Member getMember(String id);
+    abstract public User update(String id, User user);
 
-    public Member getMemberByUsername(String username);
+    abstract public Member getMemberByUsername(String username);
 
-    public String getMemberUsername(String id);
-    public boolean userIsMember(String id);
+    abstract public String getMemberUsername(String id);
+    abstract public boolean userIsMember(String id);
 }
