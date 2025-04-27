@@ -5,7 +5,7 @@ public class Guest extends User{
     private Guest() {
         super(NAME);
     }
-    public static Guest createGuest() {
+    public static synchronized Guest createGuest() {
         return new Guest();
     }
 
