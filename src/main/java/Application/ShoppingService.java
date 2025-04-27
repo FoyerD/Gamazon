@@ -17,7 +17,7 @@ public class ShoppingService{
 
     
     public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade, IReceiptRepository receiptRepo) {
-        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, IReceiptRepository receiptRepo, new MockPaymentService(), itemFacade);
+        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, receiptRepo, new MockPaymentService(), itemFacade);
     }
 
     public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
