@@ -1,7 +1,7 @@
 package Domain.Store;
 
-import Domain.IRepository;
+import Domain.ILockbasedRepository;
 
-public interface IStoreRepository extends IRepository<Store, String> {
-    public Store getStoreByName(String name);
+public abstract class IStoreRepository extends ILockbasedRepository<Store, String> {
+    abstract public Store getStoreByName(String name);
 }

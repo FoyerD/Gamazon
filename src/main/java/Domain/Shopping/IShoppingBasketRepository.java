@@ -1,8 +1,10 @@
 package Domain.Shopping;
 
-import Domain.IRepository;
+import org.slf4j.ILoggerFactory;
+
+import Domain.ILockbasedRepository;
 import Domain.Pair;
 
-public interface IShoppingBasketRepository extends IRepository<ShoppingBasket, Pair<String, String>> {
-    public void clear();
+public abstract class IShoppingBasketRepository extends ILockbasedRepository<ShoppingBasket, Pair<String, String>> {
+    abstract public void clear();
 }

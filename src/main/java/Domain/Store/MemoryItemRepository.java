@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.Pair;
 
-public class MemoryItemRepository implements IItemRepository{
+public class MemoryItemRepository extends IItemRepository{
 
     private final Map<Pair<String, String>, Item> items;
 
