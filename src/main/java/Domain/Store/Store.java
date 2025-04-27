@@ -8,8 +8,8 @@ public class Store {
     
     private String id;
     private String name;
-    private String descripsion;
-    private String foudnerId;
+    private String description;
+    private String founderId;
     private Set<String> owners;
     private Set<String> managers;
     private boolean isOpen;
@@ -18,18 +18,18 @@ public class Store {
     public Store(){
         this.id = null;
         this.name = null;
-        this.descripsion = null;
-        this.foudnerId = null;
+        this.description = null;
+        this.founderId = null;
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
         this.isOpen = true;
     }
     
-    public Store(String id, String name, String descripsion, String foudnerId) {
+    public Store(String id, String name, String description, String foudnerId) {
         this.id = id;
         this.name = name;
-        this.descripsion = descripsion;
-        this.foudnerId = foudnerId;
+        this.description = description;
+        this.founderId = foudnerId;
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
         this.isOpen = true;
@@ -49,18 +49,18 @@ public class Store {
         this.name = name;
     }
 
-    public String getDescripsion() {
-        return descripsion;
+    public String getDescription() {
+        return description;
     }
-    public void setDescripsion(String descripsion) {
-        this.descripsion = descripsion;
+    public void setDescription(String descripsion) {
+        this.description = descripsion;
     }
 
-    public String getFoudnerId() {
-        return foudnerId;
+    public String getFounderId() {
+        return founderId;
     }
-    public void setFoudnerId(String foudnerId) {
-        this.foudnerId = foudnerId;
+    public void setFounderId(String founderId) {
+        this.founderId = founderId;
     }
 
     public Set<String> getOwners() {
