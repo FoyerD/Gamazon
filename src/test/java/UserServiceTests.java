@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.UserService;
-import Domain.User.IUserRepository;
 import Domain.User.LoginManager;
 import Application.Response;
 import Application.UserDTO;
