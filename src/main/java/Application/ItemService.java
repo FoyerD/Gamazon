@@ -66,7 +66,7 @@ public class ItemService {
         }
    }
 
-   public Response<List<Item>> getAvailableItems(String productId){
+   public Response<List<Item>> getAvailableItems(){
         try {
             return new Response<>(itemFacade.getAvailableItems());
         } 

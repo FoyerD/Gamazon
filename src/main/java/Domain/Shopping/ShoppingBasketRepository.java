@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.Pair;
 
-public class ShoppingBasketRepository implements IShoppingBasketRepository {
+public class ShoppingBasketRepository extends IShoppingBasketRepository {
     
     private Map<Pair<String, String>, ShoppingBasket> baskets;
 

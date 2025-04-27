@@ -27,7 +27,7 @@ public class ItemFilter {
         if (maxPrice >= 0 && item.getPrice() > maxPrice) return false;
         if (minRating >= 0 && item.getRating() < minRating) return false;
         if (maxRating >= 0 && item.getRating() > maxRating) return false;
-        if (!categories.isEmpty() && !categories.containsAll(item.getCategories())) return false;
+        if (!categories.isEmpty() && !item.getCategories().containsAll(categories)) return false;
         if (!itemName.equals("") && !item.getProductName().contains(itemName)) return false;
         return true;
     }
