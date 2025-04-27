@@ -22,7 +22,7 @@ public class PermissionTest {
     }
 
     @Test
-    public void testInitStoreManager() {
+    public void givenNewPermission_whenInitStoreManager_thenCorrectPermissionsAssigned() {
         permission.initStoreManager();
         assertTrue(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
@@ -41,7 +41,7 @@ public class PermissionTest {
     }
 
     @Test
-    public void testInitTradingManager() {
+    public void givenNewPermission_whenInitTradingManager_thenCorrectPermissionsAssigned() {
         permission.initTradingManager();
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
@@ -53,7 +53,7 @@ public class PermissionTest {
     }
 
     @Test
-    public void testInitStoreOwner() {
+    public void givenNewPermission_whenInitStoreOwner_thenCorrectPermissionsAssigned() {
         permission.initStoreOwner();
         assertFalse(permission.isStoreManager());
         assertTrue(permission.isStoreOwner());
@@ -71,7 +71,7 @@ public class PermissionTest {
     }
 
     @Test
-    public void testInitStoreFounder() {
+    public void givenNewPermission_whenInitStoreFounder_thenCorrectPermissionsAssigned() {
         permission.initStoreFounder();
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
@@ -90,7 +90,7 @@ public class PermissionTest {
     }
 
     @Test
-    public void testSetPermissions() {
+    public void givenPermission_whenSetPermissions_thenOnlySelectedPermissionsAssigned() {
         permission.setPermissions(Set.of(
                 PermissionType.ASSIGN_OR_REMOVE_OWNERS,
                 PermissionType.HANDLE_INVENTORY
@@ -98,6 +98,7 @@ public class PermissionTest {
         assertTrue(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
         assertFalse(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertTrue(permission.hasPermission(PermissionType.HANDLE_INVENTORY));
+
         permission.setPermissions(Set.of(
                 PermissionType.SUPERVISE_MANAGERS,
                 PermissionType.DEACTIVATE_STORE,
@@ -107,6 +108,7 @@ public class PermissionTest {
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
         assertTrue(permission.hasPermission(PermissionType.MODIFY_OWNER_RIGHTS));
+
         permission.setPermissions(Set.of(
                 PermissionType.ASSIGN_OR_REMOVE_OWNERS,
                 PermissionType.SUPERVISE_MANAGERS,
@@ -121,19 +123,19 @@ public class PermissionTest {
     }
 
     @Test
-    public void testStoreManagerNoAssignOwnerPermission() {
+    public void givenStoreManagerRole_whenCheckingAssignOwnerPermission_thenShouldNotHaveIt() {
         permission.initStoreManager();
         assertFalse(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
     }
 
     @Test
-    public void testStoreManagerHasPurchaseAccessPermission() {
+    public void givenStoreManagerRole_whenCheckingPurchaseAccessPermission_thenShouldHaveIt() {
         permission.initStoreManager();
         assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
     }
 
     @Test
-    public void testStoreFounderHasAllExpectedPermissions() {
+    public void givenStoreFounderRole_whenCheckingAllExpectedPermissions_thenAllPresent() {
         permission.initStoreFounder();
         assertTrue(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
@@ -146,37 +148,39 @@ public class PermissionTest {
     }
 
     @Test
-    public void testStoreFounderModifyOwnerPermissions() {
+    public void givenStoreFounderRole_whenCheckingModifyOwnerPermission_thenShouldHaveIt() {
         permission.initStoreFounder();
         assertTrue(permission.hasPermission(PermissionType.MODIFY_OWNER_RIGHTS));
     }
 
     @Test
-    public void testIsStoreOwner() {
+    public void givenStoreOwnerRole_whenCheckingRole_thenIsStoreOwner() {
         permission.setRole(RoleType.STORE_OWNER);
         assertTrue(permission.isStoreOwner());
     }
 
     @Test
-    public void testHasPermission() {
+    public void givenStoreOwnerRole_whenCheckingSpecificPermissions_thenCorrectPermissionsPresent() {
         permission.initStoreOwner();
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
     }
 
-    // add test which includes setting new permissions and checking if the permission is set correctly and switching between permissions
     @Test
-    public void testSwitchPermissions() {
+    public void givenPermission_whenSwitchingBetweenRolesAndPermissions_thenStateUpdatedCorrectly() {
         permission.initStoreManager();
         assertTrue(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
+
         permission.initStoreOwner();
         assertFalse(permission.isStoreManager());
         assertTrue(permission.isStoreOwner());
+
         permission.initStoreFounder();
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
         assertTrue(permission.isStoreFounder());
+
         permission.initTradingManager();
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
@@ -186,6 +190,7 @@ public class PermissionTest {
         assertTrue(permission.hasPermission(PermissionType.VIEW_EMPLOYEE_INFO));
         assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
         assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+
         permission.setPermissions(Set.of(
             PermissionType.SUPERVISE_MANAGERS,
             PermissionType.ASSIGN_OR_REMOVE_OWNERS,

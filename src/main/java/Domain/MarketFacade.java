@@ -3,6 +3,7 @@ package Domain;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
@@ -26,7 +27,7 @@ public class MarketFacade implements IMarketFacade {
     private StoreFacade storeFacade; 
 
     // In-memory permissions store: storeId -> (username -> Permission)
-    private final Map<String, Map<String, Permission>> storePermissions = new HashMap<>();
+    private final Map<String, Map<String, Permission>> storePermissions = new ConcurrentHashMap<>();
 
     private static final MarketFacade INSTANCE = new MarketFacade();
 

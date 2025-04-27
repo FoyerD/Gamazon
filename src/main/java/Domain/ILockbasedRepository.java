@@ -5,6 +5,9 @@ import java.util.Map;
 public abstract class ILockbasedRepository<V, K> implements IRepository<V, K> {
     private Map<K, Object> locks = new java.util.concurrent.ConcurrentHashMap<>();
     
+    public ILockbasedRepository() {
+        this.locks = new java.util.concurrent.ConcurrentHashMap<>();
+    }
 
     public Object getLock(K id) {
         return locks.get(id);
