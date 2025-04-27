@@ -74,13 +74,20 @@ public class StoreFacade {
     }
 
     public boolean openStore(String storeId) {
-        Store store = this.storeRepository.get(storeId);
-        if (store == null) throw new RuntimeException("Store not found.");
-        if (store.isOpen()) throw new RuntimeException("Store is already open.");
+        if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
 
-        store.setOpen(true);
-        Store newStore = this.storeRepository.update(storeId, store);
-        return store.equals(newStore);
+        Object lock = this.storeRepository.getLock(storeId);
+        if (lock == null) throw new RuntimeException("Store not found.");
+        synchronized (lock) {
+        
+            Store store = this.storeRepository.get(storeId);
+            if (store == null) throw new RuntimeException("Store not found.");
+            if (store.isOpen()) throw new RuntimeException("Store is already open.");
+
+            store.setOpen(true);
+            Store newStore = this.storeRepository.update(storeId, store);
+            return store.equals(newStore);
+        }
     }
 
     public Feedback getFeedback(String storeId, String productId, String userId) {
@@ -105,25 +112,38 @@ public class StoreFacade {
     public Feedback removeFeedback(String storeId, String productId, String userId) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
 
-        return feedbackRepository.remove(storeId, productId, userId);
+        Object lock = this.feedbackRepository.getLock(Feedback.getPairKey(storeId, productId, userId));
+        if (lock == null) throw new RuntimeException("Store not found.");
+        synchronized (lock) {
+            return feedbackRepository.remove(storeId, productId, userId);
+        }
     }
 
     public Feedback updateFeedback(Feedback feedback) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         if (feedback == null) throw new IllegalArgumentException("Feedback cannot be null.");
 
-        return feedbackRepository.update(feedback.getStoreId(), feedback.getProductId(), feedback.getCustomerId(), feedback);
+        Object lock = this.feedbackRepository.getLock(feedback.getPairKey());
+        if (lock == null) throw new RuntimeException("Store not found.");
+        synchronized (lock) {
+            return feedbackRepository.update(feedback.getStoreId(), feedback.getProductId(), feedback.getCustomerId(), feedback);
+        }
     }
 
     public boolean closeStore(String storeId){
-        Store store = this.storeRepository.get(storeId);
-        if (store == null) throw new RuntimeException("Store not found.");
-        if(!store.isOpen()) throw new RuntimeException("Store is already closed.");
+        Object lock = this.storeRepository.getLock(storeId);
+        if (lock == null) throw new RuntimeException("Store not found.");
+        synchronized (lock) {
 
-        store.setOpen(false);
-        Store newStore = this.storeRepository.update(storeId, store);
-        if(!store.equals(newStore)) throw new RuntimeException("Store not updated.");
-        return true;
+            Store store = this.storeRepository.get(storeId);
+            if (store == null) throw new RuntimeException("Store not found.");
+            if(!store.isOpen()) throw new RuntimeException("Store is already closed.");
+
+            store.setOpen(false);
+            Store newStore = this.storeRepository.update(storeId, store);
+            if(!store.equals(newStore)) throw new RuntimeException("Store not updated.");
+            return true;
+        }
     }
 
     public boolean addAuction(String storeId, String productId, String auctionEndDate, float startPrice) {
