@@ -8,13 +8,20 @@ import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
+import Domain.TokenService;
 import Domain.ExternalServices.IPaymentService;
 
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
+    private final TokenService tokenService;
+
+    private boolean isValidToken(String sessionToken, TokenService tokenService) {
+        return tokenService.validateToken(sessionToken);
+    }
 
     
-    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade) {
+    public ShoppingService(TokenService tokenService, IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade) {
+        this.tokenService = tokenService;
         cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade);
     }
 
