@@ -1,5 +1,6 @@
 package Domain;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -62,31 +63,31 @@ public class Permission {
         this.permissionGiverName = permissionGiverName;
         this.member = member;
         this.role = null;
-        this.permissions = new HashSet<>();
+        this.permissions = Collections.synchronizedSet(new HashSet<>());
     }
 
     public void initStoreManager() {
         this.role = RoleType.STORE_MANAGER;
-        this.permissions = new HashSet<>(MANAGER_PERMISSIONS);
+        this.permissions = Collections.synchronizedSet(new HashSet<>(MANAGER_PERMISSIONS));
     }
 
     public void initStoreOwner() {
         this.role = RoleType.STORE_OWNER;
-        this.permissions = new HashSet<>(OWNER_PERMISSIONS);
+        this.permissions = Collections.synchronizedSet(new HashSet<>(OWNER_PERMISSIONS));
     }
 
     public void initStoreFounder() {
         this.role = RoleType.STORE_FOUNDER;
-        this.permissions = new HashSet<>(FOUNDER_PERMISSIONS);
+        this.permissions = Collections.synchronizedSet(new HashSet<>(FOUNDER_PERMISSIONS));
     }
 
     public void initTradingManager() {
         this.role = RoleType.TRADING_MANAGER;
-        this.permissions = new HashSet<>(TRADING_PERMISSIONS);
+        this.permissions = Collections.synchronizedSet(new HashSet<>(TRADING_PERMISSIONS));
     }
 
     public void setPermissions(Set<PermissionType> permissionTypes) {
-        this.permissions = new HashSet<>(permissionTypes);
+        this.permissions = Collections.synchronizedSet(new HashSet<>(permissionTypes));
     }
 
     public RoleType getRoleType() {
