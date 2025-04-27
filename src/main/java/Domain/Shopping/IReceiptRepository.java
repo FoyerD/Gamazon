@@ -1,7 +1,6 @@
 package Domain.Shopping;
 
 import java.util.Map;
-import java.time.LocalDateTime;
 
 public interface IReceiptRepository {
     /**

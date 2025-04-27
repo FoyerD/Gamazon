@@ -14,7 +14,6 @@ import Domain.Store.IItemRepository;
 import Domain.Store.Item;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
-import Domain.User.User;
 import Domain.User.Member;
 
 public class MarketFacade implements IMarketFacade {

@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Store.ItemFacade;
+import Domain.Store.StoreFacade;
 
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
@@ -18,16 +18,18 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IReceiptRepository receiptRepo;
         private final IPaymentService paymentService;
     private final ItemFacade itemFacade;
+    private final StoreFacade storeFacade;
 
 
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IReceiptRepository receiptRepo, IPaymentService paymentService, ItemFacade itemFacade) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IReceiptRepository receiptRepo, IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade) {
+
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
         this.itemFacade = itemFacade;
         this.receiptRepo = receiptRepo;
-        
-   
+        this.storeFacade = storeFacade;
+
     }
 
     private IShoppingCart getCart(String clientId) {
@@ -102,6 +104,12 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             cartRepo.update(clientId, cart);
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean makeBid(String auctionId, String clientId, float price) {
+        storeFacade.addBid(auctionId, clientId, price);
         return true;
     }
 

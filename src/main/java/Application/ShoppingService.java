@@ -10,14 +10,16 @@ import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
 import Domain.ExternalServices.IPaymentService;
-import Domain.Shopping.IReceiptRepository;
+import Domain.Store.StoreFacade;
+
+
 
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
 
-    
-    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade, IReceiptRepository receiptRepo) {
-        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, receiptRepo, new MockPaymentService(), itemFacade);
+    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade, IReceiptRepository receiptRepo, StoreFacade storeFacade) { 
+        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, receiptRepo, new MockPaymentService(), itemFacade, storeFacade);
+
     }
 
     public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
@@ -100,6 +102,18 @@ public class ShoppingService{
             //  public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv) {
 
             cartFacade.checkout(cardOwnerID, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    
+    public Response<Boolean> makeBid(String auctionId, String clientId, float price) {
+        try {
+            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
+
+            cartFacade.makeBid(auctionId, clientId, price);
             return new Response<>(true);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
