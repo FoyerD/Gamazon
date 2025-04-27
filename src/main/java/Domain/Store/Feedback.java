@@ -1,5 +1,7 @@
 package Domain.Store;
 
+import Domain.Pair;
+
 public class Feedback {
     private String customerId;
     private String storeId;
@@ -23,5 +25,9 @@ public class Feedback {
     }
     public String getComment() {
         return comment;
+    }
+
+    public Pair<Pair<String, String>, String> getPairKey() {
+        return new Pair<>(new Pair<>(this.getStoreId(), this.getProductId()), this.getCustomerId());
     }
 }

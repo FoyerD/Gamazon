@@ -24,9 +24,6 @@ public class MemoryFeedbackRepository extends IFeedbackRepository{
                !id.getFirst().getFirst().trim().isEmpty() && !id.getFirst().getSecond().trim().isEmpty() && !id.getSecond().trim().isEmpty();
     }
 
-    private Pair<Pair<String, String>, String> getId(Feedback feedback) {
-        return new Pair<>(new Pair<>(feedback.getStoreId(), feedback.getProductId()), feedback.getCustomerId());
-    }
 
     @Override
     public Feedback get(String storeId, String productId, String userId) {
@@ -74,7 +71,7 @@ public class MemoryFeedbackRepository extends IFeedbackRepository{
             throw new IllegalArgumentException("ID cannot be null");
         if (item == null)
             throw new IllegalArgumentException("Item cannot be null");
-        if (!id.equals(this.getId(item)))
+        if (!id.equals(item.getPairKey()))
             throw new IllegalArgumentException("ID does not match the feedback ID");
     
         return this.feedbacks.put(id, item);
@@ -88,7 +85,7 @@ public class MemoryFeedbackRepository extends IFeedbackRepository{
             throw new IllegalArgumentException("Item with this ID already exists");
         if (item == null)
             throw new IllegalArgumentException("Item cannot be null");
-        if (!id.equals(this.getId(item)))
+        if (!id.equals(item.getPairKey()))
             throw new IllegalArgumentException("ID does not match the feedback ID");
             
         this.addLock(id);
