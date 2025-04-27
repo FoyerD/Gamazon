@@ -2,6 +2,7 @@ package Domain.Store;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import Domain.User.IUserRepository;
 import Domain.User.User;
@@ -131,6 +132,8 @@ public class StoreFacade {
         if (this.storeRepository.get(storeId) == null) throw new RuntimeException("Store not found.");
         if (this.itemRepository.get(new Pair<>(storeId, productId)) == null) throw new RuntimeException("Item not found.");
         
+        Store store = this.storeRepository.get(storeId);
+        if (!store.isOpen()) throw new RuntimeException("Store is not open.");
 
         Date auctionStartDate = new Date();
         Date auctionEndDateParsed = null;
@@ -173,5 +176,15 @@ public class StoreFacade {
         if (this.auctionRepository.get(auctionId) == null) throw new RuntimeException("Auction not found.");
 
         return this.auctionRepository.remove(auctionId);
+    }
+
+    public List<Auction> getAllStoreAuctions(String storeId) {
+        if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
+        return this.auctionRepository.getAllStoreAuctions(storeId);
+    }
+
+    public List<Auction> getAllProductAuctions(String productId) {
+        if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
+        return this.auctionRepository.getAllProductAuctions(productId);
     }
 }

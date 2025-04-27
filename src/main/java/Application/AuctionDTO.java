@@ -2,6 +2,8 @@ package Application;
 
 import java.util.Date;
 
+import Domain.Store.Auction;
+
 public class AuctionDTO {
     private String auctionId;
     private Date auctionStartDate;
@@ -21,6 +23,17 @@ public class AuctionDTO {
         this.storeId = storeId;
         this.productId = productId;
         this.currentBidderId = currentBidderId;
+    }
+
+    public AuctionDTO(Auction auction) {
+        this.auctionId = auction.getAuctionId();
+        this.auctionStartDate = auction.getAuctionStartDate();
+        this.auctionEndDate = auction.getAuctionEndDate();
+        this.startPrice = auction.getStartPrice();
+        this.currentPrice = auction.getCurrentPrice();
+        this.storeId = auction.getStoreId();
+        this.productId = auction.getProductId();
+        this.currentBidderId = auction.getCurrentBidderId();
     }
 
     public String getAuctionId() {
