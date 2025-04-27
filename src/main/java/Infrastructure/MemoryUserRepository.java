@@ -7,7 +7,7 @@ import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
 
-public class MemoryUserRepository implements IUserRepository {
+public class MemoryUserRepository extends IUserRepository {
     Map<String, User> users;
     public MemoryUserRepository() {
         this.users = new ConcurrentHashMap<String, User>();

@@ -6,15 +6,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import Domain.Store.IStoreRepository;
 import Domain.Store.Store;
 
-public class StoreRepositoryMemory implements IStoreRepository{
+public class StoreRepositoryMemory extends IStoreRepository{
     private Map<String, Store> stores;
 
     public StoreRepositoryMemory() {
         this.stores = new ConcurrentHashMap<>();
-    }
-
-    private boolean isIdValid(String id) {
-        return id != null && !id.trim().isEmpty();
     }
 
     @Override

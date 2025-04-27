@@ -1,7 +1,8 @@
 package Domain.Shopping;
 
-import Domain.IRepository;
 
-public interface IShoppingCartRepository extends IRepository<IShoppingCart, String> {
-    public void clear();
+import Domain.ILockbasedRepository;
+
+public abstract class IShoppingCartRepository extends ILockbasedRepository<IShoppingCart, String> {
+    abstract public void clear();
 }
