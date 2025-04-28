@@ -348,3 +348,369 @@ Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
 INFO: New Guest has entered.
 Apr 28, 2025 2:20:39 PM Application.UserService exit
 SEVERE: received invalid session token.
+Apr 28, 2025 2:21:58 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as carol.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+INFO: carol has exited.
+Apr 28, 2025 2:21:59 PM Application.UserService login
+INFO: carol has logged in.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as alice.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as bob.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as dave.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+INFO: dave has exited.
+Apr 28, 2025 2:21:59 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+INFO: Guest has exited.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:13 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:13 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:22:13 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:13 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:22:47 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:27:43 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.

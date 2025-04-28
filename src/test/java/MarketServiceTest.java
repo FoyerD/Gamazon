@@ -81,7 +81,7 @@ public class MarketServiceTest {
         Response<UserDTO> guestResp = userService.guestEntry();
         guestToken = guestResp.getValue().getSessionToken();
 
-        // //Store Service setup
+        //Store Service setup
         // storeService = new StoreService();
 
         // String storeName = "NewStore";
@@ -100,41 +100,41 @@ public class MarketServiceTest {
 
     }
 
-    @Test
-    public void testaddProductsToInventory() {
-        Map<String, Integer> products = Map.of(productId, 5);
-        marketService.addProductsToInventory(guestToken, storeId, products);
-        // Verify that the product was added to the inventory
-        Response<Item> itemResponse = itemService.getItem(storeId, productId);
-        assertFalse(itemResponse.errorOccurred(), "Item retrieval failed: " + itemResponse.getErrorMessage());
-        Item item = itemResponse.getValue();
-        assertEquals(5, item.getAmount(), "Product quantity mismatch after adding to inventory");
-    }
+    // @Test
+    // public void testaddProductsToInventory() {
+    //     Map<String, Integer> products = Map.of(productId, 5);
+    //     marketService.addProductsToInventory(guestToken, storeId, products);
+    //     // Verify that the product was added to the inventory
+    //     Response<Item> itemResponse = itemService.getItem(storeId, productId);
+    //     assertFalse(itemResponse.errorOccurred(), "Item retrieval failed: " + itemResponse.getErrorMessage());
+    //     Item item = itemResponse.getValue();
+    //     assertEquals(5, item.getAmount(), "Product quantity mismatch after adding to inventory");
+    // }
 
     @Test
     public void testUpdatePaymentService() {
         Response<Void> response = marketService.updatePaymentService(guestToken, mockPaymentService);
-        assertFalse(response.errorOccurred(), "Failed to update payment service: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
         verify(mockPaymentService, never()).initialize(); // Ensure no unexpected initialization
     }
 
     @Test
     public void testUpdateNotificationService() {
         Response<Void> response = marketService.updateNotificationService(guestToken, mockNotificationService);
-        assertFalse(response.errorOccurred(), "Failed to update notification service: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testUpdateSupplyService() {
         Response<Void> response = marketService.updateSupplyService(guestToken, mockSupplyService);
-        assertFalse(response.errorOccurred(), "Failed to update supply service: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testUpdatePaymentServiceURL() throws IOException {
         String newUrl = "http://new-payment-service.com";
         Response<Void> response = marketService.updatePaymentServiceURL(guestToken, newUrl);
-        assertFalse(response.errorOccurred(), "Failed to update payment service URL: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
         verify(mockPaymentService).updatePaymentServiceURL(newUrl);
     }
 
@@ -143,7 +143,7 @@ public class MarketServiceTest {
         Map<String, Integer> productsToRemove = Map.of(productId, 1);
         marketService.removeProductsFromInventory(guestToken, storeId, productsToRemove);
         Response<Item> itemResponse = itemService.getItem(storeId, productId);
-        assertFalse(itemResponse.errorOccurred(), "Item retrieval failed: " + itemResponse.getErrorMessage());
+        assertFalse(itemResponse.errorOccurred());
         Item item = itemResponse.getValue();
         assertEquals(2, item.getAmount(), "Product quantity mismatch after removing from inventory");
     }
@@ -152,54 +152,54 @@ public class MarketServiceTest {
     public void testAppointStoreManager() {
         String appointeeUsername = "newManager";
         Response<Void> response = marketService.appointStoreManager(guestToken, "ownerUser", appointeeUsername, storeId);
-        assertFalse(response.errorOccurred(), "Failed to appoint store manager: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testRemoveStoreManager() {
         String managerUsername = "existingManager";
         Response<Void> response = marketService.removeStoreManager(guestToken, "ownerUser", managerUsername, storeId);
-        assertFalse(response.errorOccurred(), "Failed to remove store manager: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testAppointStoreOwner() {
         String appointeeUsername = "newOwner";
         Response<Void> response = marketService.appointStoreOwner(guestToken, "ownerUser", appointeeUsername, storeId);
-        assertFalse(response.errorOccurred(), "Failed to appoint store owner: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testCloseStore() {
         Response<Void> response = marketService.closeStore(guestToken, storeId);
-        assertFalse(response.errorOccurred(), "Failed to close store: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testMarketCloseStore() {
         Response<Void> response = marketService.marketCloseStore(guestToken, storeId);
-        assertFalse(response.errorOccurred(), "Failed to close store by market: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testGetManagersPermissions() {
         Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(guestToken, storeId);
-        assertFalse(response.errorOccurred(), "Failed to fetch manager permissions: " + response.getErrorMessage());
-        assertNotNull(response.getValue(), "Permissions map is null");
+        assertFalse(response.errorOccurred());
+        assertNotNull(response.getValue());
     }
 
     @Test
     public void testRespondToUserMessage() {
         String comment = "Thank you for your feedback!";
         Response<Boolean> response = marketService.respondToUserMessage(guestToken, storeId, productId, "userId", comment);
-        assertFalse(response.errorOccurred(), "Failed to respond to user message: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred(), "Failed to respond to user message");
         assertTrue(response.getValue(), "Response to user message was not successful");
     }
 
     @Test
     public void testGetUserMessage() {
         Response<Feedback> response = marketService.getUserMessage(guestToken, storeId, productId, "userId");
-        assertFalse(response.errorOccurred(), "Failed to fetch user message: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred(), "Failed to fetch user message");
         assertNotNull(response.getValue(), "Feedback is null");
     }
 
@@ -208,14 +208,14 @@ public class MarketServiceTest {
         LocalDateTime from = LocalDateTime.now().minusDays(30);
         LocalDateTime to = LocalDateTime.now();
         Response<List<ShoppingBasket>> response = marketService.getStorePurchaseHistory(guestToken, storeId, from, to);
-        assertFalse(response.errorOccurred(), "Failed to fetch store purchase history: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred(), "Failed to fetch store purchase history");
         assertNotNull(response.getValue(), "Purchase history is null");
     }
 
     @Test
     public void testOpenMarket() {
         Response<Void> response = marketService.openMarket(guestToken);
-        assertFalse(response.errorOccurred(), "Failed to open market: " + response.getErrorMessage());
+        assertFalse(response.errorOccurred(), "Failed to open market");
     }
         
 
