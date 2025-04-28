@@ -29,7 +29,7 @@ public class LoginManager {
         return guest;
     }
 
-    public Member register(String id, String username, String password, String email) throws IllegalStateException {
+    public synchronized Member register(String id, String username, String password, String email) throws IllegalStateException {
 
         Guest guest = userRepository.getGuest(id);
         if (guest == null) {
@@ -87,7 +87,7 @@ public class LoginManager {
 
     
 
-    public void exit(String id) {
+    public User exit(String id) {
 
         User user = userRepository.get(id);
         if (user == null) {
@@ -95,12 +95,18 @@ public class LoginManager {
         }
         
         user.logout(this);
+        return user;
     }
 
     public void exit(Guest guest) throws IllegalStateException {
         if (userRepository.remove(guest.getId()) == null) {
             throw new IllegalStateException("Failed to remove guest from repository");
         }
+    }
+
+    public boolean isLoggedin(String username) {
+        Member user = userRepository.getMemberByUsername(username);
+        return user.isLoggedIn();
     }
 }
 

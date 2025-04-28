@@ -1,15 +1,20 @@
 package Domain.Shopping;
 
+import Domain.Store.Product;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * Repository for storing and retrieving purchase receipts.
+ */
 public class ReceiptRepository implements IReceiptRepository {
-    // Main storage for all receipts: receiptId -> receipt details
-    private final Map<String, Map<String, Object>> receipts;
+    // Main storage for all receipts: receiptId -> Receipt
+    private final Map<String, Receipt> receipts;
     
     // Index for client purchases: clientId -> set of receiptIds
     private final Map<String, Map<String, String>> clientReceipts;
@@ -17,27 +22,26 @@ public class ReceiptRepository implements IReceiptRepository {
     // Index for store purchases: storeId -> set of receiptIds
     private final Map<String, Map<String, String>> storeReceipts;
 
+    /**
+     * Creates a new ReceiptRepository.
+     */
     public ReceiptRepository() {
         this.receipts = new ConcurrentHashMap<>();
         this.clientReceipts = new ConcurrentHashMap<>();
         this.storeReceipts = new ConcurrentHashMap<>();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String savePurchase(String clientId, String storeId, Map<String, Integer> products, double totalPrice) {
-        // Generate unique receipt ID
-        String receiptId = UUID.randomUUID().toString();
-        
-        // Create receipt details
-        Map<String, Object> receiptDetails = new HashMap<>();
-        receiptDetails.put("clientId", clientId);
-        receiptDetails.put("storeId", storeId);
-        receiptDetails.put("products", new HashMap<>(products));
-        receiptDetails.put("timestamp", LocalDateTime.now());
-        receiptDetails.put("totalPrice", totalPrice);
+    public String saveReceipt(Receipt receipt) {
+        String receiptId = receipt.getReceiptId();
+        String clientId = receipt.getClientId();
+        String storeId = receipt.getStoreId();
         
         // Save receipt
-        receipts.put(receiptId, receiptDetails);
+        receipts.put(receiptId, receipt);
         
         // Update client index
         clientReceipts.computeIfAbsent(clientId, k -> new ConcurrentHashMap<>())
@@ -49,38 +53,83 @@ public class ReceiptRepository implements IReceiptRepository {
         
         return receiptId;
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Map<String, Map<String, Object>> getClientPurchaseHistory(String clientId) {
+    public String savePurchase(String clientId, String storeId, Map<Product, Integer> products, 
+                             double totalPrice, String paymentDetails) {
+        Receipt receipt = new Receipt(clientId, storeId, products, totalPrice, paymentDetails);
+        return saveReceipt(receipt);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Receipt getReceipt(String receiptId) {
+        return receipts.get(receiptId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Receipt> getClientReceipts(String clientId) {
         Map<String, String> clientReceiptIds = clientReceipts.getOrDefault(clientId, new HashMap<>());
         
-        // Return only the receipts for this client
-        Map<String, Map<String, Object>> result = new ConcurrentHashMap<>();
+        List<Receipt> result = new ArrayList<>();
         for (String receiptId : clientReceiptIds.keySet()) {
-            if (receipts.containsKey(receiptId)) {
-                result.put(receiptId, receipts.get(receiptId));
+            Receipt receipt = receipts.get(receiptId);
+            if (receipt != null) {
+                result.add(receipt);
             }
         }
         
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Map<String, Map<String, Object>> getStorePurchaseHistory(String storeId) {
+    public List<Receipt> getStoreReceipts(String storeId) {
         Map<String, String> storeReceiptIds = storeReceipts.getOrDefault(storeId, new HashMap<>());
         
-        // Return only the receipts for this store
-        Map<String, Map<String, Object>> result = new ConcurrentHashMap<>();
+        List<Receipt> result = new ArrayList<>();
         for (String receiptId : storeReceiptIds.keySet()) {
-            if (receipts.containsKey(receiptId)) {
-                result.put(receiptId, receipts.get(receiptId));
+            Receipt receipt = receipts.get(receiptId);
+            if (receipt != null) {
+                result.add(receipt);
             }
         }
         
         return result;
     }
     
-    // Utility method to clear all receipts (for testing or admin purposes)
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Receipt> getClientStoreReceipts(String clientId, String storeId) {
+        Map<String, String> clientReceiptIds = clientReceipts.getOrDefault(clientId, new HashMap<>());
+        
+        List<Receipt> result = new ArrayList<>();
+        for (String receiptId : clientReceiptIds.keySet()) {
+            Receipt receipt = receipts.get(receiptId);
+            if (receipt != null && storeId.equals(receipt.getStoreId())) {
+                result.add(receipt);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clear() {
         receipts.clear();
         clientReceipts.clear();

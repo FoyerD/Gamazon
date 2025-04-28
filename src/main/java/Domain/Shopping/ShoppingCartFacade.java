@@ -6,28 +6,34 @@ import java.util.Map;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
+import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Product;
+import Domain.Store.StoreFacade;
+import Domain.Store.IProductRepository;
 
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;
     private final IReceiptRepository receiptRepo;
-        private final IPaymentService paymentService;
+    private final IPaymentService paymentService;
     private final ItemFacade itemFacade;
+    private final StoreFacade storeFacade;
+    private final IProductRepository productRepo;
 
-
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IReceiptRepository receiptRepo, IPaymentService paymentService, ItemFacade itemFacade) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
         this.itemFacade = itemFacade;
+        this.storeFacade = storeFacade;
         this.receiptRepo = receiptRepo;
-        
-   
+        this.productRepo = productRepository;
     }
 
     private IShoppingCart getCart(String clientId) {
@@ -107,126 +113,153 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
 
     @Override
-    public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,
-                        long andIncrement, String clientName, String deliveryAddress) {
-        IShoppingCart cart = getCart(clientId);
-
-        if (cart == null) {
-            throw new RuntimeException("Cart not found");
-        }
-
-        Map<Pair<String, String>, Integer> itemsrollbackData = new HashMap<>(); // To store rollback information
-        Set<ShoppingBasket> basketsrollbackdata = new HashSet<>();
-        Set<String> cartrollbackdata = new HashSet<>();
-        
-        // Store purchase information for receipt creation
-        Map<String, Map<String, Object>> purchaseData = new HashMap<>();
-
-        try {
-            // Iterate over all stores in the cart
-            double totalPrice = 0;
-            for (String storeId : cart.getCart()) {
-                ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
-                if (basket != null) {
-                    // Prepare store purchase data
-                    Map<String, Object> storePurchase = new HashMap<>();
-                    Map<String, Integer> storeProducts = new HashMap<>();
-                    double storeTotalPrice = 0;
-                    
-                    // Iterate over all items in the basket
-                    for (Map.Entry<String, Integer> entry : basket.getOrders().entrySet()) {
-                        String productId = entry.getKey();
-                        int quantity = entry.getValue();
-
-                        // Attempt to decrease the item quantity
-                        itemFacade.decreaseAmount(new Pair<String,String>(storeId, productId), quantity);
-                        
-                        // Get product price and calculate totals
-                        double productPrice = itemFacade.getItem(storeId, productId).getPrice();
-                        double productTotal = productPrice * quantity;
-                        storeTotalPrice += productTotal;
-                        totalPrice += productTotal;
-
-                        // Store product info for receipt
-                        storeProducts.put(productId, quantity);
-                        
-                        // Store rollback data
-                        itemsrollbackData.put(new Pair<>(storeId, productId), quantity);
-                    }
-
-                    // Store the purchase data for later receipt creation
-                    storePurchase.put("products", storeProducts);
-                    storePurchase.put("totalPrice", storeTotalPrice);
-                    purchaseData.put(storeId, storePurchase);
-
-                    // Mark the basket as checked out
-                    basketsrollbackdata.add(basket);
-                    basket.clear();
-                    basketRepo.update(new Pair<>(clientId, storeId), basket);
-                }
-            }
-
-            // Process payment
-            paymentService.processPayment(clientName, card_number, expiry_date, cvv, 
-                                        totalPrice, andIncrement, clientName, deliveryAddress);
-
-            // Clear the cart
-            cartrollbackdata.addAll(cart.getCart());
-            cart.clear();
-            cartRepo.update(clientId, cart);
-            
-            // Now that everything has succeeded, create the receipt records
-            for (Map.Entry<String, Map<String, Object>> entry : purchaseData.entrySet()) {
-                String storeId = entry.getKey();
-                Map<String, Object> storePurchase = entry.getValue();
-                
-                @SuppressWarnings("unchecked")
-                Map<String, Integer> products = (Map<String, Integer>) storePurchase.get("products");
-                double storeTotal = (double) storePurchase.get("totalPrice");
-                
-                // Save the receipt
-                receiptRepo.savePurchase(clientId, storeId, products, storeTotal);
-            }
-
-            return true;
-        } catch (Exception e) {
-            // Rollback: Increase the quantities back
-            checkoutRollBack(clientId, cart, itemsrollbackData, cartrollbackdata, basketsrollbackdata);
-            // Throw the exception to indicate failure
-            throw new RuntimeException("Checkout failed: " + e.getMessage(), e);
-            
-        }
+    public boolean makeBid(String auctionId, String clientId, float price) {
+        storeFacade.addBid(auctionId, clientId, price);
+        return true;
     }
 
+    
 
-    private void checkoutRollBack(String clientId, IShoppingCart cart, Map<Pair<String, String>, Integer> itemsrollbackData, Set<String> cartrollbackdata, Set<ShoppingBasket> basketsrollbackdata) {
-        for (Map.Entry<Pair<String, String>, Integer> entry : itemsrollbackData.entrySet()) {
-            Pair<String, String> key = entry.getKey();
-            String storeId = key.getFirst();
-            String productId = key.getSecond();
+    @Override
+public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,
+                    long andIncrement, String clientName, String deliveryAddress) {
+    IShoppingCart cart = getCart(clientId);
+
+    if (cart == null) {
+        throw new RuntimeException("Cart not found");
+    }
+
+    Map<Pair<String, String>, Integer> itemsrollbackData = new HashMap<>(); // To store rollback information
+    Set<ShoppingBasket> basketsrollbackdata = new HashSet<>();
+    Set<String> cartrollbackdata = new HashSet<>();
+    
+    // Store purchase information for receipt creation
+    Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
+
+    try {
+        // Iterate over all stores in the cart
+        double totalPrice = 0;
+        for (String storeId : cart.getCart()) {
+            ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+            if (basket != null && !basket.isEmpty()) {
+                // Track products and prices for this store
+                Map<Product, Integer> storeProducts = new HashMap<>();
+                double storeTotalPrice = 0;
+                
+                // Iterate over all items in the basket
+                for (Map.Entry<String, Integer> entry : basket.getOrders().entrySet()) {
+                    String productId = entry.getKey();
+                    int quantity = entry.getValue();
+
+                    // Attempt to decrease the item quantity
+                    itemFacade.decreaseAmount(new Pair<String,String>(storeId, productId), quantity);
+                    
+                    // Get the product object and calculate price
+                    Product product = new Product(productRepo.get(productId));
+                    double productPrice = itemFacade.getItem(storeId, product.getProductId()).getPrice() * quantity;
+                    storeTotalPrice += productPrice;
+                    totalPrice += productPrice;
+
+                    // Store product in the store's product map
+                    storeProducts.put(product, quantity);
+                    
+                    // Store rollback data
+                    itemsrollbackData.put(new Pair<>(storeId, product.getProductId()), quantity);
+                }
+
+                // Store products for this store
+                storeProductsMap.put(storeId, storeProducts);
+                
+                // Mark the basket as checked out
+                basketsrollbackdata.add(basket);
+                basket.clear();
+                basketRepo.update(new Pair<>(clientId, storeId), basket);
+            }
+        }
+
+        // Process payment
+        paymentService.processPayment(clientName, card_number, expiry_date, cvv, 
+                                    totalPrice, andIncrement, clientName, deliveryAddress);
+
+        // Clear the cart
+        cartrollbackdata.addAll(cart.getCart());
+        cart.clear();
+        cartRepo.update(clientId, cart);
+        
+        // Create masked payment details (only show last 4 digits of card)
+        String maskedCardNumber = "xxxx-xxxx-xxxx-" + card_number.substring(card_number.length() - 4);
+        String paymentDetails = "Card: " + maskedCardNumber;
+        
+        // Now that everything has succeeded, create the receipt records
+        for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
+            String storeId = entry.getKey();
+            Map<Product, Integer> products = entry.getValue();
+            
+            // Calculate store-specific total
+            double storeTotal = products.entrySet().stream()
+                .mapToDouble(e -> {
+                    Product product = e.getKey();
+                    return itemFacade.getItem(storeId, product.getProductId()).getPrice() * e.getValue();
+                })
+                .sum();
+            
+            // Create and save receipt
+            receiptRepo.savePurchase(clientId, storeId, products, storeTotal, paymentDetails);
+        }
+
+        return true;
+    } catch (Exception e) {
+        // Rollback all changes
+        checkoutRollBack(clientId, cart, itemsrollbackData, cartrollbackdata, basketsrollbackdata);
+        
+        // Throw the exception to indicate failure
+        throw new RuntimeException("Checkout failed: " + e.getMessage(), e);
+    }
+}
+
+/**
+ * Helper method to handle rollback operations during checkout failure
+ * 
+ * @param clientId The client ID
+ * @param cart The shopping cart
+ * @param itemsrollbackData Map of store-product pairs to quantities to restore
+ * @param cartrollbackdata Set of store IDs to add back to cart
+ * @param basketsrollbackdata Set of baskets to restore
+ */
+private void checkoutRollBack(String clientId, IShoppingCart cart, 
+                             Map<Pair<String, String>, Integer> itemsrollbackData, 
+                             Set<String> cartrollbackdata, 
+                             Set<ShoppingBasket> basketsrollbackdata) {
+    // Restore item quantities
+    for (Map.Entry<Pair<String, String>, Integer> entry : itemsrollbackData.entrySet()) {
+        Pair<String, String> key = entry.getKey();
+        String storeId = key.getFirst();
+        String productId = key.getSecond();
+        int quantity = entry.getValue();
+
+        itemFacade.increaseAmount(new Pair<String,String>(storeId, productId), quantity);
+    }
+
+    // Restore baskets
+    for (ShoppingBasket basket : basketsrollbackdata) {
+        // Re-add the items to the basket
+        for (Map.Entry<String, Integer> entry : basket.getOrders().entrySet()) {
+            String productId = entry.getKey();
             int quantity = entry.getValue();
 
-            itemFacade.increaseAmount(new Pair<String,String>(storeId, productId), quantity);
+            // Re-add the item to the basket
+            basket.addOrder(productId, quantity);
         }
-
-        for (ShoppingBasket basket : basketsrollbackdata) {
-            // Re-add the items to the basket
-            for (Map.Entry<String, Integer> entry : basket.getOrders().entrySet()) {
-                String productId = entry.getKey();
-                int quantity = entry.getValue();
-
-                // Re-add the item to the basket
-                basket.addOrder(productId, quantity);
-            }
-            basketRepo.update(new Pair<>(clientId, basket.getStoreId()), basket);
-        }
-        
-        for (String storeId : cartrollbackdata) {
-            // Re-add the store to the cart
-            cart.addStore(storeId);
-        }
-        cartRepo.update(clientId, cart);
+        basketRepo.update(new Pair<>(clientId, basket.getStoreId()), basket);
     }
+    
+    // Restore cart
+    for (String storeId : cartrollbackdata) {
+        // Re-add the store to the cart
+        cart.addStore(storeId);
+    }
+    cartRepo.update(clientId, cart);
+}
 
 
     @Override
@@ -297,5 +330,16 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             viewCart.put(storeId, basket.getOrders());
         }
         return viewCart;
+    }
+
+
+    // Method to get a client's purchase history
+    public List<Receipt> getClientPurchaseHistory(String clientId) {
+        return receiptRepo.getClientReceipts(clientId);
+    }
+    
+    // Method to get a store's purchase history
+    public List<Receipt> getStorePurchaseHistory(String storeId) {
+        return receiptRepo.getStoreReceipts(storeId);
     }
 }
