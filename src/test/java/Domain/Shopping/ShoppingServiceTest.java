@@ -1,4 +1,5 @@
-package Application;
+//package Application;
+package Domain.Shopping;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
