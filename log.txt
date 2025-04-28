@@ -288,3 +288,63 @@ Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
 INFO: New Guest has entered.
 Apr 28, 2025 9:55:25 AM Application.UserService exit
 SEVERE: received invalid session token.
+Apr 28, 2025 2:19:48 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:48 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:48 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:48 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:48 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService exit
+SEVERE: received invalid session token.
