@@ -12,6 +12,9 @@ import Domain.Store.IProductRepository;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
 import Domain.ExternalServices.IPaymentService;
+import Domain.Shopping.IReceiptRepository;
+import Domain.Store.StoreFacade;
+
 
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
