@@ -1,28 +1,43 @@
 package Application;
 
+import Domain.TokenService;
 import Domain.Store.Feedback;
+import Domain.Store.FeedbackDTO;
 import Domain.Store.StoreFacade;
 
 public class CustomerServiceService {
     private StoreFacade storeFacade;
+    private TokenService tokenService;
     
-    public CustomerServiceService(StoreFacade storeFacade) {
+    public CustomerServiceService(StoreFacade storeFacade, TokenService tokenService) {
+        this.tokenService = tokenService;
         this.storeFacade = storeFacade;
     }
     public CustomerServiceService() {
         this.storeFacade = null;
+        this.tokenService = null;
     }
     public void setStoreFacade(StoreFacade storeFacade) {
         this.storeFacade = storeFacade;
     }
 
-    public boolean isInitialized() {
-        return this.storeFacade != null;
+    public void setTokenService(TokenService tokenService) {
+        this.tokenService = tokenService;
     }
 
-    public Response<Boolean> addFeedback(String customerId, String storeId, String productId, String comment) {
+    public boolean isInitialized() {
+        return this.storeFacade != null && this.tokenService != null;
+    }
+
+    public Response<Boolean> addFeedback(String sessionToken, String storeId, String productId, String comment) {
         try {
-            // Assuming storeRepository has a method to add feedback
+            if(!this.isInitialized()) return new Response<>(new Error("CustomerServiceService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String customerId = this.tokenService.extractId(sessionToken);
+            
             boolean result = this.storeFacade.addFeedback(storeId, productId, customerId, comment);
             return new Response<>(result);
         } catch (Exception ex) {
@@ -30,11 +45,18 @@ public class CustomerServiceService {
         }
     }
 
-    public Response<String> getFeedback(String customerId, String storeId, String productId) {
+    public Response<FeedbackDTO> getFeedback(String sessionToken, String storeId, String productId) {
         try {
+            if(!this.isInitialized()) return new Response<>(new Error("CustomerServiceService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String customerId = this.tokenService.extractId(sessionToken);
+
             Feedback feedback = this.storeFacade.getFeedback(storeId, productId, customerId);
             if (feedback != null) {
-                return new Response<>(feedback.getComment());
+                return new Response<>(new FeedbackDTO(feedback));
             } else {
                 throw new Exception("Feedback not found");
             }

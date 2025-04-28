@@ -10,6 +10,7 @@ public class StoreRepositoryMemory extends IStoreRepository{
     private Map<String, Store> stores;
 
     public StoreRepositoryMemory() {
+        super();
         this.stores = new ConcurrentHashMap<>();
     }
 
@@ -19,12 +20,15 @@ public class StoreRepositoryMemory extends IStoreRepository{
         if (!storeId.equals(store.getId())) throw new IllegalArgumentException("ID does not match the store ID");
         if (this.stores.containsKey(storeId)) throw new IllegalArgumentException("Item with this ID already exists");
 
+        this.addLock(storeId);
         return this.stores.put(storeId, store) == null;
     }
 
     @Override
     public Store remove(String id) {
         if (!isIdValid(id)) throw new IllegalArgumentException("ID cannot be null");
+
+        this.removeLock(id);
         return stores.remove(id);
     }
 

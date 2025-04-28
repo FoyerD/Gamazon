@@ -1,28 +1,46 @@
 package Application;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import Domain.TokenService;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 
 public class StoreService {
 
     private StoreFacade storeFacade;
+    private TokenService tokenService;
+
 
     public StoreService() {
         this.storeFacade = null;
+        this.tokenService = null;
     }
 
-    public StoreService(StoreFacade storeFacade) {
+    public StoreService(StoreFacade storeFacade, TokenService tokenService) {
         this.storeFacade = storeFacade;
+        this.tokenService = tokenService;
     }
 
-    public Response<Boolean> addStore(String sessionId, String name, String description) {
+    private boolean isInitialized() {
+        return this.storeFacade != null && this.tokenService != null;
+    }
+
+    public Response<StoreDTO> addStore(String sessionToken, String name, String description) {
         try {
-            if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
+            if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
             
-            //TODO!: session logic
-            String userId = sessionId; // Assuming sessionId is the userId
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+
             Store store = storeFacade.addStore(name, description, userId);
-            return new Response<>(store != null);
+            if(store == null) {
+                return new Response<>(new Error("Failed to create store."));
+            }
+            return new Response<>(new StoreDTO(store));
 
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
@@ -31,26 +49,100 @@ public class StoreService {
 
 
 
-    public Response<Boolean> openStore(String sessionId, String storeId){
+    public Response<Boolean> openStore(String sessionToken, String storeId){
         try {
-            if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
+            if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
 
-            //TODO!: session logic
             boolean result = this.storeFacade.openStore(storeId);
             return new Response<>(result);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
-    public Response<Boolean> closeStore(String sessionId, String storeId){
+    public Response<Boolean> closeStore(String sessionToken, String storeId){
         try {
-            if(this.storeFacade == null) return new Response<>(new Error("StoreFacade is not initialized."));
+            if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
 
-            //TODO!: session logic
             boolean result = this.storeFacade.closeStore(storeId);
             return new Response<>(result);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<StoreDTO> getStoreByName(String sessionToken, String name) {
+        try {
+            if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+
+            Store store = this.storeFacade.getStoreByName(name);
+            if(store == null) {
+                return new Response<>(new Error("Store not found."));
+            }
+            return new Response<>(new StoreDTO(store));
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<Boolean> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, float startPrice) {
+        try {
+            if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                throw new RuntimeException("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+
+            return new Response<>(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice));
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public Response<List<AuctionDTO>> getAllStoreAuctions(String sessionToken, String storeId) {
+        try {
+            if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                throw new RuntimeException("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+
+            List<AuctionDTO> auctions = this.storeFacade.getAllStoreAuctions(storeId).stream().map(AuctionDTO::new).collect(Collectors.toList());
+            return new Response<>(auctions);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public Response<List<AuctionDTO>> getAllProductAuctions(String sessionToken, String productId) {
+        try {
+            if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                throw new RuntimeException("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+
+            List<AuctionDTO> auctions = this.storeFacade.getAllProductAuctions(productId).stream().map(AuctionDTO::new).collect(Collectors.toList());
+            return new Response<>(auctions);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
         }
     }
 }

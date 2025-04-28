@@ -22,6 +22,19 @@ public class Product {
         this.categories = new LinkedHashSet<>();
     }
 
+     /**
+     * Copy constructor for Product.
+     * Creates a new Product instance with the same attributes as the input Product.
+     * 
+     * @param other The Product to copy
+     */
+    public Product(Product other) {
+        this.productId = other.productId;
+        this.name = other.name;
+        // Create a new set and add all categories from the other product
+        this.categories = new LinkedHashSet<>(other.categories);
+    }
+
     public boolean addCategory(Category c){
         return categories.add(c);
     }
