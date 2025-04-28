@@ -9,7 +9,6 @@ import Application.MarketService;
 import Application.Response;
 import Application.StoreDTO;
 import Application.StoreService;
-import Domain.Store.Store;
 
 
 public class StoreServiceTests {
