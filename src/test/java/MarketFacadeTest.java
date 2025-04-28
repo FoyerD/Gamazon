@@ -103,7 +103,7 @@ public class MarketFacadeTest {
         marketFacade.getStorePermissions().get("store1").put("user1", createPermissionWith(PermissionType.HANDLE_INVENTORY));
         when(itemRepository.getItem(eq("store1"), anyString())).thenReturn(null);
 
-        Map<Integer, Integer> productQuantities = Map.of(1, 5);
+        Map<String, Integer> productQuantities = Map.of("product1", 5);
         marketFacade.addProductsToInventory("store1", productQuantities, "userId");
 
         verify(itemRepository).add(any(), any());
@@ -119,7 +119,7 @@ public class MarketFacadeTest {
         marketFacade.getStorePermissions().get("store1").put("user1", createPermissionWith(PermissionType.HANDLE_INVENTORY));
         when(itemRepository.getItem(eq("store1"), anyString())).thenReturn(existingItem);
 
-        Map<Integer, Integer> productQuantities = Map.of(1, 10);
+        Map<String, Integer> productQuantities = Map.of("product1", 10);
         marketFacade.updateProductQuantities("store1", productQuantities, "userId");
 
         verify(existingItem).setAmount(10);
@@ -136,7 +136,7 @@ public class MarketFacadeTest {
         marketFacade.getStorePermissions().get("store1").put("user1", createPermissionWith(PermissionType.HANDLE_INVENTORY));
         when(itemRepository.getItem(eq("store1"), anyString())).thenReturn(existingItem);
 
-        Map<Integer, Integer> productQuantities = Map.of(1, 2);
+        Map<String, Integer> productQuantities = Map.of("product1", 2);
         marketFacade.removeProductsFromInventory("store1", productQuantities, "userId");
 
         verify(itemRepository).remove(any());

@@ -81,7 +81,7 @@ public interface IMarketFacade {
      * @param productQuantities Map of product IDs to quantities
      * @param userId ID of the user performing the action
      */
-    void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    void addProductsToInventory(String storeId, Map<String, Integer> productQuantities, String userId);
 
     /**
      * 4.1 Update product quantities in a store's inventory.
@@ -90,7 +90,7 @@ public interface IMarketFacade {
      * @param productQuantities Map of product IDs to updated quantities
      * @param userId ID of the user performing the action
      */
-    void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    void updateProductQuantities(String storeId, Map<String, Integer> productQuantities, String userId);
 
     /**
      * 4.1 Remove products from a store's inventory.
@@ -99,7 +99,7 @@ public interface IMarketFacade {
      * @param productQuantities Map of product IDs to quantities to remove
      * @param userId ID of the user performing the action
      */
-    void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    void removeProductsFromInventory(String storeId, Map<String, Integer> productQuantities, String userId);
 
     /**
      * 4.3 Appoint a new store manager.

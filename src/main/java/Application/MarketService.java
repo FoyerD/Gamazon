@@ -123,7 +123,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> addProductsToInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> addProductsToInventory(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "addProductsToInventory", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -138,7 +138,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> updateProductQuantities(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> updateProductQuantities(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updateProductQuantities", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -153,7 +153,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> removeProductsFromInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> removeProductsFromInventory(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "removeProductsFromInventory", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
