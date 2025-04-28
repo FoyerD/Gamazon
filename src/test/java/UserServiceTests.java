@@ -62,10 +62,15 @@ public class UserServiceTests {
     @Test
     public void GivenDuplicateUsername_WhenRegister_ThenErrorUserExists() {
         userService.register(guestToken, "bob", "Password1!", "bob@mail.com");
+        Response<UserDTO> secondGuest = userService.guestEntry();
+
+        assertFalse(secondGuest.errorOccurred());
+
         Response<UserDTO> second = userService.register(
-            guestToken, "bob", "Password1!", "bob@mail.com");
+            secondGuest.getValue().getSessionToken(), "bob", "Password1!", "bob@mail.com");
+
         assertTrue("Duplicate registration should fail", second.errorOccurred());
-        assertTrue(second.getErrorMessage().contains("Username already exists"));
+        assertTrue(second.getErrorMessage(), second.getErrorMessage().contains("Username already exists"));
     }
 
     // 1.4 Login
