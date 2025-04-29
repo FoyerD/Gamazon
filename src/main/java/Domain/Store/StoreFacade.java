@@ -66,7 +66,7 @@ public class StoreFacade {
 
         String storeId = System.currentTimeMillis() + "";
         Store store = new Store(storeId, name, description, founderId);
-        this.storeRepository.add(storeId, store);
+        if (!this.storeRepository.add(storeId, store)) throw new RuntimeException("Store not added.");
         return store;
     }
 
@@ -147,7 +147,7 @@ public class StoreFacade {
         }
     }
 
-    public boolean addAuction(String storeId, String productId, String auctionEndDate, float startPrice) {
+    public Auction addAuction(String storeId, String productId, String auctionEndDate, double startPrice) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         if (this.storeRepository.get(storeId) == null) throw new RuntimeException("Store not found.");
         if (this.itemRepository.get(new Pair<>(storeId, productId)) == null) throw new RuntimeException("Item not found.");
@@ -169,7 +169,9 @@ public class StoreFacade {
         
         String auctionId = System.currentTimeMillis() + "";
         Auction auction = new Auction(auctionId, auctionStartDate, auctionEndDateParsed, startPrice, startPrice, storeId, productId);
-        return this.auctionRepository.add(auctionId, auction);
+        if (!this.auctionRepository.add(auctionId, auction)) throw new RuntimeException("Auction not added.");
+        return auction;
+        
     }
 
     public Auction getAuction(String auctionId) {

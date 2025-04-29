@@ -7,15 +7,15 @@ public class Auction {
     String auctionId;
     Date auctionStartDate;
     Date auctionEndDate;
-    float startPrice;
-    float currentPrice;
+    double startPrice;
+    double currentPrice;
     String storeId;
     String productId;
     String currentBidderId;
 
 
     public Auction(String auctionId, Date auctionStartDate,
-                   Date auctionEndDate, float startPrice, float currentPrice,
+                   Date auctionEndDate, double startPrice, double currentPrice,
                    String storeId, String productId) {
         this.auctionId = auctionId;
         this.auctionStartDate = auctionStartDate;
@@ -56,16 +56,16 @@ public class Auction {
     public void setAuctionEndDate(Date auctionEndDate) {
         this.auctionEndDate = auctionEndDate;
     }
-    public float getStartPrice() {
+    public double getStartPrice() {
         return startPrice;
     }
-    public void setStartPrice(float startPrice) {
+    public void setStartPrice(double startPrice) {
         this.startPrice = startPrice;
     }
-    public float getCurrentPrice() {
+    public double getCurrentPrice() {
         return currentPrice;
     }
-    public void setCurrentPrice(float currentPrice) {
+    public void setCurrentPrice(double currentPrice) {
         this.currentPrice = currentPrice;
     }
     public String getStoreId() {

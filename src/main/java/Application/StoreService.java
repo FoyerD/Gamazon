@@ -99,7 +99,7 @@ public class StoreService {
         }
     }
 
-    public Response<Boolean> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, float startPrice) {
+    public Response<AuctionDTO> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, double startPrice) {
         try {
             if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
             
@@ -108,7 +108,7 @@ public class StoreService {
             }
             String userId = this.tokenService.extractId(sessionToken);
 
-            return new Response<>(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice));
+            return new Response<>(new AuctionDTO(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice)));
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage());
         }
