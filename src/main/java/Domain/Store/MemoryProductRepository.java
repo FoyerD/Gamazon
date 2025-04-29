@@ -3,6 +3,10 @@ package Domain.Store;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * In-memory implementation of {@link IProductRepository}.
+ * Provides thread-safe CRUD operations on products.
+ */
 public class MemoryProductRepository extends IProductRepository {
     private final ConcurrentMap<String, Product> products;
 
@@ -14,18 +18,20 @@ public class MemoryProductRepository extends IProductRepository {
         return id != null && !id.trim().isEmpty();
     }
 
+    /** Adds a new product if it doesn't already exist. */
     @Override
     public boolean add(String id, Product value) {
         if (!isValidId(id) || value == null) {
             return false;
         }
         if (products.containsKey(id)) {
-            return false; // Already exists, do not overwrite
+            return false;
         }
         products.put(id, value);
         return true;
     }
 
+    /** Removes a product by its ID. */
     @Override
     public Product remove(String id) {
         if (!isValidId(id)) {
@@ -34,6 +40,7 @@ public class MemoryProductRepository extends IProductRepository {
         return products.remove(id);
     }
 
+    /** Retrieves a product by its ID. */
     @Override
     public Product get(String id) {
         if (!isValidId(id)) {
@@ -42,13 +49,11 @@ public class MemoryProductRepository extends IProductRepository {
         return products.get(id);
     }
 
+    /** Updates an existing product. */
     @Override
     public Product update(String id, Product value) {
-        if (!isValidId(id) || value == null) {
+        if (!isValidId(id) || value == null || !products.containsKey(id)) {
             return null;
-        }
-        if (!products.containsKey(id)) {
-            return null; // Can't update non-existing product
         }
         products.put(id, value);
         return value;

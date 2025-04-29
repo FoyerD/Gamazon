@@ -3,55 +3,84 @@ package Domain.Store;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-
+/**
+ * Represents a product in the system.
+ * A product has a unique ID, a name, and is associated with a set of categories.
+ */
 public class Product {
 
     private String productId;
     private String name;
     private Set<Category> categories;
 
-    public Product(String productId, String name, Set<Category> categories){
+    /**
+     * Constructs a product with the given ID, name, and categories.
+     *
+     * @param productId   the unique identifier of the product
+     * @param name        the product's name
+     * @param categories  the set of categories the product belongs to
+     */
+    public Product(String productId, String name, Set<Category> categories) {
         this.productId = productId;
         this.name = name;
         this.categories = categories;
     }
-    
-    public Product(String productId, String name){
+
+    /**
+     * Constructs a product with the given ID and name, initializing with no categories.
+     *
+     * @param productId the unique identifier of the product
+     * @param name      the product's name
+     */
+    public Product(String productId, String name) {
         this.productId = productId;
         this.name = name;
         this.categories = new LinkedHashSet<>();
     }
 
-     /**
+    /**
      * Copy constructor for Product.
-     * Creates a new Product instance with the same attributes as the input Product.
-     * 
-     * @param other The Product to copy
+     *
+     * @param other the product to copy
      */
     public Product(Product other) {
         this.productId = other.productId;
         this.name = other.name;
-        // Create a new set and add all categories from the other product
         this.categories = new LinkedHashSet<>(other.categories);
     }
 
-    public boolean addCategory(Category c){
+    /**
+     * Adds a category to this product.
+     *
+     * @param c the category to add
+     * @return true if the category was added, false if it was already present
+     */
+    public boolean addCategory(Category c) {
         return categories.add(c);
     }
-    
-    public boolean removeCategory(Category c){
+
+    /**
+     * Removes a category from this product.
+     *
+     * @param c the category to remove
+     * @return true if the category was removed, false if it was not present
+     */
+    public boolean removeCategory(Category c) {
         return categories.remove(c);
     }
-    
-    public String getProductId(){
+
+    /** @return the unique ID of the product */
+    public String getProductId() {
         return productId;
     }
 
-    public String getName(){
+    /** @return the name of the product */
+    public String getName() {
         return name;
     }
 
-    public Set<Category> getCategories(){
+    /** @return the set of categories this product belongs to */
+    public Set<Category> getCategories() {
         return categories;
     }
 }
