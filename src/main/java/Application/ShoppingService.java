@@ -3,12 +3,16 @@ import java.util.Map;
 
 import java.util.Date;
 
+import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingCartFacade;
+import Domain.Store.IProductRepository;
 import Domain.Store.ItemFacade;
+import Domain.Store.StoreFacade;
 import Domain.ExternalServices.IPaymentService;
+import Domain.Shopping.IReceiptRepository;
 import Domain.Store.StoreFacade;
 
 
@@ -16,8 +20,9 @@ public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
 
     
-    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade, StoreFacade storeFacade) { 
-        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade);
+
+    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository, IProductRepository productRepository) {
+        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
     }
 
     public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
