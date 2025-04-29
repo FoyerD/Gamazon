@@ -12,34 +12,49 @@ import org.junit.Test;
 import Application.ItemService;
 import Application.Response;
 import Domain.Pair;
+import Domain.Store.IItemRepository;
+import Domain.Store.IProductRepository;
+import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
 import Domain.Store.MemoryItemRepository;
+import Domain.Store.MemoryProductRepository;
+import Domain.Store.Product;
+import Domain.Store.Store;
+import Infrastructure.StoreRepositoryMemory;
 
 public class ItemServiceTests {
 
     private ItemService itemService;
+    private IItemRepository itemRepository;
+    private IProductRepository productRepository;
+    private IStoreRepository storeRepository;
 
     @Before
     public void setUp() {
-        MemoryItemRepository repository = new MemoryItemRepository();
-    
-        // Item with stock — should appear in getAvailableItems()
-        repository.add(new Pair<>("1", "101"), new Item("1", "101", 49.99f, 10, "In Stock Item"));
-    
-        // Item without stock — should NOT appear in getAvailableItems()
-        repository.add(new Pair<>("1", "out-of-stock-product"), new Item("1", "out-of-stock-product", 19.99f, 0, "Out of Stock Item"));
-    
-        // Optional: more items
-        repository.add(new Pair<>("store1", "prod2"), new Item("store1", "prod2", 39.99f, 5, "Another Stocked Item"));
-    
-        ItemFacade facade = new ItemFacade(repository);
-        itemService = new ItemService(facade);
+        itemRepository = new MemoryItemRepository();
+        productRepository = new MemoryProductRepository();
+        storeRepository = new StoreRepositoryMemory();
+
+        addStoreAndProduct("1", "Store One", "founder1", "101", "In Stock Item", 49.99f, 10, "In Stock Item");
+        addStoreAndProduct("1", "Store One", "founder1", "out-of-stock-product", "Out of Stock Item", 19.99f, 0, "Out of Stock Item");
+        addStoreAndProduct("store1", "Store 1", "founder2", "prod2", "Another Stocked Item", 39.99f, 5, "Another Stocked Item");
+
+        itemService = new ItemService(new ItemFacade(itemRepository, productRepository, storeRepository));
+    }
+
+    private void addStoreAndProduct(String storeId, String storeName, String founderId, String productId, String productName, float price, int amount, String itemName) {
+        if (storeRepository.get(storeId) == null) {
+            storeRepository.add(storeId, new Store(storeId, storeName, "description", founderId));
+        }
+        if (productRepository.get(productId) == null) {
+            productRepository.add(productId, new Product(productId, productName));
+        }
+        itemRepository.add(new Pair<>(storeId, productId), new Item(storeId, productId, price, amount, itemName));
     }
     
-    
-    
+
     // 1. getItem
     @Test
     public void GivenValidStoreAndProduct_WhenGetItem_ThenReturnItem() {
@@ -96,11 +111,12 @@ public class ItemServiceTests {
     }
 
     @Test
-    public void GivenNonexistentStoreId_WhenGetItems_ThenReturnEmptyList() {
+    public void GivenNonexistentStoreId_WhenGetItems_ThenReturnError() {
         Response<List<Item>> response = itemService.getItemsByStoreId("invalid-store");
-        assertFalse(response.errorOccurred());
-        assertTrue(response.getValue().isEmpty());
+        assertTrue(response.errorOccurred());
+        assertNotNull(response.getErrorMessage());
     }
+    
 
     // 5. getAvailableItems
     @Test
@@ -109,20 +125,24 @@ public class ItemServiceTests {
         assertFalse(response.errorOccurred());
         assertTrue(response.getValue().stream().allMatch(item -> item.getAmount() > 0));
     }
-    
+
     @Test
     public void GivenAllItemsOutOfStock_WhenGetAvailableItems_ThenReturnEmptyList() {
-        // Simulate a repository with only out-of-stock items
-        MemoryItemRepository repo = new MemoryItemRepository();
-        repo.add(new Pair<>("storeX", "prodX"), new Item("storeX", "prodX", 19.99f, 0, "Out of Stock"));
-    
-        itemService = new ItemService(new ItemFacade(repo));
-    
+        itemRepository = new MemoryItemRepository();
+        productRepository = new MemoryProductRepository();
+        storeRepository = new StoreRepositoryMemory();
+
+        storeRepository.add("storeX", new Store("storeX", "Store X", "Description", "founderX"));
+        productRepository.add("prodX", new Product("prodX", "Out of Stock Product"));
+
+        itemRepository.add(new Pair<>("storeX", "prodX"), new Item("storeX", "prodX", 19.99f, 0, "Out of Stock"));
+
+        itemService = new ItemService(new ItemFacade(itemRepository, productRepository, storeRepository));
+
         Response<List<Item>> response = itemService.getAvailableItems();
         assertFalse(response.errorOccurred());
         assertTrue(response.getValue().isEmpty());
     }
-    
     
 
     // 6. increaseAmount
@@ -172,13 +192,17 @@ public class ItemServiceTests {
     // 8. add
     @Test
     public void GivenNewItem_WhenAdd_ThenReturnTrue() {
-        Item item = new Item("storeY", "prodY",19.99f , 3, "Cool Product");
+        storeRepository.add("storeY", new Store("storeY", "Store Y", "Description", "founderY"));
+        productRepository.add("prodY", new Product("prodY", "Cool Product"));
+    
+        Item item = new Item("storeY", "prodY", 19.99f, 3, "Cool Product");
         Pair<String, String> id = new Pair<>("storeY", "prodY");
-
+    
         Response<Boolean> response = itemService.add(id, item);
         assertFalse(response.errorOccurred());
         assertTrue(response.getValue());
     }
+    
 
     @Test
     public void GivenDuplicateItem_WhenAdd_ThenReturnFalse() {
@@ -187,7 +211,7 @@ public class ItemServiceTests {
 
         Response<Boolean> response = itemService.add(id, existingItem);
         assertFalse(response.errorOccurred());
-        assertFalse(response.getValue()); // Already exists
+        assertFalse(response.getValue());
     }
 
     // 9. remove

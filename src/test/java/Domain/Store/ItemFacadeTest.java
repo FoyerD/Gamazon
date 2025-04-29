@@ -21,11 +21,15 @@ public class ItemFacadeTest {
 
     private ItemFacade facade;
     private IItemRepository repo;
+    private IProductRepository productRepo;
+    private IStoreRepository storeRepo;
 
     @Before
     public void setUp() {
         repo = mock(IItemRepository.class);
-        facade = new ItemFacade(repo);
+        productRepo = mock(IProductRepository.class);
+        storeRepo = mock(IStoreRepository.class);
+        facade = new ItemFacade(repo, productRepo, storeRepo);
     }
 
     @Test
@@ -50,19 +54,24 @@ public class ItemFacadeTest {
 
     @Test
     public void givenExistingItem_whenGetItem_thenReturns() {
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         Item item = mock(Item.class);
-        when(repo.getItem("s","p")).thenReturn(item);
-        assertSame(item, facade.getItem("s","p"));
+        when(repo.getItem("s", "p")).thenReturn(item);
+        assertSame(item, facade.getItem("s", "p"));
     }
 
     @Test(expected = NoSuchElementException.class)
     public void givenNoItem_whenGetItem_thenThrows() {
-        when(repo.getItem("s","p")).thenReturn(null);
-        facade.getItem("s","p");
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
+        when(repo.getItem("s", "p")).thenReturn(null);
+        facade.getItem("s", "p");
     }
 
     @Test
     public void givenStoreId_whenGetItemsByStoreId_thenDelegates() {
+        when(storeRepo.get("S")).thenReturn(mock(Store.class));
         List<Item> list = List.of(mock(Item.class));
         when(repo.getByStoreId("S")).thenReturn(list);
         assertSame(list, facade.getItemsByStoreId("S"));
@@ -79,6 +88,8 @@ public class ItemFacadeTest {
     public void givenIdAndItem_whenUpdate_thenRepoCalled() {
         Pair<String,String> id = new Pair<>("s","p");
         Item it = mock(Item.class);
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         facade.update(id, it);
         verify(repo).update(id, it);
     }
@@ -87,6 +98,8 @@ public class ItemFacadeTest {
     public void givenExistingItem_whenAdd_thenReturnsFalse() {
         Pair<String,String> id = new Pair<>("s","p");
         Item it = mock(Item.class);
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         when(repo.get(id)).thenReturn(it);
         assertFalse(facade.add(id, it));
         verify(repo, never()).add(any(), any());
@@ -96,9 +109,12 @@ public class ItemFacadeTest {
     public void givenNewItem_whenAdd_thenReturnsTrueAndAdds() {
         Pair<String,String> id = new Pair<>("s","p");
         Item it = mock(Item.class);
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         when(repo.get(id)).thenReturn(null);
         when(repo.getByProductId("p")).thenReturn(List.of(it));
         when(repo.add(id, it)).thenReturn(true);
+        when(it.getProductId()).thenReturn("p");
 
         assertTrue(facade.add(id, it));
         verify(repo).add(id, it);
@@ -107,6 +123,8 @@ public class ItemFacadeTest {
     @Test
     public void givenExistingItem_whenRemove_thenReturns() {
         Pair<String,String> id = new Pair<>("s","p");
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         Item it = mock(Item.class);
         when(repo.remove(id)).thenReturn(it);
         assertSame(it, facade.remove(id));
@@ -115,6 +133,8 @@ public class ItemFacadeTest {
     @Test(expected = NoSuchElementException.class)
     public void givenMissingItem_whenRemove_thenThrows() {
         Pair<String,String> id = new Pair<>("s","p");
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         when(repo.remove(id)).thenReturn(null);
         facade.remove(id);
     }
@@ -123,6 +143,8 @@ public class ItemFacadeTest {
     public void givenIdAndAmt_whenIncreaseAmount_thenDelegates() {
         Pair<String,String> id = new Pair<>("s","p");
         Item it = mock(Item.class);
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         when(repo.get(id)).thenReturn(it);
         facade.increaseAmount(id, 4);
         verify(it).increaseAmount(4);
@@ -132,6 +154,8 @@ public class ItemFacadeTest {
     public void givenIdAndAmt_whenDecreaseAmount_thenDelegates() {
         Pair<String,String> id = new Pair<>("s","p");
         Item it = mock(Item.class);
+        when(storeRepo.get("s")).thenReturn(mock(Store.class));
+        when(productRepo.get("p")).thenReturn(mock(Product.class));
         when(repo.get(id)).thenReturn(it);
         facade.decreaseAmount(id, 2);
         verify(it).decreaseAmount(2);
