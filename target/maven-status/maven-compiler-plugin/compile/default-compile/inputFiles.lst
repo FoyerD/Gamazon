@@ -20,6 +20,7 @@ C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Infrastructure\Stor
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\Store\IStoreRepository.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Application\Error.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\User\IUserRepository.java
+C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Application\CategoryDTO.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\Shopping\ShoppingCart.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\IRepository.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\Shopping\ReceiptRepository.java
@@ -58,6 +59,7 @@ C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\Store\IAucti
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\Store\User.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\Shopping\IShoppingCartRepository.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\Shopping\IShoppingCartFacade.java
+C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Application\ItemDTO.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Infrastructure\MemoryFeedbackRepository.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\ILockbasedRepository.java
 C:\Users\user1\Desktop\Gamazon project\Gamazon\src\main\java\Domain\MarketFacade.java

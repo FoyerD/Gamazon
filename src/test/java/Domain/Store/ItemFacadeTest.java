@@ -10,8 +10,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -94,16 +95,38 @@ public class ItemFacadeTest {
         verify(repo).update(id, it);
     }
 
-    @Test
-    public void givenExistingItem_whenAdd_thenReturnsFalse() {
-        Pair<String,String> id = new Pair<>("s","p");
-        Item it = mock(Item.class);
-        when(storeRepo.get("s")).thenReturn(mock(Store.class));
-        when(productRepo.get("p")).thenReturn(mock(Product.class));
-        when(repo.get(id)).thenReturn(it);
-        assertFalse(facade.add(id, it));
-        verify(repo, never()).add(any(), any());
-    }
+@Test
+public void givenExistingItem_whenAdd_thenReturnsFalseAndSkipsAdd() {
+    // Setup
+    Pair<String, String> id = new Pair<>("s", "p");
+
+    Item existingItem = mock(Item.class);
+    when(existingItem.getStoreId()).thenReturn("s");
+    when(existingItem.getProductId()).thenReturn("p");
+
+    // Mock store and product existence
+    when(storeRepo.get("s")).thenReturn(mock(Store.class));
+    when(productRepo.get("p")).thenReturn(mock(Product.class));
+
+    // VERY IMPORTANT: use argThat or eq, and test with .equals()
+    when(repo.get(argThat(arg -> 
+        arg.getFirst().equals("s") && arg.getSecond().equals("p")
+    ))).thenReturn(existingItem);
+
+    // Act
+    boolean result = facade.add(id, existingItem);
+
+    // Assert
+    assertFalse("Expected add(...) to return false since item exists", result);
+
+    // Don't throw if it was called — capture and inspect
+    verify(repo, times(1)).get(any());
+    verify(repo, times(0)).add(any(), any());
+}
+
+
+
+    
 
     @Test
     public void givenNewItem_whenAdd_thenReturnsTrueAndAdds() {

@@ -51,29 +51,31 @@ public class ItemFacade {
 
     public boolean add(Pair<String, String> id, Item item) {
         validateStoreAndProductExist(id.getFirst(), id.getSecond());
-
+    
         if (itemRepository.get(id) != null) {
-            return false; // Item already exists
+            return false; // ✅ skip if already exists
         }
-
+    
+        String itemStoreId = item.getStoreId();
+        String itemProductId = item.getProductId();
+    
+        item.setNameFetcher(() ->
+            itemRepository.getByProductId(itemProductId).stream()
+                .filter(i -> !(i.getStoreId().equals(itemStoreId) && i.getProductId().equals(itemProductId)))
+                .findFirst()
+                .map(Item::getProductName)
+                .orElse("Unknown Product")
+        );
+    
         item.setCategoryFetcher(() ->
-            itemRepository.getByProductId(item.getProductId()).stream()
+            itemRepository.getByProductId(itemProductId).stream()
+                .filter(i -> !(i.getStoreId().equals(itemStoreId) && i.getProductId().equals(itemProductId)))
                 .flatMap(i -> i.getCategories().stream())
                 .collect(Collectors.toSet())
         );
-
-        item.setNameFetcher(() ->
-            itemRepository.getByProductId(item.getProductId()).stream()
-                .findFirst()
-                .map(i -> {
-                    i.setNameFetcher(() -> ""); 
-                    return i.getProductName();
-                })
-                .orElse("Unknown Product")
-        );
+    
         return itemRepository.add(id, item);
     }
-
     public Item remove(Pair<String, String> id) {
         validateStoreAndProductExist(id.getFirst(), id.getSecond());
         Item item = itemRepository.remove(id);
