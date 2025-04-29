@@ -1,14 +1,14 @@
 package Domain;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
-import Domain.Shopping.ShoppingBasket;
+import Domain.Shopping.Receipt;
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.Item;
@@ -24,6 +24,7 @@ public class MarketFacade implements IMarketFacade {
     private IUserRepository userRepository;
     private IItemRepository itemRepository; 
     private StoreFacade storeFacade; 
+    private ShoppingCartFacade shoppingCartFacade;
 
     // In-memory permissions store: storeId -> (username -> Permission)
     private final Map<String, Map<String, Permission>> storePermissions = new ConcurrentHashMap<>();
@@ -37,10 +38,11 @@ public class MarketFacade implements IMarketFacade {
     private MarketFacade() {}
 
     @Override
-    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade) {
+    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacade shoppingCartFacade) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.storeFacade = storeFacade;
+        this.shoppingCartFacade = shoppingCartFacade;
     }
 
     // For unit testing
@@ -221,11 +223,10 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public List<ShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId) {
+    public List<Receipt> getStorePurchaseHistory(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
-        // TODO: Aviad should do it
-        //return storeRepository.get(storeId).getStorePurchaseHistory(from, to);
-        return null; // Placeholder for actual implementation
+        List<Receipt> receipts = shoppingCartFacade.getStorePurchaseHistory(storeId);
+        return receipts;
     }
 
     @Override

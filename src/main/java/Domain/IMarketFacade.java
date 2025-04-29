@@ -1,7 +1,6 @@
 package Domain;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import Domain.ExternalServices.INotificationService;
@@ -10,7 +9,8 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.User.IUserRepository;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
-import Domain.Shopping.ShoppingBasket;
+import Domain.Shopping.Receipt;
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.StoreFacade;
 
 /**
@@ -69,9 +69,9 @@ public interface IMarketFacade {
      * @param userRepository Repository for user data
      * @param itemRepository Repository for item data
      * @param storeFacade Facade for store management
+     * @param shoppingCartFacade Facade for shopping cart management
      */
-    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade);
-
+    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacade shoppingCartFacade);
     // Section 4
 
     /**
@@ -181,12 +181,10 @@ public interface IMarketFacade {
      * 4.13 Retrieve the purchase history of a store within a given date range.
      * 
      * @param storeId ID of the store
-     * @param from Start of the date range
-     * @param to End of the date range
      * @param userId ID of the user requesting the history
-     * @return List of ShoppingBaskets representing purchases
+     * @return List of Receipts representing purchases
      */
-    List<ShoppingBasket> getStorePurchaseHistory(String storeId, LocalDateTime from, LocalDateTime to, String userId);
+    List<Receipt> getStorePurchaseHistory(String storeId, String userId);
 
     // Section 6
 
