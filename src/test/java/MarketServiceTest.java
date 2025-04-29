@@ -1,7 +1,9 @@
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
+import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingBasket;
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.MarketFacade;
 import Domain.Pair;
 import Domain.PermissionType;
@@ -66,7 +68,8 @@ public class MarketServiceTest {
         mockNotificationService = mock(INotificationService.class);
         
         storeFacade = new StoreFacade();
-
+        IShoppingCartRepository cartRepository = new ShoppingCartRepository();
+        
         marketFacade = MarketFacade.getInstance();
         marketFacade.initFacades(userRepository, itemRepository, storeFacade);
         marketFacade.updatePaymentService(mockPaymentService);
