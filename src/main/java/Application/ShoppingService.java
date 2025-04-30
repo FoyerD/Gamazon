@@ -92,8 +92,6 @@ public class ShoppingService{
         }
     }
 
-    // processPayment(String card_owner, String card_number, Date expiry_date, String cvv, double price,
-    //         long andIncrement, String name, String deliveryAddress);
 
     // Make Immidiate Purchase Use Case 2.5
     public Response<Boolean> checkout(String cardOwnerID, String cardNumber, Date expiryDate, String cvv, long andIncrement,
