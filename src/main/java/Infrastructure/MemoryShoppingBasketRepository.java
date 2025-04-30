@@ -1,15 +1,17 @@
-package Domain.Shopping;
+package Infrastructure;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.Pair;
+import Domain.Shopping.IShoppingBasketRepository;
+import Domain.Shopping.ShoppingBasket;
 
-public class ShoppingBasketRepository extends IShoppingBasketRepository {
+public class MemoryShoppingBasketRepository extends IShoppingBasketRepository {
     
     private Map<Pair<String, String>, ShoppingBasket> baskets;
 
-    public ShoppingBasketRepository() {
+    public MemoryShoppingBasketRepository() {
         
         this.baskets = new ConcurrentHashMap<>();
     }

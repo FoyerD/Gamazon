@@ -2,7 +2,7 @@ package Domain.ExternalServices;
 
 import java.util.Date;
 
-import Application.Response;
+import Application.utils.Response;
 
 public interface IPaymentService {
 

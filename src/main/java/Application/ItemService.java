@@ -3,6 +3,10 @@ package Application;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import Application.DTOs.ItemDTO;
+import Application.utils.Error;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
 import Domain.Pair;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;

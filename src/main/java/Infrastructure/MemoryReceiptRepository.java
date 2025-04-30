@@ -1,7 +1,8 @@
-package Domain.Shopping;
+package Infrastructure;
 
+import Domain.Shopping.IReceiptRepository;
+import Domain.Shopping.Receipt;
 import Domain.Store.Product;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Repository for storing and retrieving purchase receipts.
  */
-public class ReceiptRepository implements IReceiptRepository {
+public class MemoryReceiptRepository implements IReceiptRepository {
     // Main storage for all receipts: receiptId -> Receipt
     private final Map<String, Receipt> receipts;
     
@@ -25,7 +26,7 @@ public class ReceiptRepository implements IReceiptRepository {
     /**
      * Creates a new ReceiptRepository.
      */
-    public ReceiptRepository() {
+    public MemoryReceiptRepository() {
         this.receipts = new ConcurrentHashMap<>();
         this.clientReceipts = new ConcurrentHashMap<>();
         this.storeReceipts = new ConcurrentHashMap<>();

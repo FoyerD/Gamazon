@@ -1,11 +1,11 @@
 package Application;
 
-import Domain.IMarketFacade;
 import Domain.User.IUserRepository;
+import Domain.management.IMarketFacade;
+import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
-import Domain.PermissionType;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.StoreFacade;
@@ -16,6 +16,10 @@ import Domain.TokenService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import Application.utils.Error;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
 
 public class MarketService {
 

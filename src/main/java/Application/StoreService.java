@@ -3,6 +3,10 @@ package Application;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import Application.DTOs.AuctionDTO;
+import Application.DTOs.StoreDTO;
+import Application.utils.Error;
+import Application.utils.Response;
 import Domain.TokenService;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;

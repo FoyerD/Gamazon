@@ -1,6 +1,9 @@
 package Application;
 import java.util.NoSuchElementException;
 
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
 import Domain.TokenService;
 import Domain.User.*;
 

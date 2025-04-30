@@ -1,4 +1,4 @@
-package Application;
+package Application.DTOs;
 
 public class UserDTO {
     

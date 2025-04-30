@@ -1,4 +1,4 @@
-package Domain;
+package Domain.management;
 
 import java.util.Collection;
 import java.util.EnumSet;

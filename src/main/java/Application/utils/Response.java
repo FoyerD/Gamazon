@@ -1,4 +1,4 @@
-package Application;
+package Application.utils;
 
 public class Response<T> {
     private T value;

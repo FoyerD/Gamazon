@@ -143,7 +143,6 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
             if (basket != null && !basket.isEmpty()) {
                 // Track products and prices for this store
                 Map<Product, Integer> storeProducts = new HashMap<>();
-                double storeTotalPrice = 0;
                 
                 // Iterate over all items in the basket
                 for (Map.Entry<String, Integer> entry : basket.getOrders().entrySet()) {

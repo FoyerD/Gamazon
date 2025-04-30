@@ -1,4 +1,4 @@
-package Domain;
+package Domain.management;
 
 import java.io.IOException;
 import java.util.List;
