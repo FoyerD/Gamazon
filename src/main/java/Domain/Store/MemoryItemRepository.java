@@ -6,6 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.Pair;
 
+/**
+ * In-memory implementation of {@link IItemRepository}.
+ * Uses a thread-safe map to manage items keyed by (storeId, productId) pairs.
+ */
 public class MemoryItemRepository extends IItemRepository {
 
     private final Map<Pair<String, String>, Item> items;
@@ -20,6 +24,7 @@ public class MemoryItemRepository extends IItemRepository {
                 && id.getSecond() != null && !id.getSecond().trim().isEmpty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Item getItem(String storeId, String productId) {
         if (storeId == null || storeId.trim().isEmpty() || productId == null || productId.trim().isEmpty()) {
@@ -31,6 +36,7 @@ public class MemoryItemRepository extends IItemRepository {
                 .orElse(null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Item> getByStoreId(String storeId) {
         if (storeId == null || storeId.trim().isEmpty()) {
@@ -41,6 +47,7 @@ public class MemoryItemRepository extends IItemRepository {
                 .toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Item> getByProductId(String productId) {
         if (productId == null || productId.trim().isEmpty()) {
@@ -51,6 +58,7 @@ public class MemoryItemRepository extends IItemRepository {
                 .toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Item> getAvailabeItems() {
         return items.values().stream()
@@ -58,6 +66,7 @@ public class MemoryItemRepository extends IItemRepository {
                 .toList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Item update(Pair<String, String> id, Item item) {
         if (!isValidId(id) || item == null) {
@@ -66,18 +75,20 @@ public class MemoryItemRepository extends IItemRepository {
         return items.computeIfPresent(id, (k, v) -> item);
     }
 
+    /** Adds a new item if the ID is valid and doesn't already exist. */
     @Override
     public boolean add(Pair<String, String> id, Item item) {
         if (!isValidId(id) || item == null) {
             return false;
         }
         if (items.containsKey(id)) {
-            return false; // Item already exists
+            return false;
         }
         items.put(id, item);
         return true;
     }
 
+    /** Removes the item with the given ID. */
     @Override
     public Item remove(Pair<String, String> id) {
         if (!isValidId(id)) {
@@ -86,6 +97,7 @@ public class MemoryItemRepository extends IItemRepository {
         return items.remove(id);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Item get(Pair<String, String> id) {
         if (!isValidId(id)) {
