@@ -1,9 +1,10 @@
-package Domain;
+package Domain.management;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;

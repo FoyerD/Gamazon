@@ -1,4 +1,4 @@
-package Domain;
+package Domain.management;
 
 public enum RoleType {
     STORE_FOUNDER,

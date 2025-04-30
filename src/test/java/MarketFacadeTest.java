@@ -1,6 +1,3 @@
-import Domain.MarketFacade;
-import Domain.Permission;
-import Domain.PermissionType;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
@@ -13,6 +10,10 @@ import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.MarketFacade;
+import Domain.management.Permission;
+import Domain.management.PermissionType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

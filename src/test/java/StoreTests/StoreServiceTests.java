@@ -6,9 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.MarketService;
-import Application.Response;
-import Application.StoreDTO;
 import Application.StoreService;
+import Application.DTOs.StoreDTO;
+import Application.utils.Response;
 
 
 public class StoreServiceTests {

@@ -9,9 +9,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import Application.ItemDTO;
 import Application.ItemService;
-import Application.Response;
+import Application.DTOs.ItemDTO;
+import Application.utils.Response;
 import Domain.Pair;
 import Domain.Store.IItemRepository;
 import Domain.Store.IProductRepository;

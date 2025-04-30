@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.CustomerServiceService;
-import Application.Response;
+import Application.utils.Response;
 
 
 public class CustomerServiceServiceTests {

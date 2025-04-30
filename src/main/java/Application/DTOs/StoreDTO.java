@@ -1,4 +1,4 @@
-package Application;
+package Application.DTOs;
 
 import java.util.HashSet;
 import java.util.Set;
