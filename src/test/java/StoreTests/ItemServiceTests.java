@@ -21,7 +21,7 @@ import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
 import Domain.Store.Product;
 import Domain.Store.Store;
-import Infrastructure.StoreRepositoryMemory;
+import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
 import Infrastructure.Repositories.MemoryProductRepository;
 
@@ -38,7 +38,7 @@ public class ItemServiceTests {
     public void setUp() {
         itemRepository = new MemoryItemRepository();
         productRepository = new MemoryProductRepository();
-        storeRepository = new StoreRepositoryMemory();
+        storeRepository = new MemoryStoreRepository();
     
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
         itemService = new ItemService(itemFacade);
@@ -136,7 +136,7 @@ public class ItemServiceTests {
     public void GivenAllItemsOutOfStock_WhenGetAvailableItems_ThenReturnEmptyList() {
         itemRepository = new MemoryItemRepository();
         productRepository = new MemoryProductRepository();
-        storeRepository = new StoreRepositoryMemory();
+        storeRepository = new MemoryStoreRepository();
 
         storeRepository.add("storeX", new Store("storeX", "Store X", "Description", "founderX"));
         productRepository.add("prodX", new Product("prodX", "Out of Stock Product"));
