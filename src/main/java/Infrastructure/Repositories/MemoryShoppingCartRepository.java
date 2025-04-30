@@ -1,4 +1,4 @@
-package Infrastructure;
+package Infrastructure.Repositories;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

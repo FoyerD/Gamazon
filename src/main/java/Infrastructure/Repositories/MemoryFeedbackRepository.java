@@ -1,4 +1,4 @@
-package Infrastructure;
+package Infrastructure.Repositories;
 
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.Feedback;

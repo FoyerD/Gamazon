@@ -19,11 +19,11 @@ import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
-import Domain.Store.MemoryItemRepository;
-import Domain.Store.MemoryProductRepository;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Infrastructure.StoreRepositoryMemory;
+import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryProductRepository;
 
 public class ItemServiceTests {
 

@@ -155,7 +155,6 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
                     // Get the product object and calculate price
                     Product product = new Product(productRepo.get(productId));
                     double productPrice = itemFacade.getItem(storeId, product.getProductId()).getPrice() * quantity;
-                    storeTotalPrice += productPrice;
                     totalPrice += productPrice;
 
                     // Store product in the store's product map
