@@ -1,4 +1,4 @@
-package Infrastructure;
+package Infrastructure.Repositories;
 import java.util.List;
 import java.util.Map;
 

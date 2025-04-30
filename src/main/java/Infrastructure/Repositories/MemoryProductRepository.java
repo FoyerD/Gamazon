@@ -1,7 +1,10 @@
-package Domain.Store;
+package Infrastructure.Repositories;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import Domain.Store.IProductRepository;
+import Domain.Store.Product;
 
 /**
  * In-memory implementation of {@link IProductRepository}.

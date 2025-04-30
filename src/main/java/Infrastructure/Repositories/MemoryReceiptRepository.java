@@ -1,4 +1,4 @@
-package Infrastructure;
+package Infrastructure.Repositories;
 
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.Receipt;

@@ -1,4 +1,4 @@
-package Infrastructure;
+package Infrastructure.Repositories;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -6,10 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import Domain.Store.IStoreRepository;
 import Domain.Store.Store;
 
-public class StoreRepositoryMemory extends IStoreRepository{
+public class MemoryStoreRepository extends IStoreRepository{
     private Map<String, Store> stores;
 
-    public StoreRepositoryMemory() {
+    public MemoryStoreRepository() {
         super();
         this.stores = new ConcurrentHashMap<>();
     }

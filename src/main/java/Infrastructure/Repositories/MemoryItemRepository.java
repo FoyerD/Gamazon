@@ -1,10 +1,12 @@
-package Domain.Store;
+package Infrastructure.Repositories;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import Domain.Pair;
+import Domain.Store.IItemRepository;
+import Domain.Store.Item;
 
 /**
  * In-memory implementation of {@link IItemRepository}.
