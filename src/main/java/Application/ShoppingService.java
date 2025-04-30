@@ -1,9 +1,8 @@
 package Application;
-import java.util.Map;
-
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Date;
 
-import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
@@ -13,7 +12,6 @@ import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
-import Domain.Store.StoreFacade;
 
 
 public class ShoppingService{
@@ -36,11 +34,13 @@ public class ShoppingService{
         }
     }
 
-    public Response<Map<String,Map<String, Integer>>> viewCart(String clientId) {
+    public Response<Set<OrderDTO>> viewCart(String clientId) {
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-            Map<String,Map<String, Integer>> itemsMapPerStore = cartFacade.viewCart(clientId);
+            Set<OrderDTO> itemsMapPerStore = cartFacade.viewCart(clientId).stream()
+                .map(item -> new OrderDTO(item.getFirst(), item.getSecond()))
+                .collect(Collectors.toSet());
             return new Response<>(itemsMapPerStore);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
