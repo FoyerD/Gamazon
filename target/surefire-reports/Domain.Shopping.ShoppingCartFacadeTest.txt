@@ -1,0 +1,31 @@
+-------------------------------------------------------------------------------
+Test set: Domain.Shopping.ShoppingCartFacadeTest
+-------------------------------------------------------------------------------
+Tests run: 22, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 0.54 s <<< FAILURE! - in Domain.Shopping.ShoppingCartFacadeTest
+testClearBasket_BasketNotFound(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.001 s  <<< FAILURE!
+java.lang.AssertionError
+	at Domain.Shopping.ShoppingCartFacadeTest.testClearBasket_BasketNotFound(ShoppingCartFacadeTest.java:309)
+
+testAddProductToCart_NewCart(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.004 s  <<< FAILURE!
+org.mockito.exceptions.verification.TooManyActualInvocations: 
+
+cartRepo.add(
+    "client123",
+    <any Domain.Shopping.IShoppingCart>
+);
+Wanted 1 time:
+-> at Domain.Shopping.ShoppingCartFacadeTest.testAddProductToCart_NewCart(ShoppingCartFacadeTest.java:106)
+But was 2 times:
+-> at Domain.Shopping.ShoppingCartFacade.getCart(ShoppingCartFacade.java:48)
+-> at Domain.Shopping.ShoppingCartFacade.addProductToCart(ShoppingCartFacade.java:90)
+
+
+	at Domain.Shopping.ShoppingCartFacadeTest.testAddProductToCart_NewCart(ShoppingCartFacadeTest.java:106)
+
+testCheckout_CartNotFound(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.001 s  <<< FAILURE!
+java.lang.AssertionError: Expected exception: java.lang.RuntimeException
+
+testClearCart_CartNotFound(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.001 s  <<< FAILURE!
+java.lang.AssertionError
+	at Domain.Shopping.ShoppingCartFacadeTest.testClearCart_CartNotFound(ShoppingCartFacadeTest.java:291)
+
