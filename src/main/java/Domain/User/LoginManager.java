@@ -29,7 +29,7 @@ public class LoginManager {
         return guest;
     }
 
-    public Member register(String id, String username, String password, String email) throws IllegalStateException {
+    public synchronized Member register(String id, String username, String password, String email) throws IllegalStateException {
 
         Guest guest = userRepository.getGuest(id);
         if (guest == null) {

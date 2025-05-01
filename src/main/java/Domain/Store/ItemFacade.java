@@ -6,79 +6,142 @@ import java.util.stream.Collectors;
 
 import Domain.Pair;
 
+/**
+ * Facade for managing item-related operations, including validation,
+ * inventory updates, filtering, and dynamic property assignment.
+ */
 public class ItemFacade {
     private final IItemRepository itemRepository;
+    private final IProductRepository productRepository;
+    private final IStoreRepository storeRepository;
 
-    public ItemFacade(IItemRepository itemRepository){
+    /**
+     * Constructs the facade with required repositories.
+     */
+    public ItemFacade(IItemRepository itemRepository, IProductRepository productRepository, IStoreRepository storeRepository) {
         this.itemRepository = itemRepository;
+        this.productRepository = productRepository;
+        this.storeRepository = storeRepository;
     }
 
-    public List<Item> filterItems(ItemFilter itemFilter){
+    /**
+     * Returns the list of items matching the given filter.
+     */
+    public List<Item> filterItems(ItemFilter itemFilter) {
         List<Item> availableItems = itemRepository.getAvailabeItems();
         return availableItems.stream().filter(itemFilter::matchesFilter).toList();
     }
 
-    public List<Item> getItemsProductId(String productId){
+    /**
+     * Returns all items associated with the given product ID.
+     */
+    public List<Item> getItemsProductId(String productId) {
         return itemRepository.getByProductId(productId);
     }
 
-    public Item getItem(String storeId, String productId){
+    /**
+     * Retrieves a single item by store and product ID after validating existence.
+     */
+    public Item getItem(String storeId, String productId) {
+        validateStoreAndProductExist(storeId, productId);
         Item item = itemRepository.getItem(storeId, productId);
-        if(item == null)
+        if (item == null)
             throw new NoSuchElementException("Item not found for storeId: " + storeId + ", productId: " + productId);
         return item;
     }
 
-    public List<Item> getItemsByStoreId(String storeId){
+    /**
+     * Returns all items from a given store after checking the store exists.
+     */
+    public List<Item> getItemsByStoreId(String storeId) {
+        if (storeRepository.get(storeId) == null)
+            throw new NoSuchElementException("Store not found for storeId: " + storeId);
         return itemRepository.getByStoreId(storeId);
     }
 
-    
-    public List<Item> getAvailableItems(){
+    /**
+     * Returns all available (non-zero stock) items.
+     */
+    public List<Item> getAvailableItems() {
         return itemRepository.getAvailabeItems();
     }
 
+    /**
+     * Updates an item in the repository after validation.
+     */
     public void update(Pair<String, String> id, Item item) {
+        validateStoreAndProductExist(id.getFirst(), id.getSecond());
         itemRepository.update(id, item);
     }
-    
+
+    /**
+     * Adds a new item to the repository and sets its name and category fetchers.
+     * Returns false if the item already exists.
+     */
     public boolean add(Pair<String, String> id, Item item) {
+        validateStoreAndProductExist(id.getFirst(), id.getSecond());
+
         if (itemRepository.get(id) != null) {
-            return false; // Item already exists
+            return false;
         }
 
-        // Lambdas that ignore input and always use item's productId
+        String itemStoreId = item.getStoreId();
+        String itemProductId = item.getProductId();
+
+        item.setNameFetcher(() ->
+            itemRepository.getByProductId(itemProductId).stream()
+                .filter(i -> !(i.getStoreId().equals(itemStoreId) && i.getProductId().equals(itemProductId)))
+                .findFirst()
+                .map(Item::getProductName)
+                .orElse("Unknown Product")
+        );
+
         item.setCategoryFetcher(() ->
-            itemRepository.getByProductId(item.getProductId()).stream()
+            itemRepository.getByProductId(itemProductId).stream()
+                .filter(i -> !(i.getStoreId().equals(itemStoreId) && i.getProductId().equals(itemProductId)))
                 .flatMap(i -> i.getCategories().stream())
                 .collect(Collectors.toSet())
         );
 
-        item.setNameFetcher(() ->
-            itemRepository.getByProductId(item.getProductId()).stream()
-                .findFirst()
-                .map(i -> {
-                    // Temporarily set nameFetcher to avoid recursion
-                    i.setNameFetcher(() -> ""); 
-                    return i.getProductName();
-                })
-                .orElse("Unknown Product")
-        );
         return itemRepository.add(id, item);
     }
 
+    /**
+     * Removes an item from the repository after validating it exists.
+     */
     public Item remove(Pair<String, String> id) {
-        Item item = itemRepository.remove(id); 
-        if(item == null)
-            throw new NoSuchElementException("Now item with id: " + id.toString() + " exists.");
+        validateStoreAndProductExist(id.getFirst(), id.getSecond());
+        Item item = itemRepository.remove(id);
+        if (item == null)
+            throw new NoSuchElementException("No item with id: " + id + " exists.");
         return item;
     }
 
+    /**
+     * Increases the stock amount of the specified item.
+     */
     public void increaseAmount(Pair<String, String> id, int amount) {
+        validateStoreAndProductExist(id.getFirst(), id.getSecond());
         itemRepository.get(id).increaseAmount(amount);
     }
 
+    /**
+     * Decreases the stock amount of the specified item.
+     */
     public void decreaseAmount(Pair<String, String> id, int amount) {
+        validateStoreAndProductExist(id.getFirst(), id.getSecond());
         itemRepository.get(id).decreaseAmount(amount);
+    }
+
+    /**
+     * Validates the existence of both store and product before any item operation.
+     */
+    private void validateStoreAndProductExist(String storeId, String productId) {
+        if (storeRepository.get(storeId) == null) {
+            throw new NoSuchElementException("Store not found for storeId: " + storeId);
+        }
+        if (productRepository.get(productId) == null) {
+            throw new NoSuchElementException("Product not found for productId: " + productId);
+        }
     }
 }

@@ -1,12 +1,14 @@
 -------------------------------------------------------------------------------
 Test set: Domain.Shopping.ShoppingCartFacadeTest
 -------------------------------------------------------------------------------
-Tests run: 22, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 0.54 s <<< FAILURE! - in Domain.Shopping.ShoppingCartFacadeTest
-testClearBasket_BasketNotFound(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.001 s  <<< FAILURE!
-java.lang.AssertionError
-	at Domain.Shopping.ShoppingCartFacadeTest.testClearBasket_BasketNotFound(ShoppingCartFacadeTest.java:309)
+Tests run: 22, Failures: 3, Errors: 1, Skipped: 0, Time elapsed: 0.024 s <<< FAILURE! - in Domain.Shopping.ShoppingCartFacadeTest
+testCheckout_Success(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.007 s  <<< ERROR!
+java.lang.RuntimeException: Checkout failed: Cannot invoke "java.util.Collection.size()" because "c" is null
+	at Domain.Shopping.ShoppingCartFacadeTest.testCheckout_Success(ShoppingCartFacadeTest.java:201)
+Caused by: java.lang.NullPointerException: Cannot invoke "java.util.Collection.size()" because "c" is null
+	at Domain.Shopping.ShoppingCartFacadeTest.testCheckout_Success(ShoppingCartFacadeTest.java:201)
 
-testAddProductToCart_NewCart(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.004 s  <<< FAILURE!
+testAddProductToCart_NewCart(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.007 s  <<< FAILURE!
 org.mockito.exceptions.verification.TooManyActualInvocations: 
 
 cartRepo.add(
@@ -14,18 +16,18 @@ cartRepo.add(
     <any Domain.Shopping.IShoppingCart>
 );
 Wanted 1 time:
--> at Domain.Shopping.ShoppingCartFacadeTest.testAddProductToCart_NewCart(ShoppingCartFacadeTest.java:106)
+-> at Domain.Shopping.ShoppingCartFacadeTest.testAddProductToCart_NewCart(ShoppingCartFacadeTest.java:126)
 But was 2 times:
--> at Domain.Shopping.ShoppingCartFacade.getCart(ShoppingCartFacade.java:48)
--> at Domain.Shopping.ShoppingCartFacade.addProductToCart(ShoppingCartFacade.java:90)
+-> at Domain.Shopping.ShoppingCartFacade.getCart(ShoppingCartFacade.java:45)
+-> at Domain.Shopping.ShoppingCartFacade.addProductToCart(ShoppingCartFacade.java:87)
 
 
-	at Domain.Shopping.ShoppingCartFacadeTest.testAddProductToCart_NewCart(ShoppingCartFacadeTest.java:106)
+	at Domain.Shopping.ShoppingCartFacadeTest.testAddProductToCart_NewCart(ShoppingCartFacadeTest.java:126)
 
-testCheckout_CartNotFound(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.001 s  <<< FAILURE!
+testCheckout_CartNotFound(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.002 s  <<< FAILURE!
 java.lang.AssertionError: Expected exception: java.lang.RuntimeException
 
 testClearCart_CartNotFound(Domain.Shopping.ShoppingCartFacadeTest)  Time elapsed: 0.001 s  <<< FAILURE!
 java.lang.AssertionError
-	at Domain.Shopping.ShoppingCartFacadeTest.testClearCart_CartNotFound(ShoppingCartFacadeTest.java:291)
+	at Domain.Shopping.ShoppingCartFacadeTest.testClearCart_CartNotFound(ShoppingCartFacadeTest.java:297)
 

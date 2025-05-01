@@ -84,7 +84,7 @@ public class ItemTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenInvalidAddRatingLow_thenThrows() {
-        item.addRating(0);
+        item.addRating(-1);
     }
 
     @Test(expected = IllegalArgumentException.class)

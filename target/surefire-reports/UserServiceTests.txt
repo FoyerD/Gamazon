@@ -1,28 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: UserServiceTests
 -------------------------------------------------------------------------------
-Tests run: 7, Failures: 4, Errors: 2, Skipped: 0, Time elapsed: 0.228 s <<< FAILURE! - in UserServiceTests
-GivenRegisteredUser_WhenLogin_ThenAuthenticated(UserServiceTests)  Time elapsed: 0.204 s  <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "Application.UserDTO.getSessionToken()" because the return value of "Application.Response.getValue()" is null
-	at UserServiceTests.GivenRegisteredUser_WhenLogin_ThenAuthenticated(UserServiceTests.java:75)
-
-GivenGuestSession_WhenRegister_ThenUserRegistered(UserServiceTests)  Time elapsed: 0.003 s  <<< FAILURE!
-java.lang.AssertionError: Registration should succeed
-	at UserServiceTests.GivenGuestSession_WhenRegister_ThenUserRegistered(UserServiceTests.java:57)
-
-GivenDuplicateUsername_WhenRegister_ThenErrorUserExists(UserServiceTests)  Time elapsed: 0.005 s  <<< FAILURE!
-java.lang.AssertionError
-	at UserServiceTests.GivenDuplicateUsername_WhenRegister_ThenErrorUserExists(UserServiceTests.java:68)
-
-GivenNoUser_WhenGuestEntry_ThenGuestCreated(UserServiceTests)  Time elapsed: 0.006 s  <<< FAILURE!
-org.junit.ComparisonFailure: expected:<[Guest]> but was:<[eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlZTFiMjE3MC1mODI0LTRkN2MtOTNiZS00MDE4MmUzMDkyMGIiLCJpYXQiOjE3NDYwMzA1MjksImV4cCI6MTc0NjExNjkyOX0.EM_d3JStTi9KwdGU6bTzMBrE1cexJfhLQR2CRuLFnDs]>
-	at UserServiceTests.GivenNoUser_WhenGuestEntry_ThenGuestCreated(UserServiceTests.java:32)
-
-GivenWrongCredentials_WhenLogin_ThenErrorInvalidCredentials(UserServiceTests)  Time elapsed: 0.003 s  <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "Application.UserDTO.getSessionToken()" because the return value of "Application.Response.getValue()" is null
-	at UserServiceTests.GivenWrongCredentials_WhenLogin_ThenErrorInvalidCredentials(UserServiceTests.java:86)
-
-GivenValidToken_WhenExit_ThenSessionEnded(UserServiceTests)  Time elapsed: 0.004 s  <<< FAILURE!
-java.lang.AssertionError: Exit with valid token should succeed
-	at UserServiceTests.GivenValidToken_WhenExit_ThenSessionEnded(UserServiceTests.java:40)
-
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.723 s - in UserServiceTests

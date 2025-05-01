@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
 Test set: StoreTests.CustomerServiceServiceTests
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.001 s <<< FAILURE! - in StoreTests.CustomerServiceServiceTests
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0 s <<< FAILURE! - in StoreTests.CustomerServiceServiceTests
 GivenNonemptyFeedback_WhenSendingFeedback_ThenReturnTrue(StoreTests.CustomerServiceServiceTests)  Time elapsed: 0 s  <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "java.lang.Boolean.booleanValue()" because the return value of "Application.Response.getValue()" is null
+java.lang.NullPointerException: Cannot invoke "java.lang.Boolean.booleanValue()" because the return value of "Application.utils.Response.getValue()" is null
 	at StoreTests.CustomerServiceServiceTests.GivenNonemptyFeedback_WhenSendingFeedback_ThenReturnTrue(CustomerServiceServiceTests.java:29)
 
-GivenEmptyFeedback_WhenSendingFeedback_ThenReturnFalse(StoreTests.CustomerServiceServiceTests)  Time elapsed: 0.001 s  <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "java.lang.Boolean.booleanValue()" because the return value of "Application.Response.getValue()" is null
+GivenEmptyFeedback_WhenSendingFeedback_ThenReturnFalse(StoreTests.CustomerServiceServiceTests)  Time elapsed: 0 s  <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "java.lang.Boolean.booleanValue()" because the return value of "Application.utils.Response.getValue()" is null
 	at StoreTests.CustomerServiceServiceTests.GivenEmptyFeedback_WhenSendingFeedback_ThenReturnFalse(CustomerServiceServiceTests.java:39)
 

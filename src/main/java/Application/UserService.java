@@ -1,6 +1,9 @@
 package Application;
 import java.util.NoSuchElementException;
 
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
 import Domain.TokenService;
 import Domain.User.*;
 
@@ -18,7 +21,7 @@ public class UserService {
         try {
             User guest = loginManager.createGuest();
             String token = tokenService.generateToken(guest.getId());
-            UserDTO guestDto = new UserDTO(guest.getName(), token);
+            UserDTO guestDto = new UserDTO(token, guest.getName());
             TradingLogger.logEvent(CLASS_NAME, "guestEntry", "New Guest has entered.");
     
             return Response.success(guestDto);
@@ -58,7 +61,7 @@ public class UserService {
         try {
             Member member = loginManager.register(id, username, password, email);
             TradingLogger.logEvent(CLASS_NAME, "register", "Guest has registed as " + username +".");
-            return Response.success(new UserDTO(member.getName(), sessionToken, email));
+            return Response.success(new UserDTO(sessionToken, member.getName(), email));
         } catch (IllegalStateException e) {
             TradingLogger.logError(CLASS_NAME, "register", "Failed to register " + username + ": " + e.getMessage());
             return Response.error("Failed to register " + username + ": " + e.getMessage());

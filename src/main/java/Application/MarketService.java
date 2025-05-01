@@ -1,21 +1,25 @@
 package Application;
 
-import Domain.IMarketFacade;
 import Domain.User.IUserRepository;
+import Domain.management.IMarketFacade;
+import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
-import Domain.PermissionType;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.StoreFacade;
-import Domain.Shopping.ShoppingBasket;
+import Domain.Shopping.Receipt;
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.TokenService;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import Application.utils.Error;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
 
 public class MarketService {
 
@@ -93,13 +97,13 @@ public class MarketService {
         }
     }
 
-    public Response<Void> initFacades(String sessionToken, IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade) {
+    public Response<Void> initFacades(String sessionToken, IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacade shoppingCartFacade) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "initFacades", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            marketFacade.initFacades(userRepository, itemRepository, storeFacade);
+            marketFacade.initFacades(userRepository, itemRepository, storeFacade, shoppingCartFacade);
             TradingLogger.logEvent(CLASS_NAME, "initFacades", "Facades initialized successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -303,13 +307,13 @@ public class MarketService {
         }
     }
 
-    public Response<List<ShoppingBasket>> getStorePurchaseHistory(String sessionToken, String storeId, LocalDateTime from, LocalDateTime to) {
+    public Response<List<Receipt>> getStorePurchaseHistory(String sessionToken, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getStorePurchaseHistory", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            List<ShoppingBasket> history = marketFacade.getStorePurchaseHistory(storeId, from, to, tokenService.extractId(sessionToken));
+            List<Receipt> history = marketFacade.getStorePurchaseHistory(storeId, tokenService.extractId(sessionToken));
             TradingLogger.logEvent(CLASS_NAME, "getStorePurchaseHistory", "Store purchase history fetched successfully.");
             return new Response<>(history);
         } catch (Exception e) {

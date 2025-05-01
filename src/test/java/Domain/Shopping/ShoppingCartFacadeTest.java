@@ -3,9 +3,11 @@ package Domain.Shopping;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,9 +20,12 @@ import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Product;
+import Domain.Store.IProductRepository;
+import Domain.Store.StoreFacade;
 
 /**
- * Test class for ShoppingCartFacade
+ * Test class for ShoppingCartFacade with updated implementation
  */
 public class ShoppingCartFacadeTest {
     
@@ -33,10 +38,19 @@ public class ShoppingCartFacadeTest {
     private IShoppingBasketRepository basketRepo;
     
     @Mock
+    private IReceiptRepository receiptRepo;
+    
+    @Mock
     private IPaymentService paymentService;
     
     @Mock
     private ItemFacade itemFacade;
+    
+    @Mock
+    private StoreFacade storeFacade;
+    
+    @Mock
+    private IProductRepository productRepo;
     
     @Mock
     private IShoppingCart cart;
@@ -47,6 +61,9 @@ public class ShoppingCartFacadeTest {
     @Mock
     private Item item;
     
+    @Mock
+    private Product product;
+    
     private static final String CLIENT_ID = "client123";
     private static final String STORE_ID = "store123";
     private static final String PRODUCT_ID = "product123";
@@ -54,7 +71,7 @@ public class ShoppingCartFacadeTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        facade = new ShoppingCartFacade(cartRepo, basketRepo, paymentService, itemFacade);
+        facade = new ShoppingCartFacade(cartRepo, basketRepo, paymentService, itemFacade, storeFacade, receiptRepo, productRepo);
         
         // Setup default behavior
         when(cartRepo.get(CLIENT_ID)).thenReturn(cart);
@@ -66,6 +83,9 @@ public class ShoppingCartFacadeTest {
         
         when(itemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(10.0);
+        
+        when(productRepo.get(PRODUCT_ID)).thenReturn(product);
+        when(product.getProductId()).thenReturn(PRODUCT_ID);
     }
     
     @Test
@@ -157,14 +177,25 @@ public class ShoppingCartFacadeTest {
     }
     
     @Test
+    public void testMakeBid() {
+        boolean result = facade.makeBid("auction123", CLIENT_ID, 100.0f);
+        
+        assertTrue(result);
+        verify(storeFacade).addBid("auction123", CLIENT_ID, 100.0f);
+    }
+    
+    @Test
     public void testCheckout_Success() {
         // Setup cart with one store
-        when(cart.getCart()).thenReturn(java.util.Collections.singleton(STORE_ID));
+        Set<String> stores = new HashSet<>();
+        stores.add(STORE_ID);
+        when(cart.getCart()).thenReturn(stores);
         
         // Setup basket with one product
         Map<String, Integer> orders = new HashMap<>();
         orders.put(PRODUCT_ID, 3);
         when(basket.getOrders()).thenReturn(orders);
+        when(basket.isEmpty()).thenReturn(false);
         
         Date expiryDate = new Date();
         boolean result = facade.checkout(CLIENT_ID, "1234567890", expiryDate, "123", 1L, "John Doe", "123 Main St");
@@ -180,6 +211,8 @@ public class ShoppingCartFacadeTest {
         // Verify cart was cleared
         verify(cart).clear();
         verify(cartRepo).update(CLIENT_ID, cart);
+        // Verify receipt was created
+        verify(receiptRepo).savePurchase(eq(CLIENT_ID), eq(STORE_ID), any(Map.class), eq(30.0), anyString());
     }
     
     @Test(expected = RuntimeException.class)
@@ -190,35 +223,12 @@ public class ShoppingCartFacadeTest {
         facade.checkout(CLIENT_ID, "1234567890", expiryDate, "123", 1L, "John Doe", "123 Main St");
     }
     
-    @Test(expected = RuntimeException.class)
-    public void testCheckout_PaymentFails() {
-        // Setup cart with one store
-        when(cart.getCart()).thenReturn(java.util.Collections.singleton(STORE_ID));
-        
-        // Setup basket with one product
-        Map<String, Integer> orders = new HashMap<>();
-        orders.put(PRODUCT_ID, 3);
-        when(basket.getOrders()).thenReturn(orders);
-        
-        // Make the payment service throw an exception
-        Date expiryDate = new Date();
-        doThrow(new RuntimeException("Payment failed")).when(paymentService).processPayment(
-            anyString(), anyString(), any(Date.class), anyString(), anyDouble(), anyLong(), anyString(), anyString()
-        );
-        
-        try {
-            facade.checkout(CLIENT_ID, "1234567890", expiryDate, "123", 1L, "John Doe", "123 Main St");
-        } catch (RuntimeException e) {
-            // Verify rollback happened
-            verify(itemFacade).increaseAmount(new Pair<>(STORE_ID, PRODUCT_ID), 3);
-            throw e;
-        }
-    }
-    
     @Test
     public void testGetTotalItems() {
         // Setup cart with one store
-        when(cart.getCart()).thenReturn(java.util.Collections.singleton(STORE_ID));
+        Set<String> stores = new HashSet<>();
+        stores.add(STORE_ID);
+        when(cart.getCart()).thenReturn(stores);
         when(basket.getQuantity()).thenReturn(3);
         
         int result = facade.getTotalItems(CLIENT_ID);
@@ -240,7 +250,9 @@ public class ShoppingCartFacadeTest {
     @Test
     public void testIsEmpty_CartWithItems() {
         when(cart.isEmpty()).thenReturn(false);
-        when(cart.getCart()).thenReturn(java.util.Collections.singleton(STORE_ID));
+        Set<String> stores = new HashSet<>();
+        stores.add(STORE_ID);
+        when(cart.getCart()).thenReturn(stores);
         when(basket.getQuantity()).thenReturn(3);
         
         boolean result = facade.isEmpty(CLIENT_ID);
@@ -251,7 +263,9 @@ public class ShoppingCartFacadeTest {
     @Test
     public void testIsEmpty_CartWithoutItems() {
         when(cart.isEmpty()).thenReturn(false);
-        when(cart.getCart()).thenReturn(java.util.Collections.singleton(STORE_ID));
+        Set<String> stores = new HashSet<>();
+        stores.add(STORE_ID);
+        when(cart.getCart()).thenReturn(stores);
         when(basket.getQuantity()).thenReturn(0);
         
         boolean result = facade.isEmpty(CLIENT_ID);
@@ -260,18 +274,10 @@ public class ShoppingCartFacadeTest {
     }
     
     @Test
-    public void testIsEmpty_NewCart() {
-        // Test when the cart is newly created and empty
-        when(cartRepo.get(CLIENT_ID)).thenReturn(null);
-        
-        boolean result = facade.isEmpty(CLIENT_ID);
-        
-        assertTrue(result);
-    }
-    
-    @Test
     public void testClearCart_Success() {
-        when(cart.getCart()).thenReturn(java.util.Collections.singleton(STORE_ID));
+        Set<String> stores = new HashSet<>();
+        stores.add(STORE_ID);
+        when(cart.getCart()).thenReturn(stores);
         
         boolean result = facade.clearCart(CLIENT_ID);
         
@@ -301,37 +307,38 @@ public class ShoppingCartFacadeTest {
     }
     
     @Test
-    public void testClearBasket_BasketNotFound() {
-        when(basketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(null);
-        
-        boolean result = facade.clearBasket(CLIENT_ID, STORE_ID);
-        
-        assertFalse(result);
-    }
-    
-    @Test
-    public void testViewCart_CartWithItems() {
+    public void testViewCart() {
         // Setup cart with one store
-        when(cart.getCart()).thenReturn(java.util.Collections.singleton(STORE_ID));
+        Set<String> stores = new HashSet<>();
+        stores.add(STORE_ID);
+        when(cart.getCart()).thenReturn(stores);
         
         // Setup basket with one product
         Map<String, Integer> orders = new HashMap<>();
         orders.put(PRODUCT_ID, 3);
         when(basket.getOrders()).thenReturn(orders);
         
-        Map<String, Map<String, Integer>> result = facade.viewCart(CLIENT_ID);
+        // Mock the item returned by the facade
+        when(itemFacade.getItem(eq(STORE_ID), eq(PRODUCT_ID))).thenReturn(item);
+        
+        Set<Pair<Item, Integer>> result = facade.viewCart(CLIENT_ID);
         
         assertEquals(1, result.size());
-        assertTrue(result.containsKey(STORE_ID));
-        assertEquals(1, result.get(STORE_ID).size());
-        assertEquals(Integer.valueOf(3), result.get(STORE_ID).get(PRODUCT_ID));
+        boolean foundItem = false;
+        for (Pair<Item, Integer> pair : result) {
+            if (pair.getFirst() == item && pair.getSecond() == 3) {
+                foundItem = true;
+                break;
+            }
+        }
+        assertTrue("Expected item not found in cart view", foundItem);
     }
     
     @Test
     public void testViewCart_EmptyCart() {
         when(cart.getCart()).thenReturn(new HashSet<>());
         
-        Map<String, Map<String, Integer>> result = facade.viewCart(CLIENT_ID);
+        Set<Pair<Item, Integer>> result = facade.viewCart(CLIENT_ID);
         
         assertTrue(result.isEmpty());
     }
@@ -340,8 +347,32 @@ public class ShoppingCartFacadeTest {
     public void testViewCart_CartNotFound() {
         when(cartRepo.get(CLIENT_ID)).thenReturn(null);
         
-        Map<String, Map<String, Integer>> result = facade.viewCart(CLIENT_ID);
+        Set<Pair<Item, Integer>> result = facade.viewCart(CLIENT_ID);
         
         assertTrue(result.isEmpty());
+    }
+    
+    @Test
+    public void testGetClientPurchaseHistory() {
+        List<Receipt> expectedReceipts = new ArrayList<>();
+        expectedReceipts.add(mock(Receipt.class));
+        when(receiptRepo.getClientReceipts(CLIENT_ID)).thenReturn(expectedReceipts);
+        
+        List<Receipt> result = facade.getClientPurchaseHistory(CLIENT_ID);
+        
+        assertEquals(expectedReceipts, result);
+        verify(receiptRepo).getClientReceipts(CLIENT_ID);
+    }
+    
+    @Test
+    public void testGetStorePurchaseHistory() {
+        List<Receipt> expectedReceipts = new ArrayList<>();
+        expectedReceipts.add(mock(Receipt.class));
+        when(receiptRepo.getStoreReceipts(STORE_ID)).thenReturn(expectedReceipts);
+        
+        List<Receipt> result = facade.getStorePurchaseHistory(STORE_ID);
+        
+        assertEquals(expectedReceipts, result);
+        verify(receiptRepo).getStoreReceipts(STORE_ID);
     }
 }

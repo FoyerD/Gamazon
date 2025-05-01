@@ -1,5 +1,10 @@
 package Application;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import Application.DTOs.OrderDTO;
+import Application.utils.Error;
+import Application.utils.Response;
 
 import java.util.Date;
 
@@ -7,9 +12,13 @@ import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingCartFacade;
+import Domain.Store.IProductRepository;
 import Domain.Store.ItemFacade;
+import Domain.Store.StoreFacade;
 import Domain.TokenService;
 import Domain.ExternalServices.IPaymentService;
+import Domain.Shopping.IReceiptRepository;
+
 
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
@@ -20,9 +29,12 @@ public class ShoppingService{
     }
 
     
-    public ShoppingService(TokenService tokenService, IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade) {
+
+    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
+     ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
+      IProductRepository productRepository, TokenService tokenService) {
         this.tokenService = tokenService;
-        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade);
+        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
     }
 
     public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
@@ -36,11 +48,13 @@ public class ShoppingService{
         }
     }
 
-    public Response<Map<String,Map<String, Integer>>> viewCart(String clientId) {
+    public Response<Set<OrderDTO>> viewCart(String clientId) {
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-            Map<String,Map<String, Integer>> itemsMapPerStore = cartFacade.viewCart(clientId);
+            Set<OrderDTO> itemsMapPerStore = cartFacade.viewCart(clientId).stream()
+                .map(item -> new OrderDTO(item.getFirst(), item.getSecond()))
+                .collect(Collectors.toSet());
             return new Response<>(itemsMapPerStore);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
@@ -103,6 +117,18 @@ public class ShoppingService{
             //  public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv) {
 
             cartFacade.checkout(cardOwnerID, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    
+    public Response<Boolean> makeBid(String auctionId, String clientId, float price) {
+        try {
+            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
+
+            cartFacade.makeBid(auctionId, clientId, price);
             return new Response<>(true);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));

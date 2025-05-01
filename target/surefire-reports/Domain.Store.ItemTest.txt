@@ -1,7 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: Domain.Store.ItemTest
 -------------------------------------------------------------------------------
-Tests run: 17, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.013 s <<< FAILURE! - in Domain.Store.ItemTest
-givenInvalidAddRatingLow_thenThrows(Domain.Store.ItemTest)  Time elapsed: 0 s  <<< FAILURE!
-java.lang.AssertionError: Expected exception: java.lang.IllegalArgumentException
-
+Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s - in Domain.Store.ItemTest

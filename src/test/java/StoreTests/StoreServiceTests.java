@@ -6,8 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.MarketService;
-import Application.Response;
 import Application.StoreService;
+import Application.DTOs.StoreDTO;
+import Application.utils.Response;
 
 
 public class StoreServiceTests {
@@ -23,20 +24,20 @@ public class StoreServiceTests {
     }
 
     @Test
-    public void GivenNewStore_WhenCreateStore_ThenReturnTrue() {
+    public void GivenNewStore_WhenCreateStore_ThenReturnStore() {
         String sessionToken = "validSessionToken";
         String storeName = "NewStore";
-        Response<Boolean> result = storeService.addStore(sessionToken, storeName, "A new store");
-        assertTrue(result.getValue());
+        Response<StoreDTO> result = storeService.addStore(sessionToken, storeName, "A new store");
+        assertTrue(result.getValue() != null);
     }
 
     @Test
-    public void GivenExistingStoreName_WhenOpenStore_ThenReturnFalse() {
+    public void GivenExistingStoreName_WhenOpenStore_ThenReturnNull() {
         String sessionToken = "validSessionToken";
         String storeName = "ExistingStore";
         storeService.addStore(sessionToken, storeName, "A new store");
-        Response<Boolean> result = storeService.addStore(sessionToken, storeName,"I should not exist");
-        assertFalse(result.getValue());
+        Response<StoreDTO> result = storeService.addStore(sessionToken, storeName,"I should not exist");
+        assertFalse(result.getValue() == null);
     }
 
     @Test
