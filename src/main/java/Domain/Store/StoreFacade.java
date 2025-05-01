@@ -202,6 +202,7 @@ public class StoreFacade {
 
     public List<Auction> getAllStoreAuctions(String storeId) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
+        if (this.storeRepository.get(storeId) == null) throw new RuntimeException("Store not found.");
         return this.auctionRepository.getAllStoreAuctions(storeId);
     }
 
