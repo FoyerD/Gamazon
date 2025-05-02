@@ -103,10 +103,11 @@ public class StoreFacade {
     public boolean addFeedback(String storeId, String productId, String userId, String comment) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         if (this.storeRepository.get(storeId) == null) throw new RuntimeException("Store not found.");
-        if (this.itemRepository.get(new Pair<>(storeId, productId)) == null) throw new RuntimeException("Item not found.");
+        if (this.itemRepository.getItem(storeId, productId) == null) throw new RuntimeException("Item not found.");
         if (this.getUser.apply(userId) == null) throw new RuntimeException("User not found.");
+        if (comment == null || comment.isEmpty()) throw new RuntimeException("Comment cannot be null or empty.");
 
-        Feedback feedback = new Feedback(storeId, productId, userId, comment);
+        Feedback feedback = new Feedback(userId, storeId, productId, comment);
         return feedbackRepository.add(storeId, productId, userId, feedback);
     }
 

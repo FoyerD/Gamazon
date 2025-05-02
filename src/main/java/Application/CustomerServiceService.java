@@ -39,6 +39,9 @@ public class CustomerServiceService {
             String customerId = this.tokenService.extractId(sessionToken);
             
             boolean result = this.storeFacade.addFeedback(storeId, productId, customerId, comment);
+            if(!result) {
+                return new Response<>(new Error("Failed to add feedback."));
+            }
             return new Response<>(result);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
