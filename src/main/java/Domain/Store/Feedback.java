@@ -33,4 +33,17 @@ public class Feedback {
     public Pair<Pair<String, String>, String> getPairKey() {
         return new Pair<>(new Pair<>(this.getStoreId(), this.getProductId()), this.getCustomerId());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Feedback)) return false;
+
+        Feedback feedback = (Feedback) o;
+
+        if (!customerId.equals(feedback.customerId)) return false;
+        if (!storeId.equals(feedback.storeId)) return false;
+        if (!productId.equals(feedback.productId)) return false;
+        return comment.equals(feedback.comment);
+    }
 }
