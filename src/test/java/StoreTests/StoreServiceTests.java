@@ -143,8 +143,8 @@ public class StoreServiceTests {
         String productId = UUID.randomUUID().toString();
         this.itemRepository.add(new Pair<>(storeId, productId), new Item(storeId, productId, 10.0, 10, "A new product"));
 
-        Date endDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
-        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate.toString(), 5.0);
+        String endDate = "2077-01-01";
+        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate, 5.0);
         assertEquals(auctionResult.getValue().getStoreId(), storeId);
         assertEquals(auctionResult.getValue().getProductId(), productId);
     }
@@ -186,10 +186,10 @@ public class StoreServiceTests {
         itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
         itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
 
-        Date endDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
-        storeService.addAuction(this.tokenId, storeId, productId1, endDate.toString(), 5.0);
-        storeService.addAuction(this.tokenId, storeId, productId2, endDate.toString(), 10.0);
-        storeService.addAuction(this.tokenId, storeId, productId3, endDate.toString(), 15.0);
+        String endDate = "2077-01-01";
+        storeService.addAuction(this.tokenId, storeId, productId1, endDate, 5.0);
+        storeService.addAuction(this.tokenId, storeId, productId2, endDate, 10.0);
+        storeService.addAuction(this.tokenId, storeId, productId3, endDate, 15.0);
 
         Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
         assertTrue(auctionsResponse.getValue() != null);
@@ -229,7 +229,7 @@ public class StoreServiceTests {
         itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
         itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
 
-        Date endDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
+        String endDate = "2077-01-01";
         storeService.addAuction(this.tokenId, storeId, productId1, endDate.toString(), 5.0);
         storeService.addAuction(this.tokenId, storeId, productId2, endDate.toString(), 10.0);
         storeService.addAuction(this.tokenId, storeId, productId3, endDate.toString(), 15.0);
