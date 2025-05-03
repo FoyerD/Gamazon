@@ -102,7 +102,7 @@ public class StoreFacade {
     public boolean addFeedback(String storeId, String productId, String userId, String comment) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         if (this.storeRepository.get(storeId) == null) throw new RuntimeException("Store not found");
-        if (this.itemRepository.getItem(storeId, productId) == null) throw new RuntimeException("Item not found");
+        if (this.itemRepository.get(new Pair<>(storeId, productId)) == null) throw new RuntimeException("Item not found");
         if (this.getUser.apply(userId) == null) throw new RuntimeException("User not found");
         if (comment == null || comment.isEmpty()) throw new RuntimeException("Comment cannot be null or empty");
 
@@ -115,7 +115,7 @@ public class StoreFacade {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
 
         Object lock = this.feedbackRepository.getLock(feedbackId);
-        if (lock == null) throw new RuntimeException("Store not found");
+        if (lock == null) throw new RuntimeException("Facade not found");
         synchronized (lock) {
             return feedbackRepository.remove(feedbackId);
         }
@@ -160,11 +160,11 @@ public class StoreFacade {
 
         Date auctionStartDate = new Date();
         Date auctionEndDateParsed = null;
-        SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy");
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
         try {
             auctionEndDateParsed = parser.parse(auctionEndDate);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid date format. Expected format: EEE MMM d HH:mm:ss zzz yyyy");
+            throw new RuntimeException("Invalid date format. Expected format: yyyy-MM-dd");
         }
         
         if (auctionEndDateParsed.before(auctionStartDate)) throw new RuntimeException("Auction end date must be after the start date");

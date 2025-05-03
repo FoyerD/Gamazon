@@ -3,16 +3,12 @@ import java.util.List;
 import java.util.Map;
 
 import Domain.Store.Auction;
-
-public class MemoryAuctionRepository implements Domain.Store.IAuctionRepository {
+import Domain.Store.IAuctionRepository;
+public class MemoryAuctionRepository extends IAuctionRepository {
     private Map<String, Auction> auctions;
     
     public MemoryAuctionRepository() {
         this.auctions = new java.util.concurrent.ConcurrentHashMap<>();
-    }
-
-    private boolean isIdValid(String id) {
-        return id != null && !id.trim().isEmpty();
     }
 
     @Override

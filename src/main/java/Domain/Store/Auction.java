@@ -87,4 +87,27 @@ public class Auction {
         this.currentBidderId = currentBidderId;
     }
     
+    
+    public boolean isAuctionOpen() {
+        Date currentDate = new Date();
+        return currentDate.before(auctionEndDate);
+    }
+    
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Auction)) return false;
+
+        Auction auction = (Auction) o;
+
+        if (Double.compare(auction.startPrice, startPrice) != 0) return false;
+        if (Double.compare(auction.currentPrice, currentPrice) != 0) return false;
+        if (!auctionId.equals(auction.auctionId)) return false;
+        if (!auctionStartDate.equals(auction.auctionStartDate)) return false;
+        if (!auctionEndDate.equals(auction.auctionEndDate)) return false;
+        if (!storeId.equals(auction.storeId)) return false;
+        if (!productId.equals(auction.productId)) return false;
+        return currentBidderId != null ? currentBidderId.equals(auction.currentBidderId) : auction.currentBidderId == null;
+    }
 }
