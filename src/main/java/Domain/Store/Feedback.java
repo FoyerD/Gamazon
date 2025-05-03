@@ -6,11 +6,11 @@ public class Feedback {
     private String customerId;
     private String storeId;
     private String productId;
-    private String feeedbackId;
+    private String feedbackId;
     private String comment;
 
     public Feedback(String feedbackId, String customerId, String storeId, String productId, String comment) {
-        this.feeedbackId = feedbackId;
+        this.feedbackId = feedbackId;
         this.customerId = customerId;
         this.storeId = storeId;
         this.productId = productId;
@@ -29,7 +29,7 @@ public class Feedback {
         return comment;
     }
     public String getFeedbackId() {
-        return feeedbackId;
+        return feedbackId;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class Feedback {
         if (!customerId.equals(feedback.customerId)) return false;
         if (!storeId.equals(feedback.storeId)) return false;
         if (!productId.equals(feedback.productId)) return false;
-        if (!feeedbackId.equals(feedback.feeedbackId)) return false;
+        if (!feedbackId.equals(feedback.feedbackId)) return false;
         return comment.equals(feedback.comment);
     }
 }
