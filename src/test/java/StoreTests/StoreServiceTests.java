@@ -11,26 +11,29 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import Application.AuctionDTO;
-import Application.Response;
-import Application.StoreDTO;
+
 import Application.StoreService;
 import Domain.TokenService;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
-import Domain.Store.MemoryItemRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
-import Infrastructure.MemoryAuctionRepository;
-import Infrastructure.MemoryFeedbackRepository;
-import Infrastructure.MemoryUserRepository;
-import Infrastructure.StoreRepositoryMemory;
 import Domain.User.User;
+import Infrastructure.Repositories.MemoryAuctionRepository;
+import Infrastructure.Repositories.MemoryFeedbackRepository;
+import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryStoreRepository;
+import Infrastructure.Repositories.MemoryUserRepository;
 import Domain.Pair;
 import Domain.Store.Item;
+import Application.MarketService;
+import Application.StoreService;
+import Application.DTOs.AuctionDTO;
+import Application.DTOs.StoreDTO;
+import Application.utils.Response;
 
 
 public class StoreServiceTests {
@@ -48,7 +51,7 @@ public class StoreServiceTests {
 
     @Before
     public void setUp() {
-        this.storeRepository = new StoreRepositoryMemory();
+        this.storeRepository = new MemoryStoreRepository();
         this.auctionRepository = new MemoryAuctionRepository();
         this.itemRepository = new MemoryItemRepository();
         this.feedbackRepository= new MemoryFeedbackRepository();

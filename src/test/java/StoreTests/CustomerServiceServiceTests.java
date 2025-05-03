@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.CustomerServiceService;
-import Application.Response;
 import Application.StoreService;
 import Domain.Pair;
 import Domain.TokenService;
@@ -21,15 +20,16 @@ import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
-import Domain.Store.MemoryItemRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
-import Infrastructure.MemoryAuctionRepository;
-import Infrastructure.MemoryFeedbackRepository;
-import Infrastructure.MemoryUserRepository;
-import Infrastructure.StoreRepositoryMemory;
+import Infrastructure.Repositories.MemoryAuctionRepository;
+import Infrastructure.Repositories.MemoryFeedbackRepository;
+import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryStoreRepository;
+import Infrastructure.Repositories.MemoryUserRepository;
+import Application.utils.Response;
 
 
 public class CustomerServiceServiceTests {
@@ -53,7 +53,7 @@ public class CustomerServiceServiceTests {
 
     @Before
     public void setUp() {
-        this.storeRepository = new StoreRepositoryMemory();
+        this.storeRepository = new MemoryStoreRepository();
         this.auctionRepository = new MemoryAuctionRepository();
         this.itemRepository = new MemoryItemRepository();
         this.feedbackRepository= new MemoryFeedbackRepository();

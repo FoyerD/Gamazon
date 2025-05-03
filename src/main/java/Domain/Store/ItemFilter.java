@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Encapsulates filtering criteria for searching items by price, rating, name, and categories.
+ * Built using the {@link Builder} pattern.
+ */
 public class ItemFilter {
     private final Set<Category> categories; 
     private final double minPrice;
@@ -22,7 +26,10 @@ public class ItemFilter {
         this.itemName = builder.itemName;
     }
 
-    public boolean matchesFilter(Item item){
+    /**
+     * Checks if the given item matches all configured filter criteria.
+     */
+    public boolean matchesFilter(Item item) {
         if (minPrice >= 0 && item.getPrice() < minPrice) return false;
         if (maxPrice >= 0 && item.getPrice() > maxPrice) return false;
         if (minRating >= 0 && item.getRating() < minRating) return false;
@@ -32,30 +39,16 @@ public class ItemFilter {
         return true;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
-    }
+    public Set<Category> getCategories() { return categories; }
+    public double getMinPrice() { return minPrice; }
+    public double getMaxPrice() { return maxPrice; }
+    public double getMinRating() { return minRating; }
+    public double getMaxRating() { return maxRating; }
+    public String getItemName() { return itemName; }
 
-    public double getMinPrice() {
-        return minPrice;
-    }
-
-    public double getMaxPrice() {
-        return maxPrice;
-    }
-
-    public double getMinRating() {
-        return minRating;
-    }
-
-    public double getMaxRating() {
-        return maxRating;
-    }
-    public String getItemName(){
-        return itemName;
-    }
-
-    // --- Builder class ---
+    /**
+     * Builder for {@link ItemFilter}.
+     */
     public static class Builder {
         private Set<Category> categories = Collections.synchronizedSet(new HashSet<>());
         private double minPrice = -1;
@@ -94,11 +87,14 @@ public class ItemFilter {
             return this;
         }
 
-        public Builder itemName(String itemName){
+        public Builder itemName(String itemName) {
             this.itemName = itemName;
             return this;
         }
 
+        /**
+         * Constructs an {@link ItemFilter} instance with the configured options.
+         */
         public ItemFilter build() {
             return new ItemFilter(this);
         }

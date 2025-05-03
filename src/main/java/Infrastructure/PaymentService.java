@@ -2,7 +2,7 @@ package Infrastructure;
 
 import java.util.Date;
 
-import Application.Response;
+import Application.utils.Response;
 import Domain.ExternalServices.IPaymentService;
 
 public class PaymentService implements IPaymentService {
