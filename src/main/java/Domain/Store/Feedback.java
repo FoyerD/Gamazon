@@ -6,9 +6,11 @@ public class Feedback {
     private String customerId;
     private String storeId;
     private String productId;
+    private String feeedbackId;
     private String comment;
 
-    public Feedback(String customerId, String storeId, String productId, String comment) {
+    public Feedback(String feedbackId, String customerId, String storeId, String productId, String comment) {
+        this.feeedbackId = feedbackId;
         this.customerId = customerId;
         this.storeId = storeId;
         this.productId = productId;
@@ -26,12 +28,8 @@ public class Feedback {
     public String getComment() {
         return comment;
     }
-
-    public static Pair<Pair<String, String>, String> getPairKey(String storeId, String productId, String customerId) {
-        return new Pair<>(new Pair<>(storeId, productId), customerId);
-    }
-    public Pair<Pair<String, String>, String> getPairKey() {
-        return new Pair<>(new Pair<>(this.getStoreId(), this.getProductId()), this.getCustomerId());
+    public String getFeedbackId() {
+        return feeedbackId;
     }
 
     @Override
@@ -44,6 +42,7 @@ public class Feedback {
         if (!customerId.equals(feedback.customerId)) return false;
         if (!storeId.equals(feedback.storeId)) return false;
         if (!productId.equals(feedback.productId)) return false;
+        if (!feeedbackId.equals(feedback.feeedbackId)) return false;
         return comment.equals(feedback.comment);
     }
 }

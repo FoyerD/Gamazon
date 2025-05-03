@@ -4,9 +4,11 @@ public class FeedbackDTO {
     private String customerId;
     private String storeId;
     private String productId;
+    private String feedbackId;
     private String comment;
 
-    public FeedbackDTO(String customerId, String storeId, String productId, String comment) {
+    public FeedbackDTO(String feedbackId, String customerId, String storeId, String productId, String comment) {
+        this.feedbackId = feedbackId;
         this.customerId = customerId;
         this.storeId = storeId;
         this.productId = productId;
@@ -14,6 +16,7 @@ public class FeedbackDTO {
     }
 
     public FeedbackDTO(Feedback feedback) {
+        this.feedbackId = feedback.getFeedbackId();
         this.customerId = feedback.getCustomerId();
         this.storeId = feedback.getStoreId();
         this.productId = feedback.getProductId();
@@ -34,5 +37,9 @@ public class FeedbackDTO {
 
     public String getComment() {
         return comment;
+    }
+
+    public String getFeedbackId() {
+        return feedbackId;
     }
 }
