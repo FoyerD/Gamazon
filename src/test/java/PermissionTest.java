@@ -1,9 +1,9 @@
-import Domain.Permission;
-import Domain.PermissionType;
-import Domain.RoleType;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import Domain.management.Permission;
+import Domain.management.PermissionType;
+import Domain.management.RoleType;
 
 import java.util.Set;
 

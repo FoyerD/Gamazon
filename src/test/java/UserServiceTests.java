@@ -4,11 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.UserService;
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
 import Domain.User.LoginManager;
-import Application.Response;
-import Application.UserDTO;
+import Infrastructure.Repositories.MemoryUserRepository;
 import Domain.TokenService;
-import Infrastructure.MemoryUserRepository;
 
 public class UserServiceTests {
     private UserService userService;

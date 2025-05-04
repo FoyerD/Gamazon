@@ -1,9 +1,9 @@
 package Domain.Store;
 import java.util.List;
 
-import Domain.IRepository;
+import Domain.ILockbasedRepository;
 
-public interface IAuctionRepository extends IRepository<Auction, String> {
-    public List<Auction> getAllStoreAuctions(String storeId);
-    public List<Auction> getAllProductAuctions(String productId);
+public abstract class IAuctionRepository extends ILockbasedRepository<Auction, String> {
+    public abstract List<Auction> getAllStoreAuctions(String storeId);
+    public abstract List<Auction> getAllProductAuctions(String productId);
 }

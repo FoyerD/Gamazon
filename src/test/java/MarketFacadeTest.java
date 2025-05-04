@@ -4,8 +4,7 @@ import Domain.PermissionType;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
-import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
+import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.Item;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +32,6 @@ public class MarketFacadeTest {
     private IUserRepository userRepository;
     private IItemRepository itemRepository;
     private StoreFacade storeFacade;
-    private ShoppingCartFacade shoppingCartFacade;
     private IPaymentService paymentService;
     private ISupplyService supplyService;
     private INotificationService notificationService;
@@ -44,12 +43,11 @@ public class MarketFacadeTest {
         userRepository = mock(IUserRepository.class);
         itemRepository = mock(IItemRepository.class);
         storeFacade = mock(StoreFacade.class);
-        shoppingCartFacade = mock(ShoppingCartFacade.class);
         paymentService = mock(IPaymentService.class);
         supplyService = mock(ISupplyService.class);
         notificationService = mock(INotificationService.class);
 
-        marketFacade.initFacades(userRepository, itemRepository, storeFacade, shoppingCartFacade);
+        marketFacade.initFacades(userRepository, itemRepository, storeFacade);
         marketFacade.updatePaymentService(paymentService);
         marketFacade.updateSupplyService(supplyService);
         marketFacade.updateNotificationService(notificationService);
@@ -60,7 +58,7 @@ public class MarketFacadeTest {
     @Test
     public void givenMarketFacade_whenInitFacades_thenInstanceIsNotNull() {
         MarketFacade instance = MarketFacade.getInstance();
-        instance.initFacades(userRepository, itemRepository, storeFacade, shoppingCartFacade);
+        instance.initFacades(userRepository, itemRepository, storeFacade);
         assertNotNull(instance);
     }
 
@@ -282,9 +280,9 @@ public class MarketFacadeTest {
         marketFacade.getStorePermissions().put("store1", new HashMap<>());
         marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
 
-        List<Receipt> history = marketFacade.getStorePurchaseHistory("store1", "userId");
+        List<ShoppingBasket> history = marketFacade.getStorePurchaseHistory("store1", LocalDateTime.now(), LocalDateTime.now(), "userId");
 
-        assertTrue(history.isEmpty());
+        assertNull(history);
     }
 
     @Test

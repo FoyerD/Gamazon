@@ -143,7 +143,6 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
             if (basket != null && !basket.isEmpty()) {
                 // Track products and prices for this store
                 Map<Product, Integer> storeProducts = new HashMap<>();
-                double storeTotalPrice = 0;
                 
                 // Iterate over all items in the basket
                 for (Map.Entry<String, Integer> entry : basket.getOrders().entrySet()) {
@@ -156,7 +155,6 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
                     // Get the product object and calculate price
                     Product product = new Product(productRepo.get(productId));
                     double productPrice = itemFacade.getItem(storeId, product.getProductId()).getPrice() * quantity;
-                    storeTotalPrice += productPrice;
                     totalPrice += productPrice;
 
                     // Store product in the store's product map
@@ -315,18 +313,23 @@ private void checkoutRollBack(String clientId, IShoppingCart cart,
     }
 
     @Override
-    public Map<String, Map<String, Integer>> viewCart(String clientId) {
+    public Set<Pair<Item,Integer>> viewCart(String clientId) {
         IShoppingCart userCart = getCart(clientId);
         if (userCart == null) {
-            return new HashMap<>(); // Return empty map if cart is not found
+            return new HashSet<>();
         }
-        Map<String, Map<String, Integer>> viewCart = new HashMap<String,Map<String,Integer>>();
-        for(String storeId : userCart.getCart()) {
+        Set<Pair<Item, Integer>> viewCart = new HashSet<>();
+        for (String storeId : userCart.getCart()) {
             ShoppingBasket basket = getBasket(clientId, storeId);
             if (basket == null) {
-                continue; // Skip if basket is not found
+                continue;
             }
-            viewCart.put(storeId, basket.getOrders());
+            for (Map.Entry<String, Integer> entry : basket.getOrders().entrySet()) {
+                String productId = entry.getKey();
+                int quantity = entry.getValue();
+                Item item = itemFacade.getItem(storeId, productId);
+                viewCart.add(new Pair<>(item, quantity));
+            }
         }
         return viewCart;
     }

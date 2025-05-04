@@ -2,7 +2,10 @@ package Domain.Shopping;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+
+import Domain.Pair;
+import Domain.Store.Item;
 
 /**
  * Interface for shopping cart operations
@@ -104,7 +107,7 @@ public interface IShoppingCartFacade {
      * @param clientId The client ID
      * @return Map of store IDs to maps of product IDs and quantities
      */
-    Map<String, Map<String, Integer>> viewCart(String clientId);
+    Set<Pair<Item,Integer>> viewCart(String clientId);
     
     /**
      * Gets a client's purchase history
