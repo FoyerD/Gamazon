@@ -101,7 +101,7 @@ public class MarketServiceTest {
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
 
         // Shopping Cart setup
-        shoppingCartRepository = new MemoryShoppingBasketRepository();
+        shoppingCartRepository = new MemoryShoppingCartRepository();
         shoppingBasketRepository = new MemoryShoppingBasketRepository();
         receiptRepository = new MemoryReceiptRepository();
         
