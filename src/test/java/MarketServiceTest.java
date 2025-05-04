@@ -11,12 +11,18 @@ import Domain.TokenService;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.IProductRepository;
+import Domain.Store.IStoreRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.LoginManager;
 import Domain.User.User;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionType;
+import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryProductRepository;
+import Infrastructure.Repositories.MemoryReceiptRepository;
+import Infrastructure.Repositories.MemoryShoppingBasketRepository;
+import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
 import ch.qos.logback.core.subst.Token;
 import Domain.Store.Item;
@@ -28,8 +34,8 @@ import org.junit.jupiter.api.Test;
 import Application.ItemService;
 import Application.MarketService;
 import Application.StoreService;
-import Application.UserService;
 import Application.DTOs.UserDTO;
+import Application.UserService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -59,7 +65,10 @@ public class MarketServiceTest {
     
     // Store
     private IItemRepository itemRepository;
+    private IProductRepository productRepository;
+    private IStoreRepository storeRepository;
     private StoreFacade storeFacade;
+    private ItemFacade itemFacade;
 
     private String guestToken;
     private StoreService storeService;
@@ -71,9 +80,7 @@ public class MarketServiceTest {
     private ShoppingCartFacade shoppingCartFacade;
     private IShoppingCartRepository shoppingCartRepository;
     private IShoppingBasketRepository shoppingBasketRepository; 
-    private ItemFacade itemFacade;
     private IReceiptRepository receiptRepository;
-    private IProductRepository productRepository;
 
 
     @BeforeEach
@@ -85,8 +92,18 @@ public class MarketServiceTest {
         
         marketFacade = MarketFacade.getInstance();
 
-        // Shopping Cart setup
+        // Store and Item setup
         storeFacade = new StoreFacade();
+        itemRepository = new MemoryItemRepository();
+        productRepository = new MemoryProductRepository();
+        storeRepository = new MemoryStoreRepository();
+
+        itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
+
+        // Shopping Cart setup
+        shoppingCartRepository = new MemoryShoppingBasketRepository();
+        shoppingBasketRepository = new MemoryShoppingBasketRepository();
+        receiptRepository = new MemoryReceiptRepository();
         
         
         shoppingCartFacade = new ShoppingCartFacade(s);
