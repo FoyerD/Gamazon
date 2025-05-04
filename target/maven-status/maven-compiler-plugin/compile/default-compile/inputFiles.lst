@@ -49,6 +49,7 @@
 /root/Sadna/Gamazon/src/main/java/Infrastructure/Repositories/MemoryItemRepository.java
 /root/Sadna/Gamazon/src/main/java/Domain/Store/ItemFacade.java
 /root/Sadna/Gamazon/src/main/java/Domain/Store/StoreFacade.java
+/root/Sadna/Gamazon/src/main/java/Domain/Shopping/ShoppingCartFactory.java
 /root/Sadna/Gamazon/src/main/java/Application/CustomerServiceService.java
 /root/Sadna/Gamazon/src/main/java/Domain/User/PasswordChecker.java
 /root/Sadna/Gamazon/src/main/java/Domain/ILockbasedRepository.java

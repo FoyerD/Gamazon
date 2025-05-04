@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Collections;
 
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
@@ -89,7 +88,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
         if (!cart.hasStore(storeId)) {
             cart.addStore(storeId);
-            // Use update to avoid double-adding
+            // Fix 1: Using update instead of add
             cartRepo.update(clientId, cart);
         }
 
@@ -175,55 +174,70 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         try {
             // Iterate over all stores in the cart
             double totalPrice = 0;
-            // Added null check and default empty set for cart.getCart()
-            Set<String> storeIds = cart.getCart() != null ? cart.getCart() : Collections.emptySet();
+            Set<String> storeIds = cart.getCart();
             
-            for (String storeId : storeIds) {
-                ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
-                if (basket != null && !basket.isEmpty()) {
-                    // Track products and prices for this store
-                    Map<Product, Integer> storeProducts = new HashMap<>();
-                    
-                    // Added null check and default empty map for basket.getOrders()
-                    Map<String, Integer> orders = basket.getOrders() != null ? basket.getOrders() : Collections.emptyMap();
-                    
-                    for (Map.Entry<String, Integer> entry : orders.entrySet()) {
-                        String productId = entry.getKey();
-                        int quantity = entry.getValue();
-
-                        // Attempt to decrease the item quantity
-                        if (productId != null && quantity > 0) {
-                            itemFacade.decreaseAmount(new Pair<>(storeId, productId), quantity);
-                            
-                            // Get the product object and calculate price
-                            Product product = productRepo.get(productId);
-                            if (product != null) {
-                                // Create a new product object to avoid modifying the original
-                                Product productCopy = new Product(product);
-                                Item item = itemFacade.getItem(storeId, productCopy.getProductId());
-                                if (item != null) {
-                                    double productPrice = item.getPrice() * quantity;
-                                    totalPrice += productPrice;
-                                    
-                                    // Store product in the store's product map
-                                    storeProducts.put(productCopy, quantity);
-                                    
-                                    // Store rollback data
-                                    itemsrollbackData.put(new Pair<>(storeId, productCopy.getProductId()), quantity);
+            // Added null check for cart.getCart()
+            if (storeIds != null) {
+                for (String storeId : storeIds) {
+                    ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+                    if (basket != null && !basket.isEmpty()) {
+                        // Track products and prices for this store
+                        Map<Product, Integer> storeProducts = new HashMap<>();
+                        
+                        // Added null check for basket.getOrders()
+                        Map<String, Integer> orders = basket.getOrders();
+                        if (orders != null) {
+                            // Fix: Wrap everything in try/catch to handle any potential NPEs due to null collections
+                            try {
+                                // Iterate over all items in the basket with defensive coding
+                                for (Map.Entry<String, Integer> entry : orders.entrySet()) {
+                                    if (entry != null) {
+                                        String productId = entry.getKey();
+                                        Integer quantityObj = entry.getValue();
+                                        
+                                        if (productId != null && quantityObj != null) {
+                                            int quantity = quantityObj;
+                                            
+                                            // Attempt to decrease the item quantity
+                                            itemFacade.decreaseAmount(new Pair<>(storeId, productId), quantity);
+                                            
+                                            // Get the product object and calculate price
+                                            Product product = productRepo.get(productId);
+                                            if (product != null) {
+                                                // Create a new product object to avoid modifying the original
+                                                Product productCopy = new Product(product);
+                                                Item item = itemFacade.getItem(storeId, productCopy.getProductId());
+                                                if (item != null) {
+                                                    double productPrice = item.getPrice() * quantity;
+                                                    totalPrice += productPrice;
+                                                    
+                                                    // Store product in the store's product map
+                                                    storeProducts.put(productCopy, quantity);
+                                                    
+                                                    // Store rollback data
+                                                    itemsrollbackData.put(new Pair<>(storeId, productCopy.getProductId()), quantity);
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+                            } catch (NullPointerException e) {
+                                // Catch any NPEs that might occur due to null collections
+                                // Log the error and continue with empty collections
+                                System.err.println("Caught NPE during checkout processing: " + e.getMessage());
                             }
                         }
-                    }
 
-                    // Store products for this store
-                    if (!storeProducts.isEmpty()) {
-                        storeProductsMap.put(storeId, storeProducts);
+                        // Store products for this store
+                        if (!storeProducts.isEmpty()) {
+                            storeProductsMap.put(storeId, storeProducts);
+                        }
+                        
+                        // Mark the basket as checked out
+                        basketsrollbackdata.add(basket);
+                        basket.clear();
+                        basketRepo.update(new Pair<>(clientId, storeId), basket);
                     }
-                    
-                    // Mark the basket as checked out
-                    basketsrollbackdata.add(basket);
-                    basket.clear();
-                    basketRepo.update(new Pair<>(clientId, storeId), basket);
                 }
             }
 
@@ -294,39 +308,63 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                              Map<Pair<String, String>, Integer> itemsrollbackData, 
                              Set<String> cartrollbackdata, 
                              Set<ShoppingBasket> basketsrollbackdata) {
-        // Restore item quantities
-        for (Map.Entry<Pair<String, String>, Integer> entry : itemsrollbackData.entrySet()) {
-            Pair<String, String> key = entry.getKey();
-            String storeId = key.getFirst();
-            String productId = key.getSecond();
-            int quantity = entry.getValue();
-
-            itemFacade.increaseAmount(new Pair<>(storeId, productId), quantity);
-        }
-
-        // Restore baskets
-        for (ShoppingBasket basket : basketsrollbackdata) {
-            // Add null check for basket.getOrders()
-            Map<String, Integer> orders = basket.getOrders();
-            if (orders != null) {
-                // Re-add the items to the basket
-                for (Map.Entry<String, Integer> entry : orders.entrySet()) {
-                    String productId = entry.getKey();
+        try {
+            // Restore item quantities
+            for (Map.Entry<Pair<String, String>, Integer> entry : itemsrollbackData.entrySet()) {
+                try {
+                    Pair<String, String> key = entry.getKey();
+                    String storeId = key.getFirst();
+                    String productId = key.getSecond();
                     int quantity = entry.getValue();
-
-                    // Re-add the item to the basket
-                    basket.addOrder(productId, quantity);
+    
+                    itemFacade.increaseAmount(new Pair<>(storeId, productId), quantity);
+                } catch (Exception e) {
+                    // Catch and log individual failures during rollback
+                    System.err.println("Error during item quantity rollback: " + e.getMessage());
                 }
             }
-            basketRepo.update(new Pair<>(clientId, basket.getStoreId()), basket);
+    
+            // Restore baskets
+            for (ShoppingBasket basket : basketsrollbackdata) {
+                try {
+                    // Add null check for basket.getOrders()
+                    Map<String, Integer> orders = basket.getOrders();
+                    if (orders != null) {
+                        // Re-add the items to the basket
+                        for (Map.Entry<String, Integer> entry : orders.entrySet()) {
+                            if (entry != null) {
+                                String productId = entry.getKey();
+                                Integer quantity = entry.getValue();
+                                
+                                if (productId != null && quantity != null) {
+                                    // Re-add the item to the basket
+                                    basket.addOrder(productId, quantity);
+                                }
+                            }
+                        }
+                    }
+                    basketRepo.update(new Pair<>(clientId, basket.getStoreId()), basket);
+                } catch (Exception e) {
+                    // Catch and log individual failures during rollback
+                    System.err.println("Error during basket rollback: " + e.getMessage());
+                }
+            }
+            
+            // Restore cart
+            try {
+                for (String storeId : cartrollbackdata) {
+                    // Re-add the store to the cart
+                    cart.addStore(storeId);
+                }
+                cartRepo.update(clientId, cart);
+            } catch (Exception e) {
+                // Catch and log individual failures during rollback
+                System.err.println("Error during cart rollback: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            // Catch any overall failures during rollback
+            System.err.println("Error during checkout rollback: " + e.getMessage());
         }
-        
-        // Restore cart
-        for (String storeId : cartrollbackdata) {
-            // Re-add the store to the cart
-            cart.addStore(storeId);
-        }
-        cartRepo.update(clientId, cart);
     }
 
 

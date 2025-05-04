@@ -1,6 +1,5 @@
 /root/Sadna/Gamazon/src/test/java/StoreTests/StoreServiceTests.java
 /root/Sadna/Gamazon/src/test/java/Domain/Shopping/ReceiptTest.java
-/root/Sadna/Gamazon/src/test/java/Domain/Shopping/ShoppingCartFacadeTest.java
 /root/Sadna/Gamazon/src/test/java/Domain/User/PasswordCheckerTest.java
 /root/Sadna/Gamazon/src/test/java/Domain/User/MemberTest.java
 /root/Sadna/Gamazon/src/test/java/AppTest.java
@@ -13,6 +12,7 @@
 /root/Sadna/Gamazon/src/test/java/Domain/Store/ProductTest.java
 /root/Sadna/Gamazon/src/test/java/Domain/Store/ItemFilterTest.java
 /root/Sadna/Gamazon/src/test/java/Infrastructure/Repositories/MemoryShoppingBasketRepositoryTest.java
+/root/Sadna/Gamazon/src/test/java/Domain/Shopping/ShoppingCartFacade.java
 /root/Sadna/Gamazon/src/test/java/Domain/Shopping/ShoppingServiceTest.java
 /root/Sadna/Gamazon/src/test/java/Domain/Store/CategoryTest.java
 /root/Sadna/Gamazon/src/test/java/Domain/User/UserTest.java

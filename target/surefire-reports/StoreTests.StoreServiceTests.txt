@@ -1,16 +1,16 @@
 -------------------------------------------------------------------------------
 Test set: StoreTests.StoreServiceTests
 -------------------------------------------------------------------------------
-Tests run: 6, Failures: 2, Errors: 4, Skipped: 0, Time elapsed: 0.01 s <<< FAILURE! - in StoreTests.StoreServiceTests
-GivenClosedStore_WhenCloseStore_ThenReturnFalse(StoreTests.StoreServiceTests)  Time elapsed: 0.006 s  <<< ERROR!
+Tests run: 6, Failures: 2, Errors: 4, Skipped: 0, Time elapsed: 0.007 s <<< FAILURE! - in StoreTests.StoreServiceTests
+GivenClosedStore_WhenCloseStore_ThenReturnFalse(StoreTests.StoreServiceTests)  Time elapsed: 0.005 s  <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "java.lang.Boolean.booleanValue()" because the return value of "Application.utils.Response.getValue()" is null
 	at StoreTests.StoreServiceTests.GivenClosedStore_WhenCloseStore_ThenReturnFalse(StoreServiceTests.java:80)
 
-GivenOpenStore_WhenCloseStore_ThenReturnTrue(StoreTests.StoreServiceTests)  Time elapsed: 0.001 s  <<< ERROR!
+GivenOpenStore_WhenCloseStore_ThenReturnTrue(StoreTests.StoreServiceTests)  Time elapsed: 0 s  <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "java.lang.Boolean.booleanValue()" because the return value of "Application.utils.Response.getValue()" is null
 	at StoreTests.StoreServiceTests.GivenOpenStore_WhenCloseStore_ThenReturnTrue(StoreServiceTests.java:70)
 
-GivenExistingStoreName_WhenOpenStore_ThenReturnNull(StoreTests.StoreServiceTests)  Time elapsed: 0.002 s  <<< FAILURE!
+GivenExistingStoreName_WhenOpenStore_ThenReturnNull(StoreTests.StoreServiceTests)  Time elapsed: 0 s  <<< FAILURE!
 java.lang.AssertionError
 	at StoreTests.StoreServiceTests.GivenExistingStoreName_WhenOpenStore_ThenReturnNull(StoreServiceTests.java:40)
 
@@ -22,7 +22,7 @@ GivenClosedStore_WhenOpenStore_ThenReturnTrue(StoreTests.StoreServiceTests)  Tim
 java.lang.NullPointerException: Cannot invoke "Application.MarketService.closeStore(String, String)" because "this.marketService" is null
 	at StoreTests.StoreServiceTests.GivenClosedStore_WhenOpenStore_ThenReturnTrue(StoreServiceTests.java:49)
 
-GivenNewStore_WhenCreateStore_ThenReturnStore(StoreTests.StoreServiceTests)  Time elapsed: 0 s  <<< FAILURE!
+GivenNewStore_WhenCreateStore_ThenReturnStore(StoreTests.StoreServiceTests)  Time elapsed: 0.001 s  <<< FAILURE!
 java.lang.AssertionError
 	at StoreTests.StoreServiceTests.GivenNewStore_WhenCreateStore_ThenReturnStore(StoreServiceTests.java:31)
 
