@@ -83,9 +83,13 @@ public class MarketServiceTest {
         mockSupplyService = mock(ISupplyService.class);
         mockNotificationService = mock(INotificationService.class);
         
+        marketFacade = MarketFacade.getInstance();
+
+        // Shopping Cart setup
         storeFacade = new StoreFacade();
         
-        marketFacade = MarketFacade.getInstance();
+        
+        shoppingCartFacade = new ShoppingCartFacade(s);
         marketFacade.initFacades(userRepository, itemRepository, storeFacade);
         marketFacade.updatePaymentService(mockPaymentService);
         marketFacade.updateSupplyService(mockSupplyService);
