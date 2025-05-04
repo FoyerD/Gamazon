@@ -15,16 +15,25 @@ import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.IProductRepository;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
+import Domain.TokenService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
 
 
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
+    private final TokenService tokenService;
+
+    private boolean isValidToken(String sessionToken, TokenService tokenService) {
+        return tokenService.validateToken(sessionToken);
+    }
 
     
 
-    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository, IProductRepository productRepository) {
+    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
+     ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
+      IProductRepository productRepository, TokenService tokenService) {
+        this.tokenService = tokenService;
         cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
     }
 
@@ -97,8 +106,6 @@ public class ShoppingService{
         }
     }
 
-    // processPayment(String card_owner, String card_number, Date expiry_date, String cvv, double price,
-    //         long andIncrement, String name, String deliveryAddress);
 
     // Make Immidiate Purchase Use Case 2.5
     public Response<Boolean> checkout(String cardOwnerID, String cardNumber, Date expiryDate, String cvv, long andIncrement,

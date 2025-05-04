@@ -1,0 +1,750 @@
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 30, 2025 7:28:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 30, 2025 7:28:49 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 01, 2025 9:42:17 PM ItemService remove
+INFO: Item removed.
+May 01, 2025 9:42:17 PM ItemService filterItems
+INFO: Items filtered.
+May 01, 2025 9:42:17 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 01, 2025 9:42:17 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 01, 2025 9:42:17 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 01, 2025 9:42:17 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 01, 2025 9:42:17 PM ItemService filterItems
+INFO: Items filtered.
+May 01, 2025 9:42:17 PM ItemService add
+INFO: Item added: true
+May 01, 2025 9:42:17 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 01, 2025 9:42:17 PM ItemService add
+INFO: Item added: false
+May 01, 2025 9:42:17 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService increaseAmount
+INFO: Amount increased.
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService changePrice
+INFO: Price changed successfully.
+May 01, 2025 9:42:17 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 01, 2025 9:42:17 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 01, 2025 9:42:19 PM Application.UserService exit
+INFO: carol has exited.
+May 01, 2025 9:42:19 PM Application.UserService login
+INFO: carol has logged in.
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 01, 2025 9:42:19 PM Application.UserService exit
+INFO: dave has exited.
+May 01, 2025 9:42:19 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 01, 2025 9:42:19 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 01, 2025 9:42:19 PM Application.UserService exit
+INFO: Guest has exited.
+May 04, 2025 1:51:37 PM ItemService remove
+INFO: Item removed.
+May 04, 2025 1:51:37 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 1:51:37 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 1:51:37 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 1:51:37 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 04, 2025 1:51:37 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 04, 2025 1:51:37 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 1:51:37 PM ItemService add
+INFO: Item added: true
+May 04, 2025 1:51:37 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 04, 2025 1:51:37 PM ItemService add
+INFO: Item added: false
+May 04, 2025 1:51:37 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService increaseAmount
+INFO: Amount increased.
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService changePrice
+INFO: Price changed successfully.
+May 04, 2025 1:51:37 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 1:51:37 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:38 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 04, 2025 1:51:38 PM Application.UserService exit
+INFO: carol has exited.
+May 04, 2025 1:51:38 PM Application.UserService login
+INFO: carol has logged in.
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:38 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:38 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:38 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:38 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 04, 2025 1:51:38 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:39 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 04, 2025 1:51:39 PM Application.UserService exit
+INFO: dave has exited.
+May 04, 2025 1:51:39 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 04, 2025 1:51:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 1:51:39 PM Application.UserService exit
+INFO: Guest has exited.
+May 04, 2025 2:45:15 PM ItemService remove
+INFO: Item removed.
+May 04, 2025 2:45:15 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 2:45:15 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 2:45:15 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 2:45:15 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 04, 2025 2:45:15 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 04, 2025 2:45:15 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 2:45:15 PM ItemService add
+INFO: Item added: true
+May 04, 2025 2:45:15 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 04, 2025 2:45:15 PM ItemService add
+INFO: Item added: false
+May 04, 2025 2:45:15 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService increaseAmount
+INFO: Amount increased.
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService changePrice
+INFO: Price changed successfully.
+May 04, 2025 2:45:15 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 2:45:15 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 04, 2025 2:45:17 PM Application.UserService exit
+INFO: carol has exited.
+May 04, 2025 2:45:17 PM Application.UserService login
+INFO: carol has logged in.
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 04, 2025 2:45:17 PM Application.UserService exit
+INFO: dave has exited.
+May 04, 2025 2:45:17 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 04, 2025 2:45:17 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 2:45:17 PM Application.UserService exit
+INFO: Guest has exited.
+May 04, 2025 3:13:01 PM ItemService remove
+INFO: Item removed.
+May 04, 2025 3:13:01 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:13:01 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:13:01 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:13:01 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 04, 2025 3:13:01 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 04, 2025 3:13:01 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:13:01 PM ItemService add
+INFO: Item added: true
+May 04, 2025 3:13:01 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 04, 2025 3:13:01 PM ItemService add
+INFO: Item added: false
+May 04, 2025 3:13:01 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService increaseAmount
+INFO: Amount increased.
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService changePrice
+INFO: Price changed successfully.
+May 04, 2025 3:13:01 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:13:01 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 04, 2025 3:13:01 PM Application.UserService exit
+INFO: carol has exited.
+May 04, 2025 3:13:01 PM Application.UserService login
+INFO: carol has logged in.
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 04, 2025 3:13:01 PM Application.UserService exit
+INFO: dave has exited.
+May 04, 2025 3:13:01 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 04, 2025 3:13:01 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:13:01 PM Application.UserService exit
+INFO: Guest has exited.
+May 04, 2025 3:24:10 PM ItemService remove
+INFO: Item removed.
+May 04, 2025 3:24:10 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:24:10 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:24:10 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:24:10 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 04, 2025 3:24:10 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 04, 2025 3:24:10 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:24:10 PM ItemService add
+INFO: Item added: true
+May 04, 2025 3:24:10 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 04, 2025 3:24:10 PM ItemService add
+INFO: Item added: false
+May 04, 2025 3:24:10 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService increaseAmount
+INFO: Amount increased.
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService changePrice
+INFO: Price changed successfully.
+May 04, 2025 3:24:10 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:24:10 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 04, 2025 3:24:11 PM Application.UserService exit
+INFO: carol has exited.
+May 04, 2025 3:24:11 PM Application.UserService login
+INFO: carol has logged in.
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 04, 2025 3:24:11 PM Application.UserService exit
+INFO: dave has exited.
+May 04, 2025 3:24:11 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 04, 2025 3:24:11 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:24:11 PM Application.UserService exit
+INFO: Guest has exited.
+May 04, 2025 3:26:22 PM ItemService remove
+INFO: Item removed.
+May 04, 2025 3:26:22 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:26:22 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:26:22 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:26:22 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 04, 2025 3:26:22 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 04, 2025 3:26:22 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:26:22 PM ItemService add
+INFO: Item added: true
+May 04, 2025 3:26:22 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 04, 2025 3:26:22 PM ItemService add
+INFO: Item added: false
+May 04, 2025 3:26:22 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService increaseAmount
+INFO: Amount increased.
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService changePrice
+INFO: Price changed successfully.
+May 04, 2025 3:26:22 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:26:22 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 04, 2025 3:26:24 PM Application.UserService exit
+INFO: carol has exited.
+May 04, 2025 3:26:24 PM Application.UserService login
+INFO: carol has logged in.
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 04, 2025 3:26:24 PM Application.UserService exit
+INFO: dave has exited.
+May 04, 2025 3:26:24 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 04, 2025 3:26:24 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:26:24 PM Application.UserService exit
+INFO: Guest has exited.
+May 04, 2025 3:28:12 PM ItemService remove
+INFO: Item removed.
+May 04, 2025 3:28:12 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:28:12 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:28:12 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:28:12 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 04, 2025 3:28:12 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 04, 2025 3:28:12 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:28:12 PM ItemService add
+INFO: Item added: true
+May 04, 2025 3:28:12 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 04, 2025 3:28:12 PM ItemService add
+INFO: Item added: false
+May 04, 2025 3:28:12 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService increaseAmount
+INFO: Amount increased.
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService changePrice
+INFO: Price changed successfully.
+May 04, 2025 3:28:12 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:28:12 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 04, 2025 3:28:14 PM Application.UserService exit
+INFO: carol has exited.
+May 04, 2025 3:28:14 PM Application.UserService login
+INFO: carol has logged in.
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 04, 2025 3:28:14 PM Application.UserService exit
+INFO: dave has exited.
+May 04, 2025 3:28:14 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 04, 2025 3:28:14 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:28:14 PM Application.UserService exit
+INFO: Guest has exited.
+May 04, 2025 3:30:54 PM ItemService remove
+INFO: Item removed.
+May 04, 2025 3:30:54 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:30:54 PM ItemService getItem
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:30:54 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:30:54 PM ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+May 04, 2025 3:30:54 PM ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService changePrice
+SEVERE: Price cannot be negative
+May 04, 2025 3:30:54 PM ItemService filterItems
+INFO: Items filtered.
+May 04, 2025 3:30:54 PM ItemService add
+INFO: Item added: true
+May 04, 2025 3:30:54 PM ItemService getAvailableItems
+INFO: Fetched available items.
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService decreaseAmount
+INFO: Amount decreased.
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService decreaseAmount
+SEVERE: Not enough items in stock
+May 04, 2025 3:30:54 PM ItemService add
+INFO: Item added: false
+May 04, 2025 3:30:54 PM ItemService remove
+SEVERE: Store not found for storeId: invalid
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService increaseAmount
+INFO: Amount increased.
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService changePrice
+INFO: Price changed successfully.
+May 04, 2025 3:30:54 PM ItemService getItem
+INFO: Item retrieved successfully.
+May 04, 2025 3:30:54 PM ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService register
+INFO: Guest has registed as carol.
+May 04, 2025 3:30:56 PM Application.UserService exit
+INFO: carol has exited.
+May 04, 2025 3:30:56 PM Application.UserService login
+INFO: carol has logged in.
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService register
+INFO: Guest has registed as alice.
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService register
+INFO: Guest has registed as bob.
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService exit
+SEVERE: received invalid session token.
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService register
+INFO: Guest has registed as dave.
+May 04, 2025 3:30:56 PM Application.UserService exit
+INFO: dave has exited.
+May 04, 2025 3:30:56 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+May 04, 2025 3:30:56 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 04, 2025 3:30:56 PM Application.UserService exit
+INFO: Guest has exited.

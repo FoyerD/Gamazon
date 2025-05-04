@@ -1,4 +1,4 @@
-package Infrastructure;
+package Infrastructure.Repositories;
 
 import org.junit.Before;
 import org.junit.Test;
