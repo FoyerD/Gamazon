@@ -292,13 +292,13 @@ public class MarketService {
         }
     }
 
-    public Response<Feedback> getUserMessage(String sessionToken, String storeId, String productId, String userId) {
+    public Response<Feedback> getUserMessage(String sessionToken, String storeId, String userId, String feedbackId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getUserMessage", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            Feedback feedback = marketFacade.getUserMessage(storeId, productId, userId);
+            Feedback feedback = marketFacade.getUserMessage(storeId, userId, feedbackId);
             TradingLogger.logEvent(CLASS_NAME, "getUserMessage", "User message fetched successfully.");
             return new Response<>(feedback);
         } catch (Exception e) {

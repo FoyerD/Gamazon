@@ -175,7 +175,7 @@ public interface IMarketFacade {
      * @param userId ID of the user
      * @return Feedback object representing the user message
      */
-    Feedback getUserMessage(String storeId, String productId, String userId);
+    Feedback getUserMessage(String storeId, String userId, String feedbackId);
 
     /**
      * 4.13 Retrieve the purchase history of a store within a given date range.

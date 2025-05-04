@@ -218,9 +218,9 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public Feedback getUserMessage(String storeId, String productId, String userId) {
+    public Feedback getUserMessage(String storeId, String userId, String feedbackId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OVERSEE_OFFERS);
-        return storeFacade.getFeedback(storeId, productId, userId);
+        return storeFacade.getFeedback(feedbackId);
     }
 
     @Override

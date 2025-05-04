@@ -1,35 +1,35 @@
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
+import Domain.Shopping.IReceiptRepository;
+import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
-import Domain.MarketFacade;
 import Domain.Pair;
-import Domain.PermissionType;
 import Domain.TokenService;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
+import Domain.Store.IProductRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.LoginManager;
 import Domain.User.User;
-import Infrastructure.MemoryUserRepository;
+import Domain.management.MarketFacade;
+import Domain.management.PermissionType;
+import Infrastructure.Repositories.MemoryUserRepository;
 import ch.qos.logback.core.subst.Token;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
-import Domain.Store.MemoryItemRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import Application.ItemService;
 import Application.MarketService;
-import Application.Response;
-import Application.StoreDTO;
 import Application.StoreService;
-import Application.UserDTO;
 import Application.UserService;
+import Application.DTOs.UserDTO;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -43,22 +43,38 @@ import static org.mockito.Mockito.*;
 
 public class MarketServiceTest {
 
+    // Market
+    private MarketService marketService;
     private MarketFacade marketFacade;
     private IPaymentService mockPaymentService;
     private ISupplyService mockSupplyService;
     private INotificationService mockNotificationService;
+
+    // Token
+    private TokenService tokenService;
+
+    // User
+    private UserService userService;
     private IUserRepository userRepository;
+    
+    // Store
     private IItemRepository itemRepository;
     private StoreFacade storeFacade;
 
-    private UserService userService;
-    private TokenService tokenService;
-    private MarketService marketService;
     private String guestToken;
     private StoreService storeService;
     private String storeId;
     private ItemService itemService;
     private String productId;
+
+    // Shopping Cart
+    private ShoppingCartFacade shoppingCartFacade;
+    private IShoppingCartRepository shoppingCartRepository;
+    private IShoppingBasketRepository shoppingBasketRepository; 
+    private ItemFacade itemFacade;
+    private IReceiptRepository receiptRepository;
+    private IProductRepository productRepository;
+
 
     @BeforeEach
     public void setUp() {
@@ -68,7 +84,6 @@ public class MarketServiceTest {
         mockNotificationService = mock(INotificationService.class);
         
         storeFacade = new StoreFacade();
-        IShoppingCartRepository cartRepository = new ShoppingCartRepository();
         
         marketFacade = MarketFacade.getInstance();
         marketFacade.initFacades(userRepository, itemRepository, storeFacade);
