@@ -1,12 +1,37 @@
 package StoreTests;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 
+
+import Application.StoreService;
+import Domain.TokenService;
+import Domain.Store.IAuctionRepository;
+import Domain.Store.IFeedbackRepository;
+import Domain.Store.IItemRepository;
+import Domain.Store.IStoreRepository;
+import Domain.Store.StoreFacade;
+import Domain.User.IUserRepository;
+import Domain.User.Member;
+import Domain.User.User;
+import Infrastructure.Repositories.MemoryAuctionRepository;
+import Infrastructure.Repositories.MemoryFeedbackRepository;
+import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryStoreRepository;
+import Infrastructure.Repositories.MemoryUserRepository;
+import Domain.Pair;
+import Domain.Store.Item;
 import Application.MarketService;
 import Application.StoreService;
+import Application.DTOs.AuctionDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 
@@ -14,71 +39,222 @@ import Application.utils.Response;
 public class StoreServiceTests {
 
     private StoreService storeService;
-    private MarketService marketService;
+    private StoreFacade storeFacade;
+    private IStoreRepository storeRepository;
+    private IAuctionRepository auctionRepository;
+    private IItemRepository itemRepository;
+    private IFeedbackRepository feedbackRepository;
+    private IUserRepository userRepository;
+    private TokenService tokenService;
+    UUID userId = UUID.randomUUID();
+    String tokenId = null;
 
     @Before
     public void setUp() {
-        storeService = new StoreService();
-        marketService = null;
+        this.storeRepository = new MemoryStoreRepository();
+        this.auctionRepository = new MemoryAuctionRepository();
+        this.itemRepository = new MemoryItemRepository();
+        this.feedbackRepository= new MemoryFeedbackRepository();
+        this.userRepository = new MemoryUserRepository();
 
+        this.tokenService = new TokenService();
+        this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
+        storeService = new StoreService(storeFacade, tokenService);
+
+        
+        tokenId = this.tokenService.generateToken(userId.toString());
+        User user = new Member(userId, "Member1", "passpass", "email@email.com");
+        this.userRepository.add(userId.toString(), user);
     }
 
     @Test
-    public void GivenNewStore_WhenCreateStore_ThenReturnStore() {
-        String sessionToken = "validSessionToken";
+    public void GivenExistingMemberAndNewStore_WhenAddStore_ThenReturnStore() {
         String storeName = "NewStore";
-        Response<StoreDTO> result = storeService.addStore(sessionToken, storeName, "A new store");
+        Response<StoreDTO> result = storeService.addStore(this.tokenId, storeName, "A new store");
         assertTrue(result.getValue() != null);
     }
 
     @Test
-    public void GivenExistingStoreName_WhenOpenStore_ThenReturnNull() {
-        String sessionToken = "validSessionToken";
+    public void GivenExistingMemberExistingStoreName_WhenAddStore_ThenReturnError() {
         String storeName = "ExistingStore";
-        storeService.addStore(sessionToken, storeName, "A new store");
-        Response<StoreDTO> result = storeService.addStore(sessionToken, storeName,"I should not exist");
-        assertFalse(result.getValue() == null);
+        storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> result = storeService.addStore(this.tokenId, storeName,"I should not exist");
+        assertTrue(result.errorOccurred());
     }
 
     @Test
-    public void GivenClosedStore_WhenOpenStore_ThenReturnTrue() {
-        String sessionToken = "validSessionToken";
+    public void GivenExistingMemberClosedStore_WhenOpenStore_ThenReturnTrue() {
         String storeName = "ExistingStore";
-        Integer storeId = 1234;
-        storeService.addStore(sessionToken, storeName, "A new store");
-        marketService.closeStore(sessionToken, storeId.toString());
-        Response<Boolean> result = storeService.openStore(sessionToken, storeId.toString());
+        Response<StoreDTO> response = storeService.addStore(this.tokenId, storeName, "A new store");
+        String storeId = response.getValue().getId();
+        this.storeService.closeStore(this.tokenId, storeId);
+        Response<Boolean> result = storeService.openStore(this.tokenId, storeId);
         assertTrue(result.getValue());
     }
 
     @Test
-    public void GivenOpenStore_WhenOpenStore_ThenReturnFalse() {
-        String sessionToken = "validSessionToken";
+    public void GivenExistingMemberOpenStore_WhenOpenStore_ThenReturnError() {
         String storeName = "ExistingStore";
-        Integer storeId = 1234;
-        storeService.addStore(sessionToken, storeName, "A new store");
-        Response<Boolean> result = storeService.openStore(sessionToken, storeId.toString());
-        assertFalse(result.getValue());
+        Response<StoreDTO> storeRes = storeService.addStore(this.tokenId, storeName, "A new store");
+        String storeId = storeRes.getValue().getId();
+        Response<Boolean> result = storeService.openStore(this.tokenId, storeId);
+        assertTrue(result.errorOccurred());
     }
     @Test
-    public void GivenOpenStore_WhenCloseStore_ThenReturnTrue() {
-        String sessionToken = "validSessionToken";
+    public void GivenExistingMemberOpenStore_WhenCloseStore_ThenReturnTrue() {
         String storeName = "StoreToClose";
-        Integer storeId = 1235;
-        storeService.addStore(sessionToken, storeName, "Temporary store");
-        Response<Boolean> result = storeService.closeStore(sessionToken, storeId.toString());
-        assertTrue("Expected store to close successfully", result.getValue());
+        Response<StoreDTO> storeRes = storeService.addStore(this.tokenId, storeName, "Temporary store");
+        String storeId = storeRes.getValue().getId();
+        Response<Boolean> result = storeService.closeStore(this.tokenId, storeId.toString());
+        assertTrue(result.getValue());
     }
     @Test
-    public void GivenClosedStore_WhenCloseStore_ThenReturnFalse() {
-        String sessionToken = "validSessionToken";
-        String storeName = "AlreadyClosedStore";
-        Integer storeId = 1236;
-        storeService.addStore(sessionToken, storeName, "Store to test double close");
-        storeService.closeStore(sessionToken, storeId.toString());
-        Response<Boolean> result = storeService.closeStore(sessionToken, storeId.toString());
-        assertFalse("Expected store to not be closed again", result.getValue());
+    public void GivenExistingMemberClosedStore_WhenCloseStore_ThenReturnFalse() {
+        String storeName = "ExistingStore";
+        Response<StoreDTO> response = storeService.addStore(this.tokenId, storeName, "A new store");
+        String storeId = response.getValue().getId();
+        this.storeService.closeStore(this.tokenId, storeId);
+        Response<Boolean> result = storeService.closeStore(this.tokenId, storeId);
+        assertTrue(result.errorOccurred());
     }
 
     
+    @Test
+    public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNewStore_ThenReturnStore() {
+        String storeName = "NewStore";
+        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, storeName);
+        assertTrue(getResult.getValue().getName().equals(storeName));
+    }
+
+    @Test
+    public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNoneExist_ThenReturnError() {
+        String storeName = "NewStore";
+        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, "NoneExist");
+        assertTrue(getResult.errorOccurred());
+    }
+
+    @Test
+    public void GivenExistingMemberAndNewStoreAndNewProduct_WhenAddAuction_ThenReturnAuction() {
+        String storeName = "NewStore";
+        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        String storeId = addResult.getValue().getId();
+        String productId = UUID.randomUUID().toString();
+        this.itemRepository.add(new Pair<>(storeId, productId), new Item(storeId, productId, 10.0, 10, "A new product"));
+
+        String endDate = "2077-01-01";
+        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate, 5.0);
+        assertEquals(auctionResult.getValue().getStoreId(), storeId);
+        assertEquals(auctionResult.getValue().getProductId(), productId);
+    }
+
+    @Test
+    public void GivenExistingMemberAndAndNewProduct_WhenAddAuctionForNoneexistingStore_ThenReturnError() {
+        String storeId = "whatwhat";
+        String productId = UUID.randomUUID().toString();
+        this.itemRepository.add(new Pair<>(storeId, productId), new Item(storeId, productId, 10.0, 10, "A new product"));
+
+        Date endDate = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
+        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate.toString(), 5.0);
+        assertTrue(auctionResult.errorOccurred());
+    }
+
+    @Test
+    public void GivenExistingMemberAndNewStore_WhenAddAuctionForNonExistingItem_ThenReturnError() {
+        String storeName = "NewStore";
+        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        String storeId = addResult.getValue().getId();
+        String nonExistingProductId = UUID.randomUUID().toString();
+
+        Date endDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
+        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, nonExistingProductId, endDate.toString(), 5.0);
+        assertTrue(auctionResult.errorOccurred());
+    }
+
+    @Test
+    public void GivenExistingStoreWithAuctions_WhenGetAllAuctions_ThenReturnAllAuctions() {
+        String storeName = "AuctionStore";
+        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
+        String storeId = storeResponse.getValue().getId();
+
+        String productId1 = UUID.randomUUID().toString();
+        String productId2 = UUID.randomUUID().toString();
+        String productId3 = UUID.randomUUID().toString();
+
+        itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
+        itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
+        itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
+
+        String endDate = "2077-01-01";
+        storeService.addAuction(this.tokenId, storeId, productId1, endDate, 5.0);
+        storeService.addAuction(this.tokenId, storeId, productId2, endDate, 10.0);
+        storeService.addAuction(this.tokenId, storeId, productId3, endDate, 15.0);
+
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+        assertTrue(auctionsResponse.getValue() != null);
+        assertEquals(3, auctionsResponse.getValue().size());
+    }
+
+    @Test
+    public void GivenStoreWithNoAuctions_WhenGetAllAuctions_ThenReturnEmptyList() {
+        String storeName = "EmptyAuctionStore";
+        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with no auctions");
+        String storeId = storeResponse.getValue().getId();
+
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+        assertTrue(auctionsResponse.getValue() != null);
+        assertEquals(0, auctionsResponse.getValue().size());
+    }
+
+    @Test
+    public void GivenNonExistingStore_WhenGetAllAuctions_ThenReturnError() {
+        String nonExistingStoreId = UUID.randomUUID().toString();
+
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, nonExistingStoreId);
+        assertTrue(auctionsResponse.errorOccurred());
+    }
+
+    @Test
+    public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
+        String storeName = "AuctionStore";
+        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
+        String storeId = storeResponse.getValue().getId();
+
+        String productId1 = UUID.randomUUID().toString();
+        String productId2 = UUID.randomUUID().toString();
+        String productId3 = UUID.randomUUID().toString();
+
+        itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
+        itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
+        itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
+
+        String endDate = "2077-01-01";
+        storeService.addAuction(this.tokenId, storeId, productId1, endDate.toString(), 5.0);
+        storeService.addAuction(this.tokenId, storeId, productId2, endDate.toString(), 10.0);
+        storeService.addAuction(this.tokenId, storeId, productId3, endDate.toString(), 15.0);
+
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+        assertTrue(auctionsResponse.getValue() != null);
+        assertEquals(3, auctionsResponse.getValue().size());
+    }
+
+    @Test
+    public void GivenStoreWithNoAuctions_WhenGetAllProductAuctions_ThenReturnEmptyList() {
+        String storeName = "EmptyAuctionStore";
+        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with no auctions");
+        String storeId = storeResponse.getValue().getId();
+
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+        assertTrue(auctionsResponse.getValue() != null);
+        assertEquals(0, auctionsResponse.getValue().size());
+    }
+
+    @Test
+    public void GivenNonExistingStore_WhenGetAllProductAuctions_ThenReturnError() {
+        String nonExistingStoreId = UUID.randomUUID().toString();
+
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, nonExistingStoreId);
+        assertTrue(auctionsResponse.errorOccurred());
+    }
 }

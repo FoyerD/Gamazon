@@ -103,18 +103,18 @@ public class StoreService {
         }
     }
 
-    public Response<Boolean> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, float startPrice) {
+    public Response<AuctionDTO> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, double startPrice) {
         try {
             if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
             
             if (!tokenService.validateToken(sessionToken)) {
-                throw new RuntimeException("Invalid token");
+                return new Response<>(new Error("Invalid token"));
             }
             String userId = this.tokenService.extractId(sessionToken);
 
-            return new Response<>(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice));
+            return new Response<>(new AuctionDTO(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice)));
         } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
         }
     }
 
@@ -123,14 +123,14 @@ public class StoreService {
             if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
             
             if (!tokenService.validateToken(sessionToken)) {
-                throw new RuntimeException("Invalid token");
+                return new Response<>(new Error("Invalid token"));
             }
             String userId = this.tokenService.extractId(sessionToken);
 
             List<AuctionDTO> auctions = this.storeFacade.getAllStoreAuctions(storeId).stream().map(AuctionDTO::new).collect(Collectors.toList());
             return new Response<>(auctions);
         } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
         }
     }
 
@@ -139,14 +139,14 @@ public class StoreService {
             if(!this.isInitialized()) return new Response<>(new Error("StoreService is not initialized."));
             
             if (!tokenService.validateToken(sessionToken)) {
-                throw new RuntimeException("Invalid token");
+                return new Response<>(new Error("Invalid token"));
             }
             String userId = this.tokenService.extractId(sessionToken);
 
             List<AuctionDTO> auctions = this.storeFacade.getAllProductAuctions(productId).stream().map(AuctionDTO::new).collect(Collectors.toList());
             return new Response<>(auctions);
         } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
         }
     }
 }

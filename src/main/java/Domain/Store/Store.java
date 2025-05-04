@@ -91,4 +91,16 @@ public class Store {
         return this.managers.remove(userId);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Store store = (Store) obj;
+        return id.equals(store.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

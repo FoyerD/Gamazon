@@ -7,15 +7,15 @@ public class Auction {
     String auctionId;
     Date auctionStartDate;
     Date auctionEndDate;
-    float startPrice;
-    float currentPrice;
+    double startPrice;
+    double currentPrice;
     String storeId;
     String productId;
     String currentBidderId;
 
 
     public Auction(String auctionId, Date auctionStartDate,
-                   Date auctionEndDate, float startPrice, float currentPrice,
+                   Date auctionEndDate, double startPrice, double currentPrice,
                    String storeId, String productId) {
         this.auctionId = auctionId;
         this.auctionStartDate = auctionStartDate;
@@ -56,16 +56,16 @@ public class Auction {
     public void setAuctionEndDate(Date auctionEndDate) {
         this.auctionEndDate = auctionEndDate;
     }
-    public float getStartPrice() {
+    public double getStartPrice() {
         return startPrice;
     }
-    public void setStartPrice(float startPrice) {
+    public void setStartPrice(double startPrice) {
         this.startPrice = startPrice;
     }
-    public float getCurrentPrice() {
+    public double getCurrentPrice() {
         return currentPrice;
     }
-    public void setCurrentPrice(float currentPrice) {
+    public void setCurrentPrice(double currentPrice) {
         this.currentPrice = currentPrice;
     }
     public String getStoreId() {
@@ -87,4 +87,27 @@ public class Auction {
         this.currentBidderId = currentBidderId;
     }
     
+    
+    public boolean isAuctionOpen() {
+        Date currentDate = new Date();
+        return currentDate.before(auctionEndDate);
+    }
+    
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Auction)) return false;
+
+        Auction auction = (Auction) o;
+
+        if (Double.compare(auction.startPrice, startPrice) != 0) return false;
+        if (Double.compare(auction.currentPrice, currentPrice) != 0) return false;
+        if (!auctionId.equals(auction.auctionId)) return false;
+        if (!auctionStartDate.equals(auction.auctionStartDate)) return false;
+        if (!auctionEndDate.equals(auction.auctionEndDate)) return false;
+        if (!storeId.equals(auction.storeId)) return false;
+        if (!productId.equals(auction.productId)) return false;
+        return currentBidderId != null ? currentBidderId.equals(auction.currentBidderId) : auction.currentBidderId == null;
+    }
 }
