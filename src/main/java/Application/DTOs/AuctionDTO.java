@@ -8,13 +8,13 @@ public class AuctionDTO {
     private String auctionId;
     private Date auctionStartDate;
     private Date auctionEndDate;
-    private float startPrice;
-    private float currentPrice;
+    private double startPrice;
+    private double currentPrice;
     private String storeId;
     private String productId;
     private String currentBidderId;
 
-    public AuctionDTO(String auctionId, Date auctionStartDate, Date auctionEndDate, float startPrice, float currentPrice, String storeId, String productId, String currentBidderId) {
+    public AuctionDTO(String auctionId, Date auctionStartDate, Date auctionEndDate, double startPrice, double currentPrice, String storeId, String productId, String currentBidderId) {
         this.auctionId = auctionId;
         this.auctionStartDate = auctionStartDate;
         this.auctionEndDate = auctionEndDate;
@@ -48,11 +48,11 @@ public class AuctionDTO {
         return auctionEndDate;
     }
 
-    public float getStartPrice() {
+    public double getStartPrice() {
         return startPrice;
     }
 
-    public float getCurrentPrice() {
+    public double getCurrentPrice() {
         return currentPrice;
     }
 
