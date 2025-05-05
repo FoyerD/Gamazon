@@ -292,7 +292,7 @@ public class MarketFacadeTest {
     @Test
     public void givenMarketFacade_whenOpenMarket_thenInitializeExternalServices() {
         Member member = mock(Member.class);
-        when(userRepository.getMemberByUsername(anyString())).thenReturn(member);
+        when(userRepository.getMember(anyString())).thenReturn(member);
         when(member.getName()).thenReturn("managerName");
 
         marketFacade.openMarket("manager");
