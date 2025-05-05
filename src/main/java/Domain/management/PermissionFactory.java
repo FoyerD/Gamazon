@@ -14,7 +14,9 @@ public class PermissionFactory {
         PermissionType.ACCESS_PURCHASE_RECORDS,
         PermissionType.ADMINISTER_STORE,
         PermissionType.OVERSEE_OFFERS,
-        PermissionType.CONTROL_CONTRACTS
+        PermissionType.CONTROL_CONTRACTS,
+        PermissionType.DEACTIVATE_STORE,
+        PermissionType.RESPOND_TO_INQUIRIES 
     );
 
     public static final Set<PermissionType> FOUNDER_PERMISSIONS = Set.of(
