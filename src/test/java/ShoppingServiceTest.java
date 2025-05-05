@@ -1,5 +1,3 @@
-package Domain.Shopping;
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -17,6 +15,10 @@ import Application.ShoppingService;
 import Application.utils.Response;
 import Domain.Pair;
 import Domain.TokenService;
+import Domain.Shopping.IReceiptRepository;
+import Domain.Shopping.IShoppingBasketRepository;
+import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.IShoppingCartRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
