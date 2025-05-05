@@ -8,6 +8,7 @@ import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
+import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
@@ -231,6 +233,26 @@ public class MarketService {
             return new Response<>(new Error(e.getMessage()));
         }
     }
+
+    public Response<StoreDTO> addStore(String sessionToken, String name, String description) {
+        if (isInvalid(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, "addStore", "Invalid session token");
+            return new Response<>(new Error("Invalid session token"));
+        }
+        try {
+            Store store = marketFacade.addStore(name, description, tokenService.extractId(sessionToken));
+            if(store == null) {
+                return new Response<>(new Error("Failed to create store."));
+            }
+            TradingLogger.logEvent(CLASS_NAME, "addStore", "Store added successfully.");
+            return new Response<>(new StoreDTO(store));
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "addStore", "Failed to add store: %s", e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+
 
     public Response<Void> closeStore(String sessionToken, String storeId) {
         if (isInvalid(sessionToken)) {

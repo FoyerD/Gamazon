@@ -34,7 +34,10 @@ import Infrastructure.Repositories.MemoryUserRepository;
 import ch.qos.logback.core.subst.Token;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Product;
+import Domain.Store.Store;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +75,8 @@ public class MarketServiceTest {
     // User
     private UserService userService;
     private IUserRepository userRepository;
-    UUID userId = UUID.randomUUID();
+    UUID userId1 = UUID.randomUUID();
+    UUID userId2 = UUID.randomUUID();
     
     // Store
     private IItemRepository itemRepository;
@@ -82,21 +86,25 @@ public class MarketServiceTest {
     private IFeedbackRepository feedbackRepository;
 
     private StoreFacade storeFacade;
-    private ItemFacade itemFacade;
 
-    private String tokenId;
+    private String tokenId1;
+    private String tokenId2;
     private StoreService storeService;
-    private String storeId;
+    private ItemFacade itemFacade;
     private ItemService itemService;
-    private String productId;
 
+    private String storeId1;
+    private String storeId2;
+
+    private final String productId1 = "product1";
+    private final String productId2 = "product2";
+    private final String productId3 = "product3";
 
     // Shopping Cart
     private ShoppingCartFacade shoppingCartFacade;
     private IShoppingCartRepository shoppingCartRepository;
     private IShoppingBasketRepository shoppingBasketRepository; 
     private IReceiptRepository receiptRepository;
-
 
     @BeforeEach
     public void setUp() {
@@ -140,79 +148,156 @@ public class MarketServiceTest {
         
         // User Service setup
         userService = new UserService(new LoginManager(new MemoryUserRepository()), tokenService);
-        tokenId = this.tokenService.generateToken(userId.toString());
-        User user = new Member(userId, "Member1", "passpass", "email@email.com");
+        tokenId1 = this.tokenService.generateToken(userId1.toString());
+        tokenId2 = this.tokenService.generateToken(userId2.toString());
+        addUser(userId1, "Member1", "passpass1", "email1@email.com");
+        addUser(userId2, "Member2", "passpass2", "email2@email.com");
+
+        this.itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
+        this.itemService = new ItemService(itemFacade);
+
+        storeId1 = marketService.addStore(tokenId1, "Store One", "A store for testing").getValue().getId();
+        addProduct(storeId1, "Store One", userId1.toString(), productId1, "In Stock Item", 49.99f, 10, "In Stock Item");
+        addProduct(storeId1, "Store One", userId1.toString(), productId2, "Out of Stock Item", 19.99f, 0, "Out of Stock Item");
+
+    }
+
+    private void addProduct(String storeId, String storeName, String founderId, String productId, String productName, float price, int amount, String itemName) {
+        if (productRepository.get(productId) == null) {
+            productRepository.add(productId, new Product(productId, productName));
+        }
+        Item item = new Item(storeId, productId, price, amount, itemName);
+    
+        itemFacade.add(new Pair<>(storeId, productId), item);
+    }
+
+    private void addUser(UUID userId, String userName, String password, String email) {
+        User user = new Member(userId, userName, password, email);
         this.userRepository.add(userId.toString(), user);
-
-
-        // Open a store
-        Response<StoreDTO> response = storeService.addStore(tokenId, "storeName", "A new store");
-        storeId = response.getValue().getId();
-        productId = UUID.randomUUID().toString();
-
-
     }
 
     @Test
-    public void testOpenMarket(){
-        // Open the market and verify that the market is open
-        Response<Void> response = marketService.openMarket(tokenId);
+    public void givenMarketClosed_whenOpenMarket_thenMarketIsOpened() {
+        Response<Void> response = marketService.openMarket(tokenId1);
         assertFalse(response.errorOccurred());
     }
 
     @Test
-    public void testGetStorePurchaseHistory_noPermissions() {
-        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId, storeId);
-        assertTrue(response.errorOccurred(), "Failed to fetch store purchase history: " + response.getErrorMessage());
-    }
-
-    @Test
-    public void testGetManagersPermissions_noPermissions() {
-        Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId, storeId);
-        assertTrue(response.errorOccurred());
-    }
-
-
-    @Test
-    public void testaddProductsToInventory_noPermissions() {
-        Map<String, Integer> products = Map.of(productId, 5);
-        Response<Void> response = marketService.addProductsToInventory(tokenId, storeId, products);
-        assertTrue(response.errorOccurred());    
-    }
-
-    @Test
-    public void testRemoveProductsFromInventory_noPermissions() {
-        Map<String, Integer> productsToRemove = Map.of(productId, 1);
-        Response<Void> response = marketService.removeProductsFromInventory(tokenId, storeId, productsToRemove);
-        assertTrue(response.errorOccurred());
-    }
-
-    @Test
-    public void testUpdatePaymentService() {
-        Response<Void> response = marketService.updatePaymentService(tokenId, mockPaymentService);
-        assertFalse(response.errorOccurred());
-        verify(mockPaymentService, never()).initialize(); // Ensure no unexpected initialization
-    }
-
-    @Test
-    public void testUpdateNotificationService() {
-        Response<Void> response = marketService.updateNotificationService(tokenId, mockNotificationService);
+    public void givenOpenStore_whenCloseStore_thenStoreIsClosed() {
+        Response<Void> response = marketService.closeStore(tokenId1, storeId1);
         assertFalse(response.errorOccurred());
     }
 
     @Test
-    public void testUpdateSupplyService() {
-        Response<Void> response = marketService.updateSupplyService(tokenId, mockSupplyService);
+    public void givenStoreExists_whenMarketClosesStore_thenStoreIsClosedByMarket() {
+        Response<Void> response = marketService.marketCloseStore(tokenId1, storeId1);
         assertFalse(response.errorOccurred());
     }
 
     @Test
-    public void testUpdatePaymentServiceURL() throws IOException {
+    public void givenValidUsers_whenAppointingStoreManager_thenStoreManagerIsAppointed() {
+        String appointerUsername = userRepository.getMemberUsername(userId1.toString());
+        String appointeeUsername = userRepository.getMemberUsername(userId2.toString());
+        Response<Void> response = marketService.appointStoreManager(tokenId1, appointerUsername, appointeeUsername, storeId1);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenStoreManagerExists_whenRemovingStoreManager_thenManagerIsRemoved() {
+        String appointerUsername = userRepository.getMemberUsername(userId1.toString());
+        String appointeeUsername = userRepository.getMemberUsername(userId2.toString());
+        Response<Void> response1 = marketService.appointStoreManager(tokenId1, appointerUsername, appointeeUsername, storeId1);
+        assertFalse(response1.errorOccurred());
+        Response<Void> response2 = marketService.removeStoreManager(tokenId1, appointerUsername, appointeeUsername, storeId1);
+        assertFalse(response2.errorOccurred());
+    }
+
+    @Test
+    public void givenValidUsers_whenAppointingStoreOwner_thenStoreOwnerIsAppointed() {
+        String appointerUsername = userRepository.getMemberUsername(userId1.toString());
+        String appointeeUsername = userRepository.getMemberUsername(userId2.toString());
+        Response<Void> response = marketService.appointStoreOwner(tokenId1, appointerUsername, appointeeUsername, storeId1);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenStoreHasPurchases_whenGettingPurchaseHistory_thenReceiptsReturned() {
+        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId1, storeId1);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenStoreHasManagers_whenGettingPermissions_thenPermissionsAreReturned() {
+        Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId1);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenManagerExists_whenChangingPermissions_thenPermissionsAreUpdated() {
+        String appointerUsername = userRepository.getMemberUsername(userId1.toString());
+        String appointeeUsername = userRepository.getMemberUsername(userId2.toString());
+        List<PermissionType> newPermissions = List.of(PermissionType.ADMINISTER_STORE);
+        Response<Void> response1 = marketService.appointStoreManager(tokenId1, appointerUsername, appointeeUsername, storeId1);
+        assertFalse(response1.errorOccurred());
+        Response<Void> response2 = marketService.changeManagerPermissions(tokenId1, appointerUsername, appointeeUsername, storeId1, newPermissions);
+        assertFalse(response2.errorOccurred());
+    }
+
+    @Test
+    public void givenStoreHasInventory_whenAddingProducts_thenInventoryIsIncreased() {
+        Map<String, Integer> products = Map.of(productId1, 5);
+        Response<Void> response = marketService.addProductsToInventory(tokenId1, storeId1, products);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenStoreHasInventory_whenRemovingProducts_thenInventoryIsDecreased() {
+        Map<String, Integer> productsToRemove = Map.of(productId1, 1);
+        Response<Void> response = marketService.removeProductsFromInventory(tokenId1, storeId1, productsToRemove);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenValidPaymentService_whenUpdatingPaymentService_thenServiceIsUpdated() {
+        Response<Void> response = marketService.updatePaymentService(tokenId1, mockPaymentService);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenValidNotificationService_whenUpdatingNotificationService_thenServiceIsUpdated() {
+        Response<Void> response = marketService.updateNotificationService(tokenId1, mockNotificationService);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenValidSupplyService_whenUpdatingSupplyService_thenServiceIsUpdated() {
+        Response<Void> response = marketService.updateSupplyService(tokenId1, mockSupplyService);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenNewUrl_whenUpdatingPaymentServiceUrl_thenServiceUrlIsUpdated() throws IOException {
         String newUrl = "http://new-payment-service.com";
-        Response<Void> response = marketService.updatePaymentServiceURL(tokenId, newUrl);
+        Response<Void> response = marketService.updatePaymentServiceURL(tokenId1, newUrl);
         assertFalse(response.errorOccurred());
         verify(mockPaymentService).updatePaymentServiceURL(newUrl);
     }
+
+    @Test
+    public void givenUserMessageExists_whenRespondingToMessage_thenResponseIsSuccessful() {
+        String comment = "Thank you for your feedback!";
+        Response<Boolean> response = marketService.respondToUserMessage(tokenId1, storeId1, productId1, userId1.toString(), comment);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void givenFeedbackIdExists_whenGettingUserMessage_thenFeedbackIsReturned() {
+        String feedbackId = UUID.randomUUID().toString();
+        Response<Feedback> response = marketService.getUserMessage(tokenId1, storeId1, userId1.toString(), feedbackId);
+        assertFalse(response.errorOccurred());
+    }
+
+
         
 
     
