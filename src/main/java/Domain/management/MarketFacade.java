@@ -77,44 +77,44 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities, String userId) {
+    public void addProductsToInventory(String storeId, Map<String, Integer> productQuantities, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
-        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-            Integer productId = entry.getKey();
+        for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
+            String productId = entry.getKey();
             Integer quantity = entry.getValue();
-            Item existingItem = itemRepository.getItem(storeId, String.valueOf(productId));
+            Item existingItem = itemRepository.getItem(storeId, productId);
             if (existingItem == null) {
                 Item newItem = new Item(storeId, String.valueOf(productId), 0, quantity, "New product");
-                itemRepository.add(new Pair<>(storeId, String.valueOf(productId)), newItem);
+                itemRepository.add(new Pair<>(storeId, productId), newItem);
                 System.out.println("Added product " + productId + " with quantity " + quantity + " to store " + storeId);
             }
         }
     }
     
     @Override
-    public void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities, String userId) {
+    public void updateProductQuantities(String storeId, Map<String, Integer> productQuantities, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
-        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-            Integer productId = entry.getKey();
+        for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
+            String productId = entry.getKey();
             Integer quantity = entry.getValue();    
-            Item existingItem = itemRepository.getItem(storeId, String.valueOf(productId));
+            Item existingItem = itemRepository.getItem(storeId, productId);
             if (existingItem != null) {
                 existingItem.setAmount(quantity);
-                itemRepository.update(new Pair<>(storeId, String.valueOf(productId)), existingItem);
+                itemRepository.update(new Pair<>(storeId, productId), existingItem);
                 System.out.println("Updated product " + productId + " with new quantity " + quantity + " in store " + storeId);
             }
         }
     }
     
     @Override
-    public void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities, String userId) {
+    public void removeProductsFromInventory(String storeId, Map<String, Integer> productQuantities, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
-        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-            Integer productId = entry.getKey();
+        for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
+            String productId = entry.getKey();
             Integer quantity = entry.getValue();
-            Item existingItem = itemRepository.getItem(storeId, String.valueOf(productId));
+            Item existingItem = itemRepository.getItem(storeId, productId);
             if (existingItem != null && quantity > 0) {
-                itemRepository.remove(new Pair<>(storeId, String.valueOf(productId)));
+                itemRepository.remove(new Pair<>(storeId, productId));
                 System.out.println("Removed product " + productId + " from store " + storeId);
             }
         }
@@ -218,9 +218,9 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public Feedback getUserMessage(String storeId, String productId, String userId) {
+    public Feedback getUserMessage(String storeId, String userId, String feedbackId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OVERSEE_OFFERS);
-        return storeFacade.getFeedback(storeId, productId, userId);
+        return storeFacade.getFeedback(feedbackId);
     }
 
     @Override
@@ -238,7 +238,7 @@ public class MarketFacade implements IMarketFacade {
         paymentService.initialize();
         supplyService.initialize();
         notificationService.initialize();
-        Member marketManager = userRepository.getMemberByUsername(userId);        
+        Member marketManager = userRepository.getMember(userId);        
         Permission founder = new Permission("system", marketManager.getName());
         founder.initTradingManager();
         storePermissions.putIfAbsent("market", new HashMap<>());
