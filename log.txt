@@ -1483,3 +1483,73 @@ May 04, 2025 7:17:04 PM Application.UserService guestEntry
 INFO: New Guest has entered.
 May 04, 2025 7:17:04 PM MarketService updatePaymentService
 INFO: Payment service updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:12:31 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:12:31 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:12:31 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:12:31 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+May 05, 2025 8:19:19 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 8:19:19 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 8:19:19 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 8:19:19 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 8:20:41 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 8:20:41 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 8:20:41 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746422441619
+May 05, 2025 8:20:41 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 8:20:41 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 8:21:58 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746422518595
+May 05, 2025 8:26:05 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:26:31 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:27:03 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:27:52 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:32:32 AM MarketService openMarket
+SEVERE: Invalid session token
+May 05, 2025 8:33:01 AM MarketService openMarket
+SEVERE: Invalid session token
+May 05, 2025 8:35:35 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:38:45 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:39:16 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746423556693
+May 05, 2025 8:40:15 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746423615521
+May 05, 2025 8:41:45 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: No permissions found for user Member1 in store 1746423705590

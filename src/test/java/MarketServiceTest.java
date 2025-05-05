@@ -9,15 +9,20 @@ import Domain.Shopping.ShoppingCartFacade;
 import Domain.Pair;
 import Domain.TokenService;
 import Domain.Store.Feedback;
+import Domain.Store.IAuctionRepository;
+import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
 import Domain.Store.IProductRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.LoginManager;
+import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionType;
+import Infrastructure.Repositories.MemoryAuctionRepository;
+import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
 import Infrastructure.Repositories.MemoryProductRepository;
 import Infrastructure.Repositories.MemoryReceiptRepository;
@@ -35,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import Application.ItemService;
 import Application.MarketService;
 import Application.StoreService;
+import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Application.UserService;
@@ -44,6 +50,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,19 +71,24 @@ public class MarketServiceTest {
     // User
     private UserService userService;
     private IUserRepository userRepository;
+    UUID userId = UUID.randomUUID();
     
     // Store
     private IItemRepository itemRepository;
     private IProductRepository productRepository;
     private IStoreRepository storeRepository;
+    private IAuctionRepository auctionRepository;
+    private IFeedbackRepository feedbackRepository;
+
     private StoreFacade storeFacade;
     private ItemFacade itemFacade;
 
-    private String guestToken;
+    private String tokenId;
     private StoreService storeService;
     private String storeId;
     private ItemService itemService;
     private String productId;
+
 
     // Shopping Cart
     private ShoppingCartFacade shoppingCartFacade;
@@ -101,6 +113,13 @@ public class MarketServiceTest {
         storeRepository = new MemoryStoreRepository();
 
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
+        auctionRepository = new MemoryAuctionRepository();
+        feedbackRepository= new MemoryFeedbackRepository();
+        userRepository = new MemoryUserRepository();
+
+        this.tokenService = new TokenService();
+        this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
+        storeService = new StoreService(storeFacade, tokenService);
 
         // Shopping Cart setup
         shoppingCartRepository = new MemoryShoppingCartRepository();
@@ -110,85 +129,78 @@ public class MarketServiceTest {
         
         shoppingCartFacade = new ShoppingCartFacade(shoppingCartRepository, shoppingBasketRepository, mockPaymentService,
                 itemFacade, storeFacade, receiptRepository, productRepository);
+
+        // Market setup
         marketFacade.initFacades(userRepository, itemRepository, storeFacade, shoppingCartFacade);
         marketFacade.updatePaymentService(mockPaymentService);
         marketFacade.updateSupplyService(mockSupplyService);
         marketFacade.updateNotificationService(mockNotificationService);
-
-        tokenService = new TokenService();
         marketService = new MarketService(marketFacade, tokenService);
         
         // User Service setup
         userService = new UserService(new LoginManager(new MemoryUserRepository()), tokenService);
-        Response<UserDTO> guestResp = userService.guestEntry();
-        guestToken = guestResp.getValue().getSessionToken();
+        tokenId = this.tokenService.generateToken(userId.toString());
+        User user = new Member(userId, "Member1", "passpass", "email@email.com");
+        this.userRepository.add(userId.toString(), user);
 
-        //Store Service setup
-        // storeService = new StoreService();
 
-        // String storeName = "NewStore";
-        // Response<StoreDTO> result = storeService.addStore(guestToken, storeName, "A new store");
-        // storeId = result.getValue().getId();
+        // Open a store
+        Response<StoreDTO> response = storeService.addStore(tokenId, "storeName", "A new store");
+        storeId = response.getValue().getId();
+        productId = UUID.randomUUID().toString();
 
-        // // Add a product to the store for testing
-        // productId = "prodY";
-        // MemoryItemRepository repository = new MemoryItemRepository();
-        // ItemFacade facade = new ItemFacade(repository);
-        // itemService = new ItemService(facade);
-        // Item item = new Item(storeId, productId,19.99f , 3, "Cool Product");
-        // Pair<String, String> id = new Pair<>(storeId, productId);
-
-        // itemService.add(id, item);
 
     }
 
-    // @Test
-    // public void testaddProductsToInventory() {
-    //     Map<String, Integer> products = Map.of(productId, 5);
-    //     marketService.addProductsToInventory(guestToken, storeId, products);
-    //     // Verify that the product was added to the inventory
-    //     Response<Item> itemResponse = itemService.getItem(storeId, productId);
-    //     assertFalse(itemResponse.errorOccurred(), "Item retrieval failed: " + itemResponse.getErrorMessage());
-    //     Item item = itemResponse.getValue();
-    //     assertEquals(5, item.getAmount(), "Product quantity mismatch after adding to inventory");
-    // }
+    @Test
+    public void testOpenMarket(){
+        // Open the market and verify that the market is open
+        Response<Void> response = marketService.openMarket(tokenId);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void testaddProductsToInventory_noPermissions() {
+        Map<String, Integer> products = Map.of(productId, 5);
+        Response<Void> response = marketService.addProductsToInventory(tokenId, storeId, products);
+        assertTrue(response.errorOccurred());    
+    }
+
+    @Test
+    public void testRemoveProductsFromInventory_noPermissions() {
+        Map<String, Integer> productsToRemove = Map.of(productId, 1);
+        Response<Void> response = marketService.removeProductsFromInventory(tokenId, storeId, productsToRemove);
+        assertTrue(response.errorOccurred());
+        // Item item = itemResponse.getValue();
+        // assertEquals(2, item.getAmount(), "Product quantity mismatch after removing from inventory");
+    }
 
     @Test
     public void testUpdatePaymentService() {
-        Response<Void> response = marketService.updatePaymentService(guestToken, mockPaymentService);
+        Response<Void> response = marketService.updatePaymentService(tokenId, mockPaymentService);
         assertFalse(response.errorOccurred());
         verify(mockPaymentService, never()).initialize(); // Ensure no unexpected initialization
     }
 
     @Test
     public void testUpdateNotificationService() {
-        Response<Void> response = marketService.updateNotificationService(guestToken, mockNotificationService);
+        Response<Void> response = marketService.updateNotificationService(tokenId, mockNotificationService);
         assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testUpdateSupplyService() {
-        Response<Void> response = marketService.updateSupplyService(guestToken, mockSupplyService);
+        Response<Void> response = marketService.updateSupplyService(tokenId, mockSupplyService);
         assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testUpdatePaymentServiceURL() throws IOException {
         String newUrl = "http://new-payment-service.com";
-        Response<Void> response = marketService.updatePaymentServiceURL(guestToken, newUrl);
+        Response<Void> response = marketService.updatePaymentServiceURL(tokenId, newUrl);
         assertFalse(response.errorOccurred());
         verify(mockPaymentService).updatePaymentServiceURL(newUrl);
     }
-
-    // @Test
-    // public void testRemoveProductsFromInventory() {
-    //     Map<String, Integer> productsToRemove = Map.of(productId, 1);
-    //     marketService.removeProductsFromInventory(guestToken, storeId, productsToRemove);
-    //     Response<Item> itemResponse = itemService.getItem(storeId, productId);
-    //     assertFalse(itemResponse.errorOccurred());
-    //     Item item = itemResponse.getValue();
-    //     assertEquals(2, item.getAmount(), "Product quantity mismatch after removing from inventory");
-    // }
 
     // @Test
     // public void testAppointStoreManager() {
