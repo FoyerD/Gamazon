@@ -9,8 +9,8 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.User.IUserRepository;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacadeTest;
 import Domain.Store.StoreFacade;
 
 /**
@@ -71,7 +71,7 @@ public interface IMarketFacade {
      * @param storeFacade Facade for store management
      * @param shoppingCartFacade Facade for shopping cart management
      */
-    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacadeTest shoppingCartFacade);
+    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, IShoppingCartFacade shoppingCartFacade);
     // Section 4
 
     /**
@@ -81,7 +81,7 @@ public interface IMarketFacade {
      * @param productQuantities Map of product IDs to quantities
      * @param userId ID of the user performing the action
      */
-    void addProductsToInventory(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    void addProductsToInventory(String storeId, Map<String, Integer> productQuantities, String userId);
 
     /**
      * 4.1 Update product quantities in a store's inventory.
@@ -90,7 +90,7 @@ public interface IMarketFacade {
      * @param productQuantities Map of product IDs to updated quantities
      * @param userId ID of the user performing the action
      */
-    void updateProductQuantities(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    void updateProductQuantities(String storeId, Map<String, Integer> productQuantities, String userId);
 
     /**
      * 4.1 Remove products from a store's inventory.
@@ -99,7 +99,7 @@ public interface IMarketFacade {
      * @param productQuantities Map of product IDs to quantities to remove
      * @param userId ID of the user performing the action
      */
-    void removeProductsFromInventory(String storeId, Map<Integer, Integer> productQuantities, String userId);
+    void removeProductsFromInventory(String storeId, Map<String, Integer> productQuantities, String userId);
 
     /**
      * 4.3 Appoint a new store manager.
@@ -175,7 +175,7 @@ public interface IMarketFacade {
      * @param userId ID of the user
      * @return Feedback object representing the user message
      */
-    Feedback getUserMessage(String storeId, String productId, String userId);
+    Feedback getUserMessage(String storeId, String userId, String feedbackId);
 
     /**
      * 4.13 Retrieve the purchase history of a store within a given date range.

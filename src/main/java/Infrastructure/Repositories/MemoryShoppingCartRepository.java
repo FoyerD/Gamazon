@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import Domain.Shopping.IShoppingCart;
 import Domain.Shopping.IShoppingCartRepository;
 
- public class MemoryShoppingCartRepository extends IShoppingCartRepository {
+public class MemoryShoppingCartRepository extends IShoppingCartRepository {
     private final Map<String, IShoppingCart> carts;
 
     public MemoryShoppingCartRepository() {

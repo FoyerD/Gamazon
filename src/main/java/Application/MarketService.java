@@ -9,8 +9,8 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.StoreFacade;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacadeTest;
 import Domain.TokenService;
 
 import java.io.IOException;
@@ -97,7 +97,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> initFacades(String sessionToken, IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacadeTest shoppingCartFacade) {
+    public Response<Void> initFacades(String sessionToken, IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, IShoppingCartFacade shoppingCartFacade) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "initFacades", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -127,7 +127,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> addProductsToInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> addProductsToInventory(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "addProductsToInventory", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -142,7 +142,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> updateProductQuantities(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> updateProductQuantities(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updateProductQuantities", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -157,7 +157,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> removeProductsFromInventory(String sessionToken, String storeId, Map<Integer, Integer> productQuantities) {
+    public Response<Void> removeProductsFromInventory(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "removeProductsFromInventory", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -292,13 +292,13 @@ public class MarketService {
         }
     }
 
-    public Response<Feedback> getUserMessage(String sessionToken, String storeId, String productId, String userId) {
+    public Response<Feedback> getUserMessage(String sessionToken, String storeId, String userId, String feedbackId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getUserMessage", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            Feedback feedback = marketFacade.getUserMessage(storeId, productId, userId);
+            Feedback feedback = marketFacade.getUserMessage(storeId, userId, feedbackId);
             TradingLogger.logEvent(CLASS_NAME, "getUserMessage", "User message fetched successfully.");
             return new Response<>(feedback);
         } catch (Exception e) {

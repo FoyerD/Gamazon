@@ -1,3 +1,721 @@
+<<<<<<< HEAD
+Apr 28, 2025 9:24:21 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:26:37 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:29:16 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:33:47 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService updateNotificationService
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService marketCloseStore
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService removeStoreManager
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService getUserMessage
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService updateSupplyService
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService addProductsToInventory
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService getStorePurchaseHistory
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService removeProductsFromInventory
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService openMarket
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService appointStoreManager
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService getManagersPermissions
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService appointStoreOwner
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService respondToUserMessage
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService closeStore
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService updatePaymentServiceURL
+SEVERE: Invalid session token
+Apr 28, 2025 9:35:07 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:35:07 AM MarketService updatePaymentService
+SEVERE: Invalid session token
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:37:51 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:40:22 AM MarketService updateNotificationService
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService marketCloseStore
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService removeStoreManager
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService getUserMessage
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService updateSupplyService
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService getStorePurchaseHistory
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService openMarket
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService appointStoreManager
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService getManagersPermissions
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService appointStoreOwner
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService respondToUserMessage
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService closeStore
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService updatePaymentServiceURL
+SEVERE: Invalid session token
+Apr 28, 2025 9:40:22 AM MarketService updatePaymentService
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService updateNotificationService
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService marketCloseStore
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService removeStoreManager
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService getUserMessage
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService updateSupplyService
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService getStorePurchaseHistory
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService openMarket
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService appointStoreManager
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService getManagersPermissions
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService appointStoreOwner
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService respondToUserMessage
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService closeStore
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService updatePaymentServiceURL
+SEVERE: Invalid session token
+Apr 28, 2025 9:42:17 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:42:17 AM MarketService updatePaymentService
+SEVERE: Invalid session token
+Apr 28, 2025 9:48:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:48:06 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:48:06 AM MarketService updatePaymentService
+SEVERE: Invalid session token
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 9:55:25 AM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 9:55:25 AM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 9:55:25 AM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:19:48 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:48 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:48 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:48 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:48 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:19:49 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:19:49 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService register
+SEVERE: Received invalid session token
+Apr 28, 2025 2:20:39 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:20:39 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:21:58 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as carol.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+INFO: carol has exited.
+Apr 28, 2025 2:21:59 PM Application.UserService login
+INFO: carol has logged in.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as alice.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as bob.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+SEVERE: Failed to register bob: Username already exists
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+SEVERE: received invalid session token.
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService register
+INFO: Guest has registed as dave.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+INFO: dave has exited.
+Apr 28, 2025 2:21:59 PM Application.UserService login
+SEVERE: Attempted login has failed. Username: dave Password: Password1
+Apr 28, 2025 2:21:59 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:21:59 PM Application.UserService exit
+INFO: Guest has exited.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:12 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:12 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:22:13 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:13 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:22:13 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:22:13 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:22:47 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:23:02 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:02 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:23:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:23:53 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:27:43 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:27:44 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:27:44 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:29:08 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService removeStoreManager
+SEVERE: Failed to remove store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService getUserMessage
+SEVERE: Failed to get user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService openMarket
+SEVERE: Failed to open market: Services not initialized.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService appointStoreOwner
+SEVERE: Failed to appoint store owner: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService closeStore
+SEVERE: Failed to close store: Cannot invoke "Domain.User.IUserRepository.get(String)" because "this.userRepository" is null
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+Apr 28, 2025 2:31:53 PM Application.UserService guestEntry
+INFO: New Guest has entered.
+Apr 28, 2025 2:31:53 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+=======
 Apr 30, 2025 7:28:49 PM Application.UserService guestEntry
 INFO: New Guest has entered.
 Apr 30, 2025 7:28:49 PM Application.UserService register
@@ -748,543 +1466,142 @@ May 04, 2025 3:30:56 PM Application.UserService guestEntry
 INFO: New Guest has entered.
 May 04, 2025 3:30:56 PM Application.UserService exit
 INFO: Guest has exited.
-May 04, 2025 10:06:29 PM ItemService remove
-INFO: Item removed.
-May 04, 2025 10:06:29 PM ItemService filterItems
-INFO: Items filtered.
-May 04, 2025 10:06:29 PM ItemService getItem
-SEVERE: Store not found for storeId: invalid
-May 04, 2025 10:06:29 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 04, 2025 10:06:29 PM ItemService getItemsByStoreId
-SEVERE: Store not found for storeId: invalid-store
-May 04, 2025 10:06:29 PM ItemService getItemsByStoreId
-INFO: Fetched items for storeId: store1
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService changePrice
-SEVERE: Price cannot be negative
-May 04, 2025 10:06:29 PM ItemService filterItems
-INFO: Items filtered.
-May 04, 2025 10:06:29 PM ItemService add
-INFO: Item added: true
-May 04, 2025 10:06:29 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService decreaseAmount
-INFO: Amount decreased.
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService decreaseAmount
-SEVERE: Not enough items in stock
-May 04, 2025 10:06:29 PM ItemService add
-INFO: Item added: false
-May 04, 2025 10:06:29 PM ItemService remove
-SEVERE: Store not found for storeId: invalid
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService increaseAmount
-INFO: Amount increased.
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService changePrice
-INFO: Price changed successfully.
-May 04, 2025 10:06:29 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 04, 2025 10:06:29 PM ItemService increaseAmount
-SEVERE: Store not found for storeId: bad
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+>>>>>>> v1
+May 04, 2025 7:17:04 PM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService register
-INFO: Guest has registed as carol.
-May 04, 2025 10:06:31 PM Application.UserService exit
-INFO: carol has exited.
-May 04, 2025 10:06:31 PM Application.UserService login
-INFO: carol has logged in.
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 04, 2025 7:17:04 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 04, 2025 7:17:04 PM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService register
-INFO: Guest has registed as alice.
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 04, 2025 7:17:04 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 04, 2025 7:17:04 PM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService register
-INFO: Guest has registed as bob.
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 04, 2025 7:17:04 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 04, 2025 7:17:04 PM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService register
-SEVERE: Failed to register bob: Username already exists
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 04, 2025 7:17:04 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 05, 2025 8:12:31 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 05, 2025 8:12:31 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService exit
-SEVERE: received invalid session token.
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService register
-INFO: Guest has registed as dave.
-May 04, 2025 10:06:31 PM Application.UserService exit
-INFO: dave has exited.
-May 04, 2025 10:06:31 PM Application.UserService login
-SEVERE: Attempted login has failed. Username: dave Password: Password1
-May 04, 2025 10:06:31 PM Application.UserService guestEntry
+May 05, 2025 8:12:31 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 8:12:31 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 04, 2025 10:06:31 PM Application.UserService exit
-INFO: Guest has exited.
-May 05, 2025 12:26:52 PM ItemService remove
-INFO: Item removed.
-May 05, 2025 12:26:52 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:26:52 PM ItemService getItem
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:26:52 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:26:52 PM ItemService getItemsByStoreId
-SEVERE: Store not found for storeId: invalid-store
-May 05, 2025 12:26:52 PM ItemService getItemsByStoreId
-INFO: Fetched items for storeId: store1
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService changePrice
-SEVERE: Price cannot be negative
-May 05, 2025 12:26:52 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:26:52 PM ItemService add
-INFO: Item added: true
-May 05, 2025 12:26:52 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService decreaseAmount
-INFO: Amount decreased.
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService decreaseAmount
-SEVERE: Not enough items in stock
-May 05, 2025 12:26:52 PM ItemService add
-INFO: Item added: false
-May 05, 2025 12:26:52 PM ItemService remove
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService increaseAmount
-INFO: Amount increased.
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService changePrice
-INFO: Price changed successfully.
-May 05, 2025 12:26:52 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:26:52 PM ItemService increaseAmount
-SEVERE: Store not found for storeId: bad
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
+May 05, 2025 8:12:31 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService register
-INFO: Guest has registed as carol.
-May 05, 2025 12:26:54 PM Application.UserService exit
-INFO: carol has exited.
-May 05, 2025 12:26:54 PM Application.UserService login
-INFO: carol has logged in.
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService register
-INFO: Guest has registed as alice.
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService register
-INFO: Guest has registed as bob.
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService register
-SEVERE: Failed to register bob: Username already exists
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
+May 05, 2025 8:16:07 AM Application.UserService guestEntry
 INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService exit
-SEVERE: received invalid session token.
-May 05, 2025 12:26:54 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:26:54 PM Application.UserService register
-INFO: Guest has registed as dave.
-May 05, 2025 12:26:54 PM Application.UserService exit
-INFO: dave has exited.
-May 05, 2025 12:26:55 PM Application.UserService login
-SEVERE: Attempted login has failed. Username: dave Password: Password1
-May 05, 2025 12:26:55 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:26:55 PM Application.UserService exit
-INFO: Guest has exited.
-May 05, 2025 12:36:55 PM ItemService remove
-INFO: Item removed.
-May 05, 2025 12:36:56 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:36:56 PM ItemService getItem
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:36:56 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:36:56 PM ItemService getItemsByStoreId
-SEVERE: Store not found for storeId: invalid-store
-May 05, 2025 12:36:56 PM ItemService getItemsByStoreId
-INFO: Fetched items for storeId: store1
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService changePrice
-SEVERE: Price cannot be negative
-May 05, 2025 12:36:56 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:36:56 PM ItemService add
-INFO: Item added: true
-May 05, 2025 12:36:56 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService decreaseAmount
-INFO: Amount decreased.
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService decreaseAmount
-SEVERE: Not enough items in stock
-May 05, 2025 12:36:56 PM ItemService add
-INFO: Item added: false
-May 05, 2025 12:36:56 PM ItemService remove
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService increaseAmount
-INFO: Amount increased.
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService changePrice
-INFO: Price changed successfully.
-May 05, 2025 12:36:56 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:36:56 PM ItemService increaseAmount
-SEVERE: Store not found for storeId: bad
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:57 PM Application.UserService register
-INFO: Guest has registed as carol.
-May 05, 2025 12:36:57 PM Application.UserService exit
-INFO: carol has exited.
-May 05, 2025 12:36:57 PM Application.UserService login
-INFO: carol has logged in.
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:57 PM Application.UserService register
-INFO: Guest has registed as alice.
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:57 PM Application.UserService register
-INFO: Guest has registed as bob.
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:57 PM Application.UserService register
-SEVERE: Failed to register bob: Username already exists
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:57 PM Application.UserService exit
-SEVERE: received invalid session token.
-May 05, 2025 12:36:57 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:58 PM Application.UserService register
-INFO: Guest has registed as dave.
-May 05, 2025 12:36:58 PM Application.UserService exit
-INFO: dave has exited.
-May 05, 2025 12:36:58 PM Application.UserService login
-SEVERE: Attempted login has failed. Username: dave Password: Password1
-May 05, 2025 12:36:58 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:36:58 PM Application.UserService exit
-INFO: Guest has exited.
-May 05, 2025 12:46:32 PM ItemService remove
-INFO: Item removed.
-May 05, 2025 12:46:32 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:46:32 PM ItemService getItem
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:46:32 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:46:32 PM ItemService getItemsByStoreId
-SEVERE: Store not found for storeId: invalid-store
-May 05, 2025 12:46:32 PM ItemService getItemsByStoreId
-INFO: Fetched items for storeId: store1
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService changePrice
-SEVERE: Price cannot be negative
-May 05, 2025 12:46:32 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:46:32 PM ItemService add
-INFO: Item added: true
-May 05, 2025 12:46:32 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService decreaseAmount
-INFO: Amount decreased.
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService decreaseAmount
-SEVERE: Not enough items in stock
-May 05, 2025 12:46:32 PM ItemService add
-INFO: Item added: false
-May 05, 2025 12:46:32 PM ItemService remove
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService increaseAmount
-INFO: Amount increased.
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService changePrice
-INFO: Price changed successfully.
-May 05, 2025 12:46:32 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:46:32 PM ItemService increaseAmount
-SEVERE: Store not found for storeId: bad
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService register
-INFO: Guest has registed as carol.
-May 05, 2025 12:46:34 PM Application.UserService exit
-INFO: carol has exited.
-May 05, 2025 12:46:34 PM Application.UserService login
-INFO: carol has logged in.
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService register
-INFO: Guest has registed as alice.
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService register
-INFO: Guest has registed as bob.
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService register
-SEVERE: Failed to register bob: Username already exists
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService exit
-SEVERE: received invalid session token.
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService register
-INFO: Guest has registed as dave.
-May 05, 2025 12:46:34 PM Application.UserService exit
-INFO: dave has exited.
-May 05, 2025 12:46:34 PM Application.UserService login
-SEVERE: Attempted login has failed. Username: dave Password: Password1
-May 05, 2025 12:46:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:46:34 PM Application.UserService exit
-INFO: Guest has exited.
-May 05, 2025 12:54:33 PM ItemService remove
-INFO: Item removed.
-May 05, 2025 12:54:33 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:54:33 PM ItemService getItem
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:54:33 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:54:33 PM ItemService getItemsByStoreId
-SEVERE: Store not found for storeId: invalid-store
-May 05, 2025 12:54:33 PM ItemService getItemsByStoreId
-INFO: Fetched items for storeId: store1
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService changePrice
-SEVERE: Price cannot be negative
-May 05, 2025 12:54:33 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:54:33 PM ItemService add
-INFO: Item added: true
-May 05, 2025 12:54:33 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService decreaseAmount
-INFO: Amount decreased.
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService decreaseAmount
-SEVERE: Not enough items in stock
-May 05, 2025 12:54:33 PM ItemService add
-INFO: Item added: false
-May 05, 2025 12:54:33 PM ItemService remove
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService increaseAmount
-INFO: Amount increased.
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService changePrice
-INFO: Price changed successfully.
-May 05, 2025 12:54:33 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:54:33 PM ItemService increaseAmount
-SEVERE: Store not found for storeId: bad
-May 05, 2025 12:54:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:34 PM Application.UserService register
-INFO: Guest has registed as carol.
-May 05, 2025 12:54:34 PM Application.UserService exit
-INFO: carol has exited.
-May 05, 2025 12:54:34 PM Application.UserService login
-INFO: carol has logged in.
-May 05, 2025 12:54:34 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService register
-INFO: Guest has registed as alice.
-May 05, 2025 12:54:35 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService register
-INFO: Guest has registed as bob.
-May 05, 2025 12:54:35 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService register
-SEVERE: Failed to register bob: Username already exists
-May 05, 2025 12:54:35 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService exit
-SEVERE: received invalid session token.
-May 05, 2025 12:54:35 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService register
-INFO: Guest has registed as dave.
-May 05, 2025 12:54:35 PM Application.UserService exit
-INFO: dave has exited.
-May 05, 2025 12:54:35 PM Application.UserService login
-SEVERE: Attempted login has failed. Username: dave Password: Password1
-May 05, 2025 12:54:35 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:54:35 PM Application.UserService exit
-INFO: Guest has exited.
-May 05, 2025 12:59:54 PM ItemService remove
-INFO: Item removed.
-May 05, 2025 12:59:54 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:59:54 PM ItemService getItem
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:59:54 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:59:54 PM ItemService getItemsByStoreId
-SEVERE: Store not found for storeId: invalid-store
-May 05, 2025 12:59:54 PM ItemService getItemsByStoreId
-INFO: Fetched items for storeId: store1
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService changePrice
-SEVERE: Price cannot be negative
-May 05, 2025 12:59:54 PM ItemService filterItems
-INFO: Items filtered.
-May 05, 2025 12:59:54 PM ItemService add
-INFO: Item added: true
-May 05, 2025 12:59:54 PM ItemService getAvailableItems
-INFO: Fetched available items.
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService decreaseAmount
-INFO: Amount decreased.
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService decreaseAmount
-SEVERE: Not enough items in stock
-May 05, 2025 12:59:54 PM ItemService add
-INFO: Item added: false
-May 05, 2025 12:59:54 PM ItemService remove
-SEVERE: Store not found for storeId: invalid
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService increaseAmount
-INFO: Amount increased.
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService changePrice
-INFO: Price changed successfully.
-May 05, 2025 12:59:54 PM ItemService getItem
-INFO: Item retrieved successfully.
-May 05, 2025 12:59:54 PM ItemService increaseAmount
-SEVERE: Store not found for storeId: bad
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService register
-INFO: Guest has registed as carol.
-May 05, 2025 12:59:56 PM Application.UserService exit
-INFO: carol has exited.
-May 05, 2025 12:59:56 PM Application.UserService login
-INFO: carol has logged in.
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService register
-INFO: Guest has registed as alice.
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService register
-INFO: Guest has registed as bob.
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService register
-SEVERE: Failed to register bob: Username already exists
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService exit
-SEVERE: received invalid session token.
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService register
-INFO: Guest has registed as dave.
-May 05, 2025 12:59:56 PM Application.UserService exit
-INFO: dave has exited.
-May 05, 2025 12:59:56 PM Application.UserService login
-SEVERE: Attempted login has failed. Username: dave Password: Password1
-May 05, 2025 12:59:56 PM Application.UserService guestEntry
-INFO: New Guest has entered.
-May 05, 2025 12:59:56 PM Application.UserService exit
-INFO: Guest has exited.
+May 05, 2025 8:19:19 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 8:19:19 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 8:19:19 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 8:19:19 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 8:20:41 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 8:20:41 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 8:20:41 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746422441619
+May 05, 2025 8:20:41 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 8:20:41 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 8:21:58 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746422518595
+May 05, 2025 8:26:05 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:26:31 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:27:03 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:27:52 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:32:32 AM MarketService openMarket
+SEVERE: Invalid session token
+May 05, 2025 8:33:01 AM MarketService openMarket
+SEVERE: Invalid session token
+May 05, 2025 8:35:35 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:38:45 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 8:39:16 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746423556693
+May 05, 2025 8:40:15 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746423615521
+May 05, 2025 8:41:45 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: No permissions found for user Member1 in store 1746423705590
+May 05, 2025 9:10:43 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member1 in store 1746425443850
+May 05, 2025 9:12:27 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746425547760
+May 05, 2025 9:13:16 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746425596813
+May 05, 2025 9:14:59 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 9:17:26 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:25:23 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:25:36 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 9:25:36 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 9:25:36 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member1 in store 1746426336407
+May 05, 2025 9:25:36 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:25:36 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746426336442
+May 05, 2025 9:25:36 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: No permissions found for user Member1 in store 1746426336457
+May 05, 2025 9:25:36 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746426336459
+May 05, 2025 9:25:36 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 9:25:36 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 9:26:54 AM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: No permissions found for user ownerUser in store 1746426414007
+May 05, 2025 9:28:24 AM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: No permissions found for user Member1 in store 1746426504480
+May 05, 2025 9:52:52 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 9:52:52 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 9:52:52 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member1 in store 1746427972389
+May 05, 2025 9:52:52 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:52:52 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746427972422
+May 05, 2025 9:52:52 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: No permissions found for user Member1 in store 1746427972433
+May 05, 2025 9:52:52 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746427972441
+May 05, 2025 9:52:52 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 9:52:52 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
