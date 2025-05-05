@@ -13,6 +13,7 @@ import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.Item;
+import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
@@ -144,6 +145,13 @@ public class MarketFacade implements IMarketFacade {
         perm.initStoreOwner();
     }
 
+    // Currently assigns the first store owner as the permission giver of himself
+    private void appointFirstStoreOwner(String appointeeUsername, String storeId) {
+        Permission perm = getOrCreatePermission(appointeeUsername, appointeeUsername, storeId);
+        perm.initStoreOwner();
+    }
+
+
     @Override
     public void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
         checkPermission(ownerUsername, storeId, PermissionType.MODIFY_OWNER_RIGHTS);
@@ -151,6 +159,18 @@ public class MarketFacade implements IMarketFacade {
         if (!permission.isStoreManager()) 
             throw new IllegalStateException(managerUsername + " is not a manager.");
         permission.setPermissions(PermissionType.collectionToSet(newPermissions));
+    }
+
+    @Override
+    public Store addStore(String name, String description, String founderId) {
+        Member storeOwner = userRepository.getMember(founderId);
+        if (storeOwner == null) {
+            throw new IllegalStateException("User does not exist.");
+        }
+        Store store = storeFacade.addStore(name, description, founderId);
+        String storeId = store.getId();
+        appointFirstStoreOwner(userRepository.getMember(founderId).getName(), storeId);
+        return store;
     }
 
     @Override

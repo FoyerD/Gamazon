@@ -1605,3 +1605,129 @@ May 05, 2025 9:52:52 AM MarketService updatePaymentServiceURL
 INFO: Payment service URL updated successfully.
 May 05, 2025 9:52:52 AM MarketService updatePaymentService
 INFO: Payment service updated successfully.
+May 05, 2025 11:03:26 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:03:49 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:05:02 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 11:05:02 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 11:05:02 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+May 05, 2025 11:05:02 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 11:05:02 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:05:02 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+May 05, 2025 11:05:02 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 11:05:02 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 11:09:06 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:11:22 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:11:22 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+May 05, 2025 11:39:50 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:39:50 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:39:50 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: Cannot invoke "Object.hashCode()" because "<parameter1>" is null
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:40:46 AM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 11:43:03 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:43:03 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:43:03 AM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 11:43:43 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:43:43 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:43:43 AM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 11:43:55 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:43:55 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:43:55 AM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 11:45:54 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:45:54 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:45:54 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 11:46:09 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:46:09 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:46:09 AM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 11:47:52 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:47:52 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:47:52 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:48:25 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:48:25 AM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 11:48:25 AM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.

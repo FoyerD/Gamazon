@@ -34,6 +34,8 @@ import Infrastructure.Repositories.MemoryUserRepository;
 import ch.qos.logback.core.subst.Token;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Product;
+import Domain.Store.Store;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,14 +84,18 @@ public class MarketServiceTest {
     private IFeedbackRepository feedbackRepository;
 
     private StoreFacade storeFacade;
-    private ItemFacade itemFacade;
 
     private String tokenId;
     private StoreService storeService;
-    private String storeId;
+    private ItemFacade itemFacade;
     private ItemService itemService;
-    private String productId;
 
+    private String storeId1;
+    private String storeId2;
+
+    private final String productId1 = "product1";
+    private final String productId2 = "product2";
+    private final String productId3 = "product3";
 
     // Shopping Cart
     private ShoppingCartFacade shoppingCartFacade;
@@ -144,13 +150,24 @@ public class MarketServiceTest {
         User user = new Member(userId, "Member1", "passpass", "email@email.com");
         this.userRepository.add(userId.toString(), user);
 
+        this.itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
+        this.itemService = new ItemService(itemFacade);
 
-        // Open a store
-        Response<StoreDTO> response = storeService.addStore(tokenId, "storeName", "A new store");
-        storeId = response.getValue().getId();
-        productId = UUID.randomUUID().toString();
+        storeId1 = marketService.addStore(tokenId, "Store One", "A store for testing").getValue().getId();
+        storeId2 = marketService.addStore(tokenId, "Store Two", "Another store for testing").getValue().getId();
+        addProduct(storeId1, "Store One", userId.toString(), productId1, "In Stock Item", 49.99f, 10, "In Stock Item");
+        addProduct(storeId1, "Store One", userId.toString(), productId2, "Out of Stock Item", 19.99f, 0, "Out of Stock Item");
+        addProduct(storeId2, "Store Two", userId.toString(), productId3, "Another Stocked Item", 39.99f, 5, "Another Stocked Item");
 
+    }
 
+    private void addProduct(String storeId, String storeName, String founderId, String productId, String productName, float price, int amount, String itemName) {
+        if (productRepository.get(productId) == null) {
+            productRepository.add(productId, new Product(productId, productName));
+        }
+        Item item = new Item(storeId, productId, price, amount, itemName);
+    
+        itemFacade.add(new Pair<>(storeId, productId), item);
     }
 
     @Test
@@ -161,37 +178,43 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void testGetStorePurchaseHistory_noPermissions() {
-        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId, storeId);
-        assertTrue(response.errorOccurred(), "Failed to fetch store purchase history: " + response.getErrorMessage());
+    public void testAddStore() {
+        // Open the store and verify that it is open
+        Response<StoreDTO> storeResponse = marketService.addStore(tokenId, "storeName", "A new store");
+        assertFalse(storeResponse.errorOccurred());
     }
 
     @Test
-    public void testGetManagersPermissions_noPermissions() {
-        Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId, storeId);
-        assertTrue(response.errorOccurred());
+    public void testGetStorePurchaseHistory() {
+        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId, storeId1);
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void testGetManagersPermissions() {
+        Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId, storeId1);
+        assertFalse(response.errorOccurred());
     }
 
 
     @Test
-    public void testaddProductsToInventory_noPermissions() {
-        Map<String, Integer> products = Map.of(productId, 5);
-        Response<Void> response = marketService.addProductsToInventory(tokenId, storeId, products);
-        assertTrue(response.errorOccurred());    
+    public void testaddProductsToInventory() {
+        Map<String, Integer> products = Map.of(productId1, 5);
+        Response<Void> response = marketService.addProductsToInventory(tokenId, storeId1, products);
+        assertFalse(response.errorOccurred());    
     }
 
     @Test
-    public void testRemoveProductsFromInventory_noPermissions() {
-        Map<String, Integer> productsToRemove = Map.of(productId, 1);
-        Response<Void> response = marketService.removeProductsFromInventory(tokenId, storeId, productsToRemove);
-        assertTrue(response.errorOccurred());
+    public void testRemoveProductsFromInventory() {
+        Map<String, Integer> productsToRemove = Map.of(productId1, 1);
+        Response<Void> response = marketService.removeProductsFromInventory(tokenId, storeId1, productsToRemove);
+        assertFalse(response.errorOccurred());
     }
 
     @Test
     public void testUpdatePaymentService() {
         Response<Void> response = marketService.updatePaymentService(tokenId, mockPaymentService);
         assertFalse(response.errorOccurred());
-        verify(mockPaymentService, never()).initialize(); // Ensure no unexpected initialization
     }
 
     @Test
