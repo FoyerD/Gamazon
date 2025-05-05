@@ -198,6 +198,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
         try {
             // Iterate over all stores in the cart
+            boolean purchaseSuccess = false;
             double totalPrice = 0;
             Set<String> storeIds = cart.getCart();
             
@@ -233,6 +234,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                                                 Product productCopy = new Product(product);
                                                 Item item = itemFacade.getItem(storeId, productCopy.getProductId());
                                                 if (item != null) {
+                                                    purchaseSuccess = true;
                                                     double productPrice = item.getPrice() * quantity;
                                                     totalPrice += productPrice;
                                                     
@@ -267,7 +269,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             }
 
             // Process payment only if there are items to checkout
-            if (totalPrice > 0) {
+            if (purchaseSuccess) {
                 paymentService.processPayment(clientName, card_number, expiry_date, cvv, 
                                             totalPrice, andIncrement, clientName, deliveryAddress);
             }
@@ -280,7 +282,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             cartRepo.update(clientId, cart);
             
             // Create receipts only if there was a purchase
-            if (totalPrice > 0) {
+            if (purchaseSuccess) {
                 // Create masked payment details (only show last 4 digits of card)
                 String maskedCardNumber = "xxxx-xxxx-xxxx-" + card_number.substring(card_number.length() - 4);
                 String paymentDetails = "Card: " + maskedCardNumber;

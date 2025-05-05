@@ -3,11 +3,11 @@ import static org.junit.Assert.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import static org.mockito.Mockito.mock;
 
 import Application.DTOs.OrderDTO;
@@ -27,6 +27,8 @@ import Domain.Store.StoreFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.User.IUserRepository;
+import Domain.User.Member;
+import Domain.User.User;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
@@ -36,6 +38,7 @@ import Infrastructure.Repositories.MemoryShoppingBasketRepository;
 import Infrastructure.Repositories.MemoryShoppingCartRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
+import io.jsonwebtoken.lang.Assert;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
@@ -60,9 +63,11 @@ public class ShoppingServiceTest {
     private IItemRepository itemRepository;
     private IStoreRepository storeRepository;
     private IAuctionRepository auctionRepository;
+    private IUserRepository userRepository;
+    static UUID userId = UUID.randomUUID();
     
     // Common test constants
-    private static final String CLIENT_ID = "client123";
+    private static final String CLIENT_ID = userId.toString();
     private static final String STORE_ID = "store123";
     private static final String PRODUCT_ID = "product123";
     private static final String AUCTION_ID = "auction123";
@@ -84,7 +89,7 @@ public class ShoppingServiceTest {
         storeRepository = new MemoryStoreRepository();
         IFeedbackRepository feedbackRepository = new MemoryFeedbackRepository();
         auctionRepository = new MemoryAuctionRepository();
-        IUserRepository userRepository = new MemoryUserRepository();
+        userRepository = new MemoryUserRepository();
         
         // Set up test data - create a product
         Product product = new Product(PRODUCT_ID, "Test Product", new HashSet<>());
@@ -99,7 +104,7 @@ public class ShoppingServiceTest {
         
         // Create a test item
         Item item = new Item(STORE_ID, PRODUCT_ID, 10.0, 5, "Test Item Description");
-        itemRepository.add(new Pair<>(STORE_ID, PRODUCT_ID), item);
+        itemFacade.add(new Pair<>(STORE_ID, PRODUCT_ID), item);
         
         // Initialize StoreFacade
         storeFacade = new StoreFacade(
@@ -138,6 +143,10 @@ public class ShoppingServiceTest {
             productRepository,
             mockTokenService
         );
+
+
+        User user = new Member(userId, "Member1", "passpass", "email@email.com");
+        this.userRepository.add(userId.toString(), user);
         
         // Set the cart facade on the shopping service if it has a setter method
         // If there is no setter method, you may need to modify the ShoppingService class

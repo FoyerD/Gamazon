@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
@@ -243,7 +243,6 @@ public class ShoppingCartFacadeTest {
         long transactionId = 12345L;
         String clientName = "John Doe";
         String deliveryAddress = "123 Main St";
-        double itemPrice = 50.0;
         
         // Mock cart and basket with items
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
@@ -259,13 +258,11 @@ public class ShoppingCartFacadeTest {
         orders.put(PRODUCT_ID, QUANTITY);
         when(mockBasket.getOrders()).thenReturn(orders);
         
-        // Mock item and product info
-        Item mockItem = mock(Item.class);
-        when(mockItem.getPrice()).thenReturn(itemPrice);
+        // Real item and product info
+        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description");
         when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mockItem);
         
-        Product mockProduct = mock(Product.class);
-        when(mockProduct.getProductId()).thenReturn(PRODUCT_ID);
+        Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());
         when(mockProductRepo.get(PRODUCT_ID)).thenReturn(mockProduct);
         
         // Act
@@ -400,13 +397,11 @@ public class ShoppingCartFacadeTest {
         orders.put(PRODUCT_ID, QUANTITY);
         when(mockBasket.getOrders()).thenReturn(orders);
         
-        // Mock item and product info
-        Item mockItem = mock(Item.class);
-        when(mockItem.getPrice()).thenReturn(itemPrice);
+        // Real item and product info
+        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description");
         when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mockItem);
         
-        Product mockProduct = mock(Product.class);
-        when(mockProduct.getProductId()).thenReturn(PRODUCT_ID);
+        Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());
         when(mockProductRepo.get(PRODUCT_ID)).thenReturn(mockProduct);
         
         // Mock payment failure
