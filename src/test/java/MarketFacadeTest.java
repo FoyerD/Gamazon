@@ -4,6 +4,7 @@ import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
+import Domain.Shopping.Receipt;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Feedback;
@@ -283,7 +284,7 @@ public class MarketFacadeTest {
         marketFacade.getStorePermissions().put("store1", new HashMap<>());
         marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
 
-        List<ShoppingBasket> history = marketFacade.getStorePurchaseHistory("store1", LocalDateTime.now(), LocalDateTime.now(), "userId");
+        List<Receipt> history = marketFacade.getStorePurchaseHistory("store1", "userId");
 
         assertNull(history);
     }

@@ -71,7 +71,7 @@ public class ShoppingServiceTest {
     @Before
     public void setUp() {
         // Initialize mocks
-        MockitoAnnotations.initMocks(this);
+        // MockitoAnnotations.initMocks(this);
         mockTokenService = mock(TokenService.class);
         paymentService = mock(IPaymentService.class);
         
