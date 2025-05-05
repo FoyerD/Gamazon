@@ -10,8 +10,8 @@ import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
 import Domain.TokenService;
 
 import java.io.IOException;
@@ -99,7 +99,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> initFacades(String sessionToken, IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacade shoppingCartFacade) {
+    public Response<Void> initFacades(String sessionToken, IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, IShoppingCartFacade shoppingCartFacade) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "initFacades", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));

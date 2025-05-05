@@ -8,8 +8,8 @@ import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.Item;
@@ -25,9 +25,10 @@ public class MarketFacade implements IMarketFacade {
     private ISupplyService supplyService;
     private INotificationService notificationService;
     private IUserRepository userRepository;
-    private IItemRepository itemRepository;
-    private StoreFacade storeFacade;
-    private ShoppingCartFacade shoppingCartFacade;
+    private IItemRepository itemRepository; 
+    private StoreFacade storeFacade; 
+    private IShoppingCartFacade shoppingCartFacade;
+
 
     private IPermissionRepository permissionRepository = new MemoryPermissionRepository();
 
@@ -40,7 +41,7 @@ public class MarketFacade implements IMarketFacade {
     private MarketFacade() {}
 
     @Override
-    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacade shoppingCartFacade) {
+    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, IShoppingCartFacade shoppingCartFacade) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.storeFacade = storeFacade;

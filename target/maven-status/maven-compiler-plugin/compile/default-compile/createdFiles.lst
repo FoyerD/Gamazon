@@ -1,8 +1,11 @@
 Infrastructure/Repositories/MemoryStoreRepository.class
 Application/utils/Response.class
+Domain/Store/FeedbackDTO.class
 Application/DTOs/OrderDTO.class
 Domain/User/Guest.class
+Application/UserService.class
 Application/app.class
+Infrastructure/Repositories/MemoryItemRepository.class
 Application/DTOs/ItemDTO.class
 Infrastructure/Repositories/MemoryProductRepository.class
 Application/utils/Error.class
@@ -12,10 +15,13 @@ Domain/Store/Category.class
 Application/DTOs/UserDTO.class
 Domain/Store/ItemFilter.class
 Domain/Store/ItemFacade.class
+Domain/User/PasswordChecker.class
+Domain/Shopping/ShoppingCart.class
 Domain/Store/IFeedbackRepository.class
 Domain/TokenService.class
 Domain/ExternalServices/INotificationService.class
 Domain/management/RoleType.class
+Infrastructure/Repositories/MemoryShoppingCartRepository.class
 Domain/Shopping/ShoppingBasket.class
 Domain/Store/Feedback.class
 Domain/management/PermissionType.class
@@ -24,6 +30,7 @@ Domain/Store/ItemFilter$Builder.class
 Domain/Store/StoreFacade.class
 Infrastructure/PaymentService.class
 Domain/Store/Store.class
+Infrastructure/Repositories/MemoryShoppingBasketRepository.class
 Domain/Store/IAuctionRepository.class
 Infrastructure/Repositories/MemoryUserRepository.class
 Domain/Store/Product.class
@@ -32,6 +39,7 @@ Domain/Pair.class
 Domain/Store/IStoreRepository.class
 Application/DTOs/AuctionDTO.class
 Domain/Store/Item.class
+Infrastructure/Repositories/MemoryFeedbackRepository.class
 Application/MarketService.class
 Domain/Shopping/IReceiptRepository.class
 Domain/ExternalServices/ISupplyService.class
@@ -42,11 +50,14 @@ Domain/User/IUserRepository.class
 Infrastructure/Repositories/MemoryReceiptRepository.class
 Domain/User/LoginManager.class
 Application/utils/TradingLogger.class
+Infrastructure/Repositories/MemoryAuctionRepository.class
 Domain/Shopping/IShoppingCart.class
 Application/ShoppingService$MockPaymentService.class
 Application/DTOs/CategoryDTO.class
 Domain/User/Member.class
 Domain/IRepository.class
+Domain/Shopping/ShoppingCartFactory.class
+Application/CustomerServiceService.class
 Infrastructure/NotificationService.class
 Domain/management/Permission.class
 Domain/ExternalServices/IPaymentService.class
@@ -54,7 +65,9 @@ Domain/Store/Auction.class
 Application/ItemService.class
 Application/DTOs/StoreDTO.class
 Domain/Store/IProductRepository.class
+Infrastructure/SupplyService.class
 Application/ShoppingService.class
 Domain/Shopping/IShoppingCartFacade.class
 Domain/Store/IItemRepository.class
 Domain/User/User.class
+Domain/management/MarketFacade.class

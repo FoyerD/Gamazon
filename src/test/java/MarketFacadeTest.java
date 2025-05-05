@@ -4,6 +4,7 @@ import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
+import Domain.Shopping.Receipt;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Feedback;
@@ -273,6 +274,19 @@ public class MarketFacadeTest {
         Feedback result = marketFacade.getUserMessage("store1", "product1", "userId");
 
         assertNotNull(result);
+    }
+
+    @Test
+    public void givenAdminWithAccessRecordsPermission_whenGetStorePurchaseHistory_thenReturnNull() {
+        User user = mock(User.class);
+        when(userRepository.get(anyString())).thenReturn(user);
+        when(user.getName()).thenReturn("adminUser");
+        marketFacade.getStorePermissions().put("store1", new HashMap<>());
+        marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
+
+        List<Receipt> history = marketFacade.getStorePurchaseHistory("store1", "userId");
+
+        assertNull(history);
     }
 
     @Test
