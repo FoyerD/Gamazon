@@ -24,12 +24,6 @@ public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
 
-    private boolean isValidToken(String sessionToken, TokenService tokenService) {
-        return tokenService.validateToken(sessionToken);
-    }
-
-    
-
     public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
      ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
       IProductRepository productRepository, TokenService tokenService) {
@@ -37,7 +31,12 @@ public class ShoppingService{
         cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
     }
 
-    public Response<Boolean> addProductToCart(String storeId, String clientId, String productId, int quantity) {
+    public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
@@ -48,7 +47,12 @@ public class ShoppingService{
         }
     }
 
-    public Response<Set<OrderDTO>> viewCart(String clientId) {
+    public Response<Set<OrderDTO>> viewCart(String sessionToken) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
@@ -62,7 +66,12 @@ public class ShoppingService{
     }
 
 
-    public Response<Boolean> removeProductFromCart(String storeId, String clientId, String productId, int quantity) {
+    public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId, int quantity) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
@@ -73,7 +82,12 @@ public class ShoppingService{
         }
     }
 
-    public Response<Boolean> removeProductFromCart(String storeId, String clientId, String productId) {
+    public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
@@ -84,7 +98,12 @@ public class ShoppingService{
         }
     }
 
-    public Response<Boolean> clearCart(String clientId) {
+    public Response<Boolean> clearCart(String sessionToken) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
@@ -95,7 +114,12 @@ public class ShoppingService{
         }
     }
 
-    public Response<Boolean> clearBasket(String clientId, String storeId) {
+    public Response<Boolean> clearBasket(String sessionToken, String storeId) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
@@ -108,15 +132,20 @@ public class ShoppingService{
 
 
     // Make Immidiate Purchase Use Case 2.5
-    public Response<Boolean> checkout(String cardOwnerID, String cardNumber, Date expiryDate, String cvv, long andIncrement,
+    public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
          String clientName, String deliveryAddress) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
 
             //  public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv) {
 
-            cartFacade.checkout(cardOwnerID, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+            cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
             return new Response<>(true);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
@@ -124,7 +153,12 @@ public class ShoppingService{
     }
 
     
-    public Response<Boolean> makeBid(String auctionId, String clientId, float price) {
+    public Response<Boolean> makeBid(String auctionId, String sessionToken, float price) {
+        if (!tokenService.validateToken(sessionToken)) {
+            return Response.error("Invalid token");
+        }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
