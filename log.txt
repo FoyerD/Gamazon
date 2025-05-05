@@ -1605,6 +1605,44 @@ May 05, 2025 9:52:52 AM MarketService updatePaymentServiceURL
 INFO: Payment service URL updated successfully.
 May 05, 2025 9:52:52 AM MarketService updatePaymentService
 INFO: Payment service updated successfully.
+<<<<<<< HEAD
+May 05, 2025 11:51:55 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 11:51:55 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 11:51:55 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: User Member1 lacks permission ACCESS_PURCHASE_RECORDS for store 1746435115796
+May 05, 2025 11:51:55 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 11:51:55 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746435115875
+May 05, 2025 11:51:55 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746435115888
+May 05, 2025 11:51:55 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: User Member1 lacks permission SUPERVISE_MANAGERS for store 1746435115907
+May 05, 2025 11:51:55 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 11:51:55 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 12:16:07 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 12:16:08 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 12:16:08 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: User Member1 lacks permission ACCESS_PURCHASE_RECORDS for store 1746436568017
+May 05, 2025 12:16:08 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 12:16:08 PM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746436568056
+May 05, 2025 12:16:08 PM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746436568068
+May 05, 2025 12:16:08 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: User Member1 lacks permission SUPERVISE_MANAGERS for store 1746436568078
+May 05, 2025 12:16:08 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 12:16:08 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+=======
 May 05, 2025 11:03:26 AM MarketService addStore
 INFO: Store added successfully.
 May 05, 2025 11:03:49 AM MarketService addStore
@@ -4612,4 +4650,457 @@ INFO: Store purchase history fetched successfully.
 May 05, 2025 2:24:30 PM MarketService addStore
 INFO: Store added successfully.
 May 05, 2025 2:24:30 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 3:54:18 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 3:54:18 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 3:54:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 3:54:18 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+>>>>>>> v1
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:03:41 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService closeStore
+SEVERE: Failed to close store: User Member1 lacks permission DEACTIVATE_STORE for store 1746450221654
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:03:41 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: User Member1 lacks permission RESPOND_TO_INQUIRIES for store 1746450221887
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 4:03:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:03:41 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: User Member1 lacks permission DEACTIVATE_STORE for store 1746450221932
+May 05, 2025 4:06:33 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:06:33 PM MarketService closeStore
+SEVERE: Failed to close store: User Member1 lacks permission DEACTIVATE_STORE for store 1746450393715
+May 05, 2025 4:08:13 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:08:13 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 4:08:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:08:18 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 4:08:27 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:08:27 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: User Member1 lacks permission RESPOND_TO_INQUIRIES for store 1746450507432
+May 05, 2025 4:09:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:15 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:09:29 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:09:29 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 4:09:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:09:29 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 4:10:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:54 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:10:54 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 4:10:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:10:55 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 4:10:55 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:10:55 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:25:44 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:25:44 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 4:25:44 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:44 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:25:54 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 4:25:54 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 4:25:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 4:25:54 PM MarketService marketCloseStore
 INFO: Market closed store successfully.

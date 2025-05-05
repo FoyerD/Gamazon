@@ -17,6 +17,7 @@ import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
+import Infrastructure.Repositories.MemoryPermissionRepository;
 
 public class MarketFacade implements IMarketFacade {
 
@@ -24,12 +25,11 @@ public class MarketFacade implements IMarketFacade {
     private ISupplyService supplyService;
     private INotificationService notificationService;
     private IUserRepository userRepository;
-    private IItemRepository itemRepository; 
-    private StoreFacade storeFacade; 
+    private IItemRepository itemRepository;
+    private StoreFacade storeFacade;
     private ShoppingCartFacade shoppingCartFacade;
 
-    // In-memory permissions store: storeId -> (username -> Permission)
-    private final Map<String, Map<String, Permission>> storePermissions = new ConcurrentHashMap<>();
+    private IPermissionRepository permissionRepository = new MemoryPermissionRepository();
 
     private static final MarketFacade INSTANCE = new MarketFacade();
 
@@ -48,8 +48,8 @@ public class MarketFacade implements IMarketFacade {
     }
 
     // For unit testing
-    public Map<String, Map<String, Permission>> getStorePermissions(){
-        return storePermissions;
+    public Map<String, Map<String, Permission>> getStorePermissions() {
+        return permissionRepository.getAllPermissions();
     }
 
     @Override
@@ -87,26 +87,24 @@ public class MarketFacade implements IMarketFacade {
             if (existingItem == null) {
                 Item newItem = new Item(storeId, String.valueOf(productId), 0, quantity, "New product");
                 itemRepository.add(new Pair<>(storeId, productId), newItem);
-                System.out.println("Added product " + productId + " with quantity " + quantity + " to store " + storeId);
             }
         }
     }
-    
+
     @Override
     public void updateProductQuantities(String storeId, Map<String, Integer> productQuantities, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
         for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
             String productId = entry.getKey();
-            Integer quantity = entry.getValue();    
+            Integer quantity = entry.getValue();
             Item existingItem = itemRepository.getItem(storeId, productId);
             if (existingItem != null) {
                 existingItem.setAmount(quantity);
                 itemRepository.update(new Pair<>(storeId, productId), existingItem);
-                System.out.println("Updated product " + productId + " with new quantity " + quantity + " in store " + storeId);
             }
         }
     }
-    
+
     @Override
     public void removeProductsFromInventory(String storeId, Map<String, Integer> productQuantities, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
@@ -116,7 +114,6 @@ public class MarketFacade implements IMarketFacade {
             Item existingItem = itemRepository.getItem(storeId, productId);
             if (existingItem != null && quantity > 0) {
                 itemRepository.remove(new Pair<>(storeId, productId));
-                System.out.println("Removed product " + productId + " from store " + storeId);
             }
         }
     }
@@ -124,41 +121,42 @@ public class MarketFacade implements IMarketFacade {
     @Override
     public void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId) {
         checkPermission(appointerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
-        Permission perm = getOrCreatePermission(appointerUsername, appointeeUsername, storeId);
-        perm.initStoreManager();
+        getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_MANAGER);
     }
 
     @Override
     public void removeStoreManager(String removerUsername, String managerUsername, String storeId) {
         checkPermission(removerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
-        Permission permission = getPermissionOrThrow(managerUsername, storeId);
-        if (!permission.isStoreManager()) 
+        Permission permission = permissionRepository.get(storeId, managerUsername);
+        if (permission == null || !permission.isStoreManager()) {
             throw new IllegalStateException(managerUsername + " is not a manager.");
+        }
         permission.setPermissions(Set.of());
         permission.setRole(null);
+        permissionRepository.update(storeId, managerUsername, permission);
     }
 
     @Override
     public void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId) {
         checkPermission(appointerUsername, storeId, PermissionType.ASSIGN_OR_REMOVE_OWNERS);
-        Permission perm = getOrCreatePermission(appointerUsername, appointeeUsername, storeId);
-        perm.initStoreOwner();
+        getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_OWNER);
     }
 
     // Currently assigns the first store owner as the permission giver of himself
     private void appointFirstStoreOwner(String appointeeUsername, String storeId) {
-        Permission perm = getOrCreatePermission(appointeeUsername, appointeeUsername, storeId);
-        perm.initStoreOwner();
+        getOrCreatePermission(appointeeUsername, appointeeUsername, storeId, RoleType.STORE_OWNER);
     }
 
 
     @Override
     public void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
         checkPermission(ownerUsername, storeId, PermissionType.MODIFY_OWNER_RIGHTS);
-        Permission permission = getPermissionOrThrow(managerUsername, storeId);
-        if (!permission.isStoreManager()) 
+        Permission permission = permissionRepository.get(storeId, managerUsername);
+        if (permission == null || !permission.isStoreManager()) {
             throw new IllegalStateException(managerUsername + " is not a manager.");
+        }
         permission.setPermissions(PermissionType.collectionToSet(newPermissions));
+        permissionRepository.update(storeId, managerUsername, permission);
     }
 
     @Override
@@ -176,55 +174,43 @@ public class MarketFacade implements IMarketFacade {
     @Override
     public void closeStore(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
-        Member marketManager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
-        if (marketManager == null) {
-            throw new IllegalStateException("Market manager is not assigned.");
-        }
-        storeFacade.closeStore(storeId); 
-        notificationService.sendNotification(
-            marketManager.getName(),
-            "Store " + storeId + " has been closed."
-        );
-        System.out.println("Store " + storeId + " has been successfully closed by the market manager.");
+        storeFacade.closeStore(storeId);
+        Member manager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
+        notificationService.sendNotification(manager.getName(), "Store " + storeId + " has been closed.");
     }
 
     @Override
     public void marketCloseStore(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
-        Member marketManager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
-        if (marketManager == null) {
-            throw new IllegalStateException("Market manager is not assigned.");
-        }
-        // Remove all users from the store permissions
-        for (Map.Entry<String, Permission> entry : storePermissions.get(storeId).entrySet()) {
-            String username = entry.getKey();
-            Permission permission = entry.getValue();
-            if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
-                // Remove permissions for store managers and owners
-                permission.setPermissions(Set.of());
-                permission.setRole(null);
+        Member manager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
+        Map<String, Permission> storePermissions = permissionRepository.getAllPermissionsForStore(storeId);
+        if (storePermissions != null) {
+            for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
+                String username = entry.getKey();
+                Permission permission = entry.getValue();
+                if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
+                    permission.setPermissions(Set.of());
+                    permission.setRole(null);
+                    permissionRepository.update(storeId, username, permission);
+                    notificationService.sendNotification(username, "Store " + storeId + " has been closed.");
+                }
             }
-            notificationService.sendNotification(
-                username,
-                "Store " + storeId + " has been closed."
-            );
         }
-        storeFacade.closeStore(storeId); 
-        notificationService.sendNotification(
-            marketManager.getName(),
-            "Store " + storeId + " has been closed."
-        );
+        storeFacade.closeStore(storeId);
+        notificationService.sendNotification(manager.getName(), "Store " + storeId + " has been closed.");
     }
 
     @Override
     public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.SUPERVISE_MANAGERS);
         Map<String, List<PermissionType>> result = new HashMap<>();
-        Map<String, Permission> storeMap = storePermissions.get(storeId);
-        if (storeMap != null) {
-            for (var entry : storeMap.entrySet()) {
-                if (entry.getValue().isStoreManager()) {
-                    result.put(entry.getKey(), List.copyOf(entry.getValue().getPermissions()));
+        Map<String, Permission> storePermissions = permissionRepository.getAllPermissionsForStore(storeId);
+        if (storePermissions != null) {
+            for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
+                String username = entry.getKey();
+                Permission p = entry.getValue();
+                if (p.isStoreManager()) {
+                    result.put(username, List.copyOf(p.getPermissions()));
                 }
             }
         }
@@ -246,8 +232,7 @@ public class MarketFacade implements IMarketFacade {
     @Override
     public List<Receipt> getStorePurchaseHistory(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
-        List<Receipt> receipts = shoppingCartFacade.getStorePurchaseHistory(storeId);
-        return receipts;
+        return shoppingCartFacade.getStorePurchaseHistory(storeId);
     }
 
     @Override
@@ -258,30 +243,25 @@ public class MarketFacade implements IMarketFacade {
         paymentService.initialize();
         supplyService.initialize();
         notificationService.initialize();
-        Member marketManager = userRepository.getMember(userId);        
-        Permission founder = new Permission("system", marketManager.getName());
-        founder.initTradingManager();
-        storePermissions.putIfAbsent("market", new HashMap<>());
-        storePermissions.get("market").put(marketManager.getName(), founder);
-        System.out.println("Market opened.");
+        Member manager = userRepository.getMember(userId);
+        Permission founder = new Permission("system", manager.getName());
+        PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
+        permissionRepository.add("1", manager.getName(), founder);
     }
 
-    private Permission getOrCreatePermission(String giver, String member, String storeId) {
-        storePermissions.putIfAbsent(storeId, new HashMap<>());
-        return storePermissions.get(storeId).computeIfAbsent(member, u -> new Permission(giver, member));
-    }
-
-    private Permission getPermissionOrThrow(String username, String storeId) {
-        Map<String, Permission> perms = storePermissions.get(storeId);
-        if (perms == null || !perms.containsKey(username)) {
-            throw new IllegalArgumentException("No permissions found for user " + username + " in store " + storeId);
+    private Permission getOrCreatePermission(String giver, String member, String storeId, RoleType role) {
+        Permission permission = permissionRepository.get(storeId, member);
+        if (permission == null) {
+            permission = new Permission(giver, member);
+            PermissionFactory.initPermissionAsRole(permission, role);
+            permissionRepository.add(storeId, member, permission);
         }
-        return perms.get(username);
+        return permission;
     }
 
     private void checkPermission(String username, String storeId, PermissionType requiredPermission) {
-        Permission permission = getPermissionOrThrow(username, storeId);
-        if (!permission.hasPermission(requiredPermission)) {
+        Permission permission = permissionRepository.get(storeId, username);
+        if (permission == null || !permission.hasPermission(requiredPermission)) {
             throw new SecurityException("User " + username + " lacks permission " + requiredPermission + " for store " + storeId);
         }
     }
