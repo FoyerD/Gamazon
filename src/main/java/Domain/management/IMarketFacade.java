@@ -9,6 +9,7 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.User.IUserRepository;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
+import Domain.Store.Store;
 import Domain.Shopping.Receipt;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.StoreFacade;
@@ -146,6 +147,9 @@ public interface IMarketFacade {
      * @param userId ID of the user requesting the closure
      */
     void closeStore(String storeId, String userId);
+
+
+    Store addStore(String name, String description, String founderId);
 
     /**
      * 4.11 Retrieve all managers and their permissions in a store.

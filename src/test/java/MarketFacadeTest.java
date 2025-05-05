@@ -275,19 +275,6 @@ public class MarketFacadeTest {
         assertNotNull(result);
     }
 
-    // @Test
-    // public void givenAdminWithAccessRecordsPermission_whenGetStorePurchaseHistory_thenReturnNull() {
-    //     User user = mock(User.class);
-    //     when(userRepository.get(anyString())).thenReturn(user);
-    //     when(user.getName()).thenReturn("adminUser");
-    //     marketFacade.getStorePermissions().put("store1", new HashMap<>());
-    //     marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
-
-    //     List<ShoppingBasket> history = marketFacade.getStorePurchaseHistory("store1", LocalDateTime.now(), LocalDateTime.now(), "userId");
-
-    //     assertNull(history);
-    // }
-
     @Test
     public void givenMarketFacade_whenOpenMarket_thenInitializeExternalServices() {
         Member member = mock(Member.class);
