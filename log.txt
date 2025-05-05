@@ -1553,3 +1553,55 @@ May 05, 2025 8:40:15 AM MarketService addProductsToInventory
 SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746423615521
 May 05, 2025 8:41:45 AM MarketService removeProductsFromInventory
 SEVERE: Failed to remove products from inventory: No permissions found for user Member1 in store 1746423705590
+May 05, 2025 9:10:43 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member1 in store 1746425443850
+May 05, 2025 9:12:27 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746425547760
+May 05, 2025 9:13:16 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746425596813
+May 05, 2025 9:14:59 AM MarketService openMarket
+SEVERE: Failed to open market: Cannot invoke "Domain.User.Member.getName()" because "marketManager" is null
+May 05, 2025 9:17:26 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:25:23 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:25:36 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 9:25:36 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 9:25:36 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member1 in store 1746426336407
+May 05, 2025 9:25:36 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:25:36 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746426336442
+May 05, 2025 9:25:36 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: No permissions found for user Member1 in store 1746426336457
+May 05, 2025 9:25:36 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746426336459
+May 05, 2025 9:25:36 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 9:25:36 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 9:26:54 AM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: No permissions found for user ownerUser in store 1746426414007
+May 05, 2025 9:28:24 AM MarketService appointStoreManager
+SEVERE: Failed to appoint store manager: No permissions found for user Member1 in store 1746426504480
+May 05, 2025 9:52:52 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 9:52:52 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 9:52:52 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member1 in store 1746427972389
+May 05, 2025 9:52:52 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 9:52:52 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: No permissions found for user Member1 in store 1746427972422
+May 05, 2025 9:52:52 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: No permissions found for user Member1 in store 1746427972433
+May 05, 2025 9:52:52 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: No permissions found for user Member1 in store 1746427972441
+May 05, 2025 9:52:52 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 9:52:52 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.

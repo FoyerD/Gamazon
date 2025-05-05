@@ -238,7 +238,7 @@ public class MarketFacade implements IMarketFacade {
         paymentService.initialize();
         supplyService.initialize();
         notificationService.initialize();
-        Member marketManager = userRepository.getMemberByUsername(userId);        
+        Member marketManager = userRepository.getMember(userId);        
         Permission founder = new Permission("system", marketManager.getName());
         founder.initTradingManager();
         storePermissions.putIfAbsent("market", new HashMap<>());

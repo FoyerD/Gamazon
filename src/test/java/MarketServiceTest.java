@@ -4,6 +4,7 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartRepository;
+import Domain.Shopping.Receipt;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Pair;
@@ -160,6 +161,19 @@ public class MarketServiceTest {
     }
 
     @Test
+    public void testGetStorePurchaseHistory_noPermissions() {
+        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId, storeId);
+        assertTrue(response.errorOccurred(), "Failed to fetch store purchase history: " + response.getErrorMessage());
+    }
+
+    @Test
+    public void testGetManagersPermissions_noPermissions() {
+        Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId, storeId);
+        assertTrue(response.errorOccurred());
+    }
+
+
+    @Test
     public void testaddProductsToInventory_noPermissions() {
         Map<String, Integer> products = Map.of(productId, 5);
         Response<Void> response = marketService.addProductsToInventory(tokenId, storeId, products);
@@ -171,8 +185,6 @@ public class MarketServiceTest {
         Map<String, Integer> productsToRemove = Map.of(productId, 1);
         Response<Void> response = marketService.removeProductsFromInventory(tokenId, storeId, productsToRemove);
         assertTrue(response.errorOccurred());
-        // Item item = itemResponse.getValue();
-        // assertEquals(2, item.getAmount(), "Product quantity mismatch after removing from inventory");
     }
 
     @Test
@@ -201,76 +213,6 @@ public class MarketServiceTest {
         assertFalse(response.errorOccurred());
         verify(mockPaymentService).updatePaymentServiceURL(newUrl);
     }
-
-    // @Test
-    // public void testAppointStoreManager() {
-    //     String appointeeUsername = "newManager";
-    //     Response<Void> response = marketService.appointStoreManager(guestToken, "ownerUser", appointeeUsername, storeId);
-    //     assertFalse(response.errorOccurred());
-    // }
-
-    // @Test
-    // public void testRemoveStoreManager() {
-    //     String managerUsername = "existingManager";
-    //     Response<Void> response = marketService.removeStoreManager(guestToken, "ownerUser", managerUsername, storeId);
-    //     assertFalse(response.errorOccurred());
-    // }
-
-    // @Test
-    // public void testAppointStoreOwner() {
-    //     String appointeeUsername = "newOwner";
-    //     Response<Void> response = marketService.appointStoreOwner(guestToken, "ownerUser", appointeeUsername, storeId);
-    //     assertFalse(response.errorOccurred());
-    // }
-
-    // @Test
-    // public void testCloseStore() {
-    //     Response<Void> response = marketService.closeStore(guestToken, storeId);
-    //     assertFalse(response.errorOccurred());
-    // }
-
-    // @Test
-    // public void testMarketCloseStore() {
-    //     Response<Void> response = marketService.marketCloseStore(guestToken, storeId);
-    //     assertFalse(response.errorOccurred());
-    // }
-
-    // @Test
-    // public void testGetManagersPermissions() {
-    //     Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(guestToken, storeId);
-    //     assertFalse(response.errorOccurred());
-    //     assertNotNull(response.getValue());
-    // }
-
-    // @Test
-    // public void testRespondToUserMessage() {
-    //     String comment = "Thank you for your feedback!";
-    //     Response<Boolean> response = marketService.respondToUserMessage(guestToken, storeId, productId, "userId", comment);
-    //     assertFalse(response.errorOccurred(), "Failed to respond to user message");
-    //     assertTrue(response.getValue(), "Response to user message was not successful");
-    // }
-
-    // @Test
-    // public void testGetUserMessage() {
-    //     Response<Feedback> response = marketService.getUserMessage(guestToken, storeId, productId, "userId");
-    //     assertFalse(response.errorOccurred(), "Failed to fetch user message");
-    //     assertNotNull(response.getValue(), "Feedback is null");
-    // }
-
-    // @Test
-    // public void testGetStorePurchaseHistory() {
-    //     LocalDateTime from = LocalDateTime.now().minusDays(30);
-    //     LocalDateTime to = LocalDateTime.now();
-    //     Response<List<ShoppingBasket>> response = marketService.getStorePurchaseHistory(guestToken, storeId, from, to);
-    //     assertFalse(response.errorOccurred(), "Failed to fetch store purchase history");
-    //     assertNotNull(response.getValue(), "Purchase history is null");
-    // }
-
-    // @Test
-    // public void testOpenMarket() {
-    //     Response<Void> response = marketService.openMarket(guestToken);
-    //     assertFalse(response.errorOccurred(), "Failed to open market");
-    // }
         
 
     
