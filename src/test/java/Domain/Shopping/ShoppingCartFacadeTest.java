@@ -22,6 +22,7 @@ import Domain.Store.Auction;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
+import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Store.IProductRepository;
 
@@ -92,6 +93,8 @@ public class ShoppingCartFacadeTest {
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockCart.hasStore(STORE_ID)).thenReturn(true);
+        when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mock(Item.class));
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mock(Store.class));
         
         // Act
         boolean result = facade.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, QUANTITY);
@@ -109,7 +112,9 @@ public class ShoppingCartFacadeTest {
         // Arrange
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(null);
         when(mockBasketRepo.get(any())).thenReturn(null);
-        
+        when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mock(Item.class));
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mock(Store.class));
+
         // Act
         boolean result = facade.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, QUANTITY);
         
@@ -125,7 +130,10 @@ public class ShoppingCartFacadeTest {
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockCart.hasStore(STORE_ID)).thenReturn(false);
+        when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mock(Item.class));
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mock(Store.class));
         
+
         // Act
         boolean result = facade.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, QUANTITY);
         
