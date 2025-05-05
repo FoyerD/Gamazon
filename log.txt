@@ -1731,3 +1731,2813 @@ May 05, 2025 11:48:25 AM MarketService addStore
 INFO: Store added successfully.
 May 05, 2025 11:48:25 AM MarketService getManagersPermissions
 INFO: Manager permissions fetched successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:15:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:15:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:17:42 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:32 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:18:45 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:22:33 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:22:33 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:22:33 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746440553714
+May 05, 2025 1:24:49 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:24:49 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:24:49 PM MarketService closeStore
+SEVERE: Failed to close store: User Member1 lacks permission DEACTIVATE_STORE for store 1746440689657
+May 05, 2025 1:25:05 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:25:05 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:25:05 PM MarketService marketCloseStore
+SEVERE: Failed to close store by market: User Member1 lacks permission DEACTIVATE_STORE for store 1746440705739
+May 05, 2025 1:28:22 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:28:22 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:28:22 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:28:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:28:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:28:29 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:31:49 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:31:49 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:31:49 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:33:11 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:33:11 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:33:11 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:33:11 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 1:33:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:33:54 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:33:54 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:37:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:37:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:37:19 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:37:19 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:42:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:42:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:42:23 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:42:56 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:42:56 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:42:56 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:43:13 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:43:13 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:43:14 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:43:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:43:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:43:19 PM MarketService respondToUserMessage
+SEVERE: Failed to respond to user message: User Member1 lacks permission RESPOND_TO_INQUIRIES for store 1746441799697
+May 05, 2025 1:44:26 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:26 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:26 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:44:43 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746441883502
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:44:43 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:44:43 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746442379813
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:52:59 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:52:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:00 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:53:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:18 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:53:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:18 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:53:19 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:53:19 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:19 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:53:50 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:53:50 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:54:24 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:54:24 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:54:24 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:55:08 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746442508677
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:55:08 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:08 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746442521473
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:55:21 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:21 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:55:39 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:55:39 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:56:52 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:56:52 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746442703184
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:58:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:58:23 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:59:39 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746442779940
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:39 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:59:40 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 1:59:40 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746442800984
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:00 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:01 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:00:42 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:00:42 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:00:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:01:52 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:01:52 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService closeStore
+SEVERE: Failed to close store: No permissions found for user Member1 in store 1746442912858
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:01:52 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:05:28 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:05:28 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:05:28 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:06:11 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:06:11 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:06:11 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:07:57 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:07:57 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:07:57 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:16 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:16 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:16 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:08:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:21 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:21 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:08:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:29 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:29 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746443309200
+May 05, 2025 2:08:33 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:33 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:33 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:08:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:40 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:40 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:08:51 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:08:51 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746443434504
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:10:34 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:10:34 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:11:49 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:11:50 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746443510110
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:11:50 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:11:50 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:50 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:11:58 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:11:58 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:11:58 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:11:58 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:12:19 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746443539497
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:12:19 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:12:19 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:19 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:12:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:41 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:12:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:41 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:12:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:41 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:12:41 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:12:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:41 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:12:41 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:41 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: No permissions found for user Member2 in store 1746443562077
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+SEVERE: Failed to add store: Item with this ID already exists
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:12:42 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:12:42 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:12:42 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:13:23 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:13:23 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:13:23 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:23 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:13:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:59 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:13:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:59 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:13:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:59 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:13:59 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:13:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:59 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:13:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:59 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:13:59 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:13:59 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:00 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:14:00 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:00 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:15 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:15 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:14:15 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:15 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:24 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:24 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:14:24 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:24 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:14:25 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:25 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:14:25 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:25 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:14:25 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:25 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:14:25 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:14:25 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:18:10 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:18:10 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:18:10 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:18:10 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:19:48 PM MarketService removeStoreManager
+INFO: Store manager removed successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService closeStore
+INFO: Store closed successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService getManagersPermissions
+INFO: Manager permissions fetched successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService removeProductsFromInventory
+INFO: Products removed from inventory successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService appointStoreManager
+INFO: Store manager appointed successfully.
+May 05, 2025 2:19:48 PM MarketService changeManagerPermissions
+INFO: Manager permissions changed successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService addProductsToInventory
+INFO: Products added to inventory successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService getUserMessage
+INFO: User message fetched successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService respondToUserMessage
+INFO: Responded to user message successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService appointStoreOwner
+INFO: Store owner appointed successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService getStorePurchaseHistory
+INFO: Store purchase history fetched successfully.
+May 05, 2025 2:19:48 PM MarketService addStore
+INFO: Store added successfully.
+May 05, 2025 2:19:48 PM MarketService marketCloseStore
+INFO: Market closed store successfully.
