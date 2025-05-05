@@ -237,4 +237,82 @@ public class ItemServiceTests {
         assertTrue(response.errorOccurred());
         assertNotNull(response.getErrorMessage());
     }
+    @Test
+    public void WhenConcurrentIncreaseAndDecrease_ThenAmountIsStable() throws InterruptedException {
+        Pair<String, String> id = new Pair<>("1", "101");
+        int initialAmount = itemService.getItem(id.getFirst(), id.getSecond()).getValue().getAmount();
+
+        int threadCount = 20;
+        Thread[] threads = new Thread[threadCount];
+
+        for (int i = 0; i < threadCount; i++) {
+            final int index = i;
+            threads[i] = new Thread(() -> {
+                if (index % 2 == 0)
+                    itemService.increaseAmount(id, 1);
+                else
+                    itemService.decreaseAmount(id, 1);
+            });
+        }
+
+        for (Thread t : threads) t.start();
+        for (Thread t : threads) t.join();
+
+        int finalAmount = itemService.getItem(id.getFirst(), id.getSecond()).getValue().getAmount();
+        assertEquals("Amount should be stable after balanced increase/decrease", initialAmount, finalAmount);
+    }
+
+    @Test
+    public void WhenManyThreadsIncreaseAmount_ThenAmountIncreasesCorrectly() throws InterruptedException {
+        Pair<String, String> id = new Pair<>("1", "101");
+        int initialAmount = itemService.getItem(id.getFirst(), id.getSecond()).getValue().getAmount();
+
+        int threads = 50;
+        Thread[] t = new Thread[threads];
+        for (int i = 0; i < threads; i++) {
+            t[i] = new Thread(() -> itemService.increaseAmount(id, 1));
+        }
+
+        for (Thread thread : t) thread.start();
+        for (Thread thread : t) thread.join();
+
+        int finalAmount = itemService.getItem(id.getFirst(), id.getSecond()).getValue().getAmount();
+        assertEquals(initialAmount + threads, finalAmount);
+    }
+
+    @Test
+    public void WhenConcurrentUpdatesOnTwoItems_ThenEachIsCorrectlyUpdated() throws InterruptedException {
+        // Setup a second item
+        addStoreAndProduct("storeX", "Extra Store", "founderX", "prodX", "Extra Item", 19.99f, 30, "Extra Item");
+        Pair<String, String> id1 = new Pair<>("1", "101");
+        Pair<String, String> id2 = new Pair<>("storeX", "prodX");
+    
+        int initial1 = itemService.getItem(id1.getFirst(), id1.getSecond()).getValue().getAmount();
+        int initial2 = itemService.getItem(id2.getFirst(), id2.getSecond()).getValue().getAmount();
+    
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 25; i++) {
+                itemService.increaseAmount(id1, 1);
+            }
+        });
+    
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 40; i++) {
+                itemService.increaseAmount(id2, 1);
+            }
+        });
+    
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+    
+        int final1 = itemService.getItem(id1.getFirst(), id1.getSecond()).getValue().getAmount();
+        int final2 = itemService.getItem(id2.getFirst(), id2.getSecond()).getValue().getAmount();
+    
+        assertEquals(initial1 + 25, final1);
+        assertEquals(initial2 + 40, final2);
+    }
+    
+
 }
