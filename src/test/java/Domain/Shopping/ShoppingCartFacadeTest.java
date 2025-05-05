@@ -1,6 +1,12 @@
 package Domain.Shopping;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -70,7 +76,16 @@ public class ShoppingCartFacadeTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        // Initialize mocks manually since initMocks isn't working
+        mockCartRepo = mock(IShoppingCartRepository.class);
+        mockBasketRepo = mock(IShoppingBasketRepository.class);
+        mockPaymentService = mock(IPaymentService.class);
+        mockItemFacade = mock(ItemFacade.class);
+        mockStoreFacade = mock(StoreFacade.class);
+        mockReceiptRepo = mock(IReceiptRepository.class);
+        mockProductRepo = mock(IProductRepository.class);
+        mockCart = mock(IShoppingCart.class);
+        mockBasket = mock(ShoppingBasket.class);
         
         facade = new ShoppingCartFacade(
             mockCartRepo, 
@@ -267,7 +282,7 @@ public class ShoppingCartFacadeTest {
         verify(mockBasket).clear();
         verify(mockCart).clear();
         verify(mockReceiptRepo).savePurchase(
-            eq(CLIENT_ID), eq(STORE_ID), any(Map.class), anyDouble(), anyString()
+            eq(CLIENT_ID), eq(STORE_ID), anyMap(), anyDouble(), anyString()
         );
     }
     
