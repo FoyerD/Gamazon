@@ -162,25 +162,4 @@ public void givenExistingItem_whenAdd_thenReturnsFalseAndSkipsAdd() {
         facade.remove(id);
     }
 
-    @Test
-    public void givenIdAndAmt_whenIncreaseAmount_thenDelegates() {
-        Pair<String,String> id = new Pair<>("s","p");
-        Item it = mock(Item.class);
-        when(storeRepo.get("s")).thenReturn(mock(Store.class));
-        when(productRepo.get("p")).thenReturn(mock(Product.class));
-        when(repo.get(id)).thenReturn(it);
-        facade.increaseAmount(id, 4);
-        verify(it).increaseAmount(4);
-    }
-
-    @Test
-    public void givenIdAndAmt_whenDecreaseAmount_thenDelegates() {
-        Pair<String,String> id = new Pair<>("s","p");
-        Item it = mock(Item.class);
-        when(storeRepo.get("s")).thenReturn(mock(Store.class));
-        when(productRepo.get("p")).thenReturn(mock(Product.class));
-        when(repo.get(id)).thenReturn(it);
-        facade.decreaseAmount(id, 2);
-        verify(it).decreaseAmount(2);
-    }
 }

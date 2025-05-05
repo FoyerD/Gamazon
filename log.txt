@@ -4444,3 +4444,769 @@ INFO: Store added successfully.
 May 05, 2025 4:25:54 PM MarketService marketCloseStore
 INFO: Market closed store successfully.
 >>>>>>> v1
+מאי 05, 2025 10:46:18 אחה״צ ItemService remove
+INFO: Item removed.
+מאי 05, 2025 10:46:18 אחה״צ ItemService filterItems
+INFO: Items filtered.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+SEVERE: Store not found for storeId: invalid
+מאי 05, 2025 10:46:18 אחה״צ ItemService getAvailableItems
+INFO: Fetched available items.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService changePrice
+SEVERE: Price cannot be negative
+מאי 05, 2025 10:46:18 אחה״צ ItemService filterItems
+INFO: Items filtered.
+מאי 05, 2025 10:46:18 אחה״צ ItemService add
+INFO: Item added: true
+מאי 05, 2025 10:46:18 אחה״צ ItemService getAvailableItems
+INFO: Fetched available items.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService decreaseAmount
+SEVERE: Not enough items in stock
+מאי 05, 2025 10:46:18 אחה״צ ItemService add
+INFO: Item added: false
+מאי 05, 2025 10:46:18 אחה״צ ItemService remove
+SEVERE: Store not found for storeId: invalid
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService changePrice
+INFO: Price changed successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:46:18 אחה״צ ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService remove
+INFO: Item removed.
+מאי 05, 2025 10:57:12 אחה״צ ItemService filterItems
+INFO: Items filtered.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+SEVERE: Store not found for storeId: invalid
+מאי 05, 2025 10:57:12 אחה״צ ItemService getAvailableItems
+INFO: Fetched available items.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService changePrice
+SEVERE: Price cannot be negative
+מאי 05, 2025 10:57:12 אחה״צ ItemService filterItems
+INFO: Items filtered.
+מאי 05, 2025 10:57:12 אחה״צ ItemService add
+INFO: Item added: true
+מאי 05, 2025 10:57:12 אחה״צ ItemService getAvailableItems
+INFO: Fetched available items.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService decreaseAmount
+SEVERE: Not enough items in stock
+מאי 05, 2025 10:57:12 אחה״צ ItemService add
+INFO: Item added: false
+מאי 05, 2025 10:57:12 אחה״צ ItemService remove
+SEVERE: Store not found for storeId: invalid
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService changePrice
+INFO: Price changed successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:12 אחה״צ ItemService increaseAmount
+SEVERE: Store not found for storeId: bad
+מאי 05, 2025 10:57:56 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:57:56 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:57:57 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:11 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:11 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:22 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:22 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:22 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:22 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService remove
+INFO: Item removed.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService filterItems
+INFO: Items filtered.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+SEVERE: Store not found for storeId: invalid
+מאי 05, 2025 10:58:34 אחה״צ ItemService getAvailableItems
+INFO: Fetched available items.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItemsByStoreId
+SEVERE: Store not found for storeId: invalid-store
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItemsByStoreId
+INFO: Fetched items for storeId: store1
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService changePrice
+SEVERE: Price cannot be negative
+מאי 05, 2025 10:58:34 אחה״צ ItemService filterItems
+INFO: Items filtered.
+מאי 05, 2025 10:58:34 אחה״צ ItemService add
+INFO: Item added: true
+מאי 05, 2025 10:58:34 אחה״צ ItemService getAvailableItems
+INFO: Fetched available items.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+INFO: Amount decreased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService decreaseAmount
+SEVERE: Not enough items in stock
+מאי 05, 2025 10:58:34 אחה״צ ItemService add
+INFO: Item added: false
+מאי 05, 2025 10:58:34 אחה״צ ItemService remove
+SEVERE: Store not found for storeId: invalid
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+INFO: Amount increased.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService changePrice
+INFO: Price changed successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService getItem
+INFO: Item retrieved successfully.
+מאי 05, 2025 10:58:34 אחה״צ ItemService increaseAmount
+SEVERE: Store not found for storeId: bad

@@ -122,7 +122,16 @@ public class ItemFacade {
      */
     public void increaseAmount(Pair<String, String> id, int amount) {
         validateStoreAndProductExist(id.getFirst(), id.getSecond());
-        itemRepository.get(id).increaseAmount(amount);
+    
+        Item item = itemRepository.get(id);
+        if (item == null) {
+            throw new NoSuchElementException("Item not found for: " + id);
+        }
+    
+        Object lock = getOrCreateLockSafe(id);
+        synchronized (lock) {
+            item.increaseAmount(amount);
+        }
     }
 
     /**
@@ -130,7 +139,16 @@ public class ItemFacade {
      */
     public void decreaseAmount(Pair<String, String> id, int amount) {
         validateStoreAndProductExist(id.getFirst(), id.getSecond());
-        itemRepository.get(id).decreaseAmount(amount);
+    
+        Item item = itemRepository.get(id);
+        if (item == null) {
+            throw new NoSuchElementException("Item not found for: " + id);
+        }
+    
+        Object lock = getOrCreateLockSafe(id);
+        synchronized (lock) {
+            item.decreaseAmount(amount);
+        }
     }
 
     /**
@@ -144,4 +162,16 @@ public class ItemFacade {
             throw new NoSuchElementException("Product not found for productId: " + productId);
         }
     }
+
+    private Object getOrCreateLockSafe(Pair<String, String> id) {
+        Object lock = itemRepository.getLock(id);
+        if (lock == null) {
+            // Trigger a side-effect that will create the lock safely.
+            // For example, call `add(...)` again with a dummy item if you know it's already added,
+            // or assume all existing items already have a lock because the repo does `addLock` on `add`.
+            throw new IllegalStateException("Lock not found for id: " + id + ". Ensure all added items create locks.");
+        }
+        return lock;
+    }
+    
 }
