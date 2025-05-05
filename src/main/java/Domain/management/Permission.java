@@ -17,7 +17,9 @@ public class Permission {
         PermissionType.ACCESS_PURCHASE_RECORDS,
         PermissionType.ADMINISTER_STORE,
         PermissionType.OVERSEE_OFFERS,
-        PermissionType.CONTROL_CONTRACTS
+        PermissionType.CONTROL_CONTRACTS,
+        PermissionType.DEACTIVATE_STORE,
+        PermissionType.RESPOND_TO_INQUIRIES
     );
 
     // Manages the trading system according to Section 4

@@ -67,7 +67,6 @@ public class PermissionTest {
         assertTrue(permission.hasPermission(PermissionType.ADMINISTER_STORE));
         assertTrue(permission.hasPermission(PermissionType.OVERSEE_OFFERS));
         assertTrue(permission.hasPermission(PermissionType.CONTROL_CONTRACTS));
-        assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
     }
 
     @Test
@@ -163,7 +162,6 @@ public class PermissionTest {
     public void givenStoreOwnerRole_whenCheckingSpecificPermissions_thenCorrectPermissionsPresent() {
         permission.initStoreOwner();
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
-        assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
     }
 
     @Test
