@@ -4,6 +4,7 @@ import org.junit.Test;
 import Domain.management.Permission;
 import Domain.management.PermissionType;
 import Domain.management.RoleType;
+import Domain.management.PermissionFactory;
 
 import java.util.Set;
 
@@ -23,7 +24,7 @@ public class PermissionTest {
 
     @Test
     public void givenNewPermission_whenInitStoreManager_thenCorrectPermissionsAssigned() {
-        permission.initStoreManager();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_MANAGER);
         assertTrue(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
         assertFalse(permission.isStoreFounder());
@@ -42,7 +43,7 @@ public class PermissionTest {
 
     @Test
     public void givenNewPermission_whenInitTradingManager_thenCorrectPermissionsAssigned() {
-        permission.initTradingManager();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.TRADING_MANAGER);
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
         assertFalse(permission.isStoreFounder());
@@ -54,7 +55,7 @@ public class PermissionTest {
 
     @Test
     public void givenNewPermission_whenInitStoreOwner_thenCorrectPermissionsAssigned() {
-        permission.initStoreOwner();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_OWNER);
         assertFalse(permission.isStoreManager());
         assertTrue(permission.isStoreOwner());
         assertFalse(permission.isStoreFounder());
@@ -72,7 +73,7 @@ public class PermissionTest {
 
     @Test
     public void givenNewPermission_whenInitStoreFounder_thenCorrectPermissionsAssigned() {
-        permission.initStoreFounder();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_FOUNDER);
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
         assertTrue(permission.isStoreFounder());
@@ -124,19 +125,19 @@ public class PermissionTest {
 
     @Test
     public void givenStoreManagerRole_whenCheckingAssignOwnerPermission_thenShouldNotHaveIt() {
-        permission.initStoreManager();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_MANAGER);
         assertFalse(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
     }
 
     @Test
     public void givenStoreManagerRole_whenCheckingPurchaseAccessPermission_thenShouldHaveIt() {
-        permission.initStoreManager();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_MANAGER);
         assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
     }
 
     @Test
     public void givenStoreFounderRole_whenCheckingAllExpectedPermissions_thenAllPresent() {
-        permission.initStoreFounder();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_FOUNDER);
         assertTrue(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
@@ -149,7 +150,7 @@ public class PermissionTest {
 
     @Test
     public void givenStoreFounderRole_whenCheckingModifyOwnerPermission_thenShouldHaveIt() {
-        permission.initStoreFounder();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_FOUNDER);
         assertTrue(permission.hasPermission(PermissionType.MODIFY_OWNER_RIGHTS));
     }
 
@@ -161,27 +162,27 @@ public class PermissionTest {
 
     @Test
     public void givenStoreOwnerRole_whenCheckingSpecificPermissions_thenCorrectPermissionsPresent() {
-        permission.initStoreOwner();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_OWNER);
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
     }
 
     @Test
     public void givenPermission_whenSwitchingBetweenRolesAndPermissions_thenStateUpdatedCorrectly() {
-        permission.initStoreManager();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_MANAGER);
         assertTrue(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
 
-        permission.initStoreOwner();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_OWNER);
         assertFalse(permission.isStoreManager());
         assertTrue(permission.isStoreOwner());
 
-        permission.initStoreFounder();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_FOUNDER);
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
         assertTrue(permission.isStoreFounder());
 
-        permission.initTradingManager();
+        PermissionFactory.initPermissionAsRole(permission, RoleType.TRADING_MANAGER);
         assertFalse(permission.isStoreManager());
         assertFalse(permission.isStoreOwner());
         assertFalse(permission.isStoreFounder());

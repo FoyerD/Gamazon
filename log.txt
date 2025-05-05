@@ -1605,3 +1605,39 @@ May 05, 2025 9:52:52 AM MarketService updatePaymentServiceURL
 INFO: Payment service URL updated successfully.
 May 05, 2025 9:52:52 AM MarketService updatePaymentService
 INFO: Payment service updated successfully.
+May 05, 2025 11:51:55 AM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 11:51:55 AM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 11:51:55 AM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: User Member1 lacks permission ACCESS_PURCHASE_RECORDS for store 1746435115796
+May 05, 2025 11:51:55 AM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 11:51:55 AM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746435115875
+May 05, 2025 11:51:55 AM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746435115888
+May 05, 2025 11:51:55 AM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: User Member1 lacks permission SUPERVISE_MANAGERS for store 1746435115907
+May 05, 2025 11:51:55 AM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 11:51:55 AM MarketService updatePaymentService
+INFO: Payment service updated successfully.
+May 05, 2025 12:16:07 PM MarketService updateNotificationService
+INFO: Notification service updated successfully.
+May 05, 2025 12:16:08 PM MarketService updateSupplyService
+INFO: Supply service updated successfully.
+May 05, 2025 12:16:08 PM MarketService getStorePurchaseHistory
+SEVERE: Failed to get store purchase history: User Member1 lacks permission ACCESS_PURCHASE_RECORDS for store 1746436568017
+May 05, 2025 12:16:08 PM MarketService openMarket
+INFO: Market opened successfully.
+May 05, 2025 12:16:08 PM MarketService addProductsToInventory
+SEVERE: Failed to add products to inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746436568056
+May 05, 2025 12:16:08 PM MarketService removeProductsFromInventory
+SEVERE: Failed to remove products from inventory: User Member1 lacks permission HANDLE_INVENTORY for store 1746436568068
+May 05, 2025 12:16:08 PM MarketService getManagersPermissions
+SEVERE: Failed to fetch manager permissions: User Member1 lacks permission SUPERVISE_MANAGERS for store 1746436568078
+May 05, 2025 12:16:08 PM MarketService updatePaymentServiceURL
+INFO: Payment service URL updated successfully.
+May 05, 2025 12:16:08 PM MarketService updatePaymentService
+INFO: Payment service updated successfully.
