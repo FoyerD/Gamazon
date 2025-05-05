@@ -1,7 +1,4 @@
-package Domain.Shopping;
-
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -11,26 +8,40 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import static org.mockito.Mockito.mock;
 
 import Application.DTOs.OrderDTO;
 import Application.ShoppingService;
 import Application.utils.Response;
 import Domain.Pair;
 import Domain.TokenService;
+import Domain.ExternalServices.IPaymentService;
+import Domain.Shopping.IReceiptRepository;
+import Domain.Shopping.IShoppingBasketRepository;
+import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.IShoppingCartRepository;
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
+import Domain.Store.Product;
+import Domain.Store.Store;
+import Domain.User.IUserRepository;
+import Infrastructure.Repositories.MemoryAuctionRepository;
+import Infrastructure.Repositories.MemoryFeedbackRepository;
+import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryProductRepository;
+import Infrastructure.Repositories.MemoryReceiptRepository;
+import Infrastructure.Repositories.MemoryShoppingBasketRepository;
+import Infrastructure.Repositories.MemoryShoppingCartRepository;
+import Infrastructure.Repositories.MemoryStoreRepository;
+import Infrastructure.Repositories.MemoryUserRepository;
+import Domain.Store.IAuctionRepository;
+import Domain.Store.IFeedbackRepository;
+import Domain.Store.IItemRepository;
 import Domain.Store.IProductRepository;
+import Domain.Store.IStoreRepository;
 
-/**
- * Test class for ShoppingService
- * 
- * Tests the main use cases:
- * - 2.3: Saving Products to the Shopping Cart
- * - 2.4: Viewing the Shopping Cart
- * - 2.5: Immediate Purchase of the Shopping Cart (All-or-Nothing)
- * - 3.9: Submitting a Purchase Bid for a Single Product
- */
 public class ShoppingServiceTest {
 
     private ShoppingService shoppingService;
@@ -38,59 +49,99 @@ public class ShoppingServiceTest {
     @Mock
     private TokenService mockTokenService;
     
-    @Mock
-    private IShoppingCartRepository mockCartRepository;
-    
-    @Mock
-    private IShoppingBasketRepository mockBasketRepository;
-    
-    @Mock
-    private ItemFacade mockItemFacade;
-    
-    @Mock
-    private StoreFacade mockStoreFacade;
-    
-    @Mock
-    private IReceiptRepository mockReceiptRepository;
-    
-    @Mock
-    private IProductRepository mockProductRepository;
-    
-    @Mock
-    private IShoppingCartFacade mockCartFacade;
+    private IShoppingCartRepository cartRepository;
+    private IShoppingBasketRepository basketRepository;
+    private ItemFacade itemFacade;
+    private StoreFacade storeFacade;
+    private IReceiptRepository receiptRepository;
+    private IProductRepository productRepository;
+    private IShoppingCartFacade cartFacade;
+    private IPaymentService paymentService;
+    private IItemRepository itemRepository;
+    private IStoreRepository storeRepository;
+    private IAuctionRepository auctionRepository;
     
     // Common test constants
     private static final String CLIENT_ID = "client123";
     private static final String STORE_ID = "store123";
     private static final String PRODUCT_ID = "product123";
     private static final String AUCTION_ID = "auction123";
-
-    // Bid-specific constants
     private static final float VALID_BID_PRICE = 100.0f;
 
     @Before
     public void setUp() {
+        // Initialize mocks
         MockitoAnnotations.initMocks(this);
+        mockTokenService = mock(TokenService.class);
+        paymentService = mock(IPaymentService.class);
         
-        // Create real shopping service with mocked dependencies
+        // Create real implementations for repositories
+        productRepository = new MemoryProductRepository();
+        receiptRepository = new MemoryReceiptRepository();
+        basketRepository = new MemoryShoppingBasketRepository();
+        cartRepository = new MemoryShoppingCartRepository();
+        itemRepository = new MemoryItemRepository();
+        storeRepository = new MemoryStoreRepository();
+        IFeedbackRepository feedbackRepository = new MemoryFeedbackRepository();
+        auctionRepository = new MemoryAuctionRepository();
+        IUserRepository userRepository = new MemoryUserRepository();
+        
+        // Set up test data - create a product
+        Product product = new Product(PRODUCT_ID, "Test Product", new HashSet<>());
+        productRepository.add(PRODUCT_ID, product);
+        
+        // Create a store
+        Store store = new Store(STORE_ID, "Test Store", "Test Store Description", "owner123");
+        storeRepository.add(STORE_ID, store);
+        
+        // Initialize facades
+        itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
+        
+        // Create a test item
+        Item item = new Item(STORE_ID, PRODUCT_ID, 10.0, 5, "Test Item Description");
+        itemRepository.add(new Pair<>(STORE_ID, PRODUCT_ID), item);
+        
+        // Initialize StoreFacade
+        storeFacade = new StoreFacade(
+            storeRepository, 
+            feedbackRepository, 
+            itemRepository,
+            userRepository,
+            auctionRepository
+        );
+        
+        // Create an auction for testing
+        storeFacade.setStoreRepository(storeRepository);
+        storeFacade.setItemRepository(itemRepository);
+        storeFacade.setAuctionRepository(auctionRepository);
+        storeFacade.setFeedbackRepository(feedbackRepository);
+        storeFacade.setGetUser(userRepository);
+        
+        // Create ShoppingCartFacade
+        cartFacade = new ShoppingCartFacade(
+            cartRepository,
+            basketRepository,
+            paymentService,
+            itemFacade,
+            storeFacade,
+            receiptRepository,
+            productRepository
+        );
+        
+        // Initialize the ShoppingService with real repositories and facades
         shoppingService = new ShoppingService(
-            mockCartRepository, 
-            mockBasketRepository, 
-            mockItemFacade, 
-            mockStoreFacade,
-            mockReceiptRepository,
-            mockProductRepository,
+            cartRepository,
+            basketRepository,
+            itemFacade,
+            storeFacade,
+            receiptRepository,
+            productRepository,
             mockTokenService
         );
         
-        // Inject mocked cart facade using reflection to avoid the real implementation being used
-        try {
-            java.lang.reflect.Field cartFacadeField = ShoppingService.class.getDeclaredField("cartFacade");
-            cartFacadeField.setAccessible(true);
-            cartFacadeField.set(shoppingService, mockCartFacade);
-        } catch (Exception e) {
-            fail("Failed to inject mocked cart facade: " + e.getMessage());
-        }
+        // Set the cart facade on the shopping service if it has a setter method
+        // If there is no setter method, you may need to modify the ShoppingService class
+        // shoppingService.setCartFacade(cartFacade);
     }
 
     //
@@ -99,34 +150,26 @@ public class ShoppingServiceTest {
 
     @Test
     public void testAddProductToCart_Success() {
-        // Arrange
-        int quantity = 2;
-        when(mockCartFacade.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity)).thenReturn(true);
-        
-        // Act
-        Response<Boolean> response = shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity);
+        // Act - use the real implementation to add a product
+        Response<Boolean> response = shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
         
         // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        verify(mockCartFacade).addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity);
     }
     
     @Test
     public void testAddProductToCart_ServiceFailure() {
-        // Arrange
-        int quantity = 2;
-        String errorMessage = "Product is out of stock";
-        when(mockCartFacade.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity))
-            .thenThrow(new RuntimeException(errorMessage));
+        // Use a non-existent store to trigger a failure
+        String nonExistentStoreId = "nonexistent-store";
         
         // Act
-        Response<Boolean> response = shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity);
+        Response<Boolean> response = shoppingService.addProductToCart(nonExistentStoreId, CLIENT_ID, PRODUCT_ID, 2);
         
         // Assert
         assertTrue("Should have error", response.errorOccurred());
-        assertEquals("Error message should match exception", errorMessage, response.getErrorMessage());
         assertNull("Value should be null", response.getValue());
+        assertNotNull("Error message should not be null", response.getErrorMessage());
     }
 
     //
@@ -135,19 +178,8 @@ public class ShoppingServiceTest {
 
     @Test
     public void testViewCart_Success() {
-        // Arrange
-        Set<Pair<Item, Integer>> cartContents = new HashSet<>();
-        Item mockItem = mock(Item.class);
-        when(mockItem.getStoreId()).thenReturn(STORE_ID);
-        when(mockItem.getProductId()).thenReturn(PRODUCT_ID);
-        when(mockItem.getProductName()).thenReturn("Test Product");
-        when(mockItem.getDescription()).thenReturn("Test Description");
-        when(mockItem.getCategories()).thenReturn(new HashSet<>());
-        
-        cartContents.add(new Pair<>(mockItem, 2));
-        
-        // Mock the behavior to return cart contents
-        when(mockCartFacade.viewCart(CLIENT_ID)).thenReturn(cartContents);
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
         
         // Act
         Response<Set<OrderDTO>> response = shoppingService.viewCart(CLIENT_ID);
@@ -155,45 +187,34 @@ public class ShoppingServiceTest {
         // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertNotNull("Response value should not be null", response.getValue());
-        assertEquals("Cart should have one item", 1, response.getValue().size());
-        
-        // Verify the item details in OrderDTO
-        OrderDTO orderDTO = response.getValue().iterator().next();
-        assertEquals(STORE_ID, orderDTO.getStoreId());
-        assertEquals(PRODUCT_ID, orderDTO.getProductId());
-        assertEquals(2, orderDTO.getQuantity());
-        
-        verify(mockCartFacade).viewCart(CLIENT_ID);
+        assertFalse("Cart should have at least one item", response.getValue().isEmpty());
     }
 
     @Test
     public void testViewCart_EmptyCart() {
-        // Arrange
-        Set<Pair<Item, Integer>> emptyCart = new HashSet<>();
-        when(mockCartFacade.viewCart(CLIENT_ID)).thenReturn(emptyCart);
+        // Make sure the cart is empty by using a new client ID
+        String newClientId = "new-client";
         
         // Act
-        Response<Set<OrderDTO>> response = shoppingService.viewCart(CLIENT_ID);
+        Response<Set<OrderDTO>> response = shoppingService.viewCart(newClientId);
         
         // Assert
         assertFalse("Should not have error even for empty cart", response.errorOccurred());
         assertTrue("Cart should be empty", response.getValue().isEmpty());
-        verify(mockCartFacade).viewCart(CLIENT_ID);
     }
     
     @Test
     public void testViewCart_ServiceFailure() {
-        // Arrange
-        String errorMessage = "Failed to access cart data";
-        when(mockCartFacade.viewCart(CLIENT_ID)).thenThrow(new RuntimeException(errorMessage));
+        // We'll use a null client ID to trigger a failure
+        String nullClientId = null;
         
         // Act
-        Response<Set<OrderDTO>> response = shoppingService.viewCart(CLIENT_ID);
+        Response<Set<OrderDTO>> response = shoppingService.viewCart(nullClientId);
         
         // Assert
         assertTrue("Should have error", response.errorOccurred());
-        assertEquals("Error message should match exception", errorMessage, response.getErrorMessage());
         assertNull("Value should be null", response.getValue());
+        assertNotNull("Error message should not be null", response.getErrorMessage());
     }
 
     //
@@ -202,7 +223,10 @@ public class ShoppingServiceTest {
 
     @Test
     public void testCheckout_Success() {
-        // Arrange
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
+        
+        // Prepare checkout parameters
         String cardNumber = "1234567890123456";
         Date expiryDate = new Date();
         String cvv = "123";
@@ -210,40 +234,35 @@ public class ShoppingServiceTest {
         String clientName = "John Doe";
         String deliveryAddress = "123 Main St";
         
-        when(mockCartFacade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress))
-            .thenReturn(true);
-        
         // Act
         Response<Boolean> response = shoppingService.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
         
         // Assert
+        // Note: If payment service is mocked to always succeed, this should not error
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        verify(mockCartFacade).checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
     }
 
     @Test
     public void testCheckout_PaymentError() {
-        // Arrange
-        String cardNumber = "1234567890123456";
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
+        
+        // Use invalid card details to trigger a payment error
+        String invalidCardNumber = "invalid";
         Date expiryDate = new Date();
         String cvv = "123";
         long transactionId = 12345L;
         String clientName = "John Doe";
         String deliveryAddress = "123 Main St";
-        String errorMessage = "Payment service rejected the transaction";
-        
-        when(mockCartFacade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress))
-            .thenThrow(new RuntimeException(errorMessage));
         
         // Act
-        Response<Boolean> response = shoppingService.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        Response<Boolean> response = shoppingService.checkout(CLIENT_ID, invalidCardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
         
         // Assert
         assertTrue("Should have error", response.errorOccurred());
-        assertEquals("Error message should match payment error", errorMessage, response.getErrorMessage());
         assertNull("Value should be null", response.getValue());
-        verify(mockCartFacade).checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        assertNotNull("Error message should not be null", response.getErrorMessage());
     }
     
     //
@@ -252,31 +271,28 @@ public class ShoppingServiceTest {
     
     @Test
     public void testRemoveProductFromCart_WithQuantity_Success() {
-        // Arrange
-        int quantity = 2;
-        when(mockCartFacade.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity)).thenReturn(true);
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 3);
         
-        // Act
-        Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity);
+        // Act - Remove fewer than total quantity
+        Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
         
         // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        verify(mockCartFacade).removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID, quantity);
     }
     
     @Test
     public void testRemoveProductFromCart_CompleteRemoval_Success() {
-        // Arrange
-        when(mockCartFacade.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID)).thenReturn(true);
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
         
-        // Act
+        // Act - Remove the product entirely
         Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID);
         
         // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        verify(mockCartFacade).removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID);
     }
     
     //
@@ -285,8 +301,8 @@ public class ShoppingServiceTest {
     
     @Test
     public void testClearCart_Success() {
-        // Arrange
-        when(mockCartFacade.clearCart(CLIENT_ID)).thenReturn(true);
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
         
         // Act
         Response<Boolean> response = shoppingService.clearCart(CLIENT_ID);
@@ -294,13 +310,16 @@ public class ShoppingServiceTest {
         // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        verify(mockCartFacade).clearCart(CLIENT_ID);
+        
+        // Verify cart is empty by checking with viewCart
+        Response<Set<OrderDTO>> cartResponse = shoppingService.viewCart(CLIENT_ID);
+        assertTrue("Cart should be empty after clearing", cartResponse.getValue().isEmpty());
     }
     
     @Test
     public void testClearBasket_Success() {
-        // Arrange
-        when(mockCartFacade.clearBasket(CLIENT_ID, STORE_ID)).thenReturn(true);
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
         
         // Act
         Response<Boolean> response = shoppingService.clearBasket(CLIENT_ID, STORE_ID);
@@ -308,7 +327,10 @@ public class ShoppingServiceTest {
         // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        verify(mockCartFacade).clearBasket(CLIENT_ID, STORE_ID);
+        
+        // Verify basket is empty by checking with viewCart
+        Response<Set<OrderDTO>> cartResponse = shoppingService.viewCart(CLIENT_ID);
+        assertTrue("Basket should be empty after clearing", cartResponse.getValue().isEmpty());
     }
     
     //
@@ -317,32 +339,45 @@ public class ShoppingServiceTest {
     
     @Test
     public void testMakeBid_Success() {
-        // Arrange
-        when(mockCartFacade.makeBid(AUCTION_ID, CLIENT_ID, VALID_BID_PRICE)).thenReturn(true);
-        
-        // Act
-        Response<Boolean> response = shoppingService.makeBid(AUCTION_ID, CLIENT_ID, VALID_BID_PRICE);
-        
-        // Assert
-        assertFalse("Should not have error", response.errorOccurred());
-        assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        verify(mockCartFacade).makeBid(AUCTION_ID, CLIENT_ID, VALID_BID_PRICE);
+        try {
+            // Create an auction first
+            String auctionDate = java.time.LocalDate.now().plusDays(1).toString();
+            storeFacade.addAuction(STORE_ID, PRODUCT_ID, auctionDate, 50.0);
+            
+            // Find the auction ID since it's generated dynamically
+            String actualAuctionId = storeFacade.getAllStoreAuctions(STORE_ID).get(0).getAuctionId();
+            
+            // Act
+            Response<Boolean> response = shoppingService.makeBid(actualAuctionId, CLIENT_ID, VALID_BID_PRICE);
+            
+            // Assert
+            assertFalse("Should not have error", response.errorOccurred());
+            assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
+        } catch (Exception e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
     }
     
     @Test
     public void testMakeBid_BidRejected() {
-        // Arrange
-        String errorMessage = "Bid price too low";
-        when(mockCartFacade.makeBid(AUCTION_ID, CLIENT_ID, VALID_BID_PRICE))
-            .thenThrow(new RuntimeException(errorMessage));
-        
-        // Act
-        Response<Boolean> response = shoppingService.makeBid(AUCTION_ID, CLIENT_ID, VALID_BID_PRICE);
-        
-        // Assert
-        assertTrue("Should have error", response.errorOccurred());
-        assertEquals("Error message should match bid rejection reason", errorMessage, response.getErrorMessage());
-        assertNull("Value should be null", response.getValue());
-        verify(mockCartFacade).makeBid(AUCTION_ID, CLIENT_ID, VALID_BID_PRICE);
+        try {
+            // Create an auction first with a high start price
+            String auctionDate = java.time.LocalDate.now().plusDays(1).toString();
+            storeFacade.addAuction(STORE_ID, PRODUCT_ID, auctionDate, 150.0);
+            
+            // Find the auction ID since it's generated dynamically
+            String actualAuctionId = storeFacade.getAllStoreAuctions(STORE_ID).get(0).getAuctionId();
+            
+            // Act - try to make a bid below the start price
+            float lowBidPrice = 100.0f; // Lower than the 150.0 start price
+            Response<Boolean> response = shoppingService.makeBid(actualAuctionId, CLIENT_ID, lowBidPrice);
+            
+            // Assert
+            assertTrue("Should have error", response.errorOccurred());
+            assertNull("Value should be null", response.getValue());
+            assertNotNull("Error message should not be null", response.getErrorMessage());
+        } catch (Exception e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
     }
 }

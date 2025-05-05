@@ -10,7 +10,7 @@ import Domain.User.IUserRepository;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
+import Domain.Shopping.ShoppingCartFacadeTest;
 import Domain.Store.StoreFacade;
 
 /**
@@ -71,7 +71,7 @@ public interface IMarketFacade {
      * @param storeFacade Facade for store management
      * @param shoppingCartFacade Facade for shopping cart management
      */
-    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacade shoppingCartFacade);
+    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacadeTest shoppingCartFacade);
     // Section 4
 
     /**

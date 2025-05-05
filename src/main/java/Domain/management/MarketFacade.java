@@ -9,7 +9,7 @@ import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
+import Domain.Shopping.ShoppingCartFacadeTest;
 import Domain.Store.Feedback;
 import Domain.Store.IItemRepository;
 import Domain.Store.Item;
@@ -25,7 +25,7 @@ public class MarketFacade implements IMarketFacade {
     private IUserRepository userRepository;
     private IItemRepository itemRepository; 
     private StoreFacade storeFacade; 
-    private ShoppingCartFacade shoppingCartFacade;
+    private ShoppingCartFacadeTest shoppingCartFacade;
 
     // In-memory permissions store: storeId -> (username -> Permission)
     private final Map<String, Map<String, Permission>> storePermissions = new ConcurrentHashMap<>();
@@ -39,7 +39,7 @@ public class MarketFacade implements IMarketFacade {
     private MarketFacade() {}
 
     @Override
-    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacade shoppingCartFacade) {
+    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, ShoppingCartFacadeTest shoppingCartFacade) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.storeFacade = storeFacade;
