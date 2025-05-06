@@ -297,6 +297,107 @@ public class MarketServiceTest {
         assertFalse(response.errorOccurred());
     }
 
+    @Test
+    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {
+        String appointeeUsername = "newManager";
+        Response<Void> response = marketService.appointStoreManager(tokenId1, "ownerUser", appointeeUsername, storeId1);
+        assertTrue(response.errorOccurred());
+    }
+
+    @Test
+    public void givenWrongAppointer_whenRemovingStoreManager_thenErrorOccurs() {
+        String managerUsername = "existingManager";
+        Response<Void> response = marketService.removeStoreManager(tokenId1, "ownerUser", managerUsername, storeId1);
+        assertTrue(response.errorOccurred());
+    }
+
+    @Test
+    public void givenWrongApointee_whenAppointingStoreOwner_thenErrorOccurs() {
+        String appointeeUsername = "newOwner";
+        Response<Void> response = marketService.appointStoreOwner(tokenId1, "ownerUser", appointeeUsername, storeId1);
+        assertTrue(response.errorOccurred());
+    }
+
+    @Test
+    public void givenInvalidPermissions_whenChangingManagerPermissions_thenErrorOccurs() {
+        List<PermissionType> newPermissions = List.of(PermissionType.ADMINISTER_STORE);
+        Response<Void> response = marketService.changeManagerPermissions(tokenId1, "ownerUser", "managerUser", storeId1, newPermissions);
+        assertTrue(response.errorOccurred());
+    }
+
+    @Test
+    public void givenStoreAlreadyClosed_whenClosingStore_thenErrorOccurs() {
+        Response<Void> response1 = marketService.closeStore(tokenId1, storeId1);
+        Response<Void> response2 = marketService.closeStore(tokenId1, storeId1);
+        assertTrue(response2.errorOccurred());
+    }
+
+    @Test
+    public void givenStoreAlreadyClosed_whenMarketClosesStore_thenErrorOccurs() {
+        Response<Void> response1 = marketService.marketCloseStore(tokenId1, storeId1);
+        Response<Void> response2 = marketService.marketCloseStore(tokenId1, storeId1);
+        assertTrue(response2.errorOccurred());
+    }
+
+    @Test
+    public void givenNoPermission_whenRespondingToUserMessage_thenErrorOccurs() {
+        String comment = "Thank you for your feedback!";
+        Response<Boolean> response = marketService.respondToUserMessage(tokenId2, storeId1, productId1, userId2.toString(), comment);
+        assertTrue(response.errorOccurred());
+    }
+
+    @Test
+    public void givenNoPermission_whenGettingUserMessage_thenErrorOccurs() {
+        String feedbackId = UUID.randomUUID().toString();
+        Response<Feedback> response = marketService.getUserMessage(tokenId2, storeId1, userId2.toString(), feedbackId);
+        assertTrue(response.errorOccurred());
+    }
+
+    @Test
+    public void givenEmptyPurchaseHistory_whenGettingStoreHistory_thenEmptyListReturned() {
+        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId1, storeId1);
+        assertFalse(response.errorOccurred());
+        assertTrue(response.getValue().isEmpty());
+    }
+
+    @Test
+    public void givenNoPermission_whenGettingStorePurchaseHistory_thenErrorOccurs() {
+        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId2, storeId1);
+        assertTrue(response.errorOccurred());
+    }
+
+    @Test
+    public void givenInvalidToken_whenAddingProductsToInventory_thenErrorOccurs() {
+        Map<String, Integer> products = Map.of(productId1, 5);
+        Response<Void> response = marketService.addProductsToInventory("invalidToken", storeId1, products);
+        assertTrue(response.errorOccurred(), "Adding products with an invalid token should fail");
+    }
+
+    @Test
+    public void givenInvalidStoreId_whenRemovingProductsFromInventory_thenErrorOccurs() {
+        Map<String, Integer> productsToRemove = Map.of(productId1, 1);
+        Response<Void> response = marketService.removeProductsFromInventory(tokenId1, "invalidStoreId", productsToRemove);
+        assertTrue(response.errorOccurred(), "Removing products from an invalid store should fail");
+    }
+
+    @Test
+    public void givenInvalidToken_whenUpdatingPaymentService_thenErrorOccurs() {
+        Response<Void> response = marketService.updatePaymentService("invalidToken", mockPaymentService);
+        assertTrue(response.errorOccurred(), "Updating payment service with an invalid token should fail");
+    }
+
+    @Test
+    public void givenInvalidToken_whenUpdatingNotificationService_thenErrorOccurs() {
+        Response<Void> response = marketService.updateNotificationService("invalidToken", mockNotificationService);
+        assertTrue(response.errorOccurred(), "Updating notification service with an invalid token should fail");
+    }
+
+    @Test
+    public void givenInvalidToken_whenUpdatingSupplyService_thenErrorOccurs() {
+        Response<Void> response = marketService.updateSupplyService("invalidToken", mockSupplyService);
+        assertTrue(response.errorOccurred(), "Updating supply service with an invalid token should fail");
+    }
+
 
         
 

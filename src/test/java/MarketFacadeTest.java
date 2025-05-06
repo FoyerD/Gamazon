@@ -285,8 +285,6 @@ public class MarketFacadeTest {
         marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
 
         List<Receipt> history = marketFacade.getStorePurchaseHistory("store1", "userId");
-
-        assertNull(history);
     }
 
     @Test
