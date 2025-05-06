@@ -13,6 +13,12 @@ public class Guest extends User{
         return new Member(this.id, username, password, email);
     }
 
+
+    /***
+     * Logs out the guest user from the system.
+     * @param loginManager The LoginManager instance to handle the logout process.
+     * * This method overrides the logout method in the User class to ensure that the guest user is properly removed from the system.
+     */
     @Override
     public void logout(LoginManager loginManager) {
         super.logout(loginManager);
