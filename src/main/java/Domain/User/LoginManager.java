@@ -13,6 +13,12 @@ public class LoginManager {
         this.userRepository = userRepository;
     }
 
+    /***
+     * Retrieves a user by their ID.
+     * @param id The ID of the user to retrieve.
+     * @return The user associated with the given ID.
+     * @throws NoSuchElementException if no user is found with the given ID.
+     ***/
     public User getUser(String id) {
         User user = userRepository.get(id);
         if (user == null) {
@@ -21,6 +27,11 @@ public class LoginManager {
         return user;
     }
 
+    /***
+     * Creates a new guest user and adds it to the repository.
+     * @return The newly created guest user.
+     * @throws IllegalStateException if the guest cannot be added to the repository.
+     ***/
     public Guest createGuest() throws IllegalStateException {
         Guest guest = Guest.createGuest();
         if (!userRepository.add(guest.getId(), guest)) {
@@ -29,6 +40,16 @@ public class LoginManager {
         return guest;
     }
 
+
+    /***
+     * Registers a new member user based on the provided guest user.
+     * @param id The ID of the guest user to register.
+     * @param username The desired username for the new member.
+     * @param password The desired password for the new member.
+     * @param email The email address of the new member.
+     * @return The newly registered member user.
+     * @throws IllegalStateException if the registration fails or if the guest cannot be removed from the repository.
+     ***/
     public synchronized Member register(String id, String username, String password, String email) throws IllegalStateException {
 
         Guest guest = userRepository.getGuest(id);
@@ -66,6 +87,15 @@ public class LoginManager {
         return member;
     }
 
+
+    /***
+     * Logs in a member user with the given username and password.
+     * @param username The username of the member to log in.
+     * @param password The password of the member to log in.
+     * @return The logged-in member user.
+     * @throws NoSuchElementException if no member is found with the given username.
+     * @throws IllegalStateException if the member is already logged in.
+     ***/
     public Member login(String username, String password) throws NoSuchElementException, IllegalStateException {
         Member member = userRepository.getMemberByUsername(username);
         if (member == null) {
@@ -86,7 +116,12 @@ public class LoginManager {
     }
 
     
-
+    /***
+     * Logs out a member user with the given ID.
+     * @param id The ID of the member to log out.
+     * @return The logged-out member user.
+     * @throws NoSuchElementException if no member is found with the given ID.
+     ***/
     public User exit(String id) {
 
         User user = userRepository.get(id);
@@ -98,12 +133,24 @@ public class LoginManager {
         return user;
     }
 
+
+    /***
+     * Logs out a guest user with the given ID. Essentially removes the guest from the repository.
+     * @param guest The guest user to log out.
+     * @throws IllegalStateException if the guest cannot be removed from the repository.
+     ***/
     public void exit(Guest guest) throws IllegalStateException {
         if (userRepository.remove(guest.getId()) == null) {
             throw new IllegalStateException("Failed to remove guest from repository");
         }
     }
 
+
+    /***
+     * Checks if a member user is logged in based on their username.
+     * @param username The username of the member to check.
+     * @return true if the member is logged in, false otherwise.
+     ***/
     public boolean isLoggedin(String username) {
         Member user = userRepository.getMemberByUsername(username);
         return user.isLoggedIn();

@@ -17,6 +17,12 @@ public class UserService {
         this.tokenService = tokenService;
     }
 
+
+    /***
+     * Creates a guest user and returns a token for it.
+     * @return {@link Response} of {@link UserDTO} containing the token and guest user name.
+     *         If an error occurs, returns an error message.
+     */
     public Response<UserDTO> guestEntry() {
         try {
             User guest = loginManager.createGuest();
@@ -33,6 +39,12 @@ public class UserService {
         
     }
 
+
+    /***
+     * Exits the session of the user associated with the given token.
+     * @param sessionToken The token of the user to exit.
+     * @return {@link Response} of {@link Void} indicating success or failure.
+     */
     public Response<Void> exit(String sessionToken) {
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "exit", "received invalid session token.", sessionToken);
@@ -50,6 +62,15 @@ public class UserService {
         return Response.success(null);
     }
 
+    /***
+     * Registers a new user with the given username, password, and email.
+     * @param sessionToken The token of the guest user to register.
+     * @param username The desired username for the new user.
+     * @param password The desired password for the new user.
+     * @param email The email address of the new user.
+     * @return {@link Response} of {@link UserDTO} containing the token and user name.
+     *         If an error occurs, returns an error message.
+     */
     public Response<UserDTO> register(String sessionToken, String username, String password, String email) {
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "register", "Received invalid session token", sessionToken);
@@ -76,6 +97,14 @@ public class UserService {
         }
     }
 
+
+    /***
+     * Logs in a user with the given username and password.
+     * @param username The username of the user to log in.
+     * @param password The password of the user to log in.
+     * @return {@link Response} of {@link UserDTO} containing the token and user name.
+     *         If an error occurs, returns an error message.
+     */
     public Response<UserDTO> login(String username, String password) {
         try {
             Member member = loginManager.login(username, password);
