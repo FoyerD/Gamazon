@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import static org.mockito.Mockito.mock;
 
 import Application.DTOs.OrderDTO;
@@ -38,7 +37,6 @@ import Infrastructure.Repositories.MemoryShoppingBasketRepository;
 import Infrastructure.Repositories.MemoryShoppingCartRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
-import io.jsonwebtoken.lang.Assert;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
@@ -48,9 +46,7 @@ import Domain.Store.IStoreRepository;
 public class ShoppingServiceTest {
 
     private ShoppingService shoppingService;
-    
-    @Mock
-    private TokenService mockTokenService;
+
     
     private IShoppingCartRepository cartRepository;
     private IShoppingBasketRepository basketRepository;
@@ -65,9 +61,10 @@ public class ShoppingServiceTest {
     private IAuctionRepository auctionRepository;
     private IUserRepository userRepository;
     static UUID userId = UUID.randomUUID();
+    static TokenService tokenService = new TokenService();
     
     // Common test constants
-    private static final String CLIENT_ID = userId.toString();
+    private static final String CLIENT_ID = tokenService.generateToken(userId.toString());
     private static final String STORE_ID = "store123";
     private static final String PRODUCT_ID = "product123";
     private static final String AUCTION_ID = "auction123";
@@ -77,7 +74,6 @@ public class ShoppingServiceTest {
     public void setUp() {
         // Initialize mocks
         // MockitoAnnotations.initMocks(this);
-        mockTokenService = mock(TokenService.class);
         paymentService = mock(IPaymentService.class);
         
         // Create real implementations for repositories
@@ -141,7 +137,7 @@ public class ShoppingServiceTest {
             storeFacade,
             receiptRepository,
             productRepository,
-            mockTokenService
+            tokenService
         );
 
 
@@ -159,11 +155,12 @@ public class ShoppingServiceTest {
 
     @Test
     public void testAddProductToCart_Success() {
+        assertTrue(CLIENT_ID, tokenService.validateToken(CLIENT_ID));
         // Act - use the real implementation to add a product
         Response<Boolean> response = shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
         
         // Assert
-        assertFalse("Should not have error", response.errorOccurred());
+        assertFalse("Shouldn't get error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
     
@@ -203,9 +200,9 @@ public class ShoppingServiceTest {
     public void testViewCart_EmptyCart() {
         // Make sure the cart is empty by using a new client ID
         String newClientId = "new-client";
-        
+        String sessionToken = tokenService.generateToken(newClientId);
         // Act
-        Response<Set<OrderDTO>> response = shoppingService.viewCart(newClientId);
+        Response<Set<OrderDTO>> response = shoppingService.viewCart(sessionToken);
         
         // Assert
         assertFalse("Should not have error even for empty cart", response.errorOccurred());
