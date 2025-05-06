@@ -7,8 +7,7 @@ import Domain.Store.Category;
 import Domain.Store.Item;
 
 public class OrderDTO {
-    private String storeId;
-    private String productId;
+    private String storeName;
     private String name;
     private String description;
     private Set<Category> categories;
@@ -17,26 +16,20 @@ public class OrderDTO {
     public OrderDTO() {
     }
 
-    public OrderDTO(String productId, String name, String description, Set<Category> categories, String storeId, int quantity) {
-        this.storeId = storeId;
-        this.productId = productId;
+    public OrderDTO(String name, String description, Set<Category> categories, String storeName, int quantity) {
+        this.storeName = storeName;
         this.name = name;
         this.description = description;
         this.categories = categories;
         this.quantity = quantity;
     }
 
-    public OrderDTO(Item item, int quantity) {
-        this.storeId = item.getStoreId();
-        this.productId = item.getProductId();
+    public OrderDTO(Item item, int quantity, String storeName) {
+        this.storeName = storeName;
         this.name = item.getProductName();
         this.description = item.getDescription();
         this.categories = new HashSet<>(item.getCategories());
         this.quantity = quantity;
-    }
-
-    public String getProductId() {
-        return productId;
     }
 
     public String getName() {
@@ -47,22 +40,17 @@ public class OrderDTO {
         return new HashSet<>(categories);
     }
 
-    public String getStoreId() {
-        return storeId;
+    public String getStoreName() {
+        return storeName;
     }
 
     public int getQuantity() {
         return quantity;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
     public String toString() {
         return "OrderDTO{" +
-                "storeId='" + storeId + '\'' +
-                ", productId='" + productId + '\'' +
+                "storeName='" + storeName + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", categories=" + categories.stream().map(Category::toString).collect(java.util.stream.Collectors.toList()) +
