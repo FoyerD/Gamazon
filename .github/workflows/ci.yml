@@ -7,7 +7,8 @@ on:
     branches: [ "develop" ]
 permissions:
   contents: read
-  dependency_graph: write
+  id-token: write
+  security-events: write
 
 jobs:
   test:
