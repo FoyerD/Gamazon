@@ -13,8 +13,11 @@ import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.IProductRepository;
+import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.Pair;
 import Domain.TokenService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
@@ -23,12 +26,14 @@ import Domain.Shopping.IReceiptRepository;
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
+    private final StoreFacade storeFacade;
 
     public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
      ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
       IProductRepository productRepository, TokenService tokenService) {
         this.tokenService = tokenService;
         cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
+        this.storeFacade = storeFacade;
     }
 
     public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {
@@ -55,9 +60,9 @@ public class ShoppingService{
         
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
-
-            Set<OrderDTO> itemsMapPerStore = cartFacade.viewCart(clientId).stream()
-                .map(item -> new OrderDTO(item.getFirst(), item.getSecond()))
+            Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
+            Set<OrderDTO> itemsMapPerStore = itemsMap.stream()
+                .map(item -> new OrderDTO(item.getFirst(), item.getSecond(), storeFacade.getStore(item.getFirst().getStoreId()).getName()))
                 .collect(Collectors.toSet());
             return new Response<>(itemsMapPerStore);
         } catch (Exception ex) {
