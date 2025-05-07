@@ -16,15 +16,16 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>19</maven.compiler.release>
+    <vaadin.version>24.3.4</vaadin.version>
   </properties>
 
   <dependencies>
-    <!-- JUnit dependency for unit testing -->
+    <!-- ✅ Testing -->
     <dependency>
-    <groupId>org.mockito</groupId>
-    <artifactId>mockito-junit-jupiter</artifactId>
-    <version>5.5.0</version>
-    <scope>test</scope>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>5.5.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -38,6 +39,8 @@
       <version>3.12.4</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- ✅ JWT -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-api</artifactId>
@@ -55,11 +58,27 @@
       <version>0.11.5</version>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- ✅ Spring Boot -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
       <version>3.1.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+
+    <!-- ✅ Vaadin -->
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-spring-boot-starter</artifactId>
+      <version>${vaadin.version}</version>
+    </dependency>
+
+    <!-- ✅ Utilities -->
     <dependency>
       <groupId>org.passay</groupId>
       <artifactId>passay</artifactId>
@@ -68,7 +87,7 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-crypto</artifactId>
-      <version>6.1.4</version> <!-- Matches Spring Boot 3.1.4 -->
+      <version>6.1.4</version>
     </dependency>
     <dependency>
       <groupId>commons-validator</groupId>
@@ -76,7 +95,6 @@
       <version>1.7</version>
     </dependency>
   </dependencies>
-
 
   <build>
     <pluginManagement>
@@ -119,5 +137,29 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+<plugins>
+    
+    <plugin>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-maven-plugin</artifactId>
+      <version>${vaadin.version}</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>prepare-frontend</goal>
+            <goal>build-frontend</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+
+    <plugin>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-maven-plugin</artifactId>
+      <version>3.1.4</version>
+    </plugin>
+  </plugins>
+
   </build>
 </project>
