@@ -1,7 +1,6 @@
 package UI.presenters;
 
 import java.util.Set;
-
 import Application.DTOs.OrderDTO;
 
 /**
@@ -12,6 +11,7 @@ public interface IPurchasePresenter {
     /**
      * Adds a specified quantity of a product to the user's cart.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product
      * @param storeName the name of the store selling the product
      * @param amount the quantity to add
@@ -22,6 +22,7 @@ public interface IPurchasePresenter {
     /**
      * Completely removes a product from the user's cart.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product
      * @param storeName the name of the store
      * @return true if the product was successfully removed; false otherwise
@@ -31,6 +32,7 @@ public interface IPurchasePresenter {
     /**
      * Removes a specific amount of a product from the cart.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product
      * @param storeName the name of the store
      * @param amount the number of items to remove
@@ -41,6 +43,7 @@ public interface IPurchasePresenter {
     /**
      * Displays the current contents of the user's cart.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @return a set of {@link OrderDTO} representing the cart contents
      */
     Set<OrderDTO> viewCart(String sessionToken);
@@ -48,6 +51,7 @@ public interface IPurchasePresenter {
     /**
      * Empties the entire cart.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @return true if the cart was cleared successfully; false otherwise
      */
     boolean clearCart(String sessionToken);
@@ -55,6 +59,7 @@ public interface IPurchasePresenter {
     /**
      * Clears the basket of a specific store within the user's cart.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param storeName the name of the store
      * @return true if the basket was cleared; false otherwise
      */
@@ -63,6 +68,7 @@ public interface IPurchasePresenter {
     /**
      * Submits a bid for an auctioned product.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product
      * @param storeName the store running the auction
      * @param bidAmount the bid value
@@ -73,6 +79,7 @@ public interface IPurchasePresenter {
     /**
      * Finalizes the purchase of the entire cart using provided payment and shipping details.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param paymentMethod the name of the payment method (e.g., "credit card")
      * @param address the shipping address
      * @param creditCardNumber the credit card number

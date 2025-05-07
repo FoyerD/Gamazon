@@ -1,7 +1,6 @@
 package UI.presenters;
 
 import java.util.Set;
-
 import Application.DTOs.ItemDTO;
 
 /**
@@ -13,6 +12,7 @@ public interface IProductPresenter {
     /**
      * Retrieves a set of products that match the given product name.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product to search for
      * @return a set of {@link ItemDTO} matching the product name
      */
@@ -21,6 +21,7 @@ public interface IProductPresenter {
     /**
      * Retrieves product details for a specific product in a specific store.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product
      * @param storeName the name of the store
      * @return an {@link ItemDTO} with the product details from the given store
@@ -30,6 +31,7 @@ public interface IProductPresenter {
     /**
      * Retrieves all available products across all stores.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @return a set of all {@link ItemDTO} in the marketplace
      */
     Set<ItemDTO> showAllProducts(String sessionToken);
@@ -37,6 +39,7 @@ public interface IProductPresenter {
     /**
      * Retrieves products that belong to the specified categories.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param categories a set of category names to filter products
      * @return a set of {@link ItemDTO} matching the specified categories
      */
@@ -45,6 +48,7 @@ public interface IProductPresenter {
     /**
      * Allows a user to rate and leave feedback for a product in a specific store.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product
      * @param storeName the name of the store offering the product
      * @param rating a numeric rating (e.g., from 1.0 to 5.0)
@@ -55,6 +59,7 @@ public interface IProductPresenter {
     /**
      * Retrieves all products that are currently under auction across all stores.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @return a set of auctioned {@link ItemDTO}
      */
     Set<ItemDTO> showAuctionedProducts(String sessionToken);
@@ -62,6 +67,7 @@ public interface IProductPresenter {
     /**
      * Retrieves auctioned products filtered by categories.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param categories a set of category names to filter auctioned products
      * @return a set of auctioned {@link ItemDTO} in the specified categories
      */
@@ -70,6 +76,7 @@ public interface IProductPresenter {
     /**
      * Retrieves auction details for a specific product across all stores.
      *
+     * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the auctioned product
      * @return a set of {@link ItemDTO} representing the product in active auctions
      */
