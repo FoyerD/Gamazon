@@ -9,7 +9,7 @@ public interface IMarketPresenter {
      * Opens the entire marketplace, making it accessible to users.
      * This might initialize system resources, load default stores, or unlock features.
      */
-    void openMarketplace();
+    void openMarketplace(String sessionToken);
 
     /**
      * Closes a specific store in the marketplace.
@@ -17,5 +17,5 @@ public interface IMarketPresenter {
      *
      * @param storeName the name of the store to close
      */
-    void closeStore(String storeName);
+    void closeStore(String sessionToken, String storeName);
 }

@@ -17,7 +17,7 @@ public interface IPurchasePresenter {
      * @param amount the quantity to add
      * @return true if the product was successfully added; false otherwise
      */
-    boolean addProductToCart(String productName, String storeName, int amount);
+    boolean addProductToCart(String sessionToken, String productName, String storeName, int amount);
 
     /**
      * Completely removes a product from the user's cart.
@@ -26,7 +26,7 @@ public interface IPurchasePresenter {
      * @param storeName the name of the store
      * @return true if the product was successfully removed; false otherwise
      */
-    boolean removeProductFromCart(String productName, String storeName);
+    boolean removeProductFromCart(String sessionToken, String productName, String storeName);
 
     /**
      * Removes a specific amount of a product from the cart.
@@ -36,21 +36,21 @@ public interface IPurchasePresenter {
      * @param amount the number of items to remove
      * @return true if the specified quantity was removed; false otherwise
      */
-    boolean removeProductFromCart(String productName, String storeName, int amount);
+    boolean removeProductFromCart(String sessionToken, String productName, String storeName, int amount);
 
     /**
      * Displays the current contents of the user's cart.
      *
      * @return a set of {@link OrderDTO} representing the cart contents
      */
-    Set<OrderDTO> viewCart();
+    Set<OrderDTO> viewCart(String sessionToken);
 
     /**
      * Empties the entire cart.
      *
      * @return true if the cart was cleared successfully; false otherwise
      */
-    boolean clearCart();
+    boolean clearCart(String sessionToken);
 
     /**
      * Clears the basket of a specific store within the user's cart.
@@ -58,7 +58,7 @@ public interface IPurchasePresenter {
      * @param storeName the name of the store
      * @return true if the basket was cleared; false otherwise
      */
-    boolean clearBasket(String storeName);
+    boolean clearBasket(String sessionToken, String storeName);
 
     /**
      * Submits a bid for an auctioned product.
@@ -68,7 +68,7 @@ public interface IPurchasePresenter {
      * @param bidAmount the bid value
      * @return true if the bid was successfully placed; false otherwise
      */
-    boolean makeBid(String productName, String storeName, double bidAmount);
+    boolean makeBid(String sessionToken, String productName, String storeName, double bidAmount);
 
     /**
      * Finalizes the purchase of the entire cart using provided payment and shipping details.
@@ -80,5 +80,5 @@ public interface IPurchasePresenter {
      * @param cvv the CVV security code
      * @return true if the purchase was successful; false otherwise
      */
-    boolean purchaseCart(String paymentMethod, String address, String creditCardNumber, String expirationDate, String cvv);
+    boolean purchaseCart(String sessionToken, String paymentMethod, String address, String creditCardNumber, String expirationDate, String cvv);
 }
