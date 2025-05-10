@@ -5,6 +5,7 @@ import Application.DTOs.UserDTO;
 import Application.utils.Response;
 
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
@@ -32,7 +33,6 @@ public class LoginView extends VerticalLayout {
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
 
-        // Stylish card layout
         Div card = new Div();
         card.getStyle().set("padding", "2rem")
                       .set("border-radius", "1rem")
@@ -50,13 +50,8 @@ public class LoginView extends VerticalLayout {
         loginButton.setWidthFull();
         guestButton.setWidthFull();
 
-        loginButton.getStyle().set("background-color", "#3498db")
-                              .set("color", "white")
-                              .set("border-radius", "8px");
-
-        guestButton.getStyle().set("background-color", "#2ecc71")
-                               .set("color", "white")
-                               .set("border-radius", "8px");
+        loginButton.getStyle().set("background-color", "#3498db").set("color", "white");
+        guestButton.getStyle().set("background-color", "#2ecc71").set("color", "white");
 
         loginButton.addClickListener(e -> login());
         guestButton.addClickListener(e -> loginAsGuest());
@@ -78,8 +73,10 @@ public class LoginView extends VerticalLayout {
         if (response.errorOccurred()) {
             Notification.show("Login failed: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
+            UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
+            UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
             Notification.show("Welcome, " + response.getValue().getUsername());
-            getUI().ifPresent(ui -> ui.navigate("")); // Navigate to homepage or dashboard
+            UI.getCurrent().navigate("home");
         }
     }
 
@@ -88,8 +85,10 @@ public class LoginView extends VerticalLayout {
         if (response.errorOccurred()) {
             Notification.show("Guest login failed: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
+            UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
+            UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
             Notification.show("Logged in as Guest");
-            getUI().ifPresent(ui -> ui.navigate(""));
+            UI.getCurrent().navigate("home");
         }
     }
 }
