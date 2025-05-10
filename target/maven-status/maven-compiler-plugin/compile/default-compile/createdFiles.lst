@@ -1,6 +1,7 @@
 Domain\management\IMarketFacade.class
 Domain\Pair.class
 Infrastructure\Repositories\MemoryProductRepository.class
+UI\presenters\ILoginPresenter.class
 Domain\Store\IAuctionRepository.class
 Domain\management\RoleType.class
 Domain\Store\ItemFilter$Builder.class
@@ -22,6 +23,8 @@ Domain\Store\StoreFacade.class
 Domain\TokenService.class
 Domain\Shopping\ShoppingBasket.class
 Infrastructure\Repositories\MemoryShoppingCartRepository.class
+UI\presenters\IManagementPresenter.class
+UI\presenters\IMarketPresenter.class
 Domain\Store\IStoreRepository.class
 Application\DTOs\StoreDTO.class
 Infrastructure\SupplyService.class
@@ -34,6 +37,7 @@ Application\ShoppingService$MockPaymentService.class
 Domain\management\MarketFacade.class
 Domain\Shopping\Receipt.class
 Domain\Store\Store.class
+UI\views\MainView.class
 Application\MarketService.class
 Domain\Shopping\ShoppingCartFactory.class
 Domain\Shopping\IShoppingCart.class
@@ -53,14 +57,17 @@ Domain\Store\IItemRepository.class
 Domain\Shopping\IReceiptRepository.class
 Application\utils\Response.class
 Domain\ExternalServices\INotificationService.class
+UI\presenters\IPurchasePresenter.class
 Application\DTOs\CategoryDTO.class
 Domain\Store\Item.class
+UI\GamazonApplication.class
+UI\presenters\IStorePresenter.class
 Application\ShoppingService.class
-UI\MainView.class
 Infrastructure\Repositories\MemoryAuctionRepository.class
 Domain\Store\IProductRepository.class
 Domain\User\User.class
 Infrastructure\Repositories\MemoryPermissionRepository.class
+UI\presenters\IProductPresenter.class
 Domain\management\Permission.class
 Application\utils\TradingLogger.class
 Application\DTOs\UserDTO.class

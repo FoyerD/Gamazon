@@ -3,9 +3,12 @@ package Infrastructure.Repositories;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Repository;
+
 import Domain.Shopping.IShoppingCart;
 import Domain.Shopping.IShoppingCartRepository;
 
+@Repository
 public class MemoryShoppingCartRepository extends IShoppingCartRepository {
     private final Map<String, IShoppingCart> carts;
 

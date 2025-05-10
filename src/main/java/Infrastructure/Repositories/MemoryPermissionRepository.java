@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Repository;
+
 import Domain.management.IPermissionRepository;
 import Domain.management.Permission;
 
+@Repository
 public class MemoryPermissionRepository extends IPermissionRepository {
 
     private final Map<String, Map<String, Permission>> permissions = new ConcurrentHashMap<>();

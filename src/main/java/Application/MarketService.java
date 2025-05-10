@@ -1,28 +1,30 @@
 package Application;
 
-import Domain.User.IUserRepository;
-import Domain.management.IMarketFacade;
-import Domain.management.PermissionType;
-import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
-import Domain.Store.Feedback;
-import Domain.Store.IItemRepository;
-import Domain.Store.Store;
-import Domain.Store.StoreFacade;
-import Domain.Shopping.IShoppingCartFacade;
-import Domain.Shopping.Receipt;
-import Domain.TokenService;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
 
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
+import Domain.ExternalServices.INotificationService;
+import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.ISupplyService;
+import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.Receipt;
+import Domain.Store.Feedback;
+import Domain.Store.IItemRepository;
+import Domain.Store.Store;
+import Domain.Store.StoreFacade;
+import Domain.TokenService;
+import Domain.User.IUserRepository;
+import Domain.management.IMarketFacade;
+import Domain.management.PermissionType;
 
+@Service
 public class MarketService {
 
     private static final String CLASS_NAME = MarketService.class.getSimpleName();

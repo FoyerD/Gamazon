@@ -1,17 +1,27 @@
 package Domain.Store;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import com.vaadin.flow.component.template.Id;
+
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 
 /**
  * Represents a product in the system.
  * A product has a unique ID, a name, and is associated with a set of categories.
  */
+@Entity
 public class Product {
 
+    @Id
     private String productId;
     private String name;
-    private Set<Category> categories;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Category> categories = new HashSet<>();
 
     /**
      * Constructs a product with the given ID, name, and categories.

@@ -2,6 +2,9 @@ package Domain.User;
 
 import java.util.UUID;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class Member extends User{
     String password; // encoded
     String email;
