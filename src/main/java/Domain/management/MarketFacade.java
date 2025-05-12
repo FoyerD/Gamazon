@@ -266,4 +266,29 @@ public class MarketFacade implements IMarketFacade {
             throw new SecurityException("User " + username + " lacks permission " + requiredPermission + " for store " + storeId);
         }
     }
+
+    /**
+     * Checks if a user is a store manager for the specified store.
+     * 
+     * @param username The username to check
+     * @param storeId The store ID to check
+     * @return true if the user is a store manager, false otherwise
+     */
+    public boolean isStoreManager(String username, String storeId) {
+        Permission permission = permissionRepository.get(storeId, username);
+        return permission != null && permission.isStoreManager();
+    }
+
+    /**
+     * Checks if a user is a store owner for the specified store.
+     * 
+     * @param username The username to check
+     * @param storeId The store ID to check
+     * @return true if the user is a store owner, false otherwise
+     */
+    public boolean isStoreOwner(String username, String storeId) {
+        Permission permission = permissionRepository.get(storeId, username);
+        return permission != null && permission.isStoreOwner();
+    }
+    
 }

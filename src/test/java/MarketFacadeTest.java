@@ -300,6 +300,126 @@ public class MarketFacadeTest {
         verify(notificationService).initialize();
     }
 
+
+    @Test
+    public void givenUserIsStoreManager_whenCheckIsStoreManager_thenReturnTrue() {
+        // Setup
+        Permission managerPermission = mock(Permission.class);
+        when(managerPermission.isStoreManager()).thenReturn(true);
+        
+        marketFacade.getStorePermissions().put("store1", new HashMap<>());
+        marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
+
+        // Add implementation for the isStoreManager method to MarketFacade
+        
+        // Execute
+        boolean isManager = marketFacade.isStoreManager("managerUser", "store1");
+        
+        // Verify
+        assertTrue(isManager, "User should be identified as a store manager");
+        verify(managerPermission).isStoreManager();
+    }
+
+    @Test
+    public void givenUserIsNotStoreManager_whenCheckIsStoreManager_thenReturnFalse() {
+        // Setup
+        Permission nonManagerPermission = mock(Permission.class);
+        when(nonManagerPermission.isStoreManager()).thenReturn(false);
+        
+        marketFacade.getStorePermissions().put("store1", new HashMap<>());
+        marketFacade.getStorePermissions().get("store1").put("regularUser", nonManagerPermission);
+
+        // Execute
+        boolean isManager = marketFacade.isStoreManager("regularUser", "store1");
+        
+        // Verify
+        assertFalse(isManager, "User should not be identified as a store manager");
+        verify(nonManagerPermission).isStoreManager();
+    }
+
+    @Test
+    public void givenUserPermissionDoesNotExist_whenCheckIsStoreManager_thenReturnFalse() {
+        // Setup
+        marketFacade.getStorePermissions().put("store1", new HashMap<>());
+        // No permission entry for "nonExistentUser"
+        
+        // Execute
+        boolean isManager = marketFacade.isStoreManager("nonExistentUser", "store1");
+        
+        // Verify
+        assertFalse(isManager, "Non-existent user should not be identified as a store manager");
+    }
+
+    @Test
+    public void givenUserIsStoreOwner_whenCheckIsStoreOwner_thenReturnTrue() {
+        // Setup
+        Permission ownerPermission = mock(Permission.class);
+        when(ownerPermission.isStoreOwner()).thenReturn(true);
+        
+        marketFacade.getStorePermissions().put("store1", new HashMap<>());
+        marketFacade.getStorePermissions().get("store1").put("ownerUser", ownerPermission);
+        
+        // Execute
+        boolean isOwner = marketFacade.isStoreOwner("ownerUser", "store1");
+        
+        // Verify
+        assertTrue(isOwner, "User should be identified as a store owner");
+        verify(ownerPermission).isStoreOwner();
+    }
+
+    @Test
+    public void givenUserIsNotStoreOwner_whenCheckIsStoreOwner_thenReturnFalse() {
+        // Setup
+        Permission nonOwnerPermission = mock(Permission.class);
+        when(nonOwnerPermission.isStoreOwner()).thenReturn(false);
+        
+        marketFacade.getStorePermissions().put("store1", new HashMap<>());
+        marketFacade.getStorePermissions().get("store1").put("regularUser", nonOwnerPermission);
+        
+        // Execute
+        boolean isOwner = marketFacade.isStoreOwner("regularUser", "store1");
+        
+        // Verify
+        assertFalse(isOwner, "User should not be identified as a store owner");
+        verify(nonOwnerPermission).isStoreOwner();
+    }
+
+    @Test
+    public void givenUserPermissionDoesNotExist_whenCheckIsStoreOwner_thenReturnFalse() {
+        // Setup
+        marketFacade.getStorePermissions().put("store1", new HashMap<>());
+        // No permission entry for "nonExistentUser"
+        
+        // Execute
+        boolean isOwner = marketFacade.isStoreOwner("nonExistentUser", "store1");
+        
+        // Verify
+        assertFalse(isOwner, "Non-existent user should not be identified as a store owner");
+    }
+
+    @Test
+    public void givenStoreDoesNotExist_whenCheckIsStoreManager_thenReturnFalse() {
+        // Setup - Store "nonExistentStore" is not in the permissions map
+        
+        // Execute
+        boolean isManager = marketFacade.isStoreManager("managerUser", "nonExistentStore");
+        
+        // Verify
+        assertFalse(isManager, "User should not be a manager of a non-existent store");
+    }
+
+    @Test
+    public void givenStoreDoesNotExist_whenCheckIsStoreOwner_thenReturnFalse() {
+        // Setup - Store "nonExistentStore" is not in the permissions map
+        
+        // Execute
+        boolean isOwner = marketFacade.isStoreOwner("ownerUser", "nonExistentStore");
+        
+        // Verify
+        assertFalse(isOwner, "User should not be an owner of a non-existent store");
+    }
+
+
     // === Helper method ===
 
     private Permission createPermissionWith(PermissionType permissionType) {

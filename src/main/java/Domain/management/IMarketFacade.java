@@ -199,4 +199,23 @@ public interface IMarketFacade {
      * @param userId ID of the user requesting the closure
      */
     void marketCloseStore(String storeId, String userId);
+    
+    /**
+     * Checks if a user is a store manager for the specified store.
+     * 
+     * @param username The username to check
+     * @param storeId The store ID to check
+     * @return true if the user is a store manager, false otherwise
+     */
+    boolean isStoreManager(String username, String storeId);
+
+    /**
+     * Checks if a user is a store owner for the specified store.
+     * 
+     * @param username The username to check
+     * @param storeId The store ID to check
+     * @return true if the user is a store owner, false otherwise
+     */
+    boolean isStoreOwner(String username, String storeId);
+    
 }

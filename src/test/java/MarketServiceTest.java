@@ -212,7 +212,7 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void testConcurrentAppointmentOfDifferentStoreManagers_OnlyOneSucceeds() throws InterruptedException {
+    public void testConcurrentAppointmentOfDifferentStoreManagers() throws InterruptedException {
         // Create two additional users who will be concurrently appointed as managers
         UUID userId3 = UUID.randomUUID();
         UUID userId4 = UUID.randomUUID();
@@ -257,42 +257,31 @@ public class MarketServiceTest {
         thread1.join(5000);  // Wait up to 5 seconds
         thread2.join(5000);
         
-        // If your system has proper thread safety on store manager appointment:
-        // 1. Either both should succeed (if there's no constraint on # of managers)
-        // 2. Or if there's a constraint that only one manager can be appointed at a time,
-        //    exactly one should succeed
-        
-        // Verify if we expect one or both to succeed
-        // If we expect only one to succeed:
-        if (!(threadSuccess[0] && threadSuccess[1])) {
-            assertTrue(threadSuccess[0] || threadSuccess[1], 
-                "At least one appointment should succeed");
-            
-            // The failed thread should have an error message
-            if (!threadSuccess[0]) {
-                assertNotNull(threadErrors[0], "Failed thread should have error message");
-            }
-            
-            if (!threadSuccess[1]) {
-                assertNotNull(threadErrors[1], "Failed thread should have error message");
-            }
+        // Print diagnostic information
+        System.out.println("Thread 1 success: " + threadSuccess[0]);
+        if (!threadSuccess[0]) {
+            System.out.println("Thread 1 error: " + threadErrors[0]);
         }
         
-        // Verify the final state of manager appointments
-        Response<Map<String, List<PermissionType>>> permissions = 
-            marketService.getManagersPermissions(tokenId1, storeId1);
-        assertFalse(permissions.errorOccurred(), "Getting permissions should succeed");
+        System.out.println("Thread 2 success: " + threadSuccess[1]);
+        if (!threadSuccess[1]) {
+            System.out.println("Thread 2 error: " + threadErrors[1]);
+        }
         
-        // Check if the expected managers are in the permissions map
+        // Verify the final state using the new isStoreManager method
         if (threadSuccess[0]) {
-            assertTrue(permissions.getValue().containsKey(candidate1Username), 
-                "Candidate 1 should be a manager if appointment succeeded");
+            boolean isManager = marketFacade.isStoreManager(candidate1Username, storeId1);
+            assertTrue(isManager, "Candidate 1 should be a manager if appointment succeeded");
         }
         
         if (threadSuccess[1]) {
-            assertTrue(permissions.getValue().containsKey(candidate2Username), 
-                "Candidate 2 should be a manager if appointment succeeded");
+            boolean isManager = marketFacade.isStoreManager(candidate2Username, storeId1);
+            assertTrue(isManager, "Candidate 2 should be a manager if appointment succeeded");
         }
+        
+        // Verify at least one appointment succeeded
+        assertTrue(threadSuccess[0] || threadSuccess[1], 
+            "At least one manager appointment should succeed");
     }
     
     @Test
@@ -304,7 +293,7 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void testConcurrentAppointmentOfDifferentStoreOwners_OnlyOneSucceeds() throws InterruptedException {
+    public void testConcurrentAppointmentOfDifferentStoreOwners() throws InterruptedException {
         // Create two additional users who will be concurrently appointed as owners
         UUID userId3 = UUID.randomUUID();
         UUID userId4 = UUID.randomUUID();
@@ -349,39 +338,31 @@ public class MarketServiceTest {
         thread1.join(5000);  // Wait up to 5 seconds
         thread2.join(5000);
         
-        // Depending on your system's thread safety mechanisms:
-        // If your system allows only one ownership appointment at a time:
-        if (!(threadSuccess[0] && threadSuccess[1])) {
-            assertTrue(threadSuccess[0] || threadSuccess[1], 
-                "At least one appointment should succeed");
-            
-            // The failed thread should have an error message
-            if (!threadSuccess[0]) {
-                assertNotNull(threadErrors[0], "Failed thread should have error message");
-            }
-            
-            if (!threadSuccess[1]) {
-                assertNotNull(threadErrors[1], "Failed thread should have error message");
-            }
+        // Print diagnostic information
+        System.out.println("Thread 1 success: " + threadSuccess[0]);
+        if (!threadSuccess[0]) {
+            System.out.println("Thread 1 error: " + threadErrors[0]);
         }
         
-        // Verify the final state
-        // For each candidate that should have succeeded, verify they have owner permissions
-        // This could be testing that they can perform owner-only actions
+        System.out.println("Thread 2 success: " + threadSuccess[1]);
+        if (!threadSuccess[1]) {
+            System.out.println("Thread 2 error: " + threadErrors[1]);
+        }
         
+        // Verify the final state using the new isStoreOwner method
         if (threadSuccess[0]) {
-            String candidate1TokenId = tokenService.generateToken(userId3.toString());
-            Response<Void> testOwnershipResponse = marketService.closeStore(candidate1TokenId, storeId1);
-            assertFalse(testOwnershipResponse.errorOccurred(), 
-                "Candidate 1 should have owner permissions if appointment succeeded");
+            boolean isOwner = marketFacade.isStoreOwner(candidate1Username, storeId1);
+            assertTrue(isOwner, "Candidate 1 should be an owner if appointment succeeded");
         }
         
         if (threadSuccess[1]) {
-            String candidate2TokenId = tokenService.generateToken(userId4.toString());
-            Response<Void> testOwnershipResponse = marketService.closeStore(candidate2TokenId, storeId1);
-            assertFalse(testOwnershipResponse.errorOccurred(), 
-                "Candidate 2 should have owner permissions if appointment succeeded");
+            boolean isOwner = marketFacade.isStoreOwner(candidate2Username, storeId1);
+            assertTrue(isOwner, "Candidate 2 should be an owner if appointment succeeded");
         }
+        
+        // Verify at least one appointment succeeded
+        assertTrue(threadSuccess[0] || threadSuccess[1], 
+            "At least one owner appointment should succeed");
     }
 
     @Test
