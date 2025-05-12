@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+
 import static org.mockito.Mockito.mock;
 
 import Application.DTOs.OrderDTO;
@@ -17,9 +19,7 @@ import Domain.TokenService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
-import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
-import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
@@ -45,17 +45,17 @@ import Domain.Store.IStoreRepository;
 
 public class ShoppingServiceTest {
 
+    @Mock
+    private IPaymentService paymentService;
+        
     private ShoppingService shoppingService;
 
-    
     private IShoppingCartRepository cartRepository;
     private IShoppingBasketRepository basketRepository;
     private ItemFacade itemFacade;
     private StoreFacade storeFacade;
     private IReceiptRepository receiptRepository;
     private IProductRepository productRepository;
-    private IShoppingCartFacade cartFacade;
-    private IPaymentService paymentService;
     private IItemRepository itemRepository;
     private IStoreRepository storeRepository;
     private IAuctionRepository auctionRepository;
@@ -118,16 +118,6 @@ public class ShoppingServiceTest {
         storeFacade.setFeedbackRepository(feedbackRepository);
         storeFacade.setGetUser(userRepository);
         
-        // Create ShoppingCartFacade
-        cartFacade = new ShoppingCartFacade(
-            cartRepository,
-            basketRepository,
-            paymentService,
-            itemFacade,
-            storeFacade,
-            receiptRepository,
-            productRepository
-        );
         
         // Initialize the ShoppingService with real repositories and facades
         shoppingService = new ShoppingService(
@@ -250,6 +240,35 @@ public class ShoppingServiceTest {
     }
 
     @Test
+    public void testCheckout_InsufficientStock() {
+        // First add a product to the cart with quantity greater than available stock
+        // From setup, we know the item has stock of 5
+        int requestedQuantity = 10; // More than the available 5
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, requestedQuantity);
+        
+        // Prepare checkout parameters
+        String cardNumber = "1234567890123456";
+        Date expiryDate = new Date();
+        String cvv = "123";
+        long transactionId = 12345L;
+        String clientName = "John Doe";
+        String deliveryAddress = "123 Main St";
+        
+        // Act - Attempt to checkout
+        Response<Boolean> response = shoppingService.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        
+        // Assert
+        assertTrue("Should have error due to insufficient stock", response.errorOccurred());
+        assertNull("Value should be null", response.getValue());
+        assertNotNull("Error message should not be null", response.getErrorMessage());
+        // Optionally, check that the error message mentions stock or inventory
+        assertTrue("Error should mention insufficient stock", 
+                response.getErrorMessage().toLowerCase().contains("stock") || 
+                response.getErrorMessage().toLowerCase().contains("inventory") ||
+                response.getErrorMessage().toLowerCase().contains("quantity"));
+    }
+
+    @Test
     public void testCheckout_PaymentError() {
         // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
@@ -270,6 +289,96 @@ public class ShoppingServiceTest {
         assertNull("Value should be null", response.getValue());
         assertNotNull("Error message should not be null", response.getErrorMessage());
     }
+
+
+    @Test
+    public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
+        // Create a product with limited stock (e.g., just 1 unit)
+        final String limitedProductId = "limitedProduct";
+        final String limitedStoreId = STORE_ID;
+        final int availableStock = 1;
+        
+        // Create a product with limited stock
+        Product limitedProduct = new Product(limitedProductId, "Limited Stock Product", new HashSet<>());
+        productRepository.add(limitedProductId, limitedProduct);
+        
+        // Create an item with just 1 unit available
+        Item limitedItem = new Item(limitedStoreId, limitedProductId, 10.0, availableStock, "Limited Stock Item");
+        itemFacade.add(new Pair<>(limitedStoreId, limitedProductId), limitedItem);
+        
+        // Create tokens for two different clients
+        String clientId1 = tokenService.generateToken(UUID.randomUUID().toString());
+        String clientId2 = tokenService.generateToken(UUID.randomUUID().toString());
+        
+        // Standard checkout parameters
+        final String cardNumber = "1234567890123456";
+        final Date expiryDate = new Date();
+        final String cvv = "123";
+        final long transactionId = 12345L;
+        final String clientName = "Test Client";
+        final String deliveryAddress = "123 Test St";
+        
+        // Add 1 unit of the limited product to each client's cart
+        shoppingService.addProductToCart(limitedStoreId, clientId1, limitedProductId, 1);
+        shoppingService.addProductToCart(limitedStoreId, clientId2, limitedProductId, 1);
+        
+        // Track the results for each thread
+        final boolean[] threadSuccess = new boolean[2];
+        final String[] threadErrors = new String[2];
+        
+        // Create two threads, each attempting to checkout
+        Thread thread1 = new Thread(() -> {
+            Response<Boolean> response = shoppingService.checkout(
+                clientId1, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+            threadSuccess[0] = !response.errorOccurred();
+            if (response.errorOccurred()) {
+                threadErrors[0] = response.getErrorMessage();
+            }
+        });
+        
+        Thread thread2 = new Thread(() -> {
+            Response<Boolean> response = shoppingService.checkout(
+                clientId2, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+            threadSuccess[1] = !response.errorOccurred();
+            if (response.errorOccurred()) {
+                threadErrors[1] = response.getErrorMessage();
+            }
+        });
+        
+        // Start both threads
+        thread1.start();
+        thread2.start();
+        
+        // Wait for both threads to complete
+        thread1.join(5000);  // Wait up to 5 seconds
+        thread2.join(5000);
+        
+        // Verify that exactly one thread succeeded and one failed
+        assertTrue("Either thread1 succeeded and thread2 failed, or vice versa",
+                (threadSuccess[0] && !threadSuccess[1]) || (!threadSuccess[0] && threadSuccess[1]));
+        
+        // At least one thread should have failed with a stock-related error
+        if (!threadSuccess[0]) {
+            assertNotNull("Thread 1 should have an error message", threadErrors[0]);
+            assertTrue("Thread 1 error should mention stock limitation", 
+                    threadErrors[0].toLowerCase().contains("stock") || 
+                    threadErrors[0].toLowerCase().contains("inventory") ||
+                    threadErrors[0].toLowerCase().contains("quantity"));
+        }
+        
+        if (!threadSuccess[1]) {
+            assertNotNull("Thread 2 should have an error message", threadErrors[1]);
+            assertTrue("Thread 2 error should mention stock limitation", 
+                    threadErrors[1].toLowerCase().contains("stock") || 
+                    threadErrors[1].toLowerCase().contains("inventory") ||
+                    threadErrors[1].toLowerCase().contains("quantity"));
+        }
+        
+        // Verify the item's stock is now 0 (all units purchased)
+        Item updatedItem = itemFacade.getItem(limitedStoreId, limitedProductId);
+        assertEquals("Stock should be depleted", 0, updatedItem.getAmount());
+    }
+    
     
     //
     // CART MANAGEMENT - REMOVE PRODUCT
