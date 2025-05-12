@@ -1,0 +1,110 @@
+package UI.views;
+
+import UI.presenters.IProductPresenter;
+import Application.DTOs.ItemDTO;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Route("home")
+public class HomePageView extends VerticalLayout implements BeforeEnterObserver {
+
+    private final IProductPresenter productPresenter;
+    private String sessionToken = null;
+    private String currentUsername = null;
+
+    private final TextField searchBar = new TextField();
+    private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
+
+    @Autowired
+    public HomePageView(IProductPresenter productPresenter) {
+        this.productPresenter = productPresenter;
+
+        setSizeFull();
+        setSpacing(true);
+        setPadding(true);
+        getStyle().set("background", "linear-gradient(to right, #edf2f7, #e2e8f0)");
+
+        H1 title = new H1("Gamazon Home");
+        title.getStyle().set("color", "#1a202c");
+
+        Span userInfo = new Span();
+        userInfo.getStyle().set("color", "#2d3748").set("font-weight", "bold");
+
+        searchBar.setPlaceholder("Search for products...");
+        searchBar.setWidth("300px");
+        searchBar.getStyle().set("background-color", "#ffffff");
+        searchBar.addValueChangeListener(e -> searchProducts());
+
+        Button refreshBtn = new Button("Refresh", e -> loadAllProducts());
+        refreshBtn.getStyle().set("background-color", "#2b6cb0").set("color", "white");
+
+        Button goToSearchBtn = new Button("Search Stores", e -> UI.getCurrent().navigate("store-search"));
+        goToSearchBtn.getStyle().set("background-color", "#3182ce").set("color", "white");
+
+        Button logoutBtn = new Button("Logout", e -> {
+            UI.getCurrent().getSession().close();
+            UI.getCurrent().navigate("login");
+        });
+        logoutBtn.getStyle().set("background-color", "#e53e3e").set("color", "white");
+
+        HorizontalLayout topBar = new HorizontalLayout(userInfo, title, searchBar, refreshBtn, goToSearchBtn, logoutBtn);
+        topBar.setAlignItems(Alignment.BASELINE);
+        topBar.setWidthFull();
+        topBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        topBar.getStyle().set("padding", "10px");
+
+        productGrid.setColumns("productName", "description", "price", "amount", "rating");
+        productGrid.setWidthFull();
+        productGrid.getStyle().set("background-color", "#f7fafc");
+
+        add(topBar, productGrid);
+
+        this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
+        this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
+        userInfo.setText("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"));
+
+        loadAllProducts();
+    }
+
+    private void loadAllProducts() {
+        if (sessionToken == null) return;
+        Set<ItemDTO> products = productPresenter.showAllProducts(sessionToken);
+        productGrid.setItems(products);
+    }
+
+    private void searchProducts() {
+        if (sessionToken == null) return;
+        String query = searchBar.getValue();
+        if (query.isBlank()) {
+            loadAllProducts();
+            return;
+        }
+        Set<ItemDTO> filtered = productPresenter.showAllProducts(sessionToken).stream()
+                .filter(p -> p.getProductName().toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toSet());
+        productGrid.setItems(filtered);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
+        if (sessionToken == null) {
+            Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
+            event.forwardTo("login");
+        }
+    }
+}
