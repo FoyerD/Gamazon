@@ -2,10 +2,13 @@ package Infrastructure;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import Domain.Store.Store;
 import Domain.Store.Item;
 import Domain.ExternalServices.ISupplyService;
 
+@Service
 public class SupplyService implements ISupplyService {
     @Override
     public void supplyItem(String itemId, int quantity) {

@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+@Service
 public class TokenService {
 
     @Value("${jwt.secret}")
