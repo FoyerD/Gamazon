@@ -30,7 +30,7 @@ public class ProductFacade {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         return productRepository.getByName(name);
     }
-    public boolean addProduct(String name, List<String> categories, List<String> catDesc) {
+    public Product addProduct(String name, List<String> categories, List<String> catDesc) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         if(this.getProductByName(name) != null) {
             throw new RuntimeException("Product already exists");
@@ -41,7 +41,10 @@ public class ProductFacade {
             Category category = new Category(categories.get(i), catDesc.get(i));
             product.addCategory(category);
         }
-        return productRepository.add(productId, product);
+        if(!productRepository.add(productId, product)){
+            throw new RuntimeException("Product not added");
+        }
+        return product;
     }
     
 }
