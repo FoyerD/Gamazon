@@ -31,6 +31,11 @@ public class ItemService {
             return new Response<>(new Error(itemRes.getErrorMessage()));
         }
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+
             itemFacade.getItem(storeId, productId).setPrice(newPrice);
             TradingLogger.logEvent("ItemService", method, "Price changed successfully.");
             return new Response<>(true);
@@ -43,6 +48,10 @@ public class ItemService {
     public Response<List<ItemDTO>> getItemsByProductId(String sessionToken, String productId) {
         String method = "getItemsByProductId";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.getItemsProductId(productId).stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Fetched items by productId: " + productId);
@@ -56,6 +65,10 @@ public class ItemService {
     public Response<List<ItemDTO>> filterItems(String sessionToken, ItemFilter filter) {
         String method = "filterItems";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.filterItems(filter).stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Items filtered.");
@@ -69,6 +82,10 @@ public class ItemService {
     public Response<ItemDTO> getItem(String sessionToken, String storeId, String productId) {
         String method = "getItem";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             Item item = itemFacade.getItem(storeId, productId);
             TradingLogger.logEvent("ItemService", method, "Item retrieved successfully.");
             return new Response<>(ItemDTO.fromItem(item));
@@ -81,6 +98,10 @@ public class ItemService {
     public Response<List<ItemDTO>> getItemsByStoreId(String sessionToken, String storeId) {
         String method = "getItemsByStoreId";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.getItemsByStoreId(storeId).stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Fetched items for storeId: " + storeId);
@@ -94,6 +115,10 @@ public class ItemService {
     public Response<List<ItemDTO>> getAvailableItems(String sessionToken) {
         String method = "getAvailableItems";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.getAvailableItems().stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Fetched available items.");
@@ -107,6 +132,10 @@ public class ItemService {
     public Response<Void> addRating(String sessionToken, String storeId, String productId, float rating) {
         String method = "addRating";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             throw new UnsupportedOperationException("Not Implemented.");
         } catch (UnsupportedOperationException ex) {
             TradingLogger.logError("ItemService", method, ex.getMessage());
@@ -117,6 +146,10 @@ public class ItemService {
     public Response<Boolean> add(String sessionToken, Pair<String, String> id, Item item) {
         String method = "add";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             boolean added = itemFacade.add(id, item);
             TradingLogger.logEvent("ItemService", method, "Item added: " + added);
             return new Response<>(added);
@@ -129,6 +162,10 @@ public class ItemService {
     public Response<ItemDTO> remove(String sessionToken, Pair<String, String> id) {
         String method = "remove";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             Item item = itemFacade.remove(id);
             TradingLogger.logEvent("ItemService", method, "Item removed.");
             return new Response<>(ItemDTO.fromItem(item));
@@ -141,6 +178,10 @@ public class ItemService {
     public Response<Void> increaseAmount(String sessionToken, Pair<String, String> id, int amount) {
         String method = "increaseAmount";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             itemFacade.increaseAmount(id, amount);
             TradingLogger.logEvent("ItemService", method, "Amount increased.");
             return new Response<>(null);
@@ -153,6 +194,10 @@ public class ItemService {
     public Response<Void> decreaseAmount(String sessionToken, Pair<String, String> id, int amount) {
         String method = "decreaseAmount";
         try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
             itemFacade.decreaseAmount(id, amount);
             TradingLogger.logEvent("ItemService", method, "Amount decreased.");
             return new Response<>(null);
