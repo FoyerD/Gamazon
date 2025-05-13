@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
@@ -185,20 +186,66 @@ public class MarketFacade implements IMarketFacade {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
         Member manager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
         Map<String, Permission> storePermissions = permissionRepository.getAllPermissionsForStore(storeId);
-        if (storePermissions != null) {
-            for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
-                String username = entry.getKey();
-                Permission permission = entry.getValue();
-                if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
-                    permission.setPermissions(Set.of());
-                    permission.setRole(null);
-                    permissionRepository.update(storeId, username, permission);
-                    notificationService.sendNotification(username, "Store " + storeId + " has been closed.");
+        
+        // Store original states for rollback
+        Map<String, RoleType> originalRoles = new HashMap<>();
+        Map<String, Set<PermissionType>> originalPermissions = new HashMap<>();
+        
+        try {
+            if (storePermissions != null) {
+                for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
+                    String username = entry.getKey();
+                    Permission permission = entry.getValue();
+                    if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
+                        // Store the original state before modification
+                        originalRoles.put(username, permission.getRoleType());
+                        originalPermissions.put(username, new HashSet<>(permission.getPermissions()));
+                        
+                        // Update the permission
+                        permission.setPermissions(Set.of());
+                        permission.setRole(null);
+                        permissionRepository.update(storeId, username, permission);
+                        
+                        // Send notification and check for failure
+                        Response<Boolean> notifyResponse = notificationService.sendNotification(
+                            username, "Store " + storeId + " has been closed.");
+                        
+                        // If notification fails, throw an exception to trigger rollback
+                        if (notifyResponse.errorOccurred()) {
+                            throw new RuntimeException("Failed to send notification: " + notifyResponse.getErrorMessage());
+                        }
+                    }
                 }
             }
+            
+            // Close the store
+            storeFacade.closeStore(storeId);
+            
+            // Send notification to the manager and check for failure
+            Response<Boolean> managerNotifyResponse = notificationService.sendNotification(
+                manager.getName(), "Store " + storeId + " has been closed.");
+            
+            // If notification fails, throw an exception
+            if (managerNotifyResponse.errorOccurred()) {
+                throw new RuntimeException("Failed to send notification to manager: " + managerNotifyResponse.getErrorMessage());
+            }
+        } catch (Exception e) {
+            // Rollback permission changes if an error occurs
+            if (storePermissions != null) {
+                for (String username : originalRoles.keySet()) {
+                    Permission permission = storePermissions.get(username);
+                    if (permission != null) {
+                        // Restore the original role and permissions
+                        permission.setRole(originalRoles.get(username));
+                        permission.setPermissions(originalPermissions.get(username));
+                        permissionRepository.update(storeId, username, permission);
+                    }
+                }
+            }
+            
+            // Re-throw the exception to indicate failure
+            throw e;
         }
-        storeFacade.closeStore(storeId);
-        notificationService.sendNotification(manager.getName(), "Store " + storeId + " has been closed.");
     }
 
     @Override
