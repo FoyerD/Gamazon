@@ -13,7 +13,6 @@ import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
-import Domain.management.PermissionType;
 
 public class ItemService {
 
@@ -147,7 +146,7 @@ public class ItemService {
         }
     }
 
-    
+
     public Response<ItemDTO> add(String sessionToken, String storeId, String productId, String description) {
         String method = "add";
         try {

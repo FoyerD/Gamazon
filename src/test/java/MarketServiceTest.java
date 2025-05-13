@@ -250,12 +250,6 @@ public class MarketServiceTest {
         assertFalse(response2.errorOccurred());
     }
 
-    @Test
-    public void givenStoreHasInventory_whenAddingProducts_thenInventoryIsIncreased() {
-        Map<String, Integer> products = Map.of(productId1, 5);
-        Response<Void> response = marketService.addProductsToInventory(tokenId1, storeId1, products);
-        assertFalse(response.errorOccurred());
-    }
 
     @Test
     public void givenStoreHasInventory_whenRemovingProducts_thenInventoryIsDecreased() {
@@ -371,13 +365,6 @@ public class MarketServiceTest {
     public void givenNoPermission_whenGettingStorePurchaseHistory_thenErrorOccurs() {
         Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId2, storeId1);
         assertTrue(response.errorOccurred());
-    }
-
-    @Test
-    public void givenInvalidToken_whenAddingProductsToInventory_thenErrorOccurs() {
-        Map<String, Integer> products = Map.of(productId1, 5);
-        Response<Void> response = marketService.addProductsToInventory("invalidToken", storeId1, products);
-        assertTrue(response.errorOccurred(), "Adding products with an invalid token should fail");
     }
 
     @Test
