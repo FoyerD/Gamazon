@@ -146,16 +146,39 @@ public class ItemService {
         }
     }
 
-    public Response<Boolean> add(String sessionToken, Pair<String, String> id, Item item) {
+    public Response<ItemDTO> add(String sessionToken, String storeId, String productId, String description) {
         String method = "add";
         try {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
-            boolean added = itemFacade.add(id, item);
-            TradingLogger.logEvent("ItemService", method, "Item added: " + added);
-            return new Response<>(added);
+            Item item = itemFacade.add(storeId, productId, description);
+            if(item == null) {
+                throw new RuntimeException("Item not added");
+            }
+            
+            TradingLogger.logEvent("ItemService", method, "Item added: " + storeId + ", " + productId);
+            return new Response<>(ItemDTO.fromItem(item));
+        } catch (Exception ex) {
+            TradingLogger.logError("ItemService", method, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+    public Response<ItemDTO> add(String sessionToken, String storeId, String productId, double price, int amount, String description) {
+        String method = "add";
+        try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+            Item item = itemFacade.add(storeId, productId, price, amount, description);
+            if(item == null) {
+                throw new RuntimeException("Item not added");
+            }
+            
+            TradingLogger.logEvent("ItemService", method, "Item added: " + storeId + ", " + productId);
+            return new Response<>(ItemDTO.fromItem(item));
         } catch (Exception ex) {
             TradingLogger.logError("ItemService", method, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
