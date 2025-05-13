@@ -73,7 +73,7 @@ public class ItemServiceTests {
         }
         Item item = new Item(storeId, productId, price, amount, itemName);
     
-        itemFacade.add(new Pair<>(storeId, productId), item);
+        itemFacade.add(storeId, productId, price, amount, itemName);
     }
     
 
@@ -218,9 +218,9 @@ public class ItemServiceTests {
         Item item = new Item("storeY", "prodY", 19.99f, 3, "Cool Product");
         Pair<String, String> id = new Pair<>("storeY", "prodY");
 
-        Response<Boolean> response = itemService.add(tokenId, id, item);
+        Response<ItemDTO> response = itemService.add(tokenId, id.getFirst(), id.getSecond(), 19.99f, 3, "Cool Product");
         assertFalse(response.errorOccurred());
-        assertTrue(response.getValue());
+        assertTrue(response.getValue() != null);
     }
 
     @Test
@@ -230,9 +230,8 @@ public class ItemServiceTests {
         // Fetch real domain Item from the repository, not through the service (which returns DTO)
         Item existingItem = itemRepository.get(id);
     
-        Response<Boolean> response = itemService.add(tokenId, id, existingItem);
-        assertFalse(response.errorOccurred());
-        assertFalse(response.getValue());
+        Response<ItemDTO> response = itemService.add(tokenId, id.getFirst(), id.getSecond(), existingItem.getPrice(), existingItem.getAmount(), existingItem.getDescription());
+        assertTrue(response.errorOccurred());
     }
     
 

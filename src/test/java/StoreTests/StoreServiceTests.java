@@ -221,9 +221,9 @@ public class StoreServiceTests {
         Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
         String storeId = storeResponse.getValue().getId();
 
-        String productId1 = UUID.randomUUID().toString();
-        String productId2 = UUID.randomUUID().toString();
-        String productId3 = UUID.randomUUID().toString();
+        String productId1 = "1";
+        String productId2 = "2";
+        String productId3 = "3";
 
         itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
         itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
