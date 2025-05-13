@@ -3,7 +3,6 @@ package Domain.management;
 import java.util.List;
 import java.util.Set;
 
-import Infrastructure.Repositories.MemoryPermissionRepository;
 
 public class PermissionManager {
     private IPermissionRepository permissionRepository;
@@ -56,10 +55,10 @@ public class PermissionManager {
         return permission;
     }
 
-    public void checkPermission(String username, String storeId, PermissionType requiredPermission) {
-        Permission permission = permissionRepository.get(storeId, username);
+    public void checkPermission(String userId, String storeId, PermissionType requiredPermission) {
+        Permission permission = permissionRepository.get(storeId, userId);
         if (permission == null || !permission.hasPermission(requiredPermission)) {
-            throw new SecurityException("User " + username + " lacks permission " + requiredPermission + " for store " + storeId);
+            throw new SecurityException("User " + userId + " lacks permission " + requiredPermission + " for store " + storeId);
         }
     }
 

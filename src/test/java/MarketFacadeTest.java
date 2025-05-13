@@ -99,21 +99,6 @@ public class MarketFacadeTest {
     }
 
     @Test
-    public void givenUserWithInventoryPermission_whenAddProductsToInventory_thenProductIsAdded() {
-        User user = mock(User.class);
-        when(userRepository.get(anyString())).thenReturn(user);
-        when(user.getName()).thenReturn("user1");
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("user1", createPermissionWith(PermissionType.HANDLE_INVENTORY));
-        when(itemRepository.getItem(eq("store1"), anyString())).thenReturn(null);
-
-        Map<String, Integer> productQuantities = Map.of("product1", 5);
-        marketFacade.addProductsToInventory("store1", productQuantities, "userId");
-
-        verify(itemRepository).add(any(), any());
-    }
-
-    @Test
     public void givenUserWithInventoryPermission_whenUpdateProductQuantities_thenItemAmountIsUpdated() {
         User user = mock(User.class);
         Item existingItem = mock(Item.class);

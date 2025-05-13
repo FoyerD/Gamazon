@@ -12,15 +12,18 @@ import Domain.TokenService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
+import Domain.management.PermissionManager;
 
 public class ItemService {
 
     private final ItemFacade itemFacade;
     private TokenService tokenService;
+    private PermissionManager permissionManager;
 
-    public ItemService(ItemFacade itemFacade, TokenService tokenService) {
+    public ItemService(ItemFacade itemFacade, TokenService tokenService, PermissionManager permissionManager) {
         this.tokenService = tokenService;
         this.itemFacade = itemFacade;
+        this.permissionManager = permissionManager;
     }
 
     public Response<Boolean> changePrice(String sessionToken, String storeId, String productId, float newPrice) {
@@ -142,6 +145,7 @@ public class ItemService {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+
 
     public Response<ItemDTO> add(String sessionToken, String storeId, String productId, String description) {
         String method = "add";

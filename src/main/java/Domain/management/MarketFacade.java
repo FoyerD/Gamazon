@@ -77,20 +77,6 @@ public class MarketFacade implements IMarketFacade {
         return notificationService;
     }
 
-    //TODO! REMOVE
-    @Override
-    public void addProductsToInventory(String storeId, Map<String, Integer> productQuantities, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
-        for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
-            String productId = entry.getKey();
-            Integer quantity = entry.getValue();
-            Item existingItem = itemRepository.getItem(storeId, productId);
-            if (existingItem == null) {
-                Item newItem = new Item(storeId, String.valueOf(productId), 0, quantity, "New product");
-                itemRepository.add(new Pair<>(storeId, productId), newItem);
-            }
-        }
-    }
 
     //TODO! REMOVE
     @Override

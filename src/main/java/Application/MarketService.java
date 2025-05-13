@@ -129,21 +129,6 @@ public class MarketService {
         }
     }
 
-    public Response<Void> addProductsToInventory(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
-        if (isInvalid(sessionToken)) {
-            TradingLogger.logError(CLASS_NAME, "addProductsToInventory", "Invalid session token");
-            return new Response<>(new Error("Invalid session token"));
-        }
-        try {
-            marketFacade.addProductsToInventory(storeId, productQuantities, tokenService.extractId(sessionToken));
-            TradingLogger.logEvent(CLASS_NAME, "addProductsToInventory", "Products added to inventory successfully.");
-            return new Response<>(null);
-        } catch (Exception e) {
-            TradingLogger.logError(CLASS_NAME, "addProductsToInventory", "Failed to add products to inventory: %s", e.getMessage());
-            return new Response<>(new Error(e.getMessage()));
-        }
-    }
-
     public Response<Void> updateProductQuantities(String sessionToken, String storeId, Map<String, Integer> productQuantities) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updateProductQuantities", "Invalid session token");
