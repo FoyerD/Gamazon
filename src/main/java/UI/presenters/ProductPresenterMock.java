@@ -1,11 +1,14 @@
 package UI.presenters;
 
+import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
+import Domain.Store.FeedbackDTO;
 import Application.DTOs.ItemDTO;
+import Application.utils.Response;
+import Domain.Store.ItemFilter;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,31 +34,32 @@ public class ProductPresenterMock implements IProductPresenter {
     ).collect(Collectors.toSet());
 
     @Override
-    public Set<ItemDTO> showProductDetails(String sessionToken, String productName) {
-        return mockProducts.stream()
-                .filter(p -> p.getProductName().toLowerCase().contains(productName.toLowerCase()))
-                .collect(Collectors.toSet());
+    public Response<List<ItemDTO>> showProductDetails(String sessionToken, ItemFilter filters) {
+        List<ItemDTO> results = mockProducts.stream()
+            .filter(item -> item.getProductName().toLowerCase().contains(filters.getItemName().toLowerCase()))
+            .collect(Collectors.toList());
+        return new Response<>(results);
     }
 
     @Override
-    public ItemDTO showProductDetailsOfaStore(String sessionToken, String productName, String storeName) {
-        // Try to match by exact store ID and product name
-        return mockProducts.stream()
-                .filter(p -> p.getProductName().equalsIgnoreCase(productName) && p.getStoreId().equalsIgnoreCase(storeName))
-                .findFirst()
-                // If not found, just match by product name (for cart integration)
-                .orElse(mockProducts.stream()
-                        .filter(p -> p.getProductName().equalsIgnoreCase(productName))
-                        .findFirst()
-                        .orElse(null));
+    public Response<List<ItemDTO>> showProductDetailsOfaStore(String sessionToken, ItemFilter filters, String storeId) {
+        List<ItemDTO> results = mockProducts.stream()
+            .filter(item -> item.getProductName().equalsIgnoreCase(filters.getItemName()) &&
+                            item.getStoreId().equalsIgnoreCase(storeId))
+            .collect(Collectors.toList());
+        return new Response<>(results);
     }
 
     @Override
-    public Set<ItemDTO> showAllProducts(String sessionToken) {
-        return mockProducts;
+    public Response<List<ItemDTO>> showAllProducts(String sessionToken) {
+        return new Response<>(new ArrayList<>(mockProducts));
     }
 
     @Override
+    public Response<Void> rateProduct(String sessionToken, ItemDTO item) {
+        System.out.println("Mock: Rated product " + item.getProductName() + " from " + item.getStoreId() + " with rating " + item.getRating());
+        return new Response<>((Void) null); // Void response
+    }
     public Set<ItemDTO> showProductsByCategories(String sessionToken, Set<String> categories) {
         return mockProducts.stream()
                 .filter(p -> p.getCategories().stream()
@@ -64,23 +68,14 @@ public class ProductPresenterMock implements IProductPresenter {
     }
 
     @Override
-    public void rateProduct(String sessionToken, String productName, String storeName, double rating, String feedback) {
-        System.out.println("Mock: Rated product " + productName + " from " + storeName + " with rating " + rating);
+    public Response<List<AuctionDTO>> showAuctionedProduct(String sessionToken, ItemFilter filters) {
+        // Mock: no actual auctions, return empty list
+        return new Response<>(new ArrayList<>());
     }
 
     @Override
-    public Set<ItemDTO> showAuctionedProducts(String sessionToken) {
-        // In this mock, returning all products as if they were auctioned
-        return mockProducts;
-    }
-
-    @Override
-    public Set<ItemDTO> showAuctionedProductsByCategories(String sessionToken, Set<String> categories) {
-        return showProductsByCategories(sessionToken, categories); // Reuse logic
-    }
-
-    @Override
-    public Set<ItemDTO> showAuctionedProduct(String sessionToken, String productName) {
-        return showProductDetails(sessionToken, productName); // Reuse logic
+    public Response<List<FeedbackDTO>> showFeedbacks(String sessionToken, ItemFilter filters) {
+        // Mock: return empty feedback list
+        return new Response<>(new ArrayList<>());
     }
 }
