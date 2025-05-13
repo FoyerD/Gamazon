@@ -1,8 +1,11 @@
 package UI.presenters;
+import Application.CustomerServiceService;
 import Application.ItemService;
 import Application.StoreService;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
+import Domain.Store.FeedbackDTO;
+
 import java.util.List;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
@@ -14,10 +17,12 @@ public class StorePresenter implements IStorePresenter {
 
     private final StoreService storeService;
     private final ItemService itemService;
+    private final CustomerServiceService customerServiceService;
 
-    public StorePresenter(StoreService storeService, ItemService itemService) {
+    public StorePresenter(StoreService storeService, ItemService itemService, CustomerServiceService customerServiceService) {
         this.storeService = storeService;
         this.itemService = itemService;
+        this.customerServiceService = customerServiceService;
     }
 
     @Override
@@ -30,5 +35,24 @@ public class StorePresenter implements IStorePresenter {
         return storeService.getAllStoreAuctions(sessionToken, storeId);
     }
 
+    @Override
+    public Response<List<ItemDTO>> getItemsByStoreId(String sessionToken, String storeId){
+        return itemService.getItemsByStoreId(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<Boolean> updateItemPrice(String sessionToken, String storeId, String productId, float newPrice) {
+        return itemService.changePrice(sessionToken, storeId, productId, newPrice);
+    }
+
+    @Override
+    public Response<Boolean> addFeedback(String sessionToken, String storeId, String productId, String comment) {
+        return customerServiceService.addFeedback(sessionToken, storeId, productId, comment);
+    }
+
+    @Override
+    public Response<List<FeedbackDTO>> getAllFeedbacksByStoreId(String sessionToken, String storeId) {
+        return customerServiceService.getAllFeedbacksByStoreId(sessionToken, storeId);
+    }
     
 }
