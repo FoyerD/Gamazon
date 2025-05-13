@@ -154,7 +154,7 @@ public class MarketServiceTest {
         addUser(userId2, "Member2", "passpass2", "email2@email.com");
 
         this.itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
-        this.itemService = new ItemService(itemFacade);
+        this.itemService = new ItemService(itemFacade, tokenService);
 
         storeId1 = marketService.addStore(tokenId1, "Store One", "A store for testing").getValue().getId();
         addProduct(storeId1, "Store One", userId1.toString(), productId1, "In Stock Item", 49.99f, 10, "In Stock Item");
