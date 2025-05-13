@@ -2,6 +2,7 @@ package UI.presenters;
 
 import java.util.Set;
 import Application.DTOs.OrderDTO;
+import Application.utils.Response;
 
 /**
  * Interface for handling purchase-related user actions such as managing the cart, placing bids, and completing purchases.
@@ -15,9 +16,9 @@ public interface IPurchasePresenter {
      * @param productName the name of the product
      * @param storeName the name of the store selling the product
      * @param amount the quantity to add
-     * @return true if the product was successfully added; false otherwise
+     * @return a {@link Response} indicating whether the product was successfully added
      */
-    boolean addProductToCart(String sessionToken, String productName, String storeName, int amount);
+    Response<Boolean> addProductToCart(String sessionToken, String productName, String storeName, int amount);
 
     /**
      * Completely removes a product from the user's cart.
@@ -25,9 +26,9 @@ public interface IPurchasePresenter {
      * @param sessionToken the token representing the current authenticated user session
      * @param productName the name of the product
      * @param storeName the name of the store
-     * @return true if the product was successfully removed; false otherwise
+     * @return a {@link Response} indicating whether the product was successfully removed
      */
-    boolean removeProductFromCart(String sessionToken, String productName, String storeName);
+    Response<Boolean> removeProductFromCart(String sessionToken, String productName, String storeName);
 
     /**
      * Removes a specific amount of a product from the cart.
@@ -36,34 +37,34 @@ public interface IPurchasePresenter {
      * @param productName the name of the product
      * @param storeName the name of the store
      * @param amount the number of items to remove
-     * @return true if the specified quantity was removed; false otherwise
+     * @return a {@link Response} indicating whether the specified quantity was removed
      */
-    boolean removeProductFromCart(String sessionToken, String productName, String storeName, int amount);
+    Response<Boolean> removeProductFromCart(String sessionToken, String productName, String storeName, int amount);
 
     /**
      * Displays the current contents of the user's cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @return a set of {@link OrderDTO} representing the cart contents
+     * @return a {@link Response} containing a set of {@link OrderDTO} representing the cart contents
      */
-    Set<OrderDTO> viewCart(String sessionToken);
+    Response<Set<OrderDTO>> viewCart(String sessionToken);
 
     /**
      * Empties the entire cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @return true if the cart was cleared successfully; false otherwise
+     * @return a {@link Response} indicating whether the cart was cleared successfully
      */
-    boolean clearCart(String sessionToken);
+    Response<Boolean> clearCart(String sessionToken);
 
     /**
      * Clears the basket of a specific store within the user's cart.
      *
      * @param sessionToken the token representing the current authenticated user session
      * @param storeName the name of the store
-     * @return true if the basket was cleared; false otherwise
+     * @return a {@link Response} indicating whether the basket was cleared successfully
      */
-    boolean clearBasket(String sessionToken, String storeName);
+    Response<Boolean> clearBasket(String sessionToken, String storeName);
 
     /**
      * Submits a bid for an auctioned product.
@@ -72,9 +73,9 @@ public interface IPurchasePresenter {
      * @param productName the name of the product
      * @param storeName the store running the auction
      * @param bidAmount the bid value
-     * @return true if the bid was successfully placed; false otherwise
+     * @return a {@link Response} indicating whether the bid was successfully placed
      */
-    boolean makeBid(String sessionToken, String productName, String storeName, double bidAmount);
+    Response<Boolean> makeBid(String sessionToken, String productName, String storeName, double bidAmount);
 
     /**
      * Finalizes the purchase of the entire cart using provided payment and shipping details.
@@ -85,7 +86,7 @@ public interface IPurchasePresenter {
      * @param creditCardNumber the credit card number
      * @param expirationDate the card's expiration date in MM/YY format
      * @param cvv the CVV security code
-     * @return true if the purchase was successful; false otherwise
+     * @return a {@link Response} indicating whether the purchase was successful
      */
-    boolean purchaseCart(String sessionToken, String paymentMethod, String address, String creditCardNumber, String expirationDate, String cvv);
+    Response<Boolean> purchaseCart(String sessionToken, String paymentMethod, String address, String creditCardNumber, String expirationDate, String cvv);
 }

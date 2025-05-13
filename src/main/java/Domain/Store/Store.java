@@ -4,12 +4,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.vaadin.flow.component.template.Id;
+
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+
 public class Store {
     
     private String id;
     private String name;
     private String description;
     private String founderId;
+    
     private Set<String> owners;
     private Set<String> managers;
     private boolean isOpen;
