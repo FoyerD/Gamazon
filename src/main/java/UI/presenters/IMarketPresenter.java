@@ -1,5 +1,7 @@
 package UI.presenters;
 
+import Application.utils.Response;
+
 /**
  * Interface for presenting high-level marketplace and store administrative actions.
  */
@@ -11,7 +13,7 @@ public interface IMarketPresenter {
      *
      * @param sessionToken the token representing the current authenticated user session
      */
-    void openMarketplace(String sessionToken);
+    Response<Void> openMarketplace(String sessionToken);
 
     /**
      * Closes a specific store in the marketplace.
@@ -20,5 +22,6 @@ public interface IMarketPresenter {
      * @param sessionToken the token representing the current authenticated user session
      * @param storeName the name of the store to close
      */
-    void closeStore(String sessionToken, String storeName);
+    Response<Void> closeStore(String sessionToken, String storeName);
+
 }
