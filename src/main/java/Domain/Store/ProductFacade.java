@@ -30,13 +30,18 @@ public class ProductFacade {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         return productRepository.getByName(name);
     }
-    public void addProduct(String name, List<String> categories, List<String> catDesc) {
+    public boolean addProduct(String name, List<String> categories, List<String> catDesc) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         if(this.getProductByName(name) != null) {
             throw new RuntimeException("Product already exists");
         }
         String productId = UUID.randomUUID().toString();
-        productRepository.add(product);
+        Product product = new Product(productId, name);
+        for (int i = 0; i < categories.size(); i++) {
+            Category category = new Category(categories.get(i), catDesc.get(i));
+            product.addCategory(category);
+        }
+        return productRepository.add(productId, product);
     }
     
 }
