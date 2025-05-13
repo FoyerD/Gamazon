@@ -59,6 +59,7 @@ public class ProductPresenterMock implements IProductPresenter {
     public Response<Void> rateProduct(String sessionToken, ItemDTO item) {
         System.out.println("Mock: Rated product " + item.getProductName() + " from " + item.getStoreId() + " with rating " + item.getRating());
         return new Response<>((Void) null); // Void response
+    }
     public Set<ItemDTO> showProductsByCategories(String sessionToken, Set<String> categories) {
         return mockProducts.stream()
                 .filter(p -> p.getCategories().stream()
