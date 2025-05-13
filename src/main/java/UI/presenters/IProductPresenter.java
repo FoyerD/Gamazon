@@ -5,6 +5,7 @@ import java.util.List;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
 import Application.utils.Response;
+import Domain.Store.FeedbackDTO;
 import Domain.Store.ItemFilter;
 
 /**
@@ -57,4 +58,13 @@ public interface IProductPresenter {
      * @return a {@link Response} containing a list of {@link AuctionDTO} representing the product in active auctions
      */
     Response<List<AuctionDTO>> showAuctionedProduct(String sessionToken, ItemFilter filters);
+
+    /**
+     * Retrieves feedback for products that match the given filters.
+     *
+     * @param sessionToken the token representing the current authenticated user session
+     * @param filters the {@link ItemFilter} object containing the criteria to filter the feedbacks
+     * @return a {@link Response} containing a list of {@link FeedbackDTO} representing the feedbacks for the filtered products
+     */
+    Response<List<FeedbackDTO>> showFeedbacks(String sessionToken, ItemFilter filters);
 }

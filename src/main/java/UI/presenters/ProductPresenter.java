@@ -1,9 +1,7 @@
 package UI.presenters;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -14,9 +12,8 @@ import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
 import Application.utils.Error;
 import Application.utils.Response;
-import Domain.Store.Item;
+import Domain.Store.FeedbackDTO;
 import Domain.Store.ItemFilter;
-import jakarta.websocket.ClientEndpointConfig.Builder;
 
 @Component
 public class ProductPresenter implements IProductPresenter {
@@ -80,6 +77,28 @@ public class ProductPresenter implements IProductPresenter {
         }
             auctionedItems.addAll(auctions.getValue());
         }
+
         return new Response<>(auctionedItems);
+    }
+
+    @Override
+    public Response<List<FeedbackDTO>> showFeedbacks(String sessionToken, ItemFilter filters) {
+        Response<List<ItemDTO>> allItems = this.itemService.filterItems(sessionToken, filters);
+        if (allItems.errorOccurred()) 
+        {
+            return new Response<>(new Error(allItems.getErrorMessage()));
+        }
+
+        List<FeedbackDTO> feedbacks = new ArrayList<>();
+        for (ItemDTO item : allItems.getValue()) {
+            Response<List<FeedbackDTO>> auctions = this.customerServiceService.getAllFeedbacksByProductId(sessionToken, item.getProductId());
+            if (auctions.errorOccurred()) 
+        {
+            return new Response<>(new Error(auctions.getErrorMessage()));
+        }
+            feedbacks.addAll(auctions.getValue());
+        }
+
+        return new Response<>(feedbacks);
     }
 }
