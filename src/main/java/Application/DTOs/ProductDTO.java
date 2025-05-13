@@ -27,7 +27,7 @@ public class ProductDTO {
         this.name = product.getName();
         this.categories = new HashSet<>();
         for (Category category : product.getCategories()) {
-            this.categories.add(new CategoryDTO(category));
+            this.categories.add(CategoryDTO.fromCategory(category));
         }
     }
 
@@ -40,5 +40,5 @@ public class ProductDTO {
     public Set<CategoryDTO> getCategories() {
         return categories;
     }
-    
+
 }

@@ -4,20 +4,22 @@ import Domain.Store.Category;
 
 public class CategoryDTO {
 
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 
     public CategoryDTO(String name, String description) {
         this.name = name;
         this.description = description;
     }
-    public CategoryDTO(Category category) {
-        this.name = category.getName();
-        this.description = category.getDescription();
+
+    public static CategoryDTO fromCategory(Category category) {
+        return new CategoryDTO(category.getName(), category.getDescription());
     }
+
     public String getName() {
         return name;
     }
+
     public String getDescription() {
         return description;
     }
