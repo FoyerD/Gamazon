@@ -61,4 +61,16 @@ public class MemoryProductRepository extends IProductRepository {
         products.put(id, value);
         return value;
     }
+    @Override
+    public Product getByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return null;
+        }
+        for (Product product : products.values()) {
+            if (product.getName().equals(name)) {
+                return product;
+            }
+        }
+        return null;
+    }
 }

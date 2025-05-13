@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.description;
 import static org.mockito.Mockito.mock;
 
 import Application.DTOs.OrderDTO;
@@ -99,8 +101,7 @@ public class ShoppingServiceTest {
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
         
         // Create a test item
-        Item item = new Item(STORE_ID, PRODUCT_ID, 10.0, 5, "Test Item Description");
-        itemFacade.add(new Pair<>(STORE_ID, PRODUCT_ID), item);
+        itemFacade.add(STORE_ID, PRODUCT_ID, 10.0, 5, "Test Item Desctiption");
         
         // Initialize StoreFacade
         storeFacade = new StoreFacade(
