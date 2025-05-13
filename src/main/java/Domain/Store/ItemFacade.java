@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import Domain.Pair;
 
 /**
  * Facade for managing item-related operations, including validation,
  * inventory updates, filtering, and dynamic property assignment.
  */
+@Component
 public class ItemFacade {
     private final IItemRepository itemRepository;
     private final IProductRepository productRepository;

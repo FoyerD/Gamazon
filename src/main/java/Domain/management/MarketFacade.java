@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
+
 import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
@@ -19,6 +21,7 @@ import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Infrastructure.Repositories.MemoryPermissionRepository;
 
+@Component
 public class MarketFacade implements IMarketFacade {
 
     private IPaymentService paymentService;
