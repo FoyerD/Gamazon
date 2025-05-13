@@ -8,6 +8,7 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
+import Domain.TokenService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
@@ -15,12 +16,14 @@ import Domain.Store.ItemFilter;
 public class ItemService {
 
     private final ItemFacade itemFacade;
+    private TokenService tokenService;
 
-    public ItemService(ItemFacade itemFacade) {
+    public ItemService(ItemFacade itemFacade, TokenService tokenService) {
+        this.tokenService = tokenService;
         this.itemFacade = itemFacade;
     }
 
-    public Response<Boolean> changePrice(String storeId, String productId, float newPrice) {
+    public Response<Boolean> changePrice(String sessionToken, String storeId, String productId, float newPrice) {
         String method = "changePrice";
         Response<ItemDTO> itemRes = getItem(storeId, productId);
         if (itemRes.errorOccurred()) {
@@ -37,7 +40,7 @@ public class ItemService {
         }
     }
 
-    public Response<List<ItemDTO>> getItemsByProductId(String productId) {
+    public Response<List<ItemDTO>> getItemsByProductId(String sessionToken, String productId) {
         String method = "getItemsByProductId";
         try {
             List<ItemDTO> dtos = itemFacade.getItemsProductId(productId).stream()
@@ -50,7 +53,7 @@ public class ItemService {
         }
     }
 
-    public Response<List<ItemDTO>> filterItems(ItemFilter filter) {
+    public Response<List<ItemDTO>> filterItems(String sessionToken, ItemFilter filter) {
         String method = "filterItems";
         try {
             List<ItemDTO> dtos = itemFacade.filterItems(filter).stream()
@@ -63,7 +66,7 @@ public class ItemService {
         }
     }
 
-    public Response<ItemDTO> getItem(String storeId, String productId) {
+    public Response<ItemDTO> getItem(String sessionToken, String storeId, String productId) {
         String method = "getItem";
         try {
             Item item = itemFacade.getItem(storeId, productId);
@@ -75,7 +78,7 @@ public class ItemService {
         }
     }
 
-    public Response<List<ItemDTO>> getItemsByStoreId(String storeId) {
+    public Response<List<ItemDTO>> getItemsByStoreId(String sessionToken, String storeId) {
         String method = "getItemsByStoreId";
         try {
             List<ItemDTO> dtos = itemFacade.getItemsByStoreId(storeId).stream()
@@ -88,7 +91,7 @@ public class ItemService {
         }
     }
 
-    public Response<List<ItemDTO>> getAvailableItems() {
+    public Response<List<ItemDTO>> getAvailableItems(String sessionToken, ) {
         String method = "getAvailableItems";
         try {
             List<ItemDTO> dtos = itemFacade.getAvailableItems().stream()
@@ -101,7 +104,7 @@ public class ItemService {
         }
     }
 
-    public Response<Void> addRating(String storeId, String productId, float rating) {
+    public Response<Void> addRating(String sessionToken, String storeId, String productId, float rating) {
         String method = "addRating";
         try {
             throw new UnsupportedOperationException("Not Implemented.");
@@ -111,7 +114,7 @@ public class ItemService {
         }
     }
 
-    public Response<Boolean> add(Pair<String, String> id, Item item) {
+    public Response<Boolean> add(String sessionToken, Pair<String, String> id, Item item) {
         String method = "add";
         try {
             boolean added = itemFacade.add(id, item);
@@ -123,7 +126,7 @@ public class ItemService {
         }
     }
 
-    public Response<ItemDTO> remove(Pair<String, String> id) {
+    public Response<ItemDTO> remove(String sessionToken, Pair<String, String> id) {
         String method = "remove";
         try {
             Item item = itemFacade.remove(id);
@@ -135,7 +138,7 @@ public class ItemService {
         }
     }
 
-    public Response<Void> increaseAmount(Pair<String, String> id, int amount) {
+    public Response<Void> increaseAmount(String sessionToken, Pair<String, String> id, int amount) {
         String method = "increaseAmount";
         try {
             itemFacade.increaseAmount(id, amount);
@@ -147,7 +150,7 @@ public class ItemService {
         }
     }
 
-    public Response<Void> decreaseAmount(Pair<String, String> id, int amount) {
+    public Response<Void> decreaseAmount(String sessionToken, Pair<String, String> id, int amount) {
         String method = "decreaseAmount";
         try {
             itemFacade.decreaseAmount(id, amount);
