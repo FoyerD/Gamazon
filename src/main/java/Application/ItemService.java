@@ -12,15 +12,19 @@ import Domain.TokenService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
+import Domain.management.PermissionManager;
+import Domain.management.PermissionType;
 
 public class ItemService {
 
     private final ItemFacade itemFacade;
     private TokenService tokenService;
+    private PermissionManager permissionManager;
 
-    public ItemService(ItemFacade itemFacade, TokenService tokenService) {
+    public ItemService(ItemFacade itemFacade, TokenService tokenService, PermissionManager permissionManager) {
         this.tokenService = tokenService;
         this.itemFacade = itemFacade;
+        this.permissionManager = permissionManager;
     }
 
     public Response<Boolean> changePrice(String sessionToken, String storeId, String productId, float newPrice) {
@@ -205,6 +209,7 @@ public class ItemService {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
+            permissionManager.checkPermission(userId, id.getFirst(), PermissionType.HANDLE_INVENTORY);
             itemFacade.increaseAmount(id, amount);
             TradingLogger.logEvent("ItemService", method, "Amount increased.");
             return new Response<>(null);
