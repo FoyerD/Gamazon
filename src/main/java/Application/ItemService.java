@@ -25,7 +25,7 @@ public class ItemService {
 
     public Response<Boolean> changePrice(String sessionToken, String storeId, String productId, float newPrice) {
         String method = "changePrice";
-        Response<ItemDTO> itemRes = getItem(storeId, productId);
+        Response<ItemDTO> itemRes = getItem(sessionToken, storeId, productId);
         if (itemRes.errorOccurred()) {
             TradingLogger.logError("ItemService", method, itemRes.getErrorMessage());
             return new Response<>(new Error(itemRes.getErrorMessage()));
@@ -91,7 +91,7 @@ public class ItemService {
         }
     }
 
-    public Response<List<ItemDTO>> getAvailableItems(String sessionToken, ) {
+    public Response<List<ItemDTO>> getAvailableItems(String sessionToken) {
         String method = "getAvailableItems";
         try {
             List<ItemDTO> dtos = itemFacade.getAvailableItems().stream()
