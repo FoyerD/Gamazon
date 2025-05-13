@@ -1,7 +1,9 @@
 package Domain.Store;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 
 /**
  * Represents a product in the system.
@@ -9,9 +11,10 @@ import java.util.Set;
  */
 public class Product {
 
+   
     private String productId;
     private String name;
-    private Set<Category> categories;
+    private Set<Category> categories = new HashSet<>();
 
     /**
      * Constructs a product with the given ID, name, and categories.

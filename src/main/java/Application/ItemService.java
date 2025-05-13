@@ -3,6 +3,8 @@ package Application;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
 import Application.DTOs.ItemDTO;
 import Application.utils.Error;
 import Application.utils.Response;
@@ -13,6 +15,7 @@ import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
 
+@Service
 public class ItemService {
 
     private final ItemFacade itemFacade;

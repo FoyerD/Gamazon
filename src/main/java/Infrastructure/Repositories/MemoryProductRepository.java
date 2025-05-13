@@ -3,6 +3,8 @@ package Infrastructure.Repositories;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.springframework.stereotype.Repository;
+
 import Domain.Store.IProductRepository;
 import Domain.Store.Product;
 
@@ -10,6 +12,7 @@ import Domain.Store.Product;
  * In-memory implementation of {@link IProductRepository}.
  * Provides thread-safe CRUD operations on products.
  */
+@Repository
 public class MemoryProductRepository extends IProductRepository {
     private final ConcurrentMap<String, Product> products;
 

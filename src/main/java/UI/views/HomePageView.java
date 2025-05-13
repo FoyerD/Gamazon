@@ -54,6 +54,9 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         Button goToSearchBtn = new Button("Search Stores", e -> UI.getCurrent().navigate("store-search"));
         goToSearchBtn.getStyle().set("background-color", "#3182ce").set("color", "white");
+        
+        Button cartBtn = new Button("View Cart", e -> UI.getCurrent().navigate("cart"));
+        cartBtn.getStyle().set("background-color", "#38a169").set("color", "white");
 
         Button logoutBtn = new Button("Logout", e -> {
             UI.getCurrent().getSession().close();
@@ -61,7 +64,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         });
         logoutBtn.getStyle().set("background-color", "#e53e3e").set("color", "white");
 
-        HorizontalLayout topBar = new HorizontalLayout(userInfo, title, searchBar, refreshBtn, goToSearchBtn, logoutBtn);
+        HorizontalLayout topBar = new HorizontalLayout(userInfo, title, searchBar, refreshBtn, goToSearchBtn, cartBtn, logoutBtn);
         topBar.setAlignItems(Alignment.BASELINE);
         topBar.setWidthFull();
         topBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
