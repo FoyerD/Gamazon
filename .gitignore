@@ -9,9 +9,7 @@ dependency-reduced-pom.xml
 
 # Vaadin
 node_modules/
-frontend/generated/
 src/main/frontend/generated/
-frontend/index.html
 src/main/frontend/index.html
 package.json
 package-lock.json
