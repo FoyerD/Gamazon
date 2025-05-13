@@ -5,19 +5,13 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import com.vaadin.flow.component.template.Id;
-
-import jakarta.persistence.Entity;
-
 /**
  * Represents an item available in a store.
  * Encapsulates inventory, pricing, description, and rating logic.
  */
-@Entity
 public class Item {
-    @Id
+
     private String storeId;
-    @Id
     private String productId;
     private double price;
     private int amount;

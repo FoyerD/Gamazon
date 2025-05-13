@@ -5,10 +5,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+
+import org.springframework.stereotype.Component;
+
 import Domain.User.IUserRepository;
 import Domain.User.User;
 import Domain.Pair;
 
+
+
+@Component
 public class StoreFacade {
     private IStoreRepository storeRepository;
     private IFeedbackRepository feedbackRepository;

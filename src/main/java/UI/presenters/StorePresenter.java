@@ -15,8 +15,9 @@ public class StorePresenter implements IStorePresenter {
     private final StoreService storeService;
     private final ItemService itemService;
 
-    public StorePresenter(StoreService storeService) {
+    public StorePresenter(StoreService storeService, ItemService itemService) {
         this.storeService = storeService;
+        this.itemService = itemService;
     }
 
     @Override
@@ -27,11 +28,6 @@ public class StorePresenter implements IStorePresenter {
     @Override
     public Response<List<AuctionDTO>> getAllStoreAuctions(String sessionToken, String storeId) {
         return storeService.getAllStoreAuctions(sessionToken, storeId);
-    }
-
-    @Override
-    public Response<List<ItemDTO>> getItemsByStoreId(String sessionToken, String storeId) {
-        return storeService.getItemsByStoreId(sessionToken, storeId);
     }
 
     
