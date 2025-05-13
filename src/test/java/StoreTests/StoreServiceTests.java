@@ -7,16 +7,18 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.jupiter.api.Disabled;
 
 import Application.StoreService;
 import Domain.TokenService;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
+import Domain.Store.IProductRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
@@ -25,10 +27,13 @@ import Domain.User.User;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryProductRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
 import Domain.Pair;
 import Domain.Store.Item;
+import Domain.Store.Product;
+import Domain.Store.ProductFacade;
 import Application.MarketService;
 import Application.StoreService;
 import Application.DTOs.AuctionDTO;
@@ -46,6 +51,8 @@ public class StoreServiceTests {
     private IFeedbackRepository feedbackRepository;
     private IUserRepository userRepository;
     private TokenService tokenService;
+    private ProductFacade productFacade;
+    private IProductRepository productRepository;
     UUID userId = UUID.randomUUID();
     String tokenId = null;
 
@@ -56,8 +63,10 @@ public class StoreServiceTests {
         this.itemRepository = new MemoryItemRepository();
         this.feedbackRepository= new MemoryFeedbackRepository();
         this.userRepository = new MemoryUserRepository();
-
+        productRepository = new MemoryProductRepository();
+        
         this.tokenService = new TokenService();
+        this.productFacade = new ProductFacade(productRepository);
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
         storeService = new StoreService(storeFacade, tokenService);
 
@@ -178,9 +187,9 @@ public class StoreServiceTests {
         Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
         String storeId = storeResponse.getValue().getId();
 
-        String productId1 = UUID.randomUUID().toString();
-        String productId2 = UUID.randomUUID().toString();
-        String productId3 = UUID.randomUUID().toString();
+        String productId1 = "1";
+        String productId2 = "2";
+        String productId3 = "3";
 
         itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
         itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
@@ -217,26 +226,25 @@ public class StoreServiceTests {
 
     @Test
     public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
-        String storeName = "AuctionStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
-        String storeId = storeResponse.getValue().getId();
+        String productId1 = UUID.randomUUID().toString();
+        Response<StoreDTO> storeRes = storeService.addStore(this.tokenId, "storestore", "Store with auctions");
+        Response<StoreDTO> storeRes2 = storeService.addStore(this.tokenId, "storestore2", "Store with auctions");
 
-        String productId1 = "1";
-        String productId2 = "2";
-        String productId3 = "3";
-
-        itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
-        itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
-        itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
+        String storeId1 = storeRes.getValue().getId();
+        String storeId2 = storeRes2.getValue().getId();
+        itemRepository.add(new Pair<>(storeId1, productId1), new Item(storeId1, productId1, 10.0, 10, "Product 1"));
+        itemRepository.add(new Pair<>(storeId2, productId1), new Item(storeId2, productId1, 20.0, 5, "Product 2"));
 
         String endDate = "2077-01-01";
-        storeService.addAuction(this.tokenId, storeId, productId1, endDate.toString(), 5.0);
-        storeService.addAuction(this.tokenId, storeId, productId2, endDate.toString(), 10.0);
-        storeService.addAuction(this.tokenId, storeId, productId3, endDate.toString(), 15.0);
+        Response<AuctionDTO> aucRes1 = storeService.addAuction(tokenId, storeId1, productId1, endDate, 5.0);
+        Response<AuctionDTO> aucRes2 = storeService.addAuction(tokenId, storeId2, productId1, endDate, 10.0);
 
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+        assertFalse(aucRes1.errorOccurred());
+        assertFalse(aucRes2.errorOccurred());
+
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllProductAuctions(tokenId, productId1);
         assertTrue(auctionsResponse.getValue() != null);
-        assertEquals(3, auctionsResponse.getValue().size());
+        assertEquals(2, auctionsResponse.getValue().size());
     }
 
     @Test
