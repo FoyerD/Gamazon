@@ -168,7 +168,7 @@ public class MarketServiceTest {
         }
         Item item = new Item(storeId, productId, price, amount, itemName);
     
-        itemFacade.add(new Pair<>(storeId, productId), item);
+        itemFacade.add(storeId, productId, price, amount, itemName);
     }
 
     private void addUser(UUID userId, String userName, String password, String email) {
