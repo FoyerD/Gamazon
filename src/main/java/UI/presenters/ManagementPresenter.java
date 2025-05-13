@@ -9,6 +9,7 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType;
+import Domain.Pair;
 
 public class ManagementPresenter implements IManagementPresenter {
 
@@ -38,54 +39,51 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
-    public Response<Boolean> addItem(String sessionToken, ItemDTO item) {
-        return itemService.add(sessionToken, null, null); // to fix
+    public Response<ItemDTO> addItem(String sessionToken, String storeId, String productId, String description) {
+        return itemService.add(sessionToken, storeId, productId, description);
+    }
+
+    public Response<ItemDTO> addItem(String sessionToken, String storeId, String productId, double price, int amount, String description){
+        return itemService.add(sessionToken, storeId, productId, price, amount, description);
     }
 
     @Override
     public Response<ItemDTO> removeItem(String sessionToken, String storeId, String productId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removeItem'");
+        return itemService.remove(sessionToken,new Pair<>(storeId, productId));
     }
 
     @Override
     public Response<Void> increaseItemAmount(String sessionToken, String storeId, String productId, int amount) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'increaseItemAmount'");
+        return itemService.increaseAmount(sessionToken, new Pair<>(storeId, productId), amount);
     }
 
     @Override
     public Response<Void> decreaseItemAmount(String sessionToken, String storeId, String productId, int amount) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'decreaseItemAmount'");
+        return itemService.decreaseAmount(sessionToken, new Pair<>(storeId, productId), amount);
     }
 
     @Override
     public Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername,
             String storeId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'appointStoreManager'");
+            return marketService.appointStoreManager(sessionToken, appointerUsername, appointeeUsername, storeId);
     }
 
     @Override
     public Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername,
             String storeId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removeStoreManager'");
+        return marketService.removeStoreManager(sessionToken, removerUsername, managerUsername, storeId);
     }
 
     @Override
     public Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername,
             String storeId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'appointStoreOwner'");
+        return marketService.appointStoreOwner(sessionToken, appointerUsername, appointeeUsername, storeId);
     }
 
     @Override
     public Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername,
             String storeId, List<PermissionType> newPermissions) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'changeManagerPermissions'");
+        return marketService.changeManagerPermissions(sessionToken, ownerUsername, managerUsername, storeId, newPermissions);
     }
     
 }
