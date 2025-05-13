@@ -157,7 +157,7 @@ public class ShoppingService{
     }
 
     
-    public Response<Boolean> makeBid(String auctionId, String sessionToken, float price) {
+    public Response<Boolean> makeBid(String sessionToken, String auctionId, float price) {
         if (!tokenService.validateToken(sessionToken)) {
             return Response.error("Invalid token");
         }
