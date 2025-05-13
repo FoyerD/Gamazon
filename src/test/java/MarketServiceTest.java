@@ -20,11 +20,14 @@ import Domain.User.IUserRepository;
 import Domain.User.LoginManager;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.IPermissionRepository;
 import Domain.management.MarketFacade;
+import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryPermissionRepository;
 import Infrastructure.Repositories.MemoryProductRepository;
 import Infrastructure.Repositories.MemoryReceiptRepository;
 import Infrastructure.Repositories.MemoryShoppingBasketRepository;
@@ -68,6 +71,8 @@ public class MarketServiceTest {
     private IPaymentService mockPaymentService;
     private ISupplyService mockSupplyService;
     private INotificationService mockNotificationService;
+    private IPermissionRepository permissionRepository;
+    private PermissionManager permissionManager;
 
     // Token
     private TokenService tokenService;
@@ -120,12 +125,14 @@ public class MarketServiceTest {
         itemRepository = new MemoryItemRepository();
         productRepository = new MemoryProductRepository();
         storeRepository = new MemoryStoreRepository();
+        permissionRepository = new MemoryPermissionRepository();
 
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
         auctionRepository = new MemoryAuctionRepository();
         feedbackRepository= new MemoryFeedbackRepository();
         userRepository = new MemoryUserRepository();
 
+        permissionManager = new PermissionManager(permissionRepository);
         this.tokenService = new TokenService();
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
         storeService = new StoreService(storeFacade, tokenService);
@@ -154,7 +161,7 @@ public class MarketServiceTest {
         addUser(userId2, "Member2", "passpass2", "email2@email.com");
 
         this.itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
-        this.itemService = new ItemService(itemFacade, tokenService);
+        this.itemService = new ItemService(itemFacade, tokenService, permissionManager);
 
         storeId1 = marketService.addStore(tokenId1, "Store One", "A store for testing").getValue().getId();
         addProduct(storeId1, "Store One", userId1.toString(), productId1, "In Stock Item", 49.99f, 10, "In Stock Item");
