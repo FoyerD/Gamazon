@@ -1,7 +1,11 @@
 package UI.presenters;
 
-import java.util.Set;
+import java.util.List;
+
+import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
+import Application.utils.Response;
+import Domain.Store.ItemFilter;
 
 /**
  * Interface for presenting product-related functionalities to the user.
@@ -10,75 +14,47 @@ import Application.DTOs.ItemDTO;
 public interface IProductPresenter {
 
     /**
-     * Retrieves a set of products that match the given product name.
+     * Retrieves a set of products that match the given filters.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the product to search for
-     * @return a set of {@link ItemDTO} matching the product name
+     * @param filters the {@link ItemFilter} object containing the criteria to filter the products
+     * @return a {@link Response} containing a list of {@link ItemDTO} that match the specified filters
      */
-    Set<ItemDTO> showProductDetails(String sessionToken, String productName);
+    Response<List<ItemDTO>> showProductDetails(String sessionToken, ItemFilter filters);
 
     /**
      * Retrieves product details for a specific product in a specific store.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the product
-     * @param storeName the name of the store
-     * @return an {@link ItemDTO} with the product details from the given store
+     * @param filters the filters to apply when retrieving the product details
+     * @param storeId the id of the store
+     * @return a {@link Response} containing a list of {@link ItemDTO} with the product details from the specified store
      */
-    ItemDTO showProductDetailsOfaStore(String sessionToken, String productName, String storeName);
+    Response<List<ItemDTO>> showProductDetailsOfaStore(String sessionToken, ItemFilter filters, String storeId);
 
     /**
      * Retrieves all available products across all stores.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @return a set of all {@link ItemDTO} in the marketplace
+     * @return a {@link Response} containing a set of all {@link ItemDTO} in the marketplace
      */
-    Set<ItemDTO> showAllProducts(String sessionToken);
-
-    /**
-     * Retrieves products that belong to the specified categories.
-     *
-     * @param sessionToken the token representing the current authenticated user session
-     * @param categories a set of category names to filter products
-     * @return a set of {@link ItemDTO} matching the specified categories
-     */
-    Set<ItemDTO> showProductsByCategories(String sessionToken, Set<String> categories);
+    Response<List<ItemDTO>> showAllProducts(String sessionToken);
 
     /**
      * Allows a user to rate and leave feedback for a product in a specific store.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the product
-     * @param storeName the name of the store offering the product
-     * @param rating a numeric rating (e.g., from 1.0 to 5.0)
-     * @param feedback user-provided feedback text
+     * @param item the {@link ItemDTO} representing the product to be rated
+     * @return a {@link Response} indicating the success or failure of the rating operation
      */
-    void rateProduct(String sessionToken, String productName, String storeName, double rating, String feedback);
-
-    /**
-     * Retrieves all products that are currently under auction across all stores.
-     *
-     * @param sessionToken the token representing the current authenticated user session
-     * @return a set of auctioned {@link ItemDTO}
-     */
-    Set<ItemDTO> showAuctionedProducts(String sessionToken);
-
-    /**
-     * Retrieves auctioned products filtered by categories.
-     *
-     * @param sessionToken the token representing the current authenticated user session
-     * @param categories a set of category names to filter auctioned products
-     * @return a set of auctioned {@link ItemDTO} in the specified categories
-     */
-    Set<ItemDTO> showAuctionedProductsByCategories(String sessionToken, Set<String> categories);
+    Response<Void> rateProduct(String sessionToken, ItemDTO item);
 
     /**
      * Retrieves auction details for a specific product across all stores.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the auctioned product
-     * @return a set of {@link ItemDTO} representing the product in active auctions
+     * @param filters the filters to apply when retrieving auction details
+     * @return a {@link Response} containing a list of {@link AuctionDTO} representing the product in active auctions
      */
-    Set<ItemDTO> showAuctionedProduct(String sessionToken, String productName);
+    Response<List<AuctionDTO>> showAuctionedProduct(String sessionToken, ItemFilter filters);
 }
