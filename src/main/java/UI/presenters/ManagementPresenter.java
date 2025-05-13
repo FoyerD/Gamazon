@@ -38,8 +38,8 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
-    public Response<Boolean> addItem(String sessionToken, String storeId, String productId, ItemDTO item) {
-        return itemService.add(sessionToken, null, null);
+    public Response<Boolean> addItem(String sessionToken, ItemDTO item) {
+        return itemService.add(sessionToken, null, null); // to fix
     }
 
     @Override

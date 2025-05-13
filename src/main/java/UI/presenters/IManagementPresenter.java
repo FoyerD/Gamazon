@@ -50,7 +50,7 @@ public interface IManagementPresenter {
      * @param item Item details.
      * @return Response with true if successful.
      */
-    Response<Boolean> addItem(String sessionToken, String storeId, String productId, ItemDTO item);
+    Response<Boolean> addItem(String sessionToken, ItemDTO item);
 
     /**
      * Removes an item from a store.
