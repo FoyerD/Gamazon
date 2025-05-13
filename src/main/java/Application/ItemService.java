@@ -209,7 +209,6 @@ public class ItemService {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
-            permissionManager.checkPermission(userId, id.getFirst(), PermissionType.HANDLE_INVENTORY);
             itemFacade.increaseAmount(id, amount);
             TradingLogger.logEvent("ItemService", method, "Amount increased.");
             return new Response<>(null);
