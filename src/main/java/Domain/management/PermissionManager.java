@@ -3,7 +3,6 @@ package Domain.management;
 import java.util.List;
 import java.util.Set;
 
-import Infrastructure.Repositories.MemoryPermissionRepository;
 
 public class PermissionManager {
     private IPermissionRepository permissionRepository;

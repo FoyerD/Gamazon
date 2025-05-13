@@ -26,9 +26,12 @@ import Domain.Store.Store;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.IPermissionRepository;
+import Domain.management.PermissionManager;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryPermissionRepository;
 import Infrastructure.Repositories.MemoryProductRepository;
 
 public class ItemServiceTests {
@@ -39,6 +42,8 @@ public class ItemServiceTests {
     private IStoreRepository storeRepository;
     private ItemFacade itemFacade;
     private TokenService tokenService;
+    private PermissionManager permissionManager;
+    private IPermissionRepository permissionRepository;
     UUID userId = UUID.randomUUID();
     String tokenId;
     private IUserRepository userRepository;
@@ -50,9 +55,11 @@ public class ItemServiceTests {
         storeRepository = new MemoryStoreRepository();
         tokenService = new TokenService();
         userRepository = new MemoryUserRepository();
+        permissionRepository = new MemoryPermissionRepository();
         
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
-        itemService = new ItemService(itemFacade, tokenService);
+        permissionManager = new PermissionManager(permissionRepository);
+        itemService = new ItemService(itemFacade, tokenService, permissionManager);
         User user = new Member(userId, "Member1", "passpass", "email@email.com");
         this.userRepository.add(userId.toString(), user);
         tokenId = this.tokenService.generateToken(userId.toString());
@@ -158,7 +165,7 @@ public class ItemServiceTests {
 
         itemRepository.add(new Pair<>("storeX", "prodX"), new Item("storeX", "prodX", 19.99f, 0, "Out of Stock"));
 
-        itemService = new ItemService(new ItemFacade(itemRepository, productRepository, storeRepository), tokenService);
+        itemService = new ItemService(new ItemFacade(itemRepository, productRepository, storeRepository), tokenService, permissionManager);
 
         Response<List<ItemDTO>> response = itemService.getAvailableItems(tokenId);
         assertFalse(response.errorOccurred());

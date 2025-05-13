@@ -76,15 +76,6 @@ public interface IMarketFacade {
     // Section 4
 
     /**
-     * 4.1 Add products and quantities to a store's inventory.
-     * 
-     * @param storeId ID of the store
-     * @param productQuantities Map of product IDs to quantities
-     * @param userId ID of the user performing the action
-     */
-    void addProductsToInventory(String storeId, Map<String, Integer> productQuantities, String userId);
-
-    /**
      * 4.1 Update product quantities in a store's inventory.
      * 
      * @param storeId ID of the store
