@@ -72,6 +72,18 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         topBar.getStyle().set("padding", "10px");
 
         productGrid.setColumns("productName", "description", "price", "amount", "rating");
+        
+        // Add review button column
+        productGrid.addComponentColumn(item -> {
+            Button reviewButton = new Button("Review", e -> {
+                UI.getCurrent().navigate("product-review/" + item.getProductId());
+            });
+            reviewButton.getStyle()
+                .set("background-color", "#805ad5")
+                .set("color", "white");
+            return reviewButton;
+        }).setHeader("Actions");
+
         productGrid.setWidthFull();
         productGrid.getStyle().set("background-color", "#f7fafc");
 
