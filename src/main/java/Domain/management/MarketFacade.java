@@ -169,7 +169,7 @@ public class MarketFacade implements IMarketFacade {
     //TODO! REMOVE
     @Override
     public void closeStore(String storeId, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OPEN_DEACTIVATE_STORE);
         storeFacade.closeStore(storeId);
         Member manager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
         notificationService.sendNotification(manager.getName(), "Store " + storeId + " has been closed.");
@@ -178,7 +178,7 @@ public class MarketFacade implements IMarketFacade {
     //TODO! REMOVE
     @Override
     public void marketCloseStore(String storeId, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.DEACTIVATE_STORE);
+        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OPEN_DEACTIVATE_STORE);
         Member manager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
         Map<String, Permission> storePermissions = permissionRepository.getAllPermissionsForStore(storeId);
         if (storePermissions != null) {
