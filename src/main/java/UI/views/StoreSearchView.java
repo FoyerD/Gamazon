@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Map;
 
+import com.vaadin.flow.component.icon.VaadinIcon;
+
 @Route("store-search")
 public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
 
@@ -60,10 +62,24 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
         homeButton.getStyle().set("background-color", "#7e57c2").set("color", "white");
 
+        Button managerButton = new Button("Store Management", VaadinIcon.COGS.create(), e -> {
+            String storeId = storeIdField.getValue();
+            if (storeId == null || storeId.isEmpty()) {
+                Notification.show("Please select a store first!", 3000, Notification.Position.TOP_CENTER);
+                return;
+            }
+            UI.getCurrent().getSession().setAttribute("currentStoreId", storeId);
+            UI.getCurrent().navigate("manager");
+        });
+        managerButton.getStyle()
+            .set("background-color", "#2196f3")
+            .set("color", "white")
+            .set("margin-left", "10px");
+
         productGrid.setColumns("productName", "price", "amount", "description");
         productGrid.getStyle().set("background-color", "#f3e5f5");
 
-        HorizontalLayout actionsLayout = new HorizontalLayout(fetchSupplyButton, homeButton);
+        HorizontalLayout actionsLayout = new HorizontalLayout(fetchSupplyButton, homeButton, managerButton);
         actionsLayout.setSpacing(true);
 
         add(title, storeNameField, storeIdField, actionsLayout, productGrid);
