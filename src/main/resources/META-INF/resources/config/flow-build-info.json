@@ -1,0 +1,17 @@
+{
+  "productionMode": false,
+  "eagerServerLoad": false,
+  "npmFolder": "/home/foyer/repos/Gamazon",
+  "node.version": "v20.10.0",
+  "node.download.root": "https://nodejs.org/dist/",
+  "frontendFolder": "/home/foyer/repos/Gamazon/src/main/frontend",
+  "connect.javaSourceFolder": "/home/foyer/repos/Gamazon/src/main/java",
+  "javaResourceFolder": "/home/foyer/repos/Gamazon/src/main/resources",
+  "connect.applicationProperties": "/home/foyer/repos/Gamazon/src/main/resources/application.properties",
+  "connect.openApiFile": "/home/foyer/repos/Gamazon/target/generated-resources/openapi.json",
+  "project.frontend.generated": "/home/foyer/repos/Gamazon/frontend/generated",
+  "pnpm.enable": false,
+  "bun.enable": false,
+  "require.home.node": false,
+  "build.folder": "target"
+}
