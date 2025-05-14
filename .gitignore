@@ -10,7 +10,8 @@ dependency-reduced-pom.xml
 # Vaadin
 node_modules/
 src/main/frontend/generated/
-src/main/frontend/index.html
+frontend/generated/
+src/main/frontend/generated
 package.json
 package-lock.json
 webpack.config.js

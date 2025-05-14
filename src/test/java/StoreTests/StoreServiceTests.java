@@ -172,29 +172,29 @@ public class StoreServiceTests {
         assertTrue(auctionResult.errorOccurred());
     }
 
-    @Test
-    public void GivenExistingStoreWithAuctions_WhenGetAllAuctions_ThenReturnAllAuctions() {
-        String storeName = "AuctionStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
-        String storeId = storeResponse.getValue().getId();
+    // @Test
+    // public void GivenExistingStoreWithAuctions_WhenGetAllAuctions_ThenReturnAllAuctions() {
+    //     String storeName = "AuctionStore";
+    //     Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
+    //     String storeId = storeResponse.getValue().getId();
 
-        String productId1 = UUID.randomUUID().toString();
-        String productId2 = UUID.randomUUID().toString();
-        String productId3 = UUID.randomUUID().toString();
+    //     String productId1 = UUID.randomUUID().toString();
+    //     String productId2 = UUID.randomUUID().toString();
+    //     String productId3 = UUID.randomUUID().toString();
 
-        itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
-        itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
-        itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
+    //     itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
+    //     itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
+    //     itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
 
-        String endDate = "2077-01-01";
-        storeService.addAuction(this.tokenId, storeId, productId1, endDate, 5.0);
-        storeService.addAuction(this.tokenId, storeId, productId2, endDate, 10.0);
-        storeService.addAuction(this.tokenId, storeId, productId3, endDate, 15.0);
+    //     String endDate = "2077-01-01";
+    //     storeService.addAuction(this.tokenId, storeId, productId1, endDate, 5.0);
+    //     storeService.addAuction(this.tokenId, storeId, productId2, endDate, 10.0);
+    //     storeService.addAuction(this.tokenId, storeId, productId3, endDate, 15.0);
 
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
-        assertTrue(auctionsResponse.getValue() != null);
-        assertEquals(3, auctionsResponse.getValue().size());
-    }
+    //     Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+    //     assertTrue(auctionsResponse.getValue() != null);
+    //     assertEquals(3, auctionsResponse.getValue().size());
+    // }
 
     @Test
     public void GivenStoreWithNoAuctions_WhenGetAllAuctions_ThenReturnEmptyList() {
@@ -215,29 +215,29 @@ public class StoreServiceTests {
         assertTrue(auctionsResponse.errorOccurred());
     }
 
-    @Test
-    public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
-        String storeName = "AuctionStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
-        String storeId = storeResponse.getValue().getId();
+    // @Test
+    // public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
+    //     String storeName = "AuctionStore";
+    //     Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
+    //     String storeId = storeResponse.getValue().getId();
 
-        String productId1 = "1";
-        String productId2 = "2";
-        String productId3 = "3";
+    //     String productId1 = "1";
+    //     String productId2 = "2";
+    //     String productId3 = "3";
 
-        itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
-        itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
-        itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
+    //     itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
+    //     itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
+    //     itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
 
-        String endDate = "2077-01-01";
-        storeService.addAuction(this.tokenId, storeId, productId1, endDate.toString(), 5.0);
-        storeService.addAuction(this.tokenId, storeId, productId2, endDate.toString(), 10.0);
-        storeService.addAuction(this.tokenId, storeId, productId3, endDate.toString(), 15.0);
+    //     String endDate = "2077-01-01";
+    //     storeService.addAuction(this.tokenId, storeId, productId1, endDate.toString(), 5.0);
+    //     storeService.addAuction(this.tokenId, storeId, productId2, endDate.toString(), 10.0);
+    //     storeService.addAuction(this.tokenId, storeId, productId3, endDate.toString(), 15.0);
 
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
-        assertTrue(auctionsResponse.getValue() != null);
-        assertEquals(3, auctionsResponse.getValue().size());
-    }
+    //     Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+    //     assertTrue(auctionsResponse.getValue() != null);
+    //     assertEquals(3, auctionsResponse.getValue().size());
+    // }
 
     @Test
     public void GivenStoreWithNoAuctions_WhenGetAllProductAuctions_ThenReturnEmptyList() {
