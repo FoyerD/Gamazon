@@ -355,10 +355,10 @@ public class ShoppingServiceTest {
             String actualAuctionId = storeFacade.getAllStoreAuctions(STORE_ID).get(0).getAuctionId();
             
             // Act
-            Response<Boolean> response = shoppingService.makeBid(actualAuctionId, CLIENT_ID, VALID_BID_PRICE);
+            Response<Boolean> response = shoppingService.makeBid(CLIENT_ID, actualAuctionId, VALID_BID_PRICE);
             
             // Assert
-            assertFalse("Should not have error", response.errorOccurred());
+            assertFalse("should not have error", response.errorOccurred());
             assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
         } catch (Exception e) {
             fail("Unexpected exception: " + e.getMessage());

@@ -1,20 +1,28 @@
 package UI.views;
 
 import UI.presenters.IPurchasePresenter;
+import Application.utils.Response;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Route("checkout")
 public class CheckoutView extends VerticalLayout implements BeforeEnterObserver {
@@ -28,7 +36,8 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
     private final TextField phoneField = new TextField("Phone Number");
     
     private final TextField cardNumberField = new TextField("Credit Card Number");
-    private final TextField expirationField = new TextField("Expiration Date (MM/YY)");
+    private final ComboBox<String> expirationMonthField = new ComboBox<>("Month");
+    private final ComboBox<String> expirationYearField = new ComboBox<>("Year");
     private final TextField cvvField = new TextField("CVV");
     
     private final Button completeOrderButton = new Button("Complete Order");
@@ -52,8 +61,10 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
         emailField.setWidthFull();
         phoneField.setWidthFull();
         cardNumberField.setWidthFull();
-        expirationField.setWidthFull();
-        cvvField.setWidthFull();
+        cvvField.setWidth("100px");
+        
+        // Set up expiration date dropdowns
+        setupExpirationDateFields();
 
         // Create a form layout
         FormLayout formLayout = new FormLayout();
@@ -69,12 +80,18 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
             .set("border-radius", "8px")
             .set("box-shadow", "0 2px 10px rgba(0, 0, 0, 0.1)");
 
+        // Create horizontal layout for expiration date
+        HorizontalLayout expirationLayout = new HorizontalLayout(expirationMonthField, expirationYearField);
+        expirationLayout.setSpacing(true);
+        expirationLayout.setWidthFull();
+
         // Payment form
         FormLayout paymentForm = new FormLayout();
-        paymentForm.add(cardNumberField, expirationField, cvvField);
+        paymentForm.add(cardNumberField, expirationLayout, cvvField);
+        paymentForm.setColspan(cardNumberField, 2);
         paymentForm.setResponsiveSteps(
             new FormLayout.ResponsiveStep("0", 1),
-            new FormLayout.ResponsiveStep("500px", 3)
+            new FormLayout.ResponsiveStep("500px", 2)
         );
         paymentForm.getStyle()
             .set("background-color", "white")
@@ -108,6 +125,25 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
             new H1("Payment Details"), paymentForm, 
             buttonLayout);
     }
+    
+    private void setupExpirationDateFields() {
+        // Configure month dropdown
+        expirationMonthField.setItems("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
+        expirationMonthField.setPlaceholder("Month");
+        expirationMonthField.setWidth("100px");
+        expirationMonthField.setClearButtonVisible(true);
+        
+        // Configure year dropdown (current year + 10 years)
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        expirationYearField.setItems(
+            IntStream.range(0, 10)
+                .mapToObj(i -> String.valueOf(currentYear + i))
+                .collect(Collectors.toList())
+        );
+        expirationYearField.setPlaceholder("Year");
+        expirationYearField.setWidth("100px");
+        expirationYearField.setClearButtonVisible(true);
+    }
 
     private void placeOrder() {
         if (!validateForm()) {
@@ -115,20 +151,39 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
             return;
         }
 
-        boolean success = purchasePresenter.purchaseCart(
+        // Create expiration date from selected month and year
+        Date expiryDate = null;
+        try {
+            String expirationDateStr = expirationMonthField.getValue() + "/" + 
+                                      expirationYearField.getValue().substring(2); // Get last 2 digits of year
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
+            dateFormat.setLenient(false);
+            expiryDate = dateFormat.parse(expirationDateStr);
+        } catch (ParseException e) {
+            Notification.show("Invalid expiration date", 3000, Notification.Position.MIDDLE);
+            return;
+        }
+
+        // Use a timestamp as a unique order identifier 
+        long orderIncrement = System.currentTimeMillis();
+
+        Response<Boolean> response = purchasePresenter.purchaseCart(
             sessionToken,
-            "Credit Card",
-            addressField.getValue(),
             cardNumberField.getValue(),
-            expirationField.getValue(),
-            cvvField.getValue()
+            expiryDate,
+            cvvField.getValue(),
+            orderIncrement,
+            nameField.getValue(),
+            addressField.getValue()
         );
 
-        if (success) {
+        if (!response.errorOccurred() && response.getValue()) {
             Notification.show("Order placed successfully!", 3000, Notification.Position.MIDDLE);
             UI.getCurrent().navigate("home");
         } else {
-            Notification.show("There was an error processing your order", 3000, Notification.Position.MIDDLE);
+            String errorMessage = response.errorOccurred() ? 
+                response.getErrorMessage() : "There was an error processing your order";
+            Notification.show(errorMessage, 3000, Notification.Position.MIDDLE);
         }
     }
 
@@ -138,7 +193,8 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
                !emailField.isEmpty() &&
                !phoneField.isEmpty() &&
                !cardNumberField.isEmpty() &&
-               !expirationField.isEmpty() &&
+               expirationMonthField.getValue() != null &&
+               expirationYearField.getValue() != null &&
                !cvvField.isEmpty();
     }
 
