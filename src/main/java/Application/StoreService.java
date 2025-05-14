@@ -118,7 +118,7 @@ public class StoreService {
                 return new Response<>(new Error("Invalid token"));
             }
             String userId = this.tokenService.extractId(sessionToken);
-            permissionManager.checkPermission(userId, storeId, PermissionType.);
+            permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
             return new Response<>(new AuctionDTO(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice)));
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
@@ -133,7 +133,7 @@ public class StoreService {
                 return new Response<>(new Error("Invalid token"));
             }
             String userId = this.tokenService.extractId(sessionToken);
-
+            
             List<AuctionDTO> auctions = this.storeFacade.getAllStoreAuctions(storeId).stream().map(AuctionDTO::new).collect(Collectors.toList());
             return new Response<>(auctions);
         } catch (Exception ex) {
