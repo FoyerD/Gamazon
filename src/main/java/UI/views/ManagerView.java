@@ -254,31 +254,22 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         usernameField.setWidth("100%");
 
         if (isManager) {
-            // Only show basic permission options for new managers
             MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
-            permissionsSelect.setItems(
-                PermissionType.VIEW_EMPLOYEE_INFO,
-                PermissionType.ACCESS_PURCHASE_RECORDS
-            );
+            permissionsSelect.setItems(PermissionType.values());
             permissionsSelect.setItemLabelGenerator(permission -> 
                 permission.name().replace("_", " ").toLowerCase());
             permissionsSelect.setWidth("100%");
-            permissionsSelect.setHelperText("You can manage more permissions in the Permissions tab");
+            permissionsSelect.setHelperText("Select initial permissions for the manager");
             dialogLayout.add(usernameField, permissionsSelect);
 
             Button saveButton = new Button("Save", e -> {
                 String username = usernameField.getValue();
                 if (username != null && !username.isEmpty()) {
                     Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
-                    if (initialPermissions.isEmpty()) {
-                        // Set default permissions if none selected
-                        initialPermissions = new HashSet<>(Arrays.asList(
-                            PermissionType.VIEW_EMPLOYEE_INFO,
-                            PermissionType.ACCESS_PURCHASE_RECORDS
-                        ));
-                    }
+                    dialog.close(); // Close first
                     appointManagerWithPermissions(username, initialPermissions);
-                    dialog.close();
+                } else {
+                    Notification.show("Please enter a username");
                 }
             });
             styleButton(saveButton, "var(--lumo-primary-color)");
@@ -295,8 +286,18 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             Button saveButton = new Button("Save", e -> {
                 String username = usernameField.getValue();
                 if (username != null && !username.isEmpty()) {
-                    appointOwner(username);
-                    dialog.close();
+                    dialog.close(); // Close first
+                    Response<Void> response = managementPresenter.appointStoreOwner(
+                        sessionToken, currentUsername, username, currentStoreId);
+                    if (response.errorOccurred()) {
+                        Notification.show("Failed to appoint owner: " + response.getErrorMessage());
+                    } else {
+                        storeOwners.add(new UserRole(username, "Owner"));
+                        refreshGrids();
+                        Notification.show("Owner appointed successfully");
+                    }
+                } else {
+                    Notification.show("Please enter a username");
                 }
             });
             styleButton(saveButton, "var(--lumo-primary-color)");
@@ -367,11 +368,8 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         availablePermissions.removeAll(currentPermissions);
 
         if (availablePermissions.isEmpty()) {
-            dialog.add(new Span("All permissions have been assigned"));
-            Button closeButton = new Button("Close", e -> dialog.close());
-            styleButton(closeButton, "#9e9e9e");
-            dialog.add(closeButton);
-            dialog.open();
+            Notification.show("All permissions have been assigned");
+            dialog.close();
             return;
         }
 
@@ -382,13 +380,18 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         permissionsSelect.setWidth("100%");
 
         Button saveButton = new Button("Add", e -> {
-            Set<PermissionType> newPermissions = new HashSet<>(currentPermissions);
-            newPermissions.addAll(permissionsSelect.getSelectedItems());
-            updatePermissions(username, new ArrayList<>(newPermissions));
-            managerPermissionsMap.put(username, newPermissions);
-            dialog.close();
-            refreshPermissionsGrid();
-            Notification.show("Permissions added successfully");
+            Set<PermissionType> selectedPermissions = permissionsSelect.getSelectedItems();
+            if (!selectedPermissions.isEmpty()) {
+                dialog.close(); // Close first
+                Set<PermissionType> newPermissions = new HashSet<>(currentPermissions);
+                newPermissions.addAll(selectedPermissions);
+                managerPermissionsMap.put(username, newPermissions);
+                updatePermissions(username, new ArrayList<>(newPermissions));
+                refreshPermissionsGrid();
+                Notification.show("Permissions added successfully");
+            } else {
+                Notification.show("Please select at least one permission");
+            }
         });
         styleButton(saveButton, "var(--lumo-primary-color)");
 
