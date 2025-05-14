@@ -2,16 +2,16 @@ package Infrastructure;
 
 import java.util.Date;
 
+import org.springframework.stereotype.Service;
+
 import Application.utils.Response;
 import Domain.ExternalServices.IPaymentService;
 
+@Service
 public class PaymentService implements IPaymentService {
     
-    private String paymentServiceURL;
+    private String paymentServiceURL = "www.google.com";
     
-    public PaymentService(String paymentServiceURL) {
-        this.paymentServiceURL = paymentServiceURL;
-    }
 
     @Override
     public void updatePaymentServiceURL(String url) {

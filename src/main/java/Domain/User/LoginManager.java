@@ -4,8 +4,10 @@ package Domain.User;
 import java.util.NoSuchElementException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.apache.commons.validator.routines.EmailValidator;
 
+@Component
 public class LoginManager {
     private IUserRepository userRepository;
 
