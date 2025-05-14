@@ -135,7 +135,7 @@ public class MarketServiceTest {
         permissionManager = new PermissionManager(permissionRepository);
         this.tokenService = new TokenService();
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
-        storeService = new StoreService(storeFacade, tokenService);
+        storeService = new StoreService(storeFacade, tokenService, permissionManager);
 
         // Shopping Cart setup
         shoppingCartRepository = new MemoryShoppingCartRepository();

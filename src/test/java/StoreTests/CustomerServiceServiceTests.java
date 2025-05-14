@@ -24,9 +24,12 @@ import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.IPermissionRepository;
+import Domain.management.PermissionManager;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryPermissionRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
 import Application.utils.Response;
@@ -42,6 +45,8 @@ public class CustomerServiceServiceTests {
     private IFeedbackRepository feedbackRepository;
     private IUserRepository userRepository;
     private TokenService tokenService;
+    private PermissionManager permissionManager;
+    private IPermissionRepository permissionRepository;
 
     UUID userId = UUID.randomUUID();
     String storeId;
@@ -58,11 +63,13 @@ public class CustomerServiceServiceTests {
         this.itemRepository = new MemoryItemRepository();
         this.feedbackRepository= new MemoryFeedbackRepository();
         this.userRepository = new MemoryUserRepository();
+        this.permissionRepository = new MemoryPermissionRepository();
         
         this.tokenService = new TokenService();
+        this.permissionManager = new PermissionManager(this.permissionRepository);
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
         customerServiceService = new CustomerServiceService(this.storeFacade, this.tokenService);
-        storeService = new StoreService(this.storeFacade, this.tokenService);
+        storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager);
 
         tokenId = this.tokenService.generateToken(userId.toString());
         User user = new Member(userId, "Member1", "passpass", "email@email.com");

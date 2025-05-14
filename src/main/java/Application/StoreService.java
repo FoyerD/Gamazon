@@ -50,7 +50,7 @@ public class StoreService {
             if(store == null) {
                 return new Response<>(new Error("Failed to create store."));
             }
-            permissionManager.appointFirstStoreOwner(name, userId);
+            permissionManager.appointFirstStoreOwner(userId, store.getId());
             return new Response<>(new StoreDTO(store));
 
         } catch (Exception ex) {

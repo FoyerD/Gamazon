@@ -24,9 +24,13 @@ import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.IPermissionRepository;
+import Domain.management.PermissionManager;
+import Domain.management.RoleType;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryPermissionRepository;
 import Infrastructure.Repositories.MemoryProductRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
@@ -51,24 +55,25 @@ public class StoreServiceTests {
     private IFeedbackRepository feedbackRepository;
     private IUserRepository userRepository;
     private TokenService tokenService;
-    private ProductFacade productFacade;
-    private IProductRepository productRepository;
-    UUID userId = UUID.randomUUID();
+    private PermissionManager permissionManager;
+    private IPermissionRepository permissionRepository;
+    UUID userId;
     String tokenId = null;
 
     @Before
     public void setUp() {
+        userId = UUID.randomUUID();
         this.storeRepository = new MemoryStoreRepository();
         this.auctionRepository = new MemoryAuctionRepository();
         this.itemRepository = new MemoryItemRepository();
         this.feedbackRepository= new MemoryFeedbackRepository();
         this.userRepository = new MemoryUserRepository();
-        productRepository = new MemoryProductRepository();
+        this.permissionRepository = new MemoryPermissionRepository();
         
         this.tokenService = new TokenService();
-        this.productFacade = new ProductFacade(productRepository);
+        this.permissionManager = new PermissionManager(permissionRepository);
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
-        storeService = new StoreService(storeFacade, tokenService);
+        storeService = new StoreService(storeFacade, tokenService, permissionManager);
 
         
         tokenId = this.tokenService.generateToken(userId.toString());
@@ -81,6 +86,7 @@ public class StoreServiceTests {
         String storeName = "NewStore";
         Response<StoreDTO> result = storeService.addStore(this.tokenId, storeName, "A new store");
         assertTrue(result.getValue() != null);
+
     }
 
     @Test
@@ -96,9 +102,9 @@ public class StoreServiceTests {
         String storeName = "ExistingStore";
         Response<StoreDTO> response = storeService.addStore(this.tokenId, storeName, "A new store");
         String storeId = response.getValue().getId();
-        this.storeService.closeStore(this.tokenId, storeId);
-        Response<Boolean> result = storeService.openStore(this.tokenId, storeId);
-        assertTrue(result.getValue());
+        Response<Boolean> resultCLose = this.storeService.closeStore(this.tokenId, storeId);
+        Response<Boolean> resultOpen = storeService.openStore(this.tokenId, storeId);
+        assertTrue(resultOpen.getValue());
     }
 
     @Test
