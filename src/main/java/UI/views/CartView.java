@@ -3,14 +3,15 @@ package UI.views;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IProductPresenter;
 import Application.DTOs.OrderDTO;
-import Application.utils.Response;
-
+import Application.DTOs.ItemDTO;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -34,7 +35,6 @@ import java.util.Collections;
 public class CartView extends VerticalLayout implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
-    // TODO: Remove IProductPresenter dependency once OrderDTO includes price information
     private final IProductPresenter productPresenter;
     private String sessionToken;
     private String currentUsername;
@@ -51,7 +51,6 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
     @Autowired
     public CartView(IPurchasePresenter purchasePresenter, IProductPresenter productPresenter) {
         this.purchasePresenter = purchasePresenter;
-        // TODO: Remove productPresenter when OrderDTO includes price information
         this.productPresenter = productPresenter;
 
         setSizeFull();
@@ -133,20 +132,9 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         // Add header to cart content
         cartContent.add(headerLayout);
 
-        // Get cart items from presenter with proper error handling
-        Response<Set<OrderDTO>> cartResponse = purchasePresenter.viewCart(sessionToken);
+        Set<OrderDTO> cartItems = purchasePresenter.viewCart(sessionToken);
         
-        if (cartResponse.errorOccurred()) {
-            Notification.show("Error loading cart: " + cartResponse.getErrorMessage(), 
-                3000, Notification.Position.MIDDLE);
-            cartContent.add(new Span("Unable to load cart contents"));
-            totalPriceLabel.setText("Total: $0.00");
-            return;
-        }
-        
-        Set<OrderDTO> cartItems = cartResponse.getValue();
-        
-        if (cartItems == null || cartItems.isEmpty()) {
+        if (cartItems.isEmpty()) {
             cartContent.add(new Span("Your cart is empty"));
             totalPriceLabel.setText("Total: $0.00");
             return;
@@ -262,15 +250,11 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
                 }
                 
                 decrementButton.addClickListener(e -> {
-                    Response<Boolean> response = purchasePresenter.removeProductFromCart(
+                    boolean success = purchasePresenter.removeProductFromCart(
                         sessionToken, order.getName(), order.getStoreName(), 1);
-                    if (!response.errorOccurred() && response.getValue()) {
+                    if (success) {
                         Notification.show("Quantity decreased", 1000, Notification.Position.MIDDLE);
                         loadCartContents();
-                    } else {
-                        String errorMsg = response.errorOccurred() ? 
-                            response.getErrorMessage() : "Failed to decrease quantity";
-                        Notification.show(errorMsg, 3000, Notification.Position.MIDDLE);
                     }
                 });
                 
@@ -285,15 +269,11 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
                     .set("min-width", "30px")
                     .set("margin", "0");
                 incrementButton.addClickListener(e -> {
-                    Response<Boolean> response = purchasePresenter.addProductToCart(
+                    boolean success = purchasePresenter.addProductToCart(
                         sessionToken, order.getName(), order.getStoreName(), 1);
-                    if (!response.errorOccurred() && response.getValue()) {
+                    if (success) {
                         Notification.show("Quantity increased", 1000, Notification.Position.MIDDLE);
                         loadCartContents();
-                    } else {
-                        String errorMsg = response.errorOccurred() ? 
-                            response.getErrorMessage() : "Failed to increase quantity";
-                        Notification.show(errorMsg, 3000, Notification.Position.MIDDLE);
                     }
                 });
                 
@@ -306,14 +286,25 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
                 return quantityLayout;
             }).setHeader("Quantity").setKey("quantity").setAutoWidth(true);
             
-            // TODO: Update price column when OrderDTO includes price information
-            basketGrid.addColumn(order -> "$0.00").setHeader("Price").setKey("price");
-            
-            // TODO: Update subtotal calculation when OrderDTO includes price information
+            // Add price column - needs to fetch from product info
             basketGrid.addColumn(order -> {
-                double unitPrice = 0.00; // Placeholder price
-                double subtotal = unitPrice * order.getQuantity();
-                return String.format("$%.2f", subtotal);
+                ItemDTO product = productPresenter.showProductDetailsOfaStore(
+                    sessionToken, order.getName(), order.getStoreName());
+                if (product != null) {
+                    return String.format("$%.2f", product.getPrice());
+                }
+                return "N/A";
+            }).setHeader("Price").setKey("price");
+            
+            // Add subtotal column
+            basketGrid.addColumn(order -> {
+                ItemDTO product = productPresenter.showProductDetailsOfaStore(
+                    sessionToken, order.getName(), order.getStoreName());
+                if (product != null) {
+                    double subtotal = product.getPrice() * order.getQuantity();
+                    return String.format("$%.2f", subtotal);
+                }
+                return "N/A";
             }).setHeader("Subtotal").setKey("subtotal");
             
             // Add remove product button column - with empty header
@@ -358,8 +349,7 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
             
             storeLayout.add(basketGrid);
 
-            // Calculate and show the basket total price (always 0 for now)
-            // TODO: Update basket total calculation when OrderDTO includes price information
+            // Calculate and show the basket total price
             double basketTotal = calculateBasketTotal(basketItems);
             storeBasketTotals.put(storeName, basketTotal);
             cartTotal += basketTotal;
@@ -379,50 +369,45 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         totalPriceLabel.setText(String.format("Total: $%.2f", cartTotal));
     }
 
-    // TODO: Update this method when OrderDTO includes price information
     private double calculateBasketTotal(Set<OrderDTO> basketItems) {
         double total = 0.0;
         for (OrderDTO order : basketItems) {
-            // Using placeholder price of 0.00 for now
-            double unitPrice = 0.00;
-            total += unitPrice * order.getQuantity();
+            ItemDTO product = productPresenter.showProductDetailsOfaStore(
+                sessionToken, order.getName(), order.getStoreName());
+            if (product != null) {
+                total += product.getPrice() * order.getQuantity();
+            }
         }
         return total;
     }
 
     private void removeProduct(String productName, String storeName) {
-        Response<Boolean> response = purchasePresenter.removeProductFromCart(sessionToken, productName, storeName);
-        if (!response.errorOccurred() && response.getValue()) {
+        boolean success = purchasePresenter.removeProductFromCart(sessionToken, productName, storeName);
+        if (success) {
             Notification.show("Product removed from cart", 3000, Notification.Position.MIDDLE);
             loadCartContents();
         } else {
-            String errorMsg = response.errorOccurred() ? 
-                response.getErrorMessage() : "Failed to remove product";
-            Notification.show(errorMsg, 3000, Notification.Position.MIDDLE);
+            Notification.show("Failed to remove product", 3000, Notification.Position.MIDDLE);
         }
     }
 
     private void removeBasket(String storeName) {
-        Response<Boolean> response = purchasePresenter.clearBasket(sessionToken, storeName);
-        if (!response.errorOccurred() && response.getValue()) {
+        boolean success = purchasePresenter.clearBasket(sessionToken, storeName);
+        if (success) {
             Notification.show("Basket removed from cart", 3000, Notification.Position.MIDDLE);
             loadCartContents();
         } else {
-            String errorMsg = response.errorOccurred() ? 
-                response.getErrorMessage() : "Failed to remove basket";
-            Notification.show(errorMsg, 3000, Notification.Position.MIDDLE);
+            Notification.show("Failed to remove basket", 3000, Notification.Position.MIDDLE);
         }
     }
     
     private void clearCart() {
-        Response<Boolean> response = purchasePresenter.clearCart(sessionToken);
-        if (!response.errorOccurred() && response.getValue()) {
+        boolean success = purchasePresenter.clearCart(sessionToken);
+        if (success) {
             Notification.show("Cart has been cleared", 3000, Notification.Position.MIDDLE);
             loadCartContents();
         } else {
-            String errorMsg = response.errorOccurred() ? 
-                response.getErrorMessage() : "Failed to clear cart";
-            Notification.show(errorMsg, 3000, Notification.Position.MIDDLE);
+            Notification.show("Failed to clear cart", 3000, Notification.Position.MIDDLE);
         }
     }
 

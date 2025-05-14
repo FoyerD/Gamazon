@@ -11,8 +11,6 @@ dependency-reduced-pom.xml
 node_modules/
 src/main/frontend/generated/
 src/main/frontend/index.html
-frontend/generated/
-frontend/index.html
 package.json
 package-lock.json
 webpack.config.js
