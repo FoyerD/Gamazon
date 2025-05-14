@@ -31,8 +31,9 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
     private final TextField storeNameField = new TextField("Search Store by Name");
     private final TextField storeIdField = new TextField("Store ID");
     private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
-    private final Button fetchSupplyButton = new Button("Check Supply Amounts");
+    private final Button fetchSupplyButton;
     private final Button homeButton = new Button("Return to Homepage");
+    private final Button ownerDashboardButton;
 
     @Autowired
     public StoreSearchView(IStorePresenter storePresenter) {
@@ -54,16 +55,43 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         storeIdField.setPlaceholder("Auto-filled upon search");
         storeIdField.setReadOnly(true);
 
-        fetchSupplyButton.addClickListener(e -> fetchStoreInventory());
-        fetchSupplyButton.getStyle().set("background-color", "#ab47bc").set("color", "white");
+        // Initialize Check Supply button (always enabled)
+        fetchSupplyButton = new Button("Check Supply Amounts");
+        fetchSupplyButton.getStyle()
+            .set("background-color", "#ab47bc")
+            .set("color", "white")
+            .set("cursor", "pointer");
+        
+        // Add click listener for Check Supply button
+        fetchSupplyButton.addClickListener(e -> {
+            if (storeIdField.getValue() == null || storeIdField.getValue().isEmpty()) {
+                Notification.show("Please search for a store first!", 3000, Notification.Position.TOP_CENTER);
+            } else {
+                fetchStoreInventory();
+            }
+        });
 
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
         homeButton.getStyle().set("background-color", "#7e57c2").set("color", "white");
 
+        // Initialize owner dashboard button (always enabled)
+        ownerDashboardButton = new Button("Store Owner Dashboard", e -> {
+            if (storeIdField.getValue() == null || storeIdField.getValue().isEmpty()) {
+                Notification.show("Please search for a store first!", 3000, Notification.Position.TOP_CENTER);
+            } else {
+                UI.getCurrent().navigate("owner");
+            }
+        });
+        ownerDashboardButton.getStyle()
+            .set("background-color", "#6b46c1")
+            .set("color", "white")
+            .set("margin-left", "10px")
+            .set("cursor", "pointer");
+
         productGrid.setColumns("productName", "price", "amount", "description");
         productGrid.getStyle().set("background-color", "#f3e5f5");
 
-        HorizontalLayout actionsLayout = new HorizontalLayout(fetchSupplyButton, homeButton);
+        HorizontalLayout actionsLayout = new HorizontalLayout(fetchSupplyButton, homeButton, ownerDashboardButton);
         actionsLayout.setSpacing(true);
 
         add(title, storeNameField, storeIdField, actionsLayout, productGrid);
@@ -91,7 +119,6 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
     private void fetchStoreInventory() {
         String storeId = storeIdField.getValue();
         if (storeId == null || storeId.isEmpty()) {
-            Notification.show("Please search for a store first.");
             return;
         }
 
