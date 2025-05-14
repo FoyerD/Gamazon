@@ -3,17 +3,14 @@ package UI.views;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IProductPresenter;
 import Application.DTOs.OrderDTO;
-import Application.DTOs.ItemDTO;
 import Application.utils.Response;
-import Domain.Store.ItemFilter;
+
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -32,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.Collections;
-import java.util.HashSet;
 
 @Route("cart")
 public class CartView extends VerticalLayout implements BeforeEnterObserver {

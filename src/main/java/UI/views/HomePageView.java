@@ -2,6 +2,7 @@ package UI.views;
 
 import UI.presenters.IProductPresenter;
 import Application.DTOs.ItemDTO;
+import Application.utils.Response;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -16,7 +17,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Route("home")
@@ -85,8 +86,13 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
     private void loadAllProducts() {
         if (sessionToken == null) return;
-        Set<ItemDTO> products = productPresenter.showAllProducts(sessionToken);
-        productGrid.setItems(products);
+        Response<List<ItemDTO>> response = productPresenter.showAllProducts(sessionToken);
+        if (!response.errorOccurred()) {
+            productGrid.setItems(response.getValue());
+        } else {
+            Notification.show("Failed to load products: " + response.getErrorMessage(), 
+                            3000, Notification.Position.MIDDLE);
+        }
     }
 
     private void searchProducts() {
@@ -96,10 +102,17 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             loadAllProducts();
             return;
         }
-        Set<ItemDTO> filtered = productPresenter.showAllProducts(sessionToken).stream()
-                .filter(p -> p.getProductName().toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toSet());
-        productGrid.setItems(filtered);
+        
+        Response<List<ItemDTO>> response = productPresenter.showAllProducts(sessionToken);
+        if (!response.errorOccurred()) {
+            List<ItemDTO> filtered = response.getValue().stream()
+                    .filter(p -> p.getProductName().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+            productGrid.setItems(filtered);
+        } else {
+            Notification.show("Failed to search products: " + response.getErrorMessage(), 
+                            3000, Notification.Position.MIDDLE);
+        }
     }
 
     @Override
