@@ -18,6 +18,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.vaadin.flow.component.icon.VaadinIcon;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
     private final Button fetchSupplyButton;
     private final Button homeButton = new Button("Return to Homepage");
     private final Button ownerDashboardButton;
+    private final Button managerButton;
 
     @Autowired
     public StoreSearchView(IStorePresenter storePresenter) {
@@ -55,14 +57,12 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         storeIdField.setPlaceholder("Auto-filled upon search");
         storeIdField.setReadOnly(true);
 
-        // Initialize Check Supply button (always enabled)
+        // Initialize Check Supply button
         fetchSupplyButton = new Button("Check Supply Amounts");
         fetchSupplyButton.getStyle()
             .set("background-color", "#ab47bc")
             .set("color", "white")
             .set("cursor", "pointer");
-        
-        // Add click listener for Check Supply button
         fetchSupplyButton.addClickListener(e -> {
             if (storeIdField.getValue() == null || storeIdField.getValue().isEmpty()) {
                 Notification.show("Please search for a store first!", 3000, Notification.Position.TOP_CENTER);
@@ -74,7 +74,7 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
         homeButton.getStyle().set("background-color", "#7e57c2").set("color", "white");
 
-        // Initialize owner dashboard button (always enabled)
+        // Initialize owner dashboard button
         ownerDashboardButton = new Button("Store Owner Dashboard", e -> {
             if (storeIdField.getValue() == null || storeIdField.getValue().isEmpty()) {
                 Notification.show("Please search for a store first!", 3000, Notification.Position.TOP_CENTER);
@@ -88,10 +88,25 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             .set("margin-left", "10px")
             .set("cursor", "pointer");
 
+        // Initialize manager button
+        managerButton = new Button("Store Management", VaadinIcon.COGS.create(), e -> {
+            String storeId = storeIdField.getValue();
+            if (storeId == null || storeId.isEmpty()) {
+                Notification.show("Please select a store first!", 3000, Notification.Position.TOP_CENTER);
+                return;
+            }
+            UI.getCurrent().getSession().setAttribute("currentStoreId", storeId);
+            UI.getCurrent().navigate("manager");
+        });
+        managerButton.getStyle()
+            .set("background-color", "#2196f3")
+            .set("color", "white")
+            .set("margin-left", "10px");
+
         productGrid.setColumns("productName", "price", "amount", "description");
         productGrid.getStyle().set("background-color", "#f3e5f5");
 
-        HorizontalLayout actionsLayout = new HorizontalLayout(fetchSupplyButton, homeButton, ownerDashboardButton);
+        HorizontalLayout actionsLayout = new HorizontalLayout(fetchSupplyButton, homeButton, ownerDashboardButton, managerButton);
         actionsLayout.setSpacing(true);
 
         add(title, storeNameField, storeIdField, actionsLayout, productGrid);
