@@ -10,6 +10,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.UI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,13 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Route("owner")
-public class OwnerView extends VerticalLayout {
+public class OwnerView extends VerticalLayout implements BeforeEnterObserver {
 
     private final Grid<PermissionEntry> permissionsGrid;
     private final Button addPermissionButton;
     private final TextField searchField;
     private List<PermissionEntry> permissions;
+    private String sessionToken;
 
     @Autowired
     public OwnerView() {
@@ -134,6 +137,19 @@ public class OwnerView extends VerticalLayout {
         add(navBar, mainContainer);
 
         // Load initial data
+        loadPermissionsData();
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
+        if (sessionToken == null) {
+            Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
+            event.forwardTo("login");
+            return;
+        }
+        
+        // Load permissions data after validating session
         loadPermissionsData();
     }
 
