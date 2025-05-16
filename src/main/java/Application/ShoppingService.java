@@ -36,6 +36,12 @@ public class ShoppingService{
         this.storeFacade = storeFacade;
     }
 
+    public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade) {
+        this.cartFacade = cartFacade;
+        this.tokenService = tokenService;
+        this.storeFacade = storeFacade;
+    }
+
     public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {
         if (!tokenService.validateToken(sessionToken)) {
             return Response.error("Invalid token");

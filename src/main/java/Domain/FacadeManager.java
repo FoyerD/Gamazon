@@ -1,14 +1,17 @@
 package Domain;
 
+
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
 import Domain.Store.ProductFacade;
 import Domain.Store.StoreFacade;
+import Domain.User.LoginManager;
+import Domain.User.PasswordChecker;
 import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
-import Infrastructure.PaymentService;
+import Domain.management.PermissionManager;
 
 public class FacadeManager {
     private IRepoManager repoManager;
@@ -18,11 +21,13 @@ public class FacadeManager {
     private ItemFacade itemFacade;
     private ProductFacade productFacade;
     private IPaymentService paymentService;
+    private LoginManager loginManager;
+    private PermissionManager permissionManager;
+    private PasswordChecker passwordChecker;
 
-
-    public FacadeManager(IRepoManager repoManager, String paymentServiceURL) {
+    public FacadeManager(IRepoManager repoManager, IPaymentService paymentService) {
         this.repoManager = repoManager;
-        this.paymentService = new PaymentService(paymentServiceURL);
+        this.paymentService = paymentService;
     }
 
     public IPaymentService getPaymentService() {
@@ -79,5 +84,18 @@ public class FacadeManager {
             productFacade = new ProductFacade(repoManager.getProductRepository());
         }
         return productFacade;
+    }
+
+    public LoginManager getLoginManager() {
+        if (loginManager == null) {
+            loginManager = new LoginManager(repoManager.getUserRepository());
+        }
+        return loginManager;
+    }
+    public PermissionManager getPermissionManager() {
+        if (permissionManager == null) {
+            permissionManager = new PermissionManager(repoManager.getPermissionRepository());
+        }
+        return permissionManager;
     }
 }
