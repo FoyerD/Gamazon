@@ -1,0 +1,85 @@
+package Application;
+
+
+import Domain.FacadeManager;
+import Domain.TokenService;
+
+public class ServiceManager {
+    private ItemService itemService;
+    private StoreService storeService;
+    private ProductService productService;
+    private MarketService marketService;
+    private TokenService tokenService;
+    private UserService userService;
+    private CustomerServiceService customerService;
+    private ShoppingService shoppingService;
+    private FacadeManager facadeManager;
+
+    public ServiceManager(FacadeManager facadeManager) {
+        this.facadeManager = facadeManager;
+    }
+
+    public TokenService getTokenService() {
+        if (tokenService == null) {
+            tokenService = new TokenService();
+        }
+        return tokenService;
+    }
+
+    public ItemService getItemService() {
+        if (itemService == null) {
+            itemService = new ItemService(facadeManager.getItemFacade(),
+                                        getTokenService(),
+                                        facadeManager.getPermissionManager());
+        }
+        return itemService;
+    }
+
+    public StoreService getStoreService() {
+        if (storeService == null) {
+            storeService = new StoreService(facadeManager.getStoreFacade(),
+                                            getTokenService(),
+                                            facadeManager.getPermissionManager());
+        }
+        return storeService;
+    }
+    public ProductService getProductService() {
+        if (productService == null) {
+            productService = new ProductService(facadeManager.getProductFacade(),
+                                                getTokenService());
+        }
+        return productService;
+    }
+
+    public MarketService getMarketService() {
+        if (marketService == null) {
+            marketService = new MarketService(facadeManager.getMarketFacade(),
+                                            getTokenService());
+        }
+        return marketService;
+    }
+    public UserService getUserService() {
+        if (userService == null) {
+            userService = new UserService(facadeManager.getLoginManager(),
+                                        getTokenService());
+        }
+        return userService;
+    }
+
+    public CustomerServiceService getCustomerService() {
+        if (customerService == null) {
+            customerService = new CustomerServiceService(facadeManager.getStoreFacade(),
+                                                        getTokenService());
+        }
+        return customerService;
+    }
+
+    public ShoppingService getShoppingService() {
+        if (shoppingService == null) {
+            shoppingService = new ShoppingService(facadeManager.getShoppingCartFacade(),
+                                                getTokenService(),
+                                                facadeManager.getStoreFacade());
+        }
+        return shoppingService;
+    }
+}

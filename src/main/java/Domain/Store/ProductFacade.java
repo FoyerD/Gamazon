@@ -2,9 +2,6 @@ package Domain.Store;
 import java.util.List;
 import java.util.UUID;
 
-import Domain.Store.IProductRepository;
-import Domain.Store.IStoreRepository;
-
 public class ProductFacade {
     private IProductRepository productRepository;
 
