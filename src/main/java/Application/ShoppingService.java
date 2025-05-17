@@ -1,27 +1,23 @@
 package Application;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import Application.DTOs.CartDTO;
-import Application.DTOs.OrderDTO;
+import Application.DTOs.ItemDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
-import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
-import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Pair;
 import Domain.TokenService;
@@ -75,11 +71,14 @@ public class ShoppingService{
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
             Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
             for (Pair<Item, Integer> item : itemsMap) {
+                ItemDTO itemDTO = ItemDTO.fromItem(item.getFirst());
+                itemDTO.setAmount(item.getSecond());
+                
                 if(baskets.containsKey(item.getFirst().getStoreId())){
-                    baskets.get(item.getFirst().getStoreId()).getOrders().put(item.getFirst().getProductId(), item.getSecond());
+                    baskets.get(item.getFirst().getStoreId()).getOrders().put(item.getFirst().getProductId(), itemDTO);
                 } else {
                     ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>());
-                    basket.getOrders().put(item.getFirst().getProductId(), item.getSecond());
+                    basket.getOrders().put(item.getFirst().getProductId(), itemDTO);
                     baskets.put(item.getFirst().getStoreId(), basket);
                 }
             }

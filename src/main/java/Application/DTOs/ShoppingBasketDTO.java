@@ -1,5 +1,6 @@
 package Application.DTOs;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import Domain.Shopping.ShoppingBasket;
@@ -7,9 +8,9 @@ import Domain.Shopping.ShoppingBasket;
 public class ShoppingBasketDTO {
     private String storeId;
     private String clientId;
-    private Map<String, Integer> orders;
+    private Map<String, ItemDTO> orders;
 
-    public ShoppingBasketDTO(String storeId, String clientId, Map<String, Integer> orders) {
+    public ShoppingBasketDTO(String storeId, String clientId, Map<String, ItemDTO> orders) {
         this.storeId = storeId;
         this.clientId = clientId;
         this.orders = orders;
@@ -18,14 +19,14 @@ public class ShoppingBasketDTO {
     public ShoppingBasketDTO(ShoppingBasket basket) {
         this.storeId = basket.getStoreId();
         this.clientId = basket.getClientId();
-        this.orders = basket.getOrders();
+        this.orders = new HashMap<>();
     }
 
     public String getStoreId() {
         return storeId;
     }
 
-    public Map<String, Integer> getOrders() {
+    public Map<String, ItemDTO> getOrders() {
         return orders;
     }
 

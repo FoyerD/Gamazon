@@ -11,6 +11,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.description;
 import static org.mockito.Mockito.mock;
 
+import Application.DTOs.CartDTO;
 import Application.DTOs.OrderDTO;
 import Application.ShoppingService;
 import Application.utils.Response;
@@ -189,12 +190,12 @@ public class ShoppingServiceTest {
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
         
         // Act
-        Response<Set<OrderDTO>> response = shoppingService.viewCart(CLIENT_ID);
+        Response<CartDTO> response = shoppingService.viewCart(CLIENT_ID);
         
         // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertNotNull("Response value should not be null", response.getValue());
-        assertFalse("Cart should have at least one item", response.getValue().isEmpty());
+        assertFalse("Cart should have at least one item", response.getValue().getBaskets().isEmpty());
     }
 
     @Test
@@ -203,11 +204,11 @@ public class ShoppingServiceTest {
         String newClientId = "new-client";
         String sessionToken = tokenService.generateToken(newClientId);
         // Act
-        Response<Set<OrderDTO>> response = shoppingService.viewCart(sessionToken);
+        Response<CartDTO> response = shoppingService.viewCart(sessionToken);
         
         // Assert
         assertFalse("Should not have error even for empty cart", response.errorOccurred());
-        assertTrue("Cart should be empty", response.getValue().isEmpty());
+        assertTrue("Cart should be empty", response.getValue().getBaskets().isEmpty());
     }
     
     @Test
@@ -216,7 +217,7 @@ public class ShoppingServiceTest {
         String nullClientId = null;
         
         // Act
-        Response<Set<OrderDTO>> response = shoppingService.viewCart(nullClientId);
+        Response<CartDTO> response = shoppingService.viewCart(nullClientId);
         
         // Assert
         assertTrue("Should have error", response.errorOccurred());
@@ -319,8 +320,8 @@ public class ShoppingServiceTest {
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
         
         // Verify cart is empty by checking with viewCart
-        Response<Set<OrderDTO>> cartResponse = shoppingService.viewCart(CLIENT_ID);
-        assertTrue("Cart should be empty after clearing", cartResponse.getValue().isEmpty());
+        Response<CartDTO> cartResponse = shoppingService.viewCart(CLIENT_ID);
+        assertTrue("Cart should be empty after clearing", cartResponse.getValue().getBaskets().isEmpty());
     }
     
     @Test
@@ -336,8 +337,8 @@ public class ShoppingServiceTest {
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
         
         // Verify basket is empty by checking with viewCart
-        Response<Set<OrderDTO>> cartResponse = shoppingService.viewCart(CLIENT_ID);
-        assertTrue("Basket should be empty after clearing", cartResponse.getValue().isEmpty());
+        Response<CartDTO> cartResponse = shoppingService.viewCart(CLIENT_ID);
+        assertTrue("Basket should be empty after clearing", cartResponse.getValue().getBaskets().isEmpty());
     }
     
     //
