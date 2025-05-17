@@ -1,8 +1,6 @@
 package StoreTests;
 
 import java.util.List;
-import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -40,10 +38,7 @@ public class ItemServiceTests {
 
     private String tokenId;
     private UserDTO guest;
-    private UserDTO user1;
-    private UserDTO user2;
     private StoreDTO store1;
-    private StoreDTO store2;
     private ProductDTO product1;
     private ProductDTO product2;
 
@@ -66,7 +61,6 @@ public class ItemServiceTests {
 
         Response<StoreDTO> storeREs1 = storeService.addStore(tokenId, "Store One", "desc1");
         store1 = storeREs1.getValue();
-        store2 = storeService.addStore(tokenId, "Store Two", "desc2").getValue();
         product1 = serviceManager.getProductService().addProduct(tokenId, "prod1", List.of("cat1"), List.of("desc1")).getValue();
         product2 = serviceManager.getProductService().addProduct(tokenId, "prod2", List.of("cat2"), List.of("desc2")).getValue();
         

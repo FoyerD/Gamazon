@@ -59,8 +59,6 @@ public class CustomerServiceService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String customerId = this.tokenService.extractId(sessionToken);
-            
             List<Feedback> feedbacks = this.storeFacade.getAllFeedbacksByStoreId(storeId);
             List<FeedbackDTO> feedbackDTOs = feedbacks.stream().map(FeedbackDTO::new).collect(Collectors.toList());
             return new Response<>(feedbackDTOs);
@@ -76,8 +74,6 @@ public class CustomerServiceService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String customerId = this.tokenService.extractId(sessionToken);
-            
             List<Feedback> feedbacks = this.storeFacade.getAllFeedbacksByProductId(productId);
             List<FeedbackDTO> feedbackDTOs = feedbacks.stream().map(FeedbackDTO::new).collect(Collectors.toList());
             return new Response<>(feedbackDTOs);
@@ -93,8 +89,6 @@ public class CustomerServiceService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String customerId = this.tokenService.extractId(sessionToken);
-            
             List<Feedback> feedbacks = this.storeFacade.getAllFeedbacksByUserId(userId);
             List<FeedbackDTO> feedbackDTOs = feedbacks.stream().map(FeedbackDTO::new).collect(Collectors.toList());
             return new Response<>(feedbackDTOs);

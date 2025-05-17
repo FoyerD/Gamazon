@@ -1,7 +1,5 @@
 package Domain.Store;
 
-import Domain.Pair;
-
 public class Feedback {
     private String customerId;
     private String storeId;

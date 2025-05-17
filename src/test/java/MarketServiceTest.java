@@ -2,7 +2,6 @@ import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.Receipt;
-import Domain.User.User;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
 import Domain.TokenService;
@@ -18,7 +17,6 @@ import Application.MarketService;
 import Application.ProductService;
 import Application.ServiceManager;
 import Application.StoreService;
-import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
@@ -54,8 +52,6 @@ public class MarketServiceTest {
     private UserDTO user2;
     private ProductDTO product1;
     private StoreDTO store1;
-    private ItemDTO item1;
-    private ItemDTO item2;
 
     IPaymentService mockPaymentService;
     ISupplyService mockSupplyService;
@@ -91,8 +87,8 @@ public class MarketServiceTest {
         // Add products to store
         product1 = productService.addProduct(user1.getSessionToken(), "prod1", List.of("cat1"),List.of("catDesc1")).getValue();
         
-        item1 = itemService.add(user1.getSessionToken(), store1.getId(), product1.getId(), 49.99f, 10, "Item in stock").getValue();
-        item2 = itemService.add(user1.getSessionToken(), store1.getId(), product1.getId(), 19.99f, 0, "Item out of stock").getValue();
+        itemService.add(user1.getSessionToken(), store1.getId(), product1.getId(), 49.99f, 10, "Item in stock").getValue();
+        itemService.add(user1.getSessionToken(), store1.getId(), product1.getId(), 19.99f, 0, "Item out of stock").getValue();
 
 
         // Register external services

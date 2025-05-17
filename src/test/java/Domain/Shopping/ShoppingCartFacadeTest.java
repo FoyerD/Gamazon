@@ -356,7 +356,6 @@ public class ShoppingCartFacadeTest {
         
         // Mock null cart, which will cause a new empty cart to be created
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(null);
-        IShoppingCart newCart = ShoppingCartFactory.createShoppingCart(CLIENT_ID);
         Set<String> emptyStores = new HashSet<>();
         when(mockCart.getCart()).thenReturn(emptyStores);
         
@@ -381,8 +380,6 @@ public class ShoppingCartFacadeTest {
         long transactionId = 12345L;
         String clientName = "John Doe";
         String deliveryAddress = "123 Main St";
-        double itemPrice = 50.0;
-        
         // Mock cart and basket with items
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
         Set<String> stores = new HashSet<>();

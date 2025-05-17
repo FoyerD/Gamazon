@@ -7,12 +7,8 @@ import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.User.IUserRepository;
-import Domain.Store.Feedback;
-import Domain.Store.IItemRepository;
 import Domain.Shopping.IShoppingCartFacade;
-import Domain.Store.Store;
 import Domain.Shopping.Receipt;
-import Domain.Store.StoreFacade;
 
 /**
  * Interface for the Market Facade that manages all market-related operations.

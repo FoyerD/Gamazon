@@ -8,7 +8,7 @@ import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 

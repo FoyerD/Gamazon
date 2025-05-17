@@ -11,14 +11,12 @@ import static org.junit.Assert.assertFalse;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 
 import Application.StoreService;
 import Domain.TokenService;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
-import Domain.Store.IProductRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
@@ -26,20 +24,15 @@ import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
-import Domain.management.RoleType;
+import Infrastructure.NotificationService;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
 import Infrastructure.Repositories.MemoryPermissionRepository;
-import Infrastructure.Repositories.MemoryProductRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
 import Domain.Pair;
 import Domain.Store.Item;
-import Domain.Store.Product;
-import Domain.Store.ProductFacade;
-import Application.MarketService;
-import Application.StoreService;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -73,7 +66,7 @@ public class StoreServiceTests {
         this.tokenService = new TokenService();
         this.permissionManager = new PermissionManager(permissionRepository);
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
-        storeService = new StoreService(storeFacade, tokenService, permissionManager);
+        storeService = new StoreService(storeFacade, tokenService, permissionManager, new NotificationService());
 
         
         tokenId = this.tokenService.generateToken(userId.toString());
@@ -102,7 +95,7 @@ public class StoreServiceTests {
         String storeName = "ExistingStore";
         Response<StoreDTO> response = storeService.addStore(this.tokenId, storeName, "A new store");
         String storeId = response.getValue().getId();
-        Response<Boolean> resultCLose = this.storeService.closeStore(this.tokenId, storeId);
+        this.storeService.closeStore(this.tokenId, storeId);
         Response<Boolean> resultOpen = storeService.openStore(this.tokenId, storeId);
         assertTrue(resultOpen.getValue());
     }
@@ -137,7 +130,7 @@ public class StoreServiceTests {
     @Test
     public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNewStore_ThenReturnStore() {
         String storeName = "NewStore";
-        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        storeService.addStore(this.tokenId, storeName, "A new store");
         Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, storeName);
         assertTrue(getResult.getValue().getName().equals(storeName));
     }
@@ -145,7 +138,7 @@ public class StoreServiceTests {
     @Test
     public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNoneExist_ThenReturnError() {
         String storeName = "NewStore";
-        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        storeService.addStore(this.tokenId, storeName, "A new store");
         Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, "NoneExist");
         assertTrue(getResult.errorOccurred());
     }

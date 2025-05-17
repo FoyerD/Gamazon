@@ -28,20 +28,16 @@ import Domain.Shopping.IReceiptRepository;
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
-    private final StoreFacade storeFacade;
-
     public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
      ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
       IProductRepository productRepository, TokenService tokenService) {
         this.tokenService = tokenService;
         cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
-        this.storeFacade = storeFacade;
     }
 
     public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade) {
         this.cartFacade = cartFacade;
         this.tokenService = tokenService;
-        this.storeFacade = storeFacade;
     }
 
     public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {

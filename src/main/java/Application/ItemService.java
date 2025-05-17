@@ -55,7 +55,6 @@ public class ItemService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.getItemsProductId(productId).stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Fetched items by productId: " + productId);
@@ -72,7 +71,6 @@ public class ItemService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.filterItems(filter).stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Items filtered.");
@@ -89,7 +87,6 @@ public class ItemService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
             Item item = itemFacade.getItem(storeId, productId);
             TradingLogger.logEvent("ItemService", method, "Item retrieved successfully.");
             return new Response<>(ItemDTO.fromItem(item));
@@ -105,7 +102,6 @@ public class ItemService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.getItemsByStoreId(storeId).stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Fetched items for storeId: " + storeId);
@@ -122,7 +118,6 @@ public class ItemService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
             List<ItemDTO> dtos = itemFacade.getAvailableItems().stream()
                 .map(ItemDTO::fromItem).collect(Collectors.toList());
             TradingLogger.logEvent("ItemService", method, "Fetched available items.");
@@ -139,7 +134,6 @@ public class ItemService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
             throw new UnsupportedOperationException("Not Implemented.");
         } catch (UnsupportedOperationException ex) {
             TradingLogger.logError("ItemService", method, ex.getMessage());

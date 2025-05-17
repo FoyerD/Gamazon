@@ -96,7 +96,7 @@ public class StoreService {
                 for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
                     String currId = entry.getKey();
                     Permission permission = entry.getValue();
-                    if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
+                    if (permission.isStoreManager() || permission.isStoreOwner()) {
                         permissionManager.removeAllPermissions(storeId, userId);
                         notificationService.sendNotification(currId, "Store " + storeId + " has been closed.");
                     }
@@ -115,8 +115,6 @@ public class StoreService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
-
             Store store = this.storeFacade.getStoreByName(name);
             if(store == null) {
                 return new Response<>(new Error("Store not found."));
@@ -149,8 +147,6 @@ public class StoreService {
             if (!tokenService.validateToken(sessionToken)) {
                 return new Response<>(new Error("Invalid token"));
             }
-            String userId = this.tokenService.extractId(sessionToken);
-            
             List<AuctionDTO> auctions = this.storeFacade.getAllStoreAuctions(storeId).stream().map(AuctionDTO::new).collect(Collectors.toList());
             return new Response<>(auctions);
         } catch (Exception ex) {
@@ -165,8 +161,6 @@ public class StoreService {
             if (!tokenService.validateToken(sessionToken)) {
                 return new Response<>(new Error("Invalid token"));
             }
-            String userId = this.tokenService.extractId(sessionToken);
-
             List<AuctionDTO> auctions = this.storeFacade.getAllProductAuctions(productId).stream().map(AuctionDTO::new).collect(Collectors.toList());
             return new Response<>(auctions);
         } catch (Exception ex) {
