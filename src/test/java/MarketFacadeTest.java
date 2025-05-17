@@ -189,7 +189,7 @@ public class MarketFacadeTest {
         when(userRepository.getMemberByUsername(anyString())).thenReturn(member);
         when(member.getName()).thenReturn("adminUser");
         marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.DEACTIVATE_STORE));
+        marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.OPEN_DEACTIVATE_STORE));
 
         marketFacade.closeStore("store1", "userId");
 
@@ -206,7 +206,7 @@ public class MarketFacadeTest {
         when(userRepository.getMemberByUsername(anyString())).thenReturn(member);
         when(member.getName()).thenReturn("adminUser");
         marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        Permission permission = createPermissionWith(PermissionType.DEACTIVATE_STORE);
+        Permission permission = createPermissionWith(PermissionType.OPEN_DEACTIVATE_STORE);
         when(permission.isStoreManager()).thenReturn(true);
         marketFacade.getStorePermissions().get("store1").put("adminUser", permission);
 

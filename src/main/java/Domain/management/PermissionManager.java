@@ -18,9 +18,9 @@ public class PermissionManager {
         this.permissionRepository = permissionRepository;
     }
 
-    public void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId) {
-        checkPermission(appointerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
-        getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_MANAGER);
+    public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
+        checkPermission(appointerId, storeId, PermissionType.SUPERVISE_MANAGERS);
+        getOrCreatePermission(appointerId, appointeeId, storeId, RoleType.STORE_MANAGER);
     }
 
     public void removeStoreManager(String removerUsername, String managerUsername, String storeId) {
@@ -35,14 +35,14 @@ public class PermissionManager {
     }
 
 
-    public void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId) {
-        checkPermission(appointerUsername, storeId, PermissionType.ASSIGN_OR_REMOVE_OWNERS);
-        getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_OWNER);
+    public void appointStoreOwner(String appointerId, String appointeeId, String storeId) {
+        checkPermission(appointerId, storeId, PermissionType.ASSIGN_OR_REMOVE_OWNERS);
+        getOrCreatePermission(appointerId, appointeeId, storeId, RoleType.STORE_OWNER);
     }
 
     // Currently assigns the first store owner as the permission giver of himself
-    public void appointFirstStoreOwner(String appointeeUsername, String storeId) {
-        getOrCreatePermission(appointeeUsername, appointeeUsername, storeId, RoleType.STORE_OWNER);
+    public void appointFirstStoreOwner(String appointeeId, String storeId) {
+        getOrCreatePermission(appointeeId, appointeeId, storeId, RoleType.STORE_FOUNDER);
     }
 
     public Permission getOrCreatePermission(String giver, String member, String storeId, RoleType role) {
@@ -58,7 +58,7 @@ public class PermissionManager {
     public void checkPermission(String userId, String storeId, PermissionType requiredPermission) {
         Permission permission = permissionRepository.get(storeId, userId);
         if (permission == null || !permission.hasPermission(requiredPermission)) {
-            throw new SecurityException("User " + userId + " lacks permission " + requiredPermission + " for store " + storeId);
+            throw new SecurityException("User lacks permission " + requiredPermission + " for store " + storeId);
         }
     }
 
