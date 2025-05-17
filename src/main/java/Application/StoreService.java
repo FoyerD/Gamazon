@@ -2,12 +2,8 @@ package Application;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.aspectj.weaver.ast.Not;
-
-import com.vaadin.flow.component.notification.Notification;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.StoreDTO;

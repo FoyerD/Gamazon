@@ -3,20 +3,14 @@ package Domain.management;
 import java.io.IOException;
 import java.util.*;
 
-import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.Store.Feedback;
-import Domain.Store.IItemRepository;
-import Domain.Store.Item;
-import Domain.Store.Store;
-import Domain.Store.StoreFacade;
+
 import Domain.User.IUserRepository;
 import Domain.User.Member;
-import Infrastructure.Repositories.MemoryPermissionRepository;
 
 public class MarketFacade implements IMarketFacade {
 
@@ -24,12 +18,9 @@ public class MarketFacade implements IMarketFacade {
     private ISupplyService supplyService;
     private INotificationService notificationService;
     private IUserRepository userRepository;
-    private IItemRepository itemRepository; 
-    private StoreFacade storeFacade; 
+    private PermissionManager permissionManager;
     private IShoppingCartFacade shoppingCartFacade;
 
-
-    private IPermissionRepository permissionRepository = new MemoryPermissionRepository();
 
     private static final MarketFacade INSTANCE = new MarketFacade();
 
@@ -40,16 +31,15 @@ public class MarketFacade implements IMarketFacade {
     private MarketFacade() {}
 
     @Override
-    public void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, IShoppingCartFacade shoppingCartFacade) {
+    public void initFacades(IUserRepository userRepository, IShoppingCartFacade shoppingCartFacade, PermissionManager permissionManager) {
         this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-        this.storeFacade = storeFacade;
         this.shoppingCartFacade = shoppingCartFacade;
+        this.permissionManager = permissionManager;
     }
 
     // For unit testing
     public Map<String, Map<String, Permission>> getStorePermissions() {
-        return permissionRepository.getAllPermissions();
+        return permissionManager.getAllStorePermissions();
     }
 
     @Override
@@ -79,46 +69,30 @@ public class MarketFacade implements IMarketFacade {
 
 
     @Override
-    public void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId) {
-        checkPermission(appointerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
-        getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_MANAGER);
+    public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
+        permissionManager.appointFirstStoreOwner(appointeeId, storeId);
     }
 
     @Override
-    public void removeStoreManager(String removerUsername, String managerUsername, String storeId) {
-        checkPermission(removerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
-        Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !permission.isStoreManager()) {
-            throw new IllegalStateException(managerUsername + " is not a manager.");
-        }
-        permission.setPermissions(Set.of());
-        permission.setRole(null);
-        permissionRepository.update(storeId, managerUsername, permission);
+    public void removeStoreManager(String removerId, String managerId, String storeId) {
+        permissionManager.removeStoreManager(removerId, managerId, storeId);
     }
 
     @Override
-    public void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId) {
-        checkPermission(appointerUsername, storeId, PermissionType.ASSIGN_OR_REMOVE_OWNERS);
-        getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_OWNER);
+    public void appointStoreOwner(String appointerId, String appointeeId, String storeId) {
+        permissionManager.appointStoreOwner(appointerId, appointeeId, storeId);
     }
 
-
     @Override
-    public void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
-        checkPermission(ownerUsername, storeId, PermissionType.MODIFY_OWNER_RIGHTS);
-        Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !permission.isStoreManager()) {
-            throw new IllegalStateException(managerUsername + " is not a manager.");
-        }
-        permission.setPermissions(PermissionType.collectionToSet(newPermissions));
-        permissionRepository.update(storeId, managerUsername, permission);
+    public void changeManagerPermissions(String ownerId, String managerId, String storeId, List<PermissionType> newPermissions) {
+        permissionManager.changeManagerPermissions(ownerId, managerId, storeId, newPermissions);
     }
 
     @Override
     public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.SUPERVISE_MANAGERS);
+        permissionManager.checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.SUPERVISE_MANAGERS);
         Map<String, List<PermissionType>> result = new HashMap<>();
-        Map<String, Permission> storePermissions = permissionRepository.getAllPermissionsForStore(storeId);
+        Map<String, Permission> storePermissions = permissionManager.getAllPermissionsForStore(storeId);
         if (storePermissions != null) {
             for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
                 String username = entry.getKey();
@@ -131,10 +105,10 @@ public class MarketFacade implements IMarketFacade {
         return result;
     }
 
-    //TODO! REMOVE
+
     @Override
     public List<Receipt> getStorePurchaseHistory(String storeId, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
+        permissionManager.checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
         return shoppingCartFacade.getStorePurchaseHistory(storeId);
     }
 
@@ -147,8 +121,6 @@ public class MarketFacade implements IMarketFacade {
         supplyService.initialize();
         notificationService.initialize();
         Member manager = userRepository.getMember(userId);
-        Permission founder = new Permission("system", manager.getName());
-        PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
-        permissionRepository.add("1", manager.getName(), founder);
+        permissionManager.addMarketManager(manager);
     }
 }

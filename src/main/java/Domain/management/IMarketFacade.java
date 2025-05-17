@@ -72,26 +72,8 @@ public interface IMarketFacade {
      * @param storeFacade Facade for store management
      * @param shoppingCartFacade Facade for shopping cart management
      */
-    void initFacades(IUserRepository userRepository, IItemRepository itemRepository, StoreFacade storeFacade, IShoppingCartFacade shoppingCartFacade);
+    void initFacades(IUserRepository userRepository, IShoppingCartFacade shoppingCartFacade, PermissionManager permissionManager);
     // Section 4
-
-    /**
-     * 4.1 Update product quantities in a store's inventory.
-     * 
-     * @param storeId ID of the store
-     * @param productQuantities Map of product IDs to updated quantities
-     * @param userId ID of the user performing the action
-     */
-    void updateProductQuantities(String storeId, Map<String, Integer> productQuantities, String userId);
-
-    /**
-     * 4.1 Remove products from a store's inventory.
-     * 
-     * @param storeId ID of the store
-     * @param productQuantities Map of product IDs to quantities to remove
-     * @param userId ID of the user performing the action
-     */
-    void removeProductsFromInventory(String storeId, Map<String, Integer> productQuantities, String userId);
 
     /**
      * 4.3 Appoint a new store manager.
@@ -111,14 +93,6 @@ public interface IMarketFacade {
      */
     void removeStoreManager(String removerUsername, String managerUsername, String storeId);
 
-    /**
-     * 4.6 Appoint a new store owner.
-     * 
-     * @param appointerUsername Username of the appointing user
-     * @param appointeeUsername Username of the user being appointed as owner
-     * @param storeId ID of the store
-     */
-    void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId);
 
     /**
      * 4.7 Change the permissions of a store manager.
@@ -130,17 +104,15 @@ public interface IMarketFacade {
      */
     void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId,
                                    List<PermissionType> newPermissions);
-
+                                   
     /**
-     * 4.9 Close a store.
+     * 4.6 Appoint a new store owner.
      * 
-     * @param storeId ID of the store to close
-     * @param userId ID of the user requesting the closure
+     * @param appointerUsername Username of the appointing user
+     * @param appointeeUsername Username of the user being appointed as owner
+     * @param storeId ID of the store
      */
-    void closeStore(String storeId, String userId);
-
-
-    Store addStore(String name, String description, String founderId);
+    void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId);
 
     /**
      * 4.11 Retrieve all managers and their permissions in a store.
@@ -152,27 +124,6 @@ public interface IMarketFacade {
     Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId);
 
     /**
-     * 4.12 Respond to a user message (feedback or complaint) related to a product.
-     * 
-     * @param storeId ID of the store
-     * @param productId ID of the product
-     * @param userId ID of the user
-     * @param comment Response comment to send
-     * @return true if response is sent successfully, false otherwise
-     */
-    boolean respondToUserMessage(String storeId, String productId, String userId, String comment);
-
-    /**
-     * 4.12 Retrieve a user's message related to a product.
-     * 
-     * @param storeId ID of the store
-     * @param productId ID of the product
-     * @param userId ID of the user
-     * @return Feedback object representing the user message
-     */
-    Feedback getUserMessage(String storeId, String userId, String feedbackId);
-
-    /**
      * 4.13 Retrieve the purchase history of a store within a given date range.
      * 
      * @param storeId ID of the store
@@ -180,14 +131,4 @@ public interface IMarketFacade {
      * @return List of Receipts representing purchases
      */
     List<Receipt> getStorePurchaseHistory(String storeId, String userId);
-
-    // Section 6
-
-    /**
-     * 6.1 Close a store from the market without affecting subscriptions.
-     * 
-     * @param storeId ID of the store
-     * @param userId ID of the user requesting the closure
-     */
-    void marketCloseStore(String storeId, String userId);
 }

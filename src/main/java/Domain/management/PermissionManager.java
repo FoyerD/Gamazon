@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import Domain.User.Member;
+
 
 public class PermissionManager {
     private IPermissionRepository permissionRepository;
@@ -35,6 +37,9 @@ public class PermissionManager {
         permissionRepository.update(storeId, managerUsername, permission);
     }
 
+    public Map<String, Map<String, Permission>> getAllStorePermissions(){
+        return permissionRepository.getAllPermissions();
+    }
 
     public void appointStoreOwner(String appointerId, String appointeeId, String storeId) {
         checkPermission(appointerId, storeId, PermissionType.ASSIGN_OR_REMOVE_OWNERS);
@@ -54,6 +59,10 @@ public class PermissionManager {
             permissionRepository.add(storeId, member, permission);
         }
         return permission;
+    }
+
+    public Permission getPermission(String storeId, String userId) {
+        return permissionRepository.get(storeId, userId);
     }
 
     public void checkPermission(String userId, String storeId, PermissionType requiredPermission) {
@@ -85,5 +94,15 @@ public class PermissionManager {
         permission.setPermissions(Set.of());
         permission.setRole(null);
         permissionRepository.update(storeId, userId, permission);
+    }
+
+    public Map<String, Permission> getAllPermissionsForStore(String storeId) {
+        return permissionRepository.getAllPermissionsForStore(storeId);
+    }
+
+    public void addMarketManager(Member manager){
+        Permission founder = new Permission("system", manager.getId());
+        PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
+        permissionRepository.add("1", manager.getId(), founder);
     }
 }

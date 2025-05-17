@@ -1,8 +1,10 @@
 package Application;
 
 
+
 import Domain.FacadeManager;
 import Domain.TokenService;
+import Infrastructure.NotificationService;
 
 public class ServiceManager {
     private ItemService itemService;
@@ -14,6 +16,7 @@ public class ServiceManager {
     private CustomerServiceService customerService;
     private ShoppingService shoppingService;
     private FacadeManager facadeManager;
+    private NotificationService notificationService;
 
     public ServiceManager(FacadeManager facadeManager) {
         this.facadeManager = facadeManager;
@@ -35,11 +38,19 @@ public class ServiceManager {
         return itemService;
     }
 
+    public NotificationService getNotificationService() {
+        if (notificationService == null) {
+            notificationService = new NotificationService();
+        }
+        return notificationService;
+    }
+
     public StoreService getStoreService() {
         if (storeService == null) {
             storeService = new StoreService(facadeManager.getStoreFacade(),
                                             getTokenService(),
-                                            facadeManager.getPermissionManager());
+                                            facadeManager.getPermissionManager(),
+                                            getNotificationService());
         }
         return storeService;
     }
