@@ -5,8 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+
+import com.vaadin.flow.component.notification.Notification;
+
 import Domain.User.IUserRepository;
+import Domain.User.Member;
 import Domain.User.User;
+import Infrastructure.NotificationService;
 import Domain.Pair;
 
 public class StoreFacade {
@@ -15,13 +20,15 @@ public class StoreFacade {
     private IItemRepository itemRepository;
     private IAuctionRepository auctionRepository;
     private Function<String, User> getUser;
+    private NotificationService notificationService;
 
-    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository) {
+    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, NotificationService notificationService) {
         this.itemRepository = itemRepository;
         this.storeRepository = storeRepository;
         this.feedbackRepository = feedbackRepository;
         this.auctionRepository = auctionRepository;
         this.getUser = userRepository::get;
+        this.notificationService = notificationService;
     }
 
     public StoreFacade() {

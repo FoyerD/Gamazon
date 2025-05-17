@@ -78,43 +78,12 @@ public class MarketFacade implements IMarketFacade {
     }
 
 
-    //TODO! REMOVE
-    @Override
-    public void updateProductQuantities(String storeId, Map<String, Integer> productQuantities, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
-        for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
-            String productId = entry.getKey();
-            Integer quantity = entry.getValue();
-            Item existingItem = itemRepository.getItem(storeId, productId);
-            if (existingItem != null) {
-                existingItem.setAmount(quantity);
-                itemRepository.update(new Pair<>(storeId, productId), existingItem);
-            }
-        }
-    }
-
-    //TODO! REMOVE
-    @Override
-    public void removeProductsFromInventory(String storeId, Map<String, Integer> productQuantities, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.HANDLE_INVENTORY);
-        for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
-            String productId = entry.getKey();
-            Integer quantity = entry.getValue();
-            Item existingItem = itemRepository.getItem(storeId, productId);
-            if (existingItem != null && quantity > 0) {
-                itemRepository.remove(new Pair<>(storeId, productId));
-            }
-        }
-    }
-
-    //TODO! REMOVE
     @Override
     public void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId) {
         checkPermission(appointerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
         getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_MANAGER);
     }
 
-    //TODO! REMOVE
     @Override
     public void removeStoreManager(String removerUsername, String managerUsername, String storeId) {
         checkPermission(removerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
@@ -127,21 +96,13 @@ public class MarketFacade implements IMarketFacade {
         permissionRepository.update(storeId, managerUsername, permission);
     }
 
-    //TODO! REMOVE
     @Override
     public void appointStoreOwner(String appointerUsername, String appointeeUsername, String storeId) {
         checkPermission(appointerUsername, storeId, PermissionType.ASSIGN_OR_REMOVE_OWNERS);
         getOrCreatePermission(appointerUsername, appointeeUsername, storeId, RoleType.STORE_OWNER);
     }
 
-    //TODO! REMOVE
-    // Currently assigns the first store owner as the permission giver of himself
-    private void appointFirstStoreOwner(String appointeeUsername, String storeId) {
-        getOrCreatePermission(appointeeUsername, appointeeUsername, storeId, RoleType.STORE_OWNER);
-    }
 
-
-    //TODO! REMOVE
     @Override
     public void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
         checkPermission(ownerUsername, storeId, PermissionType.MODIFY_OWNER_RIGHTS);
@@ -153,51 +114,6 @@ public class MarketFacade implements IMarketFacade {
         permissionRepository.update(storeId, managerUsername, permission);
     }
 
-    //TODO! REMOVE
-    @Override
-    public Store addStore(String name, String description, String founderId) {
-        Member storeOwner = userRepository.getMember(founderId);
-        if (storeOwner == null) {
-            throw new IllegalStateException("User does not exist.");
-        }
-        Store store = storeFacade.addStore(name, description, founderId);
-        String storeId = store.getId();
-        appointFirstStoreOwner(userRepository.getMember(founderId).getName(), storeId);
-        return store;
-    }
-
-    //TODO! REMOVE
-    @Override
-    public void closeStore(String storeId, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OPEN_DEACTIVATE_STORE);
-        storeFacade.closeStore(storeId);
-        Member manager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
-        notificationService.sendNotification(manager.getName(), "Store " + storeId + " has been closed.");
-    }
-
-    //TODO! REMOVE
-    @Override
-    public void marketCloseStore(String storeId, String userId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OPEN_DEACTIVATE_STORE);
-        Member manager = userRepository.getMemberByUsername(userRepository.get(userId).getName());
-        Map<String, Permission> storePermissions = permissionRepository.getAllPermissionsForStore(storeId);
-        if (storePermissions != null) {
-            for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
-                String username = entry.getKey();
-                Permission permission = entry.getValue();
-                if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
-                    permission.setPermissions(Set.of());
-                    permission.setRole(null);
-                    permissionRepository.update(storeId, username, permission);
-                    notificationService.sendNotification(username, "Store " + storeId + " has been closed.");
-                }
-            }
-        }
-        storeFacade.closeStore(storeId);
-        notificationService.sendNotification(manager.getName(), "Store " + storeId + " has been closed.");
-    }
-
-    //TODO! REMOVE
     @Override
     public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
         checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.SUPERVISE_MANAGERS);
@@ -213,20 +129,6 @@ public class MarketFacade implements IMarketFacade {
             }
         }
         return result;
-    }
-
-    //TODO! REMOVE
-    @Override
-    public boolean respondToUserMessage(String storeId, String productId, String userId, String response) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.RESPOND_TO_INQUIRIES);
-        return storeFacade.addFeedback(storeId, productId, userId, response);
-    }
-
-    //TODO! REMOVE
-    @Override
-    public Feedback getUserMessage(String storeId, String userId, String feedbackId) {
-        checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.OVERSEE_OFFERS);
-        return storeFacade.getFeedback(feedbackId);
     }
 
     //TODO! REMOVE
@@ -248,24 +150,5 @@ public class MarketFacade implements IMarketFacade {
         Permission founder = new Permission("system", manager.getName());
         PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
         permissionRepository.add("1", manager.getName(), founder);
-    }
-
-    //TODO! REMOVE
-    private Permission getOrCreatePermission(String giver, String member, String storeId, RoleType role) {
-        Permission permission = permissionRepository.get(storeId, member);
-        if (permission == null) {
-            permission = new Permission(giver, member);
-            PermissionFactory.initPermissionAsRole(permission, role);
-            permissionRepository.add(storeId, member, permission);
-        }
-        return permission;
-    }
-
-    //TODO! REMOVE
-    private void checkPermission(String username, String storeId, PermissionType requiredPermission) {
-        Permission permission = permissionRepository.get(storeId, username);
-        if (permission == null || !permission.hasPermission(requiredPermission)) {
-            throw new SecurityException("User " + username + " lacks permission " + requiredPermission + " for store " + storeId);
-        }
     }
 }

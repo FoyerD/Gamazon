@@ -1,6 +1,7 @@
 package Domain.management;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -70,5 +71,19 @@ public class PermissionManager {
         }
         permission.setPermissions(PermissionType.collectionToSet(newPermissions));
         permissionRepository.update(storeId, managerUsername, permission);
+    }
+
+    public Map<String, Permission> getStorePermissions(String storeId) {
+        return permissionRepository.getAllPermissionsForStore(storeId);
+    }
+
+    public void removeAllPermissions(String storeId, String userId) {
+        Permission permission = permissionRepository.get(storeId, userId);
+        if (permission == null) {
+            throw new IllegalStateException(userId + " does not have any permissions.");
+        }
+        permission.setPermissions(Set.of());
+        permission.setRole(null);
+        permissionRepository.update(storeId, userId, permission);
     }
 }

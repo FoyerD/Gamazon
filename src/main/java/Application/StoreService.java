@@ -1,8 +1,13 @@
 package Application;
 
-import java.security.Permission;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.aspectj.weaver.ast.Not;
+
+import com.vaadin.flow.component.notification.Notification;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.StoreDTO;
@@ -13,21 +18,26 @@ import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
+import Infrastructure.NotificationService;
+import Domain.management.Permission;
 
 public class StoreService {
 
     private StoreFacade storeFacade;
     private TokenService tokenService;
     private PermissionManager permissionManager;
+    private NotificationService notificationService;
 
 
     public StoreService() {
         this.storeFacade = null;
         this.tokenService = null;
         this.permissionManager = null;
+        this.notificationService = null;
     }
 
-    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager) {
+    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, NotificationService notificationService) {
+        this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
         this.permissionManager = permissionManager;
@@ -85,6 +95,17 @@ public class StoreService {
             String userId = this.tokenService.extractId(sessionToken);
             permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
             boolean result = this.storeFacade.closeStore(storeId);
+            Map<String, Permission> storePermissions = permissionManager.getStorePermissions(storeId);
+            if (storePermissions != null) {
+                for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
+                    String currId = entry.getKey();
+                    Permission permission = entry.getValue();
+                    if (permission.isStoreManager() || permission.isStoreOwner() || permission.isStoreFounder()) {
+                        permissionManager.removeAllPermissions(storeId, userId);
+                        notificationService.sendNotification(currId, "Store " + storeId + " has been closed.");
+                    }
+                }
+            }
             return new Response<>(result);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
