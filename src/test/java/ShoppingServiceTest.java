@@ -2,28 +2,18 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.mockito.Mockito.description;
-import static org.mockito.Mockito.mock;
-
 import Application.DTOs.CartDTO;
-import Application.DTOs.OrderDTO;
 import Application.ShoppingService;
 import Application.utils.Response;
-import Domain.Pair;
 import Domain.TokenService;
-import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
-import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
-import Domain.Shopping.ShoppingCartFacade;
-import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
 import Domain.Store.Product;
@@ -57,8 +47,6 @@ public class ShoppingServiceTest {
     private StoreFacade storeFacade;
     private IReceiptRepository receiptRepository;
     private IProductRepository productRepository;
-    private IShoppingCartFacade cartFacade;
-    private IPaymentService paymentService;
     private IItemRepository itemRepository;
     private IStoreRepository storeRepository;
     private IAuctionRepository auctionRepository;
@@ -70,14 +58,12 @@ public class ShoppingServiceTest {
     private static final String CLIENT_ID = tokenService.generateToken(userId.toString());
     private static final String STORE_ID = "store123";
     private static final String PRODUCT_ID = "product123";
-    private static final String AUCTION_ID = "auction123";
     private static final float VALID_BID_PRICE = 100.0f;
 
     @Before
     public void setUp() {
         // Initialize mocks
         // MockitoAnnotations.initMocks(this);
-        paymentService = mock(IPaymentService.class);
         
         // Create real implementations for repositories
         productRepository = new MemoryProductRepository();
@@ -120,16 +106,6 @@ public class ShoppingServiceTest {
         storeFacade.setFeedbackRepository(feedbackRepository);
         storeFacade.setGetUser(userRepository);
         
-        // Create ShoppingCartFacade
-        cartFacade = new ShoppingCartFacade(
-            cartRepository,
-            basketRepository,
-            paymentService,
-            itemFacade,
-            storeFacade,
-            receiptRepository,
-            productRepository
-        );
         
         // Initialize the ShoppingService with real repositories and facades
         shoppingService = new ShoppingService(

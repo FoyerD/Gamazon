@@ -1,7 +1,10 @@
 package Domain.management;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import Domain.User.Member;
 
 
 public class PermissionManager {
@@ -26,7 +29,7 @@ public class PermissionManager {
     public void removeStoreManager(String removerUsername, String managerUsername, String storeId) {
         checkPermission(removerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
         Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !permission.isStoreManager()) {
+        if (permission == null || !(permission.isStoreManager())) {
             throw new IllegalStateException(managerUsername + " is not a manager.");
         }
         permission.setPermissions(Set.of());
@@ -34,6 +37,9 @@ public class PermissionManager {
         permissionRepository.update(storeId, managerUsername, permission);
     }
 
+    public Map<String, Map<String, Permission>> getAllStorePermissions(){
+        return permissionRepository.getAllPermissions();
+    }
 
     public void appointStoreOwner(String appointerId, String appointeeId, String storeId) {
         checkPermission(appointerId, storeId, PermissionType.ASSIGN_OR_REMOVE_OWNERS);
@@ -55,6 +61,10 @@ public class PermissionManager {
         return permission;
     }
 
+    public Permission getPermission(String storeId, String userId) {
+        return permissionRepository.get(storeId, userId);
+    }
+
     public void checkPermission(String userId, String storeId, PermissionType requiredPermission) {
         Permission permission = permissionRepository.get(storeId, userId);
         if (permission == null || !permission.hasPermission(requiredPermission)) {
@@ -65,10 +75,34 @@ public class PermissionManager {
     public void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
         checkPermission(ownerUsername, storeId, PermissionType.MODIFY_OWNER_RIGHTS);
         Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !permission.isStoreManager()) {
+        if (permission == null || !(permission.isStoreManager())) {
             throw new IllegalStateException(managerUsername + " is not a manager.");
         }
         permission.setPermissions(PermissionType.collectionToSet(newPermissions));
         permissionRepository.update(storeId, managerUsername, permission);
+    }
+
+    public Map<String, Permission> getStorePermissions(String storeId) {
+        return permissionRepository.getAllPermissionsForStore(storeId);
+    }
+
+    public void removeAllPermissions(String storeId, String userId) {
+        Permission permission = permissionRepository.get(storeId, userId);
+        if (permission == null) {
+            throw new IllegalStateException(userId + " does not have any permissions.");
+        }
+        permission.setPermissions(Set.of());
+        permission.setRole(null);
+        permissionRepository.update(storeId, userId, permission);
+    }
+
+    public Map<String, Permission> getAllPermissionsForStore(String storeId) {
+        return permissionRepository.getAllPermissionsForStore(storeId);
+    }
+
+    public void addMarketManager(Member manager){
+        Permission founder = new Permission("system", manager.getId());
+        PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
+        permissionRepository.add("1", manager.getId(), founder);
     }
 }

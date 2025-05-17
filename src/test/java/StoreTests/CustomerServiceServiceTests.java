@@ -1,7 +1,6 @@
 package StoreTests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -26,6 +25,7 @@ import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
+import Infrastructure.NotificationService;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
@@ -69,7 +69,7 @@ public class CustomerServiceServiceTests {
         this.permissionManager = new PermissionManager(this.permissionRepository);
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
         customerServiceService = new CustomerServiceService(this.storeFacade, this.tokenService);
-        storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager);
+        storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager, new NotificationService());
 
         tokenId = this.tokenService.generateToken(userId.toString());
         User user = new Member(userId, "Member1", "passpass", "email@email.com");
@@ -104,8 +104,8 @@ public class CustomerServiceServiceTests {
     @Test
     public void GivenExistingMemberAndExistingStoreAndExistingItemAndNonemptyFeedbacks_WhenGettingFeedbackByStore_ThenReturnFeedbacks() {
         String feedback = "Ayo those test cases are fire";
-        Response<Boolean> addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
-        addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
 
         Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByStoreId(this.tokenId, storeId);
         assertEquals(getResult.getValue().size(), 2);
@@ -122,8 +122,8 @@ public class CustomerServiceServiceTests {
     @Test
     public void GivenExistingMemberAndExistingStoreAndExistingItemAndNonemptyFeedbacks_WhenGettingFeedbackByProduct_ThenReturnFeedbacks() {
         String feedback = "Ayo those test cases are fire";
-        Response<Boolean> addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
-        addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
 
         Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByProductId(this.tokenId, productId);
         assertEquals(getResult.getValue().size(), 2);
@@ -132,8 +132,8 @@ public class CustomerServiceServiceTests {
     @Test   
     public void GivenExistingMemberAndExistingStoreAndExistingItemAndNonemptyFeedbacks_WhenGettingFeedbackByUser_ThenReturnFeedbacks() {
         String feedback = "Ayo those test cases are fire";
-        Response<Boolean> addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
-        addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
 
         Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByUserId(this.tokenId, userId.toString());
         assertEquals(getResult.getValue().size(), 2);
@@ -142,8 +142,8 @@ public class CustomerServiceServiceTests {
     @Test
     public void GivenExistingMemberAndExistingStoreAndExistingItemAndNonemptyFeedbacks_WhenGettingFeedbackByUser_ThenReturnEmptyList() {
         String feedback = "Ayo those test cases are fire";
-        Response<Boolean> addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
-        addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
 
         Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByUserId(this.tokenId, "nonexistinguser");
         assertTrue(getResult.getValue().isEmpty());
@@ -152,8 +152,8 @@ public class CustomerServiceServiceTests {
     @Test
     public void GivenExistingMemberAndExistingStoreAndExistingItemAndNonemptyFeedbacks_WhenGettingFeedbackByStore_ThenReturnEmptyList() {
         String feedback = "Ayo those test cases are fire";
-        Response<Boolean> addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
-        addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
 
         Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByStoreId(this.tokenId, "nonexistingstore");
         assertTrue(getResult.getValue().isEmpty());
@@ -162,8 +162,8 @@ public class CustomerServiceServiceTests {
     @Test
     public void GivenExistingMemberAndExistingStoreAndExistingItemAndNonemptyFeedbacks_WhenGettingFeedbackByProduct_ThenReturnEmptyList() {
         String feedback = "Ayo those test cases are fire";
-        Response<Boolean> addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
-        addResult = customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
+        customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
 
         Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByProductId(this.tokenId, "nonexistingproduct");
         assertTrue(getResult.getValue().isEmpty());
