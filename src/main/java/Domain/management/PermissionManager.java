@@ -29,7 +29,7 @@ public class PermissionManager {
     public void removeStoreManager(String removerUsername, String managerUsername, String storeId) {
         checkPermission(removerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
         Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !permission.isStoreManager()) {
+        if (permission == null || !(permission.isStoreManager() || permission.isStoreFounder())) {
             throw new IllegalStateException(managerUsername + " is not a manager.");
         }
         permission.setPermissions(Set.of());
@@ -75,7 +75,7 @@ public class PermissionManager {
     public void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
         checkPermission(ownerUsername, storeId, PermissionType.MODIFY_OWNER_RIGHTS);
         Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !permission.isStoreManager()) {
+        if (permission == null || !(permission.isStoreManager() || permission.isStoreFounder())) {
             throw new IllegalStateException(managerUsername + " is not a manager.");
         }
         permission.setPermissions(PermissionType.collectionToSet(newPermissions));

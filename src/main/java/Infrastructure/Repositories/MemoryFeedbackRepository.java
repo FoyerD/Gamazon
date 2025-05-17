@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import Domain.Pair; 
 public class MemoryFeedbackRepository extends IFeedbackRepository{
     private Map<String, Feedback> feedbacks;
 

@@ -20,15 +20,13 @@ public class StoreFacade {
     private IItemRepository itemRepository;
     private IAuctionRepository auctionRepository;
     private Function<String, User> getUser;
-    private NotificationService notificationService;
 
-    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, NotificationService notificationService) {
+    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository) {
         this.itemRepository = itemRepository;
         this.storeRepository = storeRepository;
         this.feedbackRepository = feedbackRepository;
         this.auctionRepository = auctionRepository;
         this.getUser = userRepository::get;
-        this.notificationService = notificationService;
     }
 
     public StoreFacade() {

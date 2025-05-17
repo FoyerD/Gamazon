@@ -70,7 +70,7 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
-        permissionManager.appointFirstStoreOwner(appointeeId, storeId);
+        permissionManager.appointStoreManager(appointerId, appointeeId, storeId);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
-        permissionManager.checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.SUPERVISE_MANAGERS);
+        permissionManager.checkPermission(userId, storeId, PermissionType.SUPERVISE_MANAGERS);
         Map<String, List<PermissionType>> result = new HashMap<>();
         Map<String, Permission> storePermissions = permissionManager.getAllPermissionsForStore(storeId);
         if (storePermissions != null) {
@@ -108,7 +108,7 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public List<Receipt> getStorePurchaseHistory(String storeId, String userId) {
-        permissionManager.checkPermission(userRepository.get(userId).getName(), storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
+        permissionManager.checkPermission(userId, storeId, PermissionType.ACCESS_PURCHASE_RECORDS);
         return shoppingCartFacade.getStorePurchaseHistory(storeId);
     }
 

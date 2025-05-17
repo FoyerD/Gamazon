@@ -38,9 +38,8 @@ public class FacadeManager {
         if (marketFacade == null) {
             marketFacade = MarketFacade.getInstance();
             marketFacade.initFacades(repoManager.getUserRepository(),
-                                    repoManager.getItemRepository(),
-                                    getStoreFacade(),
-                                    getShoppingCartFacade());
+                                    getShoppingCartFacade(),
+                                    getPermissionManager());
 
         }
         return marketFacade;
