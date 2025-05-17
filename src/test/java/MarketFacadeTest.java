@@ -15,8 +15,8 @@
 // import Domain.User.IUserRepository;
 // import Domain.User.Member;
 // import Domain.User.User;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
+// import org.junit.Before;
+// import org.junit.Test;
 
 // import java.io.IOException;
 // import java.time.LocalDateTime;
@@ -41,7 +41,7 @@
 //     private INotificationService notificationService;
 //     private PermissionManager permissionManager;
 
-//     @BeforeEach
+//     @Before
 //     public void setUp() {
 //         marketFacade = MarketFacade.getInstance();
 
@@ -63,46 +63,13 @@
 //     }
 
 //     @Test
-//     public void givenMarketFacade_whenUpdatePaymentService_thenInstanceIsNotNull() {
-//         MarketFacade instance = MarketFacade.getInstance();
-//         instance.updatePaymentService(paymentService);
-//         assertNotNull(instance);
-//     }
-
-//     @Test
-//     public void givenMarketFacade_whenUpdateNotificationService_thenInstanceIsNotNull() {
-//         MarketFacade instance = MarketFacade.getInstance();
-//         instance.updateNotificationService(notificationService);
-//         assertNotNull(instance);
-//     }
-
-//     @Test
-//     public void givenMarketFacade_whenUpdateSupplyService_thenInstanceIsNotNull() {
-//         MarketFacade instance = MarketFacade.getInstance();
-//         instance.updateSupplyService(supplyService);
-//         assertNotNull(instance);
-//     }
-
-//     @Test
-//     public void givenMarketFacade_whenUpdatePaymentServiceURL_thenServiceURLUpdated() throws IOException {
-//         marketFacade.updatePaymentServiceURL("http://example.com");
-//         verify(paymentService).updatePaymentServiceURL("http://example.com");
-//     }
-
-//     @Test
-//     public void givenNotificationServiceInitialized_whenGetNotificationService_thenReturnService() {
-//         assertEquals(notificationService, marketFacade.getNotificationService());
-//     }
-
-
-//     @Test
 //     public void givenAdminWithSupervisePermission_whenAppointStoreManager_thenManagerIsAppointed() {
 //         marketFacade.getStorePermissions().put("store1", new HashMap<>());
 //         marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.SUPERVISE_MANAGERS));
 
 //         marketFacade.appointStoreManager("admin", "newManager", "store1");
 
-//         assertNotNull(marketFacade.getStorePermissions().get("store1").get("newManager"));
+//         assertTrue(marketFacade.getStorePermissions().get("store1").containsKey("newManager"));
 //     }
 
 //     @Test
@@ -115,7 +82,7 @@
 
 //         marketFacade.removeStoreManager("admin", "managerUser", "store1");
 
-//         verify(managerPermission).setPermissions(eq(Set.of()));
+//         verify(managerPermission).setPermissions(eq(Collections.emptySet()));
 //         verify(managerPermission).setRole(null);
 //     }
 
@@ -126,13 +93,14 @@
 
 //         marketFacade.appointStoreOwner("admin", "newOwner", "store1");
 
-//         assertNotNull(marketFacade.getStorePermissions().get("store1").get("newOwner"));
+//         assertTrue(marketFacade.getStorePermissions().get("store1").containsKey("newOwner"));
 //     }
 
 //     @Test
 //     public void givenAdminWithModifyRightsPermission_whenChangeManagerPermissions_thenPermissionsAreChanged() {
 //         Permission managerPermission = createPermissionWith(PermissionType.MODIFY_OWNER_RIGHTS);
 //         when(managerPermission.isStoreManager()).thenReturn(true);
+
 //         marketFacade.getStorePermissions().put("store1", new HashMap<>());
 //         marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.MODIFY_OWNER_RIGHTS));
 //         marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
@@ -141,44 +109,46 @@
 
 //         marketFacade.changeManagerPermissions("admin", "managerUser", "store1", newPermissions);
 
-//         verify(managerPermission).setPermissions(any());
+//         verify(managerPermission).setPermissions(new HashSet<>(newPermissions));
 //     }
-
 
 //     @Test
 //     public void givenAdminWithSupervisePermission_whenGetManagersPermissions_thenReturnManagerPermissions() {
 //         User user = mock(User.class);
-//         when(userRepository.get(anyString())).thenReturn(user);
 //         when(user.getName()).thenReturn("admin");
+//         when(userRepository.get(anyString())).thenReturn(user);
+
 //         Permission managerPermission = createPermissionWith(PermissionType.SUPERVISE_MANAGERS);
 //         when(managerPermission.isStoreManager()).thenReturn(true);
+
 //         marketFacade.getStorePermissions().put("store1", new HashMap<>());
-//         marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
 //         marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.SUPERVISE_MANAGERS));
+//         marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
 
-//         Map<String, List<PermissionType>> permissions = marketFacade.getManagersPermissions("store1", "userId");
+//         Map<String, List<PermissionType>> result = marketFacade.getManagersPermissions("store1", "userId");
 
-//         assertTrue(permissions.containsKey("managerUser"));
+//         assertTrue(result.containsKey("managerUser"));
 //     }
-
-
 
 //     @Test
 //     public void givenAdminWithAccessRecordsPermission_whenGetStorePurchaseHistory_thenReturnNull() {
 //         User user = mock(User.class);
-//         when(userRepository.get(anyString())).thenReturn(user);
 //         when(user.getName()).thenReturn("adminUser");
+//         when(userRepository.get(anyString())).thenReturn(user);
+
 //         marketFacade.getStorePermissions().put("store1", new HashMap<>());
 //         marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
 
-//         List<Receipt> history = marketFacade.getStorePurchaseHistory("store1", "userId");
+//         List<Receipt> result = marketFacade.getStorePurchaseHistory("store1", "userId");
+
+//         assertNull(result);  // As per original behavior
 //     }
 
 //     @Test
 //     public void givenMarketFacade_whenOpenMarket_thenInitializeExternalServices() {
 //         Member member = mock(Member.class);
-//         when(userRepository.getMember(anyString())).thenReturn(member);
 //         when(member.getName()).thenReturn("managerName");
+//         when(userRepository.getMember(anyString())).thenReturn(member);
 
 //         marketFacade.openMarket("manager");
 
@@ -186,6 +156,7 @@
 //         verify(supplyService).initialize();
 //         verify(notificationService).initialize();
 //     }
+
 
 //     // === Helper method ===
 
