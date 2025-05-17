@@ -1,12 +1,15 @@
 package Application;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import Application.DTOs.OrderDTO;
+import Application.DTOs.CartDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
@@ -15,7 +18,6 @@ import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
-import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Pair;
 import Domain.TokenService;
@@ -58,7 +60,7 @@ public class ShoppingService{
         }
     }
 
-    public Response<Set<OrderDTO>> viewCart(String sessionToken) {
+    public Response<CartDTO> viewCart(String sessionToken) {
         if (!tokenService.validateToken(sessionToken)) {
             return Response.error("Invalid token");
         }
@@ -67,10 +69,21 @@ public class ShoppingService{
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
-            Set<OrderDTO> itemsMapPerStore = itemsMap.stream()
-                .map(item -> new OrderDTO(item.getFirst(), item.getSecond(), storeFacade.getStore(item.getFirst().getStoreId()).getName()))
-                .collect(Collectors.toSet());
-            return new Response<>(itemsMapPerStore);
+            Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
+            for (Pair<Item, Integer> item : itemsMap) {
+                ItemDTO itemDTO = ItemDTO.fromItem(item.getFirst());
+                itemDTO.setAmount(item.getSecond());
+                
+                if(baskets.containsKey(item.getFirst().getStoreId())){
+                    baskets.get(item.getFirst().getStoreId()).getOrders().put(item.getFirst().getProductId(), itemDTO);
+                } else {
+                    ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>());
+                    basket.getOrders().put(item.getFirst().getProductId(), itemDTO);
+                    baskets.put(item.getFirst().getStoreId(), basket);
+                }
+            }
+            CartDTO cart = new CartDTO(clientId, baskets);
+            return new Response<>(cart);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
         }
