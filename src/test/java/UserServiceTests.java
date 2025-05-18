@@ -3,12 +3,12 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import Application.TokenService;
 import Application.UserService;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.User.LoginManager;
 import Infrastructure.Repositories.MemoryUserRepository;
-import Domain.TokenService;
 
 public class UserServiceTests {
     private UserService userService;

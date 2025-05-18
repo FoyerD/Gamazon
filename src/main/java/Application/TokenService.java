@@ -1,4 +1,4 @@
-package Domain;
+package Application;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

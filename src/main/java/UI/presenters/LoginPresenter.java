@@ -3,10 +3,10 @@ package UI.presenters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import Application.TokenService;
 import Application.UserService;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Domain.TokenService;
 
 @Component
 public class LoginPresenter implements ILoginPresenter {
