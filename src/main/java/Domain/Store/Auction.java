@@ -1,6 +1,7 @@
 package Domain.Store;
 
 import java.util.Date;
+import java.util.function.Supplier;
 
 
 public class Auction {
@@ -12,6 +13,8 @@ public class Auction {
     String storeId;
     String productId;
     String currentBidderId;
+
+    private Supplier<Boolean> chargeCallback;
 
 
     public Auction(String auctionId, Date auctionStartDate,
@@ -87,6 +90,16 @@ public class Auction {
         this.currentBidderId = currentBidderId;
     }
     
+    public void setChargeCallback(Supplier<Boolean> chargeCallback) {
+        this.chargeCallback = chargeCallback;
+    }
+
+    public boolean triggerCharge() {
+        if (chargeCallback == null) {
+            throw new IllegalStateException("No payment callback defined.");
+        }
+        return chargeCallback.get();
+    }
     
     public boolean isAuctionOpen() {
         Date currentDate = new Date();

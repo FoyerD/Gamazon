@@ -175,16 +175,24 @@ public class ShoppingService{
     }
 
     
-    public Response<Boolean> makeBid(String auctionId, String sessionToken, float price) {
+    public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
+                                    String cardNumber, Date expiryDate, String cvv,
+                                    long andIncrement, String clientName, String deliveryAddress) {
         if (!tokenService.validateToken(sessionToken)) {
             return Response.error("Invalid token");
         }
-        String clientId = this.tokenService.extractId(sessionToken);
-        
-        try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-            cartFacade.makeBid(auctionId, clientId, price);
+        String clientId = this.tokenService.extractId(sessionToken);
+
+        try {
+            if (this.cartFacade == null) {
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
+
+            cartFacade.makeBid(auctionId, clientId, price,
+                            cardNumber, expiryDate, cvv,
+                            andIncrement, clientName, deliveryAddress);
+
             return new Response<>(true);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));

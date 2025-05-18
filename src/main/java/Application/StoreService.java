@@ -7,9 +7,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
+
+import Domain.TokenService;
+import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
@@ -168,4 +172,34 @@ public class StoreService {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+
+    public Response<ItemDTO> acceptBid(String sessionToken, String storeId, String productId, String auctionId) {
+        try {
+            if (!this.isInitialized()) {
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = tokenService.extractId(sessionToken);
+
+            // Check that the user has permission to accept bids
+            permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
+
+            // Accept the bid for the given auction and product
+            Item item = storeFacade.acceptBid(storeId, productId, auctionId);
+            if (item == null) {
+                return new Response<>(new Error("Failed to accept bid. It may not exist or the auction is closed."));
+            }
+
+            return new Response<>(ItemDTO.fromItem(item));
+
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+
 }

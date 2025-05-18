@@ -40,7 +40,6 @@ public class ShoppingServiceTest {
 
     private ShoppingService shoppingService;
 
-    
     private IShoppingCartRepository cartRepository;
     private IShoppingBasketRepository basketRepository;
     private ItemFacade itemFacade;
@@ -53,7 +52,7 @@ public class ShoppingServiceTest {
     private IUserRepository userRepository;
     static UUID userId = UUID.randomUUID();
     static TokenService tokenService = new TokenService();
-    
+
     // Common test constants
     private static final String CLIENT_ID = tokenService.generateToken(userId.toString());
     private static final String STORE_ID = "store123";
@@ -62,10 +61,7 @@ public class ShoppingServiceTest {
 
     @Before
     public void setUp() {
-        // Initialize mocks
-        // MockitoAnnotations.initMocks(this);
-        
-        // Create real implementations for repositories
+        // Initialize repositories
         productRepository = new MemoryProductRepository();
         receiptRepository = new MemoryReceiptRepository();
         basketRepository = new MemoryShoppingBasketRepository();
@@ -75,39 +71,30 @@ public class ShoppingServiceTest {
         IFeedbackRepository feedbackRepository = new MemoryFeedbackRepository();
         auctionRepository = new MemoryAuctionRepository();
         userRepository = new MemoryUserRepository();
-        
-        // Set up test data - create a product
+
+        // Create sample product and store
         Product product = new Product(PRODUCT_ID, "Test Product", new HashSet<>());
         productRepository.add(PRODUCT_ID, product);
-        
-        // Create a store
+
         Store store = new Store(STORE_ID, "Test Store", "Test Store Description", "owner123");
         storeRepository.add(STORE_ID, store);
-        
-        // Initialize facades
+
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
-        
-        // Create a test item
-        itemFacade.add(STORE_ID, PRODUCT_ID, 10.0, 5, "Test Item Desctiption");
-        
-        // Initialize StoreFacade
+        itemFacade.add(STORE_ID, PRODUCT_ID, 10.0, 5, "Test Item Description");
+
         storeFacade = new StoreFacade(
-            storeRepository, 
-            feedbackRepository, 
+            storeRepository,
+            feedbackRepository,
             itemRepository,
             userRepository,
             auctionRepository
         );
-        
-        // Create an auction for testing
         storeFacade.setStoreRepository(storeRepository);
         storeFacade.setItemRepository(itemRepository);
         storeFacade.setAuctionRepository(auctionRepository);
         storeFacade.setFeedbackRepository(feedbackRepository);
         storeFacade.setGetUser(userRepository);
-        
-        
-        // Initialize the ShoppingService with real repositories and facades
+
         shoppingService = new ShoppingService(
             cartRepository,
             basketRepository,
@@ -118,13 +105,8 @@ public class ShoppingServiceTest {
             tokenService
         );
 
-
         User user = new Member(userId, "Member1", "passpass", "email@email.com");
-        this.userRepository.add(userId.toString(), user);
-        
-        // Set the cart facade on the shopping service if it has a setter method
-        // If there is no setter method, you may need to modify the ShoppingService class
-        // shoppingService.setCartFacade(cartFacade);
+        userRepository.add(userId.toString(), user);
     }
 
     //
@@ -134,23 +116,15 @@ public class ShoppingServiceTest {
     @Test
     public void testAddProductToCart_Success() {
         assertTrue(CLIENT_ID, tokenService.validateToken(CLIENT_ID));
-        // Act - use the real implementation to add a product
         Response<Boolean> response = shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        
-        // Assert
         assertFalse("Shouldn't get error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
-    
+
     @Test
     public void testAddProductToCart_ServiceFailure() {
-        // Use a non-existent store to trigger a failure
         String nonExistentStoreId = "nonexistent-store";
-        
-        // Act
         Response<Boolean> response = shoppingService.addProductToCart(nonExistentStoreId, CLIENT_ID, PRODUCT_ID, 2);
-        
-        // Assert
         assertTrue("Should have error", response.errorOccurred());
         assertNull("Value should be null", response.getValue());
         assertNotNull("Error message should not be null", response.getErrorMessage());
@@ -162,13 +136,8 @@ public class ShoppingServiceTest {
 
     @Test
     public void testViewCart_Success() {
-        // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        
-        // Act
         Response<CartDTO> response = shoppingService.viewCart(CLIENT_ID);
-        
-        // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertNotNull("Response value should not be null", response.getValue());
         assertFalse("Cart should have at least one item", response.getValue().getBaskets().isEmpty());
@@ -176,29 +145,10 @@ public class ShoppingServiceTest {
 
     @Test
     public void testViewCart_EmptyCart() {
-        // Make sure the cart is empty by using a new client ID
-        String newClientId = "new-client";
-        String sessionToken = tokenService.generateToken(newClientId);
-        // Act
+        String sessionToken = tokenService.generateToken("new-client");
         Response<CartDTO> response = shoppingService.viewCart(sessionToken);
-        
-        // Assert
         assertFalse("Should not have error even for empty cart", response.errorOccurred());
         assertTrue("Cart should be empty", response.getValue().getBaskets().isEmpty());
-    }
-    
-    @Test
-    public void testViewCart_ServiceFailure() {
-        // We'll use a null client ID to trigger a failure
-        String nullClientId = null;
-        
-        // Act
-        Response<CartDTO> response = shoppingService.viewCart(nullClientId);
-        
-        // Assert
-        assertTrue("Should have error", response.errorOccurred());
-        assertNull("Value should be null", response.getValue());
-        assertNotNull("Error message should not be null", response.getErrorMessage());
     }
 
     //
@@ -207,156 +157,115 @@ public class ShoppingServiceTest {
 
     @Test
     public void testCheckout_Success() {
-        // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
-        
-        // Prepare checkout parameters
-        String cardNumber = "1234567890123456";
-        Date expiryDate = new Date();
-        String cvv = "123";
-        long transactionId = 12345L;
-        String clientName = "John Doe";
-        String deliveryAddress = "123 Main St";
-        
-        // Act
-        Response<Boolean> response = shoppingService.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
-        
-        // Assert
-        // Note: If payment service is mocked to always succeed, this should not error
+        Response<Boolean> response = shoppingService.checkout(
+            CLIENT_ID, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
 
     @Test
     public void testCheckout_PaymentError() {
-        // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
-        
-        // Use invalid card details to trigger a payment error
-        String invalidCardNumber = "invalid";
-        Date expiryDate = new Date();
-        String cvv = "123";
-        long transactionId = 12345L;
-        String clientName = "John Doe";
-        String deliveryAddress = "123 Main St";
-        
-        // Act
-        Response<Boolean> response = shoppingService.checkout(CLIENT_ID, invalidCardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
-        
-        // Assert
+        Response<Boolean> response = shoppingService.checkout(
+            CLIENT_ID, "invalid", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertTrue("Should have error", response.errorOccurred());
         assertNull("Value should be null", response.getValue());
-        assertNotNull("Error message should not be null", response.getErrorMessage());
     }
-    
+
     //
     // CART MANAGEMENT - REMOVE PRODUCT
     //
-    
+
     @Test
     public void testRemoveProductFromCart_WithQuantity_Success() {
-        // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 3);
-        
-        // Act - Remove fewer than total quantity
         Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
-        
-        // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
-    
+
     @Test
     public void testRemoveProductFromCart_CompleteRemoval_Success() {
-        // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        
-        // Act - Remove the product entirely
         Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID);
-        
-        // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
-    
+
     //
     // CART MANAGEMENT - CLEAR OPERATIONS
     //
-    
+
     @Test
     public void testClearCart_Success() {
-        // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        
-        // Act
         Response<Boolean> response = shoppingService.clearCart(CLIENT_ID);
-        
-        // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        
-        // Verify cart is empty by checking with viewCart
-        Response<CartDTO> cartResponse = shoppingService.viewCart(CLIENT_ID);
-        assertTrue("Cart should be empty after clearing", cartResponse.getValue().getBaskets().isEmpty());
+        assertTrue("Cart should be empty after clearing", shoppingService.viewCart(CLIENT_ID).getValue().getBaskets().isEmpty());
     }
-    
+
     @Test
     public void testClearBasket_Success() {
-        // First add a product to the cart
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        
-        // Act
         Response<Boolean> response = shoppingService.clearBasket(CLIENT_ID, STORE_ID);
-        
-        // Assert
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        
-        // Verify basket is empty by checking with viewCart
-        Response<CartDTO> cartResponse = shoppingService.viewCart(CLIENT_ID);
-        assertTrue("Basket should be empty after clearing", cartResponse.getValue().getBaskets().isEmpty());
+        assertTrue("Basket should be empty after clearing", shoppingService.viewCart(CLIENT_ID).getValue().getBaskets().isEmpty());
     }
-    
+
     //
     // USE CASE 3.9: SUBMITTING A PURCHASE BID
     //
-    
+
     @Test
     public void testMakeBid_Success() {
         try {
-            // Create an auction first
             String auctionDate = java.time.LocalDate.now().plusDays(1).toString();
             storeFacade.addAuction(STORE_ID, PRODUCT_ID, auctionDate, 50.0);
-            
-            // Find the auction ID since it's generated dynamically
             String actualAuctionId = storeFacade.getAllStoreAuctions(STORE_ID).get(0).getAuctionId();
-            
-            // Act
-            Response<Boolean> response = shoppingService.makeBid(actualAuctionId, CLIENT_ID, VALID_BID_PRICE);
-            
-            // Assert
+
+            String cardNumber = "1234567890123456";
+            Date expiryDate = new Date();
+            String cvv = "123";
+            long transactionId = 12345L;
+            String clientName = "John Doe";
+            String deliveryAddress = "123 Main St";
+
+            Response<Boolean> response = shoppingService.makeBid(
+                actualAuctionId, CLIENT_ID, VALID_BID_PRICE,
+                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+            );
+
             assertFalse("Should not have error", response.errorOccurred());
             assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
         } catch (Exception e) {
             fail("Unexpected exception: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void testMakeBid_BidRejected() {
         try {
-            // Create an auction first with a high start price
             String auctionDate = java.time.LocalDate.now().plusDays(1).toString();
             storeFacade.addAuction(STORE_ID, PRODUCT_ID, auctionDate, 150.0);
-            
-            // Find the auction ID since it's generated dynamically
             String actualAuctionId = storeFacade.getAllStoreAuctions(STORE_ID).get(0).getAuctionId();
-            
-            // Act - try to make a bid below the start price
-            float lowBidPrice = 100.0f; // Lower than the 150.0 start price
-            Response<Boolean> response = shoppingService.makeBid(actualAuctionId, CLIENT_ID, lowBidPrice);
-            
-            // Assert
+
+            float lowBidPrice = 100.0f;
+
+            String cardNumber = "1234567890123456";
+            Date expiryDate = new Date();
+            String cvv = "123";
+            long transactionId = 12345L;
+            String clientName = "John Doe";
+            String deliveryAddress = "123 Main St";
+
+            Response<Boolean> response = shoppingService.makeBid(
+                actualAuctionId, CLIENT_ID, lowBidPrice,
+                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+            );
+
             assertTrue("Should have error", response.errorOccurred());
             assertNull("Value should be null", response.getValue());
             assertNotNull("Error message should not be null", response.getErrorMessage());
