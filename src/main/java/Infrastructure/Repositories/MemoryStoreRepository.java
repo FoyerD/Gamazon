@@ -3,9 +3,12 @@ package Infrastructure.Repositories;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Repository;
+
 import Domain.Store.IStoreRepository;
 import Domain.Store.Store;
 
+@Repository
 public class MemoryStoreRepository extends IStoreRepository{
     private Map<String, Store> stores;
 

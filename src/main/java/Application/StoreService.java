@@ -4,19 +4,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
-import Domain.TokenService;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Infrastructure.NotificationService;
 import Domain.management.Permission;
+import Domain.TokenService;
 
+@Service
 public class StoreService {
 
     private StoreFacade storeFacade;

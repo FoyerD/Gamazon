@@ -1,7 +1,9 @@
 package UI.presenters;
 
+import java.util.Date;
 import java.util.Set;
 import Application.DTOs.OrderDTO;
+import Application.utils.Response;
 
 /**
  * Interface for handling purchase-related user actions such as managing the cart, placing bids, and completing purchases.
@@ -12,80 +14,81 @@ public interface IPurchasePresenter {
      * Adds a specified quantity of a product to the user's cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the product
-     * @param storeName the name of the store selling the product
-     * @param amount the quantity to add
-     * @return true if the product was successfully added; false otherwise
+     * @param productId the unique identifier of the product
+     * @param storeId the unique identifier of the store selling the product
+     * @param amount the quantity of the product to add
+     * @return a {@link Response} indicating whether the product was successfully added to the cart
      */
-    boolean addProductToCart(String sessionToken, String productName, String storeName, int amount);
+    Response<Boolean> addProductToCart(String sessionToken, String productId, String storeId, int amount);
 
     /**
      * Completely removes a product from the user's cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the product
-     * @param storeName the name of the store
-     * @return true if the product was successfully removed; false otherwise
+     * @param productId the unique identifier of the product
+     * @param storeId the unique identifier of the store selling the product
+     * @return a {@link Response} indicating whether the product was successfully removed from the cart
      */
-    boolean removeProductFromCart(String sessionToken, String productName, String storeName);
+    Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId);
 
     /**
-     * Removes a specific amount of a product from the cart.
+     * Removes a specific quantity of a product from the user's cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the product
-     * @param storeName the name of the store
-     * @param amount the number of items to remove
-     * @return true if the specified quantity was removed; false otherwise
+     * @param productId the unique identifier of the product
+     * @param storeId the unique identifier of the store selling the product
+     * @param amount the quantity of the product to remove
+     * @return a {@link Response} indicating whether the specified quantity was successfully removed from the cart
      */
-    boolean removeProductFromCart(String sessionToken, String productName, String storeName, int amount);
+    Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId, int amount);
 
     /**
      * Displays the current contents of the user's cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @return a set of {@link OrderDTO} representing the cart contents
+     * @return a {@link Response} containing a set of {@link OrderDTO} representing the items in the cart
      */
-    Set<OrderDTO> viewCart(String sessionToken);
+    Response<Set<OrderDTO>> viewCart(String sessionToken);
 
     /**
      * Empties the entire cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @return true if the cart was cleared successfully; false otherwise
+     * @return a {@link Response} indicating whether the cart was successfully cleared
      */
-    boolean clearCart(String sessionToken);
+    Response<Boolean> clearCart(String sessionToken);
 
     /**
      * Clears the basket of a specific store within the user's cart.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param storeName the name of the store
-     * @return true if the basket was cleared; false otherwise
+     * @param storeId the unique identifier of the store whose basket is to be cleared
+     * @return a {@link Response} indicating whether the basket was successfully cleared
      */
-    boolean clearBasket(String sessionToken, String storeName);
+    Response<Boolean> clearBasket(String sessionToken, String storeId);
 
     /**
      * Submits a bid for an auctioned product.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param productName the name of the product
-     * @param storeName the store running the auction
-     * @param bidAmount the bid value
-     * @return true if the bid was successfully placed; false otherwise
+     * @param auctionId the unique identifier of the auction
+     * @param bid the value of the bid being placed
+     * @return a {@link Response} indicating whether the bid was successfully placed
      */
-    boolean makeBid(String sessionToken, String productName, String storeName, double bidAmount);
+    Response<Boolean> makeBid(String sessionToken, String auctionId, float bid);
 
     /**
-     * Finalizes the purchase of the entire cart using provided payment and shipping details.
+     * Finalizes the purchase of the entire cart using the provided payment and shipping details.
      *
      * @param sessionToken the token representing the current authenticated user session
-     * @param paymentMethod the name of the payment method (e.g., "credit card")
-     * @param address the shipping address
-     * @param creditCardNumber the credit card number
-     * @param expirationDate the card's expiration date in MM/YY format
-     * @param cvv the CVV security code
-     * @return true if the purchase was successful; false otherwise
+     * @param cardNumber the credit card number used for payment
+     * @param expiryDate the expiration date of the credit card
+     * @param cvv the CVV security code of the credit card
+     * @param andIncrement an increment value for tracking or processing purposes
+     * @param clientName the name of the client making the purchase
+     * @param deliveryAddress the address where the purchased items will be delivered
+     * @return a {@link Response} indicating whether the purchase was successfully completed
      */
-    boolean purchaseCart(String sessionToken, String paymentMethod, String address, String creditCardNumber, String expirationDate, String cvv);
+    Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
+         String clientName, String deliveryAddress);
 }

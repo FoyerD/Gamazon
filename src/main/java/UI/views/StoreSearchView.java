@@ -15,10 +15,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 @Route("store-search")
 public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
@@ -69,6 +71,10 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
 
     private void fetchStoreByName() {
         String storeName = storeNameField.getValue();
+        if (storeName == null || storeName.isEmpty()) {
+            return;
+        }
+        
         Response<StoreDTO> response = storePresenter.getStoreByName(sessionToken, storeName);
 
         if (response.errorOccurred()) {
@@ -77,6 +83,8 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             StoreDTO store = response.getValue();
             storeIdField.setValue(store.getId());
             Notification.show("Store found: " + store.getName());
+            // Automatically fetch inventory when store is found
+            fetchStoreInventory();
         }
     }
 
@@ -101,6 +109,20 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         if (sessionToken == null) {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("login");
+            return;
+        }
+        
+        // Check for query parameters
+        Location location = event.getLocation();
+        Map<String, List<String>> queryParameters = location.getQueryParameters().getParameters();
+        
+        if (queryParameters.containsKey("storeName") && !queryParameters.get("storeName").isEmpty()) {
+            String storeName = queryParameters.get("storeName").get(0);
+            if (storeName != null && !storeName.isEmpty()) {
+                // Set the store name in the field and trigger search
+                storeNameField.setValue(storeName);
+                // fetchStoreByName will be triggered by the value change listener
+            }
         }
     }
 }

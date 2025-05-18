@@ -12,10 +12,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+
+import org.springframework.stereotype.Service;
+
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 
+@Service
 public class MarketService {
 
     private static final String CLASS_NAME = MarketService.class.getSimpleName();
