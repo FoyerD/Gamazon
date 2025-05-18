@@ -6,8 +6,6 @@ import org.junit.Test;
 import Domain.User.Guest;
 import Domain.User.Member;
 import Domain.User.User;
-import Infrastructure.Repositories.MemoryUserRepository;
-
 import static org.junit.Assert.*;
 
 import java.util.UUID;

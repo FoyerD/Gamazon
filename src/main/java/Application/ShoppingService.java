@@ -1,13 +1,22 @@
 package Application;
+import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import Application.DTOs.OrderDTO;
+import Application.DTOs.CartDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
+import Application.DTOs.OrderDTO;
+import Domain.ExternalServices.IPaymentService;
+import Domain.Pair;
+import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
@@ -16,23 +25,21 @@ import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
-import Domain.Pair;
-import Domain.TokenService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.Shopping.IReceiptRepository;
 
-
+@Service
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
-    private final StoreFacade storeFacade;
-
     public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
      ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
       IProductRepository productRepository, TokenService tokenService) {
         this.tokenService = tokenService;
         cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
-        this.storeFacade = storeFacade;
+    }
+
+    public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade) {
+        this.cartFacade = cartFacade;
+        this.tokenService = tokenService;
     }
 
     public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {
@@ -51,7 +58,7 @@ public class ShoppingService{
         }
     }
 
-    public Response<Set<OrderDTO>> viewCart(String sessionToken) {
+    public Response<CartDTO> viewCart(String sessionToken) {
         if (!tokenService.validateToken(sessionToken)) {
             return Response.error("Invalid token");
         }
@@ -60,10 +67,21 @@ public class ShoppingService{
         try {
             if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
-            Set<OrderDTO> itemsMapPerStore = itemsMap.stream()
-                .map(item -> new OrderDTO(item.getFirst(), item.getSecond(), storeFacade.getStore(item.getFirst().getStoreId()).getName()))
-                .collect(Collectors.toSet());
-            return new Response<>(itemsMapPerStore);
+            Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
+            for (Pair<Item, Integer> item : itemsMap) {
+                ItemDTO itemDTO = ItemDTO.fromItem(item.getFirst());
+                itemDTO.setAmount(item.getSecond());
+                
+                if(baskets.containsKey(item.getFirst().getStoreId())){
+                    baskets.get(item.getFirst().getStoreId()).getOrders().put(item.getFirst().getProductId(), itemDTO);
+                } else {
+                    ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>());
+                    basket.getOrders().put(item.getFirst().getProductId(), itemDTO);
+                    baskets.put(item.getFirst().getStoreId(), basket);
+                }
+            }
+            CartDTO cart = new CartDTO(clientId, baskets);
+            return new Response<>(cart);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
         }
@@ -157,16 +175,24 @@ public class ShoppingService{
     }
 
     
-    public Response<Boolean> makeBid(String auctionId, String sessionToken, float price) {
+    public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
+                                    String cardNumber, Date expiryDate, String cvv,
+                                    long andIncrement, String clientName, String deliveryAddress) {
         if (!tokenService.validateToken(sessionToken)) {
             return Response.error("Invalid token");
         }
-        String clientId = this.tokenService.extractId(sessionToken);
-        
-        try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
 
-            cartFacade.makeBid(auctionId, clientId, price);
+        String clientId = this.tokenService.extractId(sessionToken);
+
+        try {
+            if (this.cartFacade == null) {
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
+
+            cartFacade.makeBid(auctionId, clientId, price,
+                            cardNumber, expiryDate, cvv,
+                            andIncrement, clientName, deliveryAddress);
+
             return new Response<>(true);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));

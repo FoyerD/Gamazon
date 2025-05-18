@@ -15,14 +15,14 @@ public class PermissionFactory {
         PermissionType.ADMINISTER_STORE,
         PermissionType.OVERSEE_OFFERS,
         PermissionType.CONTROL_CONTRACTS,
-        PermissionType.DEACTIVATE_STORE,
+        PermissionType.OPEN_DEACTIVATE_STORE,
         PermissionType.RESPOND_TO_INQUIRIES 
     );
 
     public static final Set<PermissionType> FOUNDER_PERMISSIONS = Set.of(
         PermissionType.ASSIGN_OR_REMOVE_OWNERS,
         PermissionType.SUPERVISE_MANAGERS,
-        PermissionType.DEACTIVATE_STORE,
+        PermissionType.OPEN_DEACTIVATE_STORE,
         PermissionType.HANDLE_INVENTORY,
         PermissionType.EDIT_STORE_POLICIES,
         PermissionType.MODIFY_OWNER_RIGHTS,
@@ -40,7 +40,7 @@ public class PermissionFactory {
     public static final Set<PermissionType> TRADING_PERMISSIONS = Set.of(
         PermissionType.ASSIGN_OR_REMOVE_OWNERS,
         PermissionType.SUPERVISE_MANAGERS,
-        PermissionType.DEACTIVATE_STORE,
+        PermissionType.OPEN_DEACTIVATE_STORE,
         PermissionType.HANDLE_INVENTORY,
         PermissionType.EDIT_STORE_POLICIES,
         PermissionType.MODIFY_OWNER_RIGHTS,

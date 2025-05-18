@@ -2,13 +2,16 @@ package Application;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import Application.utils.Error;
 import Application.utils.Response;
-import Domain.TokenService;
 import Domain.Store.Feedback;
 import Domain.Store.FeedbackDTO;
 import Domain.Store.StoreFacade;
 
+@Service
 public class CustomerServiceService {
     private StoreFacade storeFacade;
     private TokenService tokenService;
@@ -59,8 +62,6 @@ public class CustomerServiceService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String customerId = this.tokenService.extractId(sessionToken);
-            
             List<Feedback> feedbacks = this.storeFacade.getAllFeedbacksByStoreId(storeId);
             List<FeedbackDTO> feedbackDTOs = feedbacks.stream().map(FeedbackDTO::new).collect(Collectors.toList());
             return new Response<>(feedbackDTOs);
@@ -76,8 +77,6 @@ public class CustomerServiceService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String customerId = this.tokenService.extractId(sessionToken);
-            
             List<Feedback> feedbacks = this.storeFacade.getAllFeedbacksByProductId(productId);
             List<FeedbackDTO> feedbackDTOs = feedbacks.stream().map(FeedbackDTO::new).collect(Collectors.toList());
             return new Response<>(feedbackDTOs);
@@ -93,8 +92,6 @@ public class CustomerServiceService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String customerId = this.tokenService.extractId(sessionToken);
-            
             List<Feedback> feedbacks = this.storeFacade.getAllFeedbacksByUserId(userId);
             List<FeedbackDTO> feedbackDTOs = feedbacks.stream().map(FeedbackDTO::new).collect(Collectors.toList());
             return new Response<>(feedbackDTOs);
