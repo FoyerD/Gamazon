@@ -16,6 +16,7 @@ public class ItemFilter {
     private final double maxRating;
     private final double minRating;
     private final String itemName;
+    private final int amount;
 
     private ItemFilter(Builder builder) {
         this.categories = builder.categories;
@@ -24,6 +25,7 @@ public class ItemFilter {
         this.maxRating = builder.maxRating;
         this.minRating = builder.minRating;
         this.itemName = builder.itemName;
+        this.amount = builder.amount;
     }
 
     /**
@@ -36,6 +38,7 @@ public class ItemFilter {
         if (maxRating >= 0 && item.getRating() > maxRating) return false;
         if (!categories.isEmpty() && !item.getCategories().containsAll(categories)) return false;
         if (!itemName.equals("") && !item.getProductName().contains(itemName)) return false;
+        if (amount >= 0 && item.getAmount() < amount) return false;
         return true;
     }
 
@@ -45,6 +48,7 @@ public class ItemFilter {
     public double getMinRating() { return minRating; }
     public double getMaxRating() { return maxRating; }
     public String getItemName() { return itemName; }
+    public int getAmount() { return amount; }
 
     /**
      * Builder for {@link ItemFilter}.
@@ -56,6 +60,7 @@ public class ItemFilter {
         private double minRating = -1;
         private double maxRating = -1;
         private String itemName = "";
+        private int amount = -1;
 
         public Builder addCategory(Category c) {
             categories.add(c);
@@ -89,6 +94,11 @@ public class ItemFilter {
 
         public Builder itemName(String itemName) {
             this.itemName = itemName;
+            return this;
+        }
+
+        public Builder amount(int amount) {
+            this.amount = amount;
             return this;
         }
 

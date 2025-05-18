@@ -1,13 +1,15 @@
 package Infrastructure.Repositories;
 
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.Feedback;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Repository;
+
+import Domain.Store.Feedback; 
+import Domain.Store.IFeedbackRepository;
+@Repository
 public class MemoryFeedbackRepository extends IFeedbackRepository{
     private Map<String, Feedback> feedbacks;
 

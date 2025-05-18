@@ -4,7 +4,6 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.Receipt;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
-import Domain.TokenService;
 import Domain.management.PermissionType;
 import Infrastructure.MemoryRepoManager;
 
@@ -17,6 +16,7 @@ import Application.MarketService;
 import Application.ProductService;
 import Application.ServiceManager;
 import Application.StoreService;
+import Application.TokenService;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;

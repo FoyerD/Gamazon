@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.springframework.stereotype.Component;
+
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Store.Item;
@@ -20,6 +22,7 @@ import Domain.Store.IProductRepository;
  * Implementation of the IShoppingCartFacade interface.
  * Orchestrates interactions between shopping carts, baskets, payment services, and item management.
  */
+@Component
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;

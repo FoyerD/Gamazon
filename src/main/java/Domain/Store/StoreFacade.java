@@ -7,10 +7,15 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.springframework.stereotype.Component;
+
 import Domain.User.IUserRepository;
 import Domain.User.User;
 import Domain.Pair;
 
+
+
+@Component
 public class StoreFacade {
     private IStoreRepository storeRepository;
     private IFeedbackRepository feedbackRepository;

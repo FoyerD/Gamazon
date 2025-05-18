@@ -47,11 +47,24 @@ public interface IManagementPresenter {
      * @param sessionToken Session identifier for authentication.
      * @param storeId Store ID to which the item will be added.
      * @param productId Unique ID for the item.
-     * @param item Item details.
-     * @return Response with true if successful.
+     * @param description Item description.
+     * @return Response with the ItemDTO if successful.
      */
-    Response<Boolean> addItem(String sessionToken, String storeId, String productId, ItemDTO item);
+    public Response<ItemDTO> addItem(String sessionToken, String storeId, String productId, String description);
 
+    /**
+     * Adds a new item to a store's inventory with price and amount.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId Store ID to which the item will be added.
+     * @param productId Unique ID for the item.
+     * @param price Price of the item.
+     * @param amount Amount of the item.
+     * @param description Item description.
+     * @return Response with the ItemDTO if successful.
+     */
+    public Response<ItemDTO> addItem(String sessionToken, String storeId, String productId, double price, int amount, String description);
+    
     /**
      * Removes an item from a store.
      *

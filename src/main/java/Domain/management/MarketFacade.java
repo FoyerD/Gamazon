@@ -2,16 +2,17 @@ package Domain.management;
 
 import java.io.IOException;
 import java.util.*;
+import org.springframework.stereotype.Component;
 
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 
+@Component
 public class MarketFacade implements IMarketFacade {
 
     private IPaymentService paymentService;

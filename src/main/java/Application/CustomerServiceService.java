@@ -2,13 +2,16 @@ package Application;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import Application.utils.Error;
 import Application.utils.Response;
-import Domain.TokenService;
 import Domain.Store.Feedback;
 import Domain.Store.FeedbackDTO;
 import Domain.Store.StoreFacade;
 
+@Service
 public class CustomerServiceService {
     private StoreFacade storeFacade;
     private TokenService tokenService;

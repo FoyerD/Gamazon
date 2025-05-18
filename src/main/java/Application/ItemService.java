@@ -3,18 +3,20 @@ package Application;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
 import Application.DTOs.ItemDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
-import Domain.TokenService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 
+@Service
 public class ItemService {
 
     private final ItemFacade itemFacade;

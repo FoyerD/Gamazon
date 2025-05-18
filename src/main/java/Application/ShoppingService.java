@@ -1,4 +1,5 @@
 package Application;
+import java.util.Date;
 import java.util.Set;
 
 import Application.DTOs.CartDTO;
@@ -7,10 +8,15 @@ import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
+import Application.DTOs.OrderDTO;
+import Domain.ExternalServices.IPaymentService;
+import Domain.Pair;
+import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
@@ -19,12 +25,8 @@ import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
-import Domain.Pair;
-import Domain.TokenService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.Shopping.IReceiptRepository;
 
-
+@Service
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
