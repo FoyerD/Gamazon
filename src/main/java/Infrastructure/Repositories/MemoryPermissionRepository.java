@@ -15,31 +15,31 @@ public class MemoryPermissionRepository extends IPermissionRepository {
     private final Map<String, Map<String, Permission>> permissions = new ConcurrentHashMap<>();
 
     @Override
-    public boolean add(String storeId, String username, Permission value) {
+    public boolean add(String storeId, String userId, Permission value) {
         permissions.putIfAbsent(storeId, new HashMap<>());
-        permissions.get(storeId).put(username, value);
+        permissions.get(storeId).put(userId, value);
         return true;
     }
 
     @Override
-    public Permission update(String storeId, String username, Permission value) {
+    public Permission update(String storeId, String userId, Permission value) {
         Map<String, Permission> storeMap = permissions.get(storeId);
-        if (storeMap == null || !storeMap.containsKey(username)) return null;
-        storeMap.put(username, value);
+        if (storeMap == null || !storeMap.containsKey(userId)) return null;
+        storeMap.put(userId, value);
         return value;
     }
 
     @Override
-    public Permission remove(String storeId, String username) {
+    public Permission remove(String storeId, String userId) {
         Map<String, Permission> storeMap = permissions.get(storeId);
         if (storeMap == null) return null;
-        return storeMap.remove(username);
+        return storeMap.remove(userId);
     }
 
     @Override
-    public Permission get(String storeId, String username) {
+    public Permission get(String storeId, String userId) {
         Map<String, Permission> storeMap = permissions.get(storeId);
-        return storeMap == null ? null : storeMap.get(username);
+        return storeMap == null ? null : storeMap.get(userId);
     }
 
     public Map<String, Permission> getAllPermissionsForStore(String storeId) {

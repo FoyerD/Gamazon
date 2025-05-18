@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Before;
 import org.junit.Test;
 
-
 import Application.StoreService;
-import Domain.TokenService;
+import Application.TokenService;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
@@ -22,15 +22,17 @@ import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.IPermissionRepository;
+import Domain.management.PermissionManager;
+import Infrastructure.NotificationService;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
+import Infrastructure.Repositories.MemoryPermissionRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
 import Domain.Pair;
 import Domain.Store.Item;
-import Application.MarketService;
-import Application.StoreService;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -46,20 +48,25 @@ public class StoreServiceTests {
     private IFeedbackRepository feedbackRepository;
     private IUserRepository userRepository;
     private TokenService tokenService;
-    UUID userId = UUID.randomUUID();
+    private PermissionManager permissionManager;
+    private IPermissionRepository permissionRepository;
+    UUID userId;
     String tokenId = null;
 
     @Before
     public void setUp() {
+        userId = UUID.randomUUID();
         this.storeRepository = new MemoryStoreRepository();
         this.auctionRepository = new MemoryAuctionRepository();
         this.itemRepository = new MemoryItemRepository();
         this.feedbackRepository= new MemoryFeedbackRepository();
         this.userRepository = new MemoryUserRepository();
-
+        this.permissionRepository = new MemoryPermissionRepository();
+        
         this.tokenService = new TokenService();
+        this.permissionManager = new PermissionManager(permissionRepository);
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
-        storeService = new StoreService(storeFacade, tokenService);
+        storeService = new StoreService(storeFacade, tokenService, permissionManager, new NotificationService());
 
         
         tokenId = this.tokenService.generateToken(userId.toString());
@@ -72,6 +79,7 @@ public class StoreServiceTests {
         String storeName = "NewStore";
         Response<StoreDTO> result = storeService.addStore(this.tokenId, storeName, "A new store");
         assertTrue(result.getValue() != null);
+
     }
 
     @Test
@@ -88,8 +96,8 @@ public class StoreServiceTests {
         Response<StoreDTO> response = storeService.addStore(this.tokenId, storeName, "A new store");
         String storeId = response.getValue().getId();
         this.storeService.closeStore(this.tokenId, storeId);
-        Response<Boolean> result = storeService.openStore(this.tokenId, storeId);
-        assertTrue(result.getValue());
+        Response<Boolean> resultOpen = storeService.openStore(this.tokenId, storeId);
+        assertTrue(resultOpen.getValue());
     }
 
     @Test
@@ -122,7 +130,7 @@ public class StoreServiceTests {
     @Test
     public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNewStore_ThenReturnStore() {
         String storeName = "NewStore";
-        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        storeService.addStore(this.tokenId, storeName, "A new store");
         Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, storeName);
         assertTrue(getResult.getValue().getName().equals(storeName));
     }
@@ -130,7 +138,7 @@ public class StoreServiceTests {
     @Test
     public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNoneExist_ThenReturnError() {
         String storeName = "NewStore";
-        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        storeService.addStore(this.tokenId, storeName, "A new store");
         Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, "NoneExist");
         assertTrue(getResult.errorOccurred());
     }
@@ -217,26 +225,25 @@ public class StoreServiceTests {
 
     // @Test
     // public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
-    //     String storeName = "AuctionStore";
-    //     Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
-    //     String storeId = storeResponse.getValue().getId();
+    //     String productId1 = UUID.randomUUID().toString();
+    //     Response<StoreDTO> storeRes = storeService.addStore(this.tokenId, "storestore", "Store with auctions");
+    //     Response<StoreDTO> storeRes2 = storeService.addStore(this.tokenId, "storestore2", "Store with auctions");
 
-    //     String productId1 = "1";
-    //     String productId2 = "2";
-    //     String productId3 = "3";
-
-    //     itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
-    //     itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
-    //     itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
+    //     String storeId1 = storeRes.getValue().getId();
+    //     String storeId2 = storeRes2.getValue().getId();
+    //     itemRepository.add(new Pair<>(storeId1, productId1), new Item(storeId1, productId1, 10.0, 10, "Product 1"));
+    //     itemRepository.add(new Pair<>(storeId2, productId1), new Item(storeId2, productId1, 20.0, 5, "Product 2"));
 
     //     String endDate = "2077-01-01";
-    //     storeService.addAuction(this.tokenId, storeId, productId1, endDate.toString(), 5.0);
-    //     storeService.addAuction(this.tokenId, storeId, productId2, endDate.toString(), 10.0);
-    //     storeService.addAuction(this.tokenId, storeId, productId3, endDate.toString(), 15.0);
+    //     Response<AuctionDTO> aucRes1 = storeService.addAuction(tokenId, storeId1, productId1, endDate, 5.0);
+    //     Response<AuctionDTO> aucRes2 = storeService.addAuction(tokenId, storeId2, productId1, endDate, 10.0);
 
-    //     Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+    //     assertFalse(aucRes1.errorOccurred());
+    //     assertFalse(aucRes2.errorOccurred());
+
+    //     Response<List<AuctionDTO>> auctionsResponse = storeService.getAllProductAuctions(tokenId, productId1);
     //     assertTrue(auctionsResponse.getValue() != null);
-    //     assertEquals(3, auctionsResponse.getValue().size());
+    //     assertEquals(2, auctionsResponse.getValue().size());
     // }
 
     @Test

@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component;
 
 import Application.MarketService;
 import Application.StoreService;
+import Application.TokenService;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
 
 import Domain.Store.Store;
 import Application.utils.Error;
-import Domain.TokenService;
 
 
 @Component
@@ -42,7 +42,7 @@ public class MarketPresenter implements IMarketPresenter {
         Response<Boolean> resp = storeService.closeStore(sessionToken, storeId);
         if (resp.errorOccurred()) {
             // fallback: if user is a trading manager closing any store
-            Response<Void> marketResp = marketService.marketCloseStore(sessionToken, storeId);
+            Response<Boolean> marketResp = storeService.closeStore(sessionToken, storeId);
             if (marketResp.errorOccurred()) {
                 return Response.error(marketResp.getErrorMessage());
             }

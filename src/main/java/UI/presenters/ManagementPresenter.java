@@ -25,7 +25,7 @@ public class ManagementPresenter implements IManagementPresenter {
 
     @Override
     public Response<StoreDTO> addStore(String sessionToken, String name, String description) {
-        return marketService.addStore(sessionToken, name, description);
+        return storeService.addStore(sessionToken, name, description);
     }
 
     @Override

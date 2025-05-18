@@ -31,7 +31,7 @@ public class PermissionTest {
         assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
         assertFalse(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertFalse(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
-        assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+        assertFalse(permission.hasPermission(PermissionType.OPEN_DEACTIVATE_STORE));
         assertFalse(permission.hasPermission(PermissionType.HANDLE_INVENTORY));
         assertFalse(permission.hasPermission(PermissionType.EDIT_STORE_POLICIES));
         assertFalse(permission.hasPermission(PermissionType.MODIFY_OWNER_RIGHTS));
@@ -78,7 +78,7 @@ public class PermissionTest {
         assertTrue(permission.isStoreFounder());
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         assertTrue(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
-        assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+        assertTrue(permission.hasPermission(PermissionType.OPEN_DEACTIVATE_STORE));
         assertTrue(permission.hasPermission(PermissionType.HANDLE_INVENTORY));
         assertTrue(permission.hasPermission(PermissionType.EDIT_STORE_POLICIES));
         assertTrue(permission.hasPermission(PermissionType.MODIFY_OWNER_RIGHTS));
@@ -101,12 +101,12 @@ public class PermissionTest {
 
         permission.setPermissions(Set.of(
                 PermissionType.SUPERVISE_MANAGERS,
-                PermissionType.DEACTIVATE_STORE,
+                PermissionType.OPEN_DEACTIVATE_STORE,
                 PermissionType.MODIFY_OWNER_RIGHTS
         ));
         assertFalse(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
-        assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+        assertTrue(permission.hasPermission(PermissionType.OPEN_DEACTIVATE_STORE));
         assertTrue(permission.hasPermission(PermissionType.MODIFY_OWNER_RIGHTS));
 
         permission.setPermissions(Set.of(
@@ -139,7 +139,7 @@ public class PermissionTest {
         PermissionFactory.initPermissionAsRole(permission, RoleType.STORE_FOUNDER);
         assertTrue(permission.hasPermission(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
-        assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+        assertTrue(permission.hasPermission(PermissionType.OPEN_DEACTIVATE_STORE));
         assertTrue(permission.hasPermission(PermissionType.HANDLE_INVENTORY));
         assertTrue(permission.hasPermission(PermissionType.EDIT_STORE_POLICIES));
         assertTrue(permission.hasPermission(PermissionType.MODIFY_OWNER_RIGHTS));
@@ -188,7 +188,7 @@ public class PermissionTest {
         assertTrue(permission.hasPermission(PermissionType.EDIT_STORE_POLICIES));
         assertTrue(permission.hasPermission(PermissionType.VIEW_EMPLOYEE_INFO));
         assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
-        assertTrue(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+        assertTrue(permission.hasPermission(PermissionType.OPEN_DEACTIVATE_STORE));
 
         permission.setPermissions(Set.of(
             PermissionType.SUPERVISE_MANAGERS,
@@ -203,7 +203,7 @@ public class PermissionTest {
             PermissionType.CONTROL_CONTRACTS
         ));
         assertTrue(permission.hasPermission(PermissionType.ACCESS_PURCHASE_RECORDS));
-        assertFalse(permission.hasPermission(PermissionType.DEACTIVATE_STORE));
+        assertFalse(permission.hasPermission(PermissionType.OPEN_DEACTIVATE_STORE));
 
         assertTrue(permission.hasPermission(PermissionType.SUPERVISE_MANAGERS));
         permission.removePermission(PermissionType.SUPERVISE_MANAGERS);

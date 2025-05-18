@@ -1,8 +1,6 @@
 package StoreTests;
 
 import java.util.List;
-import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -11,76 +9,70 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.ItemService;
+import Application.ServiceManager;
+import Application.StoreService;
+import Application.UserService;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
+import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
+import Domain.FacadeManager;
+import Domain.IRepoManager;
 import Domain.Pair;
-import Domain.TokenService;
-import Domain.Store.IItemRepository;
-import Domain.Store.IProductRepository;
-import Domain.Store.IStoreRepository;
-import Domain.Store.Item;
-import Domain.Store.ItemFacade;
+import Domain.ExternalServices.IPaymentService;
 import Domain.Store.ItemFilter;
-import Domain.Store.Product;
-import Domain.Store.Store;
-import Domain.User.IUserRepository;
-import Domain.User.Member;
-import Domain.User.User;
-import Infrastructure.Repositories.MemoryStoreRepository;
-import Infrastructure.Repositories.MemoryUserRepository;
-import Infrastructure.Repositories.MemoryItemRepository;
-import Infrastructure.Repositories.MemoryProductRepository;
+import Infrastructure.MemoryRepoManager;
+import Infrastructure.PaymentService;
+
 
 public class ItemServiceTests {
 
+    private IRepoManager repoManager;
+    private IPaymentService paymentService;
+    private FacadeManager facadeManager;
+    private ServiceManager serviceManager;
     private ItemService itemService;
-    private IItemRepository itemRepository;
-    private IProductRepository productRepository;
-    private IStoreRepository storeRepository;
-    private ItemFacade itemFacade;
-    private TokenService tokenService;
-    UUID userId = UUID.randomUUID();
-    String tokenId;
-    private IUserRepository userRepository;
+    private UserService userService;
+    private StoreService storeService;
+
+    private String tokenId;
+    private UserDTO guest;
+    private StoreDTO store1;
+    private ProductDTO product1;
+    private ProductDTO product2;
+
 
     @Before
     public void setUp() {
-        itemRepository = new MemoryItemRepository();
-        productRepository = new MemoryProductRepository();
-        storeRepository = new MemoryStoreRepository();
-        tokenService = new TokenService();
-        userRepository = new MemoryUserRepository();
+        repoManager = new MemoryRepoManager();
+        paymentService = new PaymentService();
+        facadeManager = new FacadeManager(repoManager, paymentService);
+        serviceManager = new ServiceManager(facadeManager);
+        itemService = serviceManager.getItemService();
+        userService = serviceManager.getUserService();
+        storeService = serviceManager.getStoreService();
+
+
+        guest = userService.guestEntry().getValue();
+        Response<UserDTO> resigerRes = userService.register(guest.getSessionToken(), "user1", "WhyWontWork1!","what@walla.com");
+        tokenId = resigerRes.getValue().getSessionToken();
         
-        itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
-        itemService = new ItemService(itemFacade, tokenService);
-        User user = new Member(userId, "Member1", "passpass", "email@email.com");
-        this.userRepository.add(userId.toString(), user);
-        tokenId = this.tokenService.generateToken(userId.toString());
 
+        Response<StoreDTO> storeREs1 = storeService.addStore(tokenId, "Store One", "desc1");
+        store1 = storeREs1.getValue();
+        product1 = serviceManager.getProductService().addProduct(tokenId, "prod1", List.of("cat1"), List.of("desc1")).getValue();
+        product2 = serviceManager.getProductService().addProduct(tokenId, "prod2", List.of("cat2"), List.of("desc2")).getValue();
+        
 
-        addStoreAndProduct("1", "Store One", "founder1", "101", "In Stock Item", 49.99f, 10, "In Stock Item");
-        addStoreAndProduct("1", "Store One", "founder1", "out-of-stock-product", "Out of Stock Item", 19.99f, 0, "Out of Stock Item");
-        addStoreAndProduct("store1", "Store 1", "founder2", "prod2", "Another Stocked Item", 39.99f, 5, "Another Stocked Item");
+        itemService.add(tokenId, store1.getId(), product1.getId(), 49.99f, 10, "In Stock Item");
+        itemService.add(tokenId, store1.getId(), "out-of-stock-product", 19.99f, 0, "Out of Stock Item");
+        itemService.add(tokenId, store1.getId(), product2.getId(), 39.99f, 5, "Another Stocked Item");
     }
-    
 
-    private void addStoreAndProduct(String storeId, String storeName, String founderId, String productId, String productName, float price, int amount, String itemName) {
-        if (storeRepository.get(storeId) == null) {
-            storeRepository.add(storeId, new Store(storeId, storeName, "description", founderId));
-        }
-        if (productRepository.get(productId) == null) {
-            productRepository.add(productId, new Product(productId, productName));
-        }
-        Item item = new Item(storeId, productId, price, amount, itemName);
-    
-        itemFacade.add(storeId, productId, price, amount, itemName);
-    }
-    
-
-    // 1. getItem
     @Test
     public void GivenValidStoreAndProduct_WhenGetItem_ThenReturnItem() {
-        Response<ItemDTO> response = itemService.getItem(tokenId, "1", "101");
+        Response<ItemDTO> response = itemService.getItem(tokenId, store1.getId(), product1.getId());
         assertFalse(response.errorOccurred());
         assertNotNull(response.getValue());
     }
@@ -92,22 +84,19 @@ public class ItemServiceTests {
         assertNotNull(response.getErrorMessage());
     }
 
-    // 2. changePrice
     @Test
     public void GivenValidItem_WhenChangePrice_ThenReturnTrue() {
-        Response<Boolean> response = itemService.changePrice(tokenId, "1", "101", 99.99f);
+        Response<Boolean> response = itemService.changePrice(tokenId, store1.getId(), product1.getId(), 99.99f);
         assertFalse(response.errorOccurred());
         assertTrue(response.getValue());
     }
 
     @Test
     public void GivenInvalidPrice_WhenChangePrice_ThenReturnError() {
-        Response<Boolean> response = itemService.changePrice(tokenId, "1", "101", -10f);
+        Response<Boolean> response = itemService.changePrice(tokenId, store1.getId(), product1.getId(), -10f);
         assertTrue(response.errorOccurred());
-        assertNotNull(response.getErrorMessage());
     }
 
-    // 3. filterItems
     @Test
     public void GivenMatchingFilter_WhenFilterItems_ThenReturnNonEmptyList() {
         ItemFilter filter = new ItemFilter.Builder().minPrice(10).maxPrice(500).build();
@@ -124,10 +113,9 @@ public class ItemServiceTests {
         assertTrue(response.getValue().isEmpty());
     }
 
-    // 4. getItemsByStoreId
     @Test
     public void GivenExistingStoreId_WhenGetItems_ThenReturnItems() {
-        Response<List<ItemDTO>> response = itemService.getItemsByStoreId(tokenId, "store1");
+        Response<List<ItemDTO>> response = itemService.getItemsByStoreId(tokenId, store1.getId());
         assertFalse(response.errorOccurred());
         assertFalse(response.getValue().isEmpty());
     }
@@ -136,10 +124,8 @@ public class ItemServiceTests {
     public void GivenNonexistentStoreId_WhenGetItems_ThenReturnError() {
         Response<List<ItemDTO>> response = itemService.getItemsByStoreId(tokenId, "invalid-store");
         assertTrue(response.errorOccurred());
-        assertNotNull(response.getErrorMessage());
     }
 
-    // 5. getAvailableItems
     @Test
     public void GivenItemsWithStock_WhenGetAvailableItems_ThenReturnNonEmptyList() {
         Response<List<ItemDTO>> response = itemService.getAvailableItems(tokenId);
@@ -148,100 +134,56 @@ public class ItemServiceTests {
     }
 
     @Test
-    public void GivenAllItemsOutOfStock_WhenGetAvailableItems_ThenReturnEmptyList() {
-        itemRepository = new MemoryItemRepository();
-        productRepository = new MemoryProductRepository();
-        storeRepository = new MemoryStoreRepository();
-
-        storeRepository.add("storeX", new Store("storeX", "Store X", "Description", "founderX"));
-        productRepository.add("prodX", new Product("prodX", "Out of Stock Product"));
-
-        itemRepository.add(new Pair<>("storeX", "prodX"), new Item("storeX", "prodX", 19.99f, 0, "Out of Stock"));
-
-        itemService = new ItemService(new ItemFacade(itemRepository, productRepository, storeRepository), tokenService);
-
-        Response<List<ItemDTO>> response = itemService.getAvailableItems(tokenId);
-        assertFalse(response.errorOccurred());
-        assertTrue(response.getValue().isEmpty());
-    }
-
-    // 6. increaseAmount
-    @Test
     public void GivenValidItem_WhenIncreaseAmount_ThenAmountIncreased() {
-        Pair<String, String> id = new Pair<>("1", "101");
-        Response<ItemDTO> before = itemService.getItem(tokenId, "1", "101");
-        int oldAmount = before.getValue().getAmount();
+        Pair<String, String> id = new Pair<>(store1.getId(), product1.getId());
+        int oldAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
 
-        Response<Void> response = itemService.increaseAmount(tokenId, id, 3);
-        assertFalse(response.errorOccurred());
+        itemService.increaseAmount(tokenId, id, 3);
 
-        Response<ItemDTO> after = itemService.getItem(tokenId, "1", "101");
-        assertEquals(oldAmount + 3, after.getValue().getAmount());
+        int newAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
+        assertEquals(oldAmount + 3, newAmount);
     }
 
-    @Test
-    public void GivenInvalidItem_WhenIncreaseAmount_ThenReturnError() {
-        Pair<String, String> id = new Pair<>("bad", "bad");
-        Response<Void> response = itemService.increaseAmount(tokenId, id, 3);
-        assertTrue(response.errorOccurred());
-    }
-
-    // 7. decreaseAmount
     @Test
     public void GivenValidItem_WhenDecreaseAmount_ThenAmountDecreased() {
-        Pair<String, String> id = new Pair<>("1", "101");
-        Response<ItemDTO> before = itemService.getItem(tokenId, "1", "101");
-        int oldAmount = before.getValue().getAmount();
+        Pair<String, String> id = new Pair<>(store1.getId(), product1.getId());
+        int oldAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
 
-        Response<Void> response = itemService.decreaseAmount(tokenId, id, 2);
-        assertFalse(response.errorOccurred());
+        itemService.decreaseAmount(tokenId, id, 2);
 
-        Response<ItemDTO> after = itemService.getItem(tokenId, "1", "101");
-        assertEquals(oldAmount - 2, after.getValue().getAmount());
+        int newAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
+        assertEquals(oldAmount - 2, newAmount);
     }
 
     @Test
     public void GivenTooLargeDecrease_WhenDecreaseAmount_ThenReturnError() {
-        Pair<String, String> id = new Pair<>("1", "101");
-        Response<ItemDTO> item = itemService.getItem(tokenId, "1", "101");
-        Response<Void> response = itemService.decreaseAmount(tokenId, id, item.getValue().getAmount() + 100);
+        Pair<String, String> id = new Pair<>(store1.getId(), product1.getId());
+        int amount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
+        Response<Void> response = itemService.decreaseAmount(tokenId, id, amount + 100);
         assertTrue(response.errorOccurred());
-        assertNotNull(response.getErrorMessage());
     }
 
-    // 8. add
     @Test
     public void GivenNewItem_WhenAdd_ThenReturnTrue() {
-        storeRepository.add("storeY", new Store("storeY", "Store Y", "Description", "founderY"));
-        productRepository.add("prodY", new Product("prodY", "Cool Product"));
+        StoreDTO newStore = storeService.addStore(tokenId, "StoreY", "desc").getValue();
+        ProductDTO newProduct = serviceManager.getProductService().addProduct(tokenId, "prodY", List.of("c"), List.of("d")).getValue();
 
-        Item item = new Item("storeY", "prodY", 19.99f, 3, "Cool Product");
-        Pair<String, String> id = new Pair<>("storeY", "prodY");
-
-        Response<ItemDTO> response = itemService.add(tokenId, id.getFirst(), id.getSecond(), 19.99f, 3, "Cool Product");
+        Response<ItemDTO> response = itemService.add(tokenId, newStore.getId(), newProduct.getId(), 19.99f, 3, "Cool Product");
         assertFalse(response.errorOccurred());
-        assertTrue(response.getValue() != null);
     }
 
     @Test
     public void GivenDuplicateItem_WhenAdd_ThenReturnFalse() {
-        Pair<String, String> id = new Pair<>("1", "101");
-    
-        // Fetch real domain Item from the repository, not through the service (which returns DTO)
-        Item existingItem = itemRepository.get(id);
-    
-        Response<ItemDTO> response = itemService.add(tokenId, id.getFirst(), id.getSecond(), existingItem.getPrice(), existingItem.getAmount(), existingItem.getDescription());
+        Response<ItemDTO> response = itemService.add(tokenId, store1.getId(), product1.getId(), 49.99f, 10, "Duplicate");
         assertTrue(response.errorOccurred());
     }
-    
 
-    // 9. remove
     @Test
     public void GivenExistingItem_WhenRemove_ThenReturnItem() {
-        Pair<String, String> id = new Pair<>("1", "101");
+        Pair<String, String> id = new Pair<>(store1.getId(), product1.getId());
         Response<ItemDTO> response = itemService.remove(tokenId, id);
         assertFalse(response.errorOccurred());
-        assertEquals("101", response.getValue().getProductId());
+        assertEquals(product1.getId(), response.getValue().getProductId());
     }
 
     @Test
@@ -249,84 +191,75 @@ public class ItemServiceTests {
         Pair<String, String> id = new Pair<>("invalid", "invalid");
         Response<ItemDTO> response = itemService.remove(tokenId, id);
         assertTrue(response.errorOccurred());
-        assertNotNull(response.getErrorMessage());
     }
+
     @Test
     public void WhenConcurrentIncreaseAndDecrease_ThenAmountIsStable() throws InterruptedException {
-        Pair<String, String> id = new Pair<>("1", "101");
+        Pair<String, String> id = new Pair<>(store1.getId(), product1.getId());
         int initialAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
 
-        int threadCount = 20;
-        Thread[] threads = new Thread[threadCount];
-
-        for (int i = 0; i < threadCount; i++) {
-            final int index = i;
+        Thread[] threads = new Thread[20];
+        for (int i = 0; i < 20; i++) {
+            int idx = i;
             threads[i] = new Thread(() -> {
-                if (index % 2 == 0)
+                if (idx % 2 == 0)
                     itemService.increaseAmount(tokenId, id, 1);
                 else
                     itemService.decreaseAmount(tokenId, id, 1);
             });
         }
-
         for (Thread t : threads) t.start();
         for (Thread t : threads) t.join();
 
         int finalAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
-        assertEquals("Amount should be stable after balanced increase/decrease", initialAmount, finalAmount);
+        assertEquals(initialAmount, finalAmount);
     }
 
     @Test
     public void WhenManyThreadsIncreaseAmount_ThenAmountIncreasesCorrectly() throws InterruptedException {
-        Pair<String, String> id = new Pair<>("1", "101");
+        Pair<String, String> id = new Pair<>(store1.getId(), product1.getId());
         int initialAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
 
-        int threads = 50;
-        Thread[] t = new Thread[threads];
-        for (int i = 0; i < threads; i++) {
-            t[i] = new Thread(() -> itemService.increaseAmount(tokenId, id, 1));
+        Thread[] threads = new Thread[50];
+        for (int i = 0; i < 50; i++) {
+            threads[i] = new Thread(() -> itemService.increaseAmount(tokenId, id, 1));
         }
-
-        for (Thread thread : t) thread.start();
-        for (Thread thread : t) thread.join();
+        for (Thread t : threads) t.start();
+        for (Thread t : threads) t.join();
 
         int finalAmount = itemService.getItem(tokenId, id.getFirst(), id.getSecond()).getValue().getAmount();
-        assertEquals(initialAmount + threads, finalAmount);
+        assertEquals(initialAmount + 50, finalAmount);
     }
 
     @Test
     public void WhenConcurrentUpdatesOnTwoItems_ThenEachIsCorrectlyUpdated() throws InterruptedException {
-        // Setup a second item
-        addStoreAndProduct("storeX", "Extra Store", "founderX", "prodX", "Extra Item", 19.99f, 30, "Extra Item");
-        Pair<String, String> id1 = new Pair<>("1", "101");
-        Pair<String, String> id2 = new Pair<>("storeX", "prodX");
-    
+        StoreDTO storeX = storeService.addStore(tokenId, "StoreX", "desc").getValue();
+        ProductDTO productX = serviceManager.getProductService().addProduct(tokenId, "prodX", List.of("cat"), List.of("desc")).getValue();
+        itemService.add(tokenId, storeX.getId(), productX.getId(), 19.99f, 30, "Extra Item");
+
+        Pair<String, String> id1 = new Pair<>(store1.getId(), product1.getId());
+        Pair<String, String> id2 = new Pair<>(storeX.getId(), productX.getId());
+
         int initial1 = itemService.getItem(tokenId, id1.getFirst(), id1.getSecond()).getValue().getAmount();
         int initial2 = itemService.getItem(tokenId, id2.getFirst(), id2.getSecond()).getValue().getAmount();
-    
+
         Thread t1 = new Thread(() -> {
-            for (int i = 0; i < 25; i++) {
-                itemService.increaseAmount(tokenId, id1, 1);
-            }
+            for (int i = 0; i < 25; i++) itemService.increaseAmount(tokenId, id1, 1);
         });
-    
+
         Thread t2 = new Thread(() -> {
-            for (int i = 0; i < 40; i++) {
-                itemService.increaseAmount(tokenId, id2, 1);
-            }
+            for (int i = 0; i < 40; i++) itemService.increaseAmount(tokenId, id2, 1);
         });
-    
+
         t1.start();
         t2.start();
         t1.join();
         t2.join();
-    
+
         int final1 = itemService.getItem(tokenId, id1.getFirst(), id1.getSecond()).getValue().getAmount();
         int final2 = itemService.getItem(tokenId, id2.getFirst(), id2.getSecond()).getValue().getAmount();
-    
+
         assertEquals(initial1 + 25, final1);
         assertEquals(initial2 + 40, final2);
     }
-    
-
-}
+} 

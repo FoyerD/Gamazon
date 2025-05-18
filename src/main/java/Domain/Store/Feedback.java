@@ -1,7 +1,6 @@
 package Domain.Store;
 
 
-
 public class Feedback {
     private String customerId;
     private String storeId;

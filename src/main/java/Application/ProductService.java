@@ -2,7 +2,6 @@ package Application;
 
 import Application.utils.Response;
 import Application.utils.TradingLogger;
-import Domain.TokenService;
 import Domain.Store.Product;
 import Domain.Store.ProductFacade;
 
@@ -12,7 +11,6 @@ import Application.DTOs.ProductDTO;
 import Application.utils.Error;
 
 public class ProductService {
-    private static final ProductFacade TokenService = null;
     private final ProductFacade productFacade;
     private TokenService tokenService;
 
@@ -28,7 +26,7 @@ public class ProductService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
+            //String userId = this.tokenService.extractId(sessionToken);
             Product product = productFacade.addProduct(name, categories, catDesc);
             TradingLogger.logEvent("ProductService", method, "Product added successfully.");
             return new Response<>(new ProductDTO(product));
@@ -44,7 +42,7 @@ public class ProductService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
+            //String userId = this.tokenService.extractId(sessionToken);
             Product product = productFacade.getProductByName(name);
             TradingLogger.logEvent("ProductService", method, "Fetched product by name: " + name);
             return new Response<>(new ProductDTO(product));

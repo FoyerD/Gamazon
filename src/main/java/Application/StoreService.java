@@ -1,37 +1,51 @@
 package Application;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
+
+import Application.TokenService;
+import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
-import Domain.TokenService;
+import Domain.management.PermissionManager;
+import Domain.management.PermissionType;
+import Infrastructure.NotificationService;
+import Domain.management.Permission;
 
 @Service
 public class StoreService {
 
     private StoreFacade storeFacade;
     private TokenService tokenService;
+    private PermissionManager permissionManager;
+    private NotificationService notificationService;
 
 
     public StoreService() {
         this.storeFacade = null;
         this.tokenService = null;
+        this.permissionManager = null;
+        this.notificationService = null;
     }
 
-    public StoreService(StoreFacade storeFacade, TokenService tokenService) {
+    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, NotificationService notificationService) {
+        this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
+        this.permissionManager = permissionManager;
     }
 
     private boolean isInitialized() {
-        return this.storeFacade != null && this.tokenService != null;
+        return this.storeFacade != null && this.tokenService != null && this.permissionManager != null;
     }
 
     public Response<StoreDTO> addStore(String sessionToken, String name, String description) {
@@ -47,6 +61,7 @@ public class StoreService {
             if(store == null) {
                 return new Response<>(new Error("Failed to create store."));
             }
+            permissionManager.appointFirstStoreOwner(userId, store.getId());
             return new Response<>(new StoreDTO(store));
 
         } catch (Exception ex) {
@@ -64,7 +79,7 @@ public class StoreService {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
-
+            permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
             boolean result = this.storeFacade.openStore(storeId);
             return new Response<>(result);
         } catch (Exception ex) {
@@ -79,8 +94,19 @@ public class StoreService {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
-
+            permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
             boolean result = this.storeFacade.closeStore(storeId);
+            Map<String, Permission> storePermissions = permissionManager.getStorePermissions(storeId);
+            if (storePermissions != null) {
+                for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
+                    String currId = entry.getKey();
+                    Permission permission = entry.getValue();
+                    if (permission.isStoreManager() || permission.isStoreOwner()) {
+                        permissionManager.removeAllPermissions(storeId, userId);
+                        notificationService.sendNotification(currId, "Store " + storeId + " has been closed.");
+                    }
+                }
+            }
             return new Response<>(result);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
@@ -94,8 +120,6 @@ public class StoreService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            String userId = this.tokenService.extractId(sessionToken);
-
             Store store = this.storeFacade.getStoreByName(name);
             if(store == null) {
                 return new Response<>(new Error("Store not found."));
@@ -114,7 +138,7 @@ public class StoreService {
                 return new Response<>(new Error("Invalid token"));
             }
             String userId = this.tokenService.extractId(sessionToken);
-
+            permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
             return new Response<>(new AuctionDTO(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice)));
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
@@ -128,8 +152,6 @@ public class StoreService {
             if (!tokenService.validateToken(sessionToken)) {
                 return new Response<>(new Error("Invalid token"));
             }
-            String userId = this.tokenService.extractId(sessionToken);
-
             List<AuctionDTO> auctions = this.storeFacade.getAllStoreAuctions(storeId).stream().map(AuctionDTO::new).collect(Collectors.toList());
             return new Response<>(auctions);
         } catch (Exception ex) {
@@ -144,12 +166,40 @@ public class StoreService {
             if (!tokenService.validateToken(sessionToken)) {
                 return new Response<>(new Error("Invalid token"));
             }
-            String userId = this.tokenService.extractId(sessionToken);
-
             List<AuctionDTO> auctions = this.storeFacade.getAllProductAuctions(productId).stream().map(AuctionDTO::new).collect(Collectors.toList());
             return new Response<>(auctions);
         } catch (Exception ex) {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+
+    public Response<ItemDTO> acceptBid(String sessionToken, String storeId, String productId, String auctionId) {
+        try {
+            if (!this.isInitialized()) {
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = tokenService.extractId(sessionToken);
+
+            // Check that the user has permission to accept bids
+            permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
+
+            // Accept the bid for the given auction and product
+            Item item = storeFacade.acceptBid(storeId, productId, auctionId);
+            if (item == null) {
+                return new Response<>(new Error("Failed to accept bid. It may not exist or the auction is closed."));
+            }
+
+            return new Response<>(ItemDTO.fromItem(item));
+
+        } catch (Exception ex) {
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+
 }
