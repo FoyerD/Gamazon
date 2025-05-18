@@ -2,8 +2,11 @@ package Application;
 
 
 
+import org.springframework.stereotype.Service;
+
 import Domain.FacadeManager;
 import Infrastructure.NotificationService;
+
 
 public class ServiceManager {
     private ItemService itemService;

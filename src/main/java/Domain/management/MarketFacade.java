@@ -10,6 +10,8 @@ import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 @Component
 public class MarketFacade implements IMarketFacade {
@@ -28,6 +30,22 @@ public class MarketFacade implements IMarketFacade {
         return INSTANCE;
     }
 
+    @Autowired
+    public MarketFacade(IPaymentService paymentService,
+                        ISupplyService supplyService,
+                        INotificationService notificationService,
+                        IUserRepository userRepository,
+                        IShoppingCartFacade shoppingCartFacade,
+                        PermissionManager permissionManager) {
+        this.paymentService = paymentService;
+        this.supplyService = supplyService;
+        this.notificationService = notificationService;
+        this.userRepository = userRepository;
+        this.shoppingCartFacade = shoppingCartFacade;
+        this.permissionManager = permissionManager;
+    }
+
+    //Ask Amit if this is needed
     private MarketFacade() {}
 
     @Override

@@ -110,13 +110,13 @@ public class MarketService {
         }
     }
 
-    public Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername, String storeId) {
+    public Response<Void> appointStoreManager(String sessionToken, String appointerId, String appointeeId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "appointStoreManager", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            marketFacade.appointStoreManager(appointerUsername, appointeeUsername, storeId);
+            marketFacade.appointStoreManager(appointerId, appointeeId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "appointStoreManager", "Store manager appointed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -125,13 +125,13 @@ public class MarketService {
         }
     }
 
-    public Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername, String storeId) {
+    public Response<Void> removeStoreManager(String sessionToken, String removerId, String managerId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "removeStoreManager", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            marketFacade.removeStoreManager(removerUsername, managerUsername, storeId);
+            marketFacade.removeStoreManager(removerId, managerId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "removeStoreManager", "Store manager removed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -140,13 +140,13 @@ public class MarketService {
         }
     }
 
-    public Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername, String storeId) {
+    public Response<Void> appointStoreOwner(String sessionToken, String appointerId, String appointeeId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "appointStoreOwner", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            marketFacade.appointStoreOwner(appointerUsername, appointeeUsername, storeId);
+            marketFacade.appointStoreOwner(appointerId, appointeeId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "appointStoreOwner", "Store owner appointed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -155,13 +155,13 @@ public class MarketService {
         }
     }
 
-    public Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
+    public Response<Void> changeManagerPermissions(String sessionToken, String ownerId, String managerId, String storeId, List<PermissionType> newPermissions) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "changeManagerPermissions", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            marketFacade.changeManagerPermissions(ownerUsername, managerUsername, storeId, newPermissions);
+            marketFacade.changeManagerPermissions(ownerId, managerId, storeId, newPermissions);
             TradingLogger.logEvent(CLASS_NAME, "changeManagerPermissions", "Manager permissions changed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
