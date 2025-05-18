@@ -534,17 +534,129 @@ public class StoreFacadeTests {
     }
 
     @Test
-    public void givenInitializedFacadeAndNoAuction_whenAddBid_thenReturnAuction(){
+    public void givenInitializedFacadeAndAuction_whenAddBid_thenReturnAuction(){
         String auctionId = "auctionId";
         String userId = "userId";
         float bid = 10.0f;
+
         Auction auction = mock(Auction.class);
         when(auction.getAuctionId()).thenReturn(auctionId);
         when(auction.getCurrentPrice()).thenReturn(5.0);
         when(auction.getStartPrice()).thenReturn(5.0);
+
         when(auctionRepository.get(auctionId)).thenReturn(auction);
         when(userRepository.get(userId)).thenReturn(mock(Member.class));
         when(auctionRepository.update(anyString(), any(Auction.class))).thenReturn(auction);
-        assertTrue(storeFacade.addBid(auctionId, userId, bid).getAuctionId().equals(auctionId));
+
+        assertEquals(auctionId, storeFacade.addBid(auctionId, userId, bid, () -> true).getAuctionId());
     }
+
+    @Test
+    public void givenValidAuctionAndItem_whenAcceptBid_thenReturnsUpdatedItem() {
+        String storeId = "store1";
+        String productId = "product1";
+        String auctionId = "auction1";
+
+        Pair<String, String> itemKey = new Pair<>(storeId, productId);
+        Item item = mock(Item.class);
+        Auction auction = mock(Auction.class);
+
+        when(itemRepository.get(itemKey)).thenReturn(item);
+        when(item.getAmount()).thenReturn(1); // Sufficient quantity
+        when(auctionRepository.get(auctionId)).thenReturn(auction);
+        when(auction.getStoreId()).thenReturn(storeId);
+        when(auction.getProductId()).thenReturn(productId);
+        when(auction.getCurrentBidderId()).thenReturn("user123");
+        when(auction.triggerCharge()).thenReturn(true);
+
+        when(itemRepository.update(itemKey, item)).thenReturn(item);
+        when(auctionRepository.remove(auctionId)).thenReturn(auction);
+
+        Item result = storeFacade.acceptBid(storeId, productId, auctionId);
+        assertEquals(item, result);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void givenNoItemInStore_whenAcceptBid_thenThrows() {
+        when(itemRepository.get(any())).thenReturn(null);
+        storeFacade.acceptBid("storeX", "productY", "auctionZ");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenNoAuction_whenAcceptBid_thenThrows() {
+        String storeId = "store1";
+        String productId = "product1";
+        String auctionId = "auction1";
+
+        Pair<String, String> itemKey = new Pair<>(storeId, productId);
+        Item item = mock(Item.class);
+        when(item.getAmount()).thenReturn(1);
+
+        when(itemRepository.get(itemKey)).thenReturn(item);
+        when(auctionRepository.get(auctionId)).thenReturn(null);
+        when(itemRepository.update(itemKey, item)).thenReturn(item); // for rollback
+
+        storeFacade.acceptBid(storeId, productId, auctionId);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void givenMismatchedAuctionData_whenAcceptBid_thenThrows() {
+        String storeId = "store1";
+        String productId = "product1";
+        String auctionId = "auction1";
+
+        Pair<String, String> itemKey = new Pair<>(storeId, productId);
+        Item item = mock(Item.class);
+        Auction auction = mock(Auction.class);
+
+        when(item.getAmount()).thenReturn(1);
+        when(itemRepository.get(itemKey)).thenReturn(item);
+        when(auctionRepository.get(auctionId)).thenReturn(auction);
+        when(auction.getStoreId()).thenReturn("wrongStore");
+        when(auction.getProductId()).thenReturn("wrongProduct");
+
+        storeFacade.acceptBid(storeId, productId, auctionId);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void givenNoCurrentBidder_whenAcceptBid_thenThrows() {
+        String storeId = "store1";
+        String productId = "product1";
+        String auctionId = "auction1";
+
+        Pair<String, String> itemKey = new Pair<>(storeId, productId);
+        Item item = mock(Item.class);
+        Auction auction = mock(Auction.class);
+
+        when(item.getAmount()).thenReturn(1);
+        when(itemRepository.get(itemKey)).thenReturn(item);
+        when(auctionRepository.get(auctionId)).thenReturn(auction);
+        when(auction.getStoreId()).thenReturn(storeId);
+        when(auction.getProductId()).thenReturn(productId);
+        when(auction.getCurrentBidderId()).thenReturn(null);
+
+        storeFacade.acceptBid(storeId, productId, auctionId);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void givenChargeFails_whenAcceptBid_thenThrows() {
+        String storeId = "store1";
+        String productId = "product1";
+        String auctionId = "auction1";
+
+        Pair<String, String> itemKey = new Pair<>(storeId, productId);
+        Item item = mock(Item.class);
+        Auction auction = mock(Auction.class);
+
+        when(item.getAmount()).thenReturn(1);
+        when(itemRepository.get(itemKey)).thenReturn(item);
+        when(auctionRepository.get(auctionId)).thenReturn(auction);
+        when(auction.getStoreId()).thenReturn(storeId);
+        when(auction.getProductId()).thenReturn(productId);
+        when(auction.getCurrentBidderId()).thenReturn("user123");
+        when(auction.triggerCharge()).thenReturn(false);
+
+        storeFacade.acceptBid(storeId, productId, auctionId);
+    }
+
 }

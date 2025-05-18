@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
@@ -167,12 +168,41 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         return true;
     }
 
-
+    /**
+     * Places a bid on the specified auction with deferred payment details.
+     * The bid will be stored along with the provided payment information.
+     * If the bid is later accepted by a store manager, the payment will be processed automatically.
+     *
+     * @param auctionId The ID of the auction to bid on
+     * @param clientId The ID of the client placing the bid
+     * @param price The amount of the bid
+     * @param cardNumber The client's credit card number (used for payment if bid is accepted)
+     * @param expiryDate The expiration date of the credit card
+     * @param cvv The CVV code of the credit card
+     * @param andIncrement An identifier used for secure payment tracking
+     * @param clientName The name of the client (used for billing)
+     * @param deliveryAddress The address for delivery if the bid is accepted
+     * @return true if the bid was successfully placed
+     */
     @Override
-    public boolean makeBid(String auctionId, String clientId, float price) {
-        storeFacade.addBid(auctionId, clientId, price);
+    public boolean makeBid(String auctionId, String clientId, float price,
+                        String cardNumber, Date expiryDate, String cvv,
+                        long andIncrement, String clientName, String deliveryAddress) {
+
+        Supplier<Boolean> chargeSupplier = () -> {
+            if (!isCardNumber(cardNumber)) {
+                throw new IllegalArgumentException("Invalid card number");
+            }
+
+            paymentService.processPayment(clientName, cardNumber, expiryDate, cvv,
+                                        price, andIncrement, clientName, deliveryAddress);
+            return true;
+        };
+
+        storeFacade.addBid(auctionId, clientId, price, chargeSupplier);
         return true;
     }
+
 
     @Override
     public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,

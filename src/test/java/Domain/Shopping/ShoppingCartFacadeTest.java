@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -547,15 +548,22 @@ public class ShoppingCartFacadeTest {
     @Test
     public void testMakeBid_Success() {
         // Arrange
-        when(mockStoreFacade.addBid(AUCTION_ID, CLIENT_ID, BID_PRICE)).thenReturn(mock(Auction.class));
-        
+        Supplier<Boolean> mockChargeCallback = mock(Supplier.class);
+        when(mockChargeCallback.get()).thenReturn(true);
+
+        Auction mockAuction = mock(Auction.class);
+        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class)))
+            .thenReturn(mockAuction);
+
         // Act
-        boolean result = facade.makeBid(AUCTION_ID, CLIENT_ID, BID_PRICE);
-        
+        boolean result = facade.makeBid(AUCTION_ID, CLIENT_ID, BID_PRICE,
+            "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
+
         // Assert
         assertTrue("Should return true for successful bid", result);
-        verify(mockStoreFacade).addBid(AUCTION_ID, CLIENT_ID, BID_PRICE);
+        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class));
     }
+
     
     //
     // PURCHASE HISTORY TESTS
