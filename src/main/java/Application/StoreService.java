@@ -12,7 +12,7 @@ import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 
-import Domain.TokenService;
+import Application.TokenService;
 import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
