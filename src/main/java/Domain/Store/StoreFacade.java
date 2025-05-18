@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import Domain.User.IUserRepository;
 import Domain.User.User;
@@ -183,19 +184,24 @@ public class StoreFacade {
         return this.auctionRepository.get(auctionId);
     }
 
-    public Auction addBid(String auctionId, String userId, float bid) {
+    public Auction addBid(String auctionId, String userId, float bid, Supplier<Boolean> chargeCallback) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         if (this.auctionRepository.get(auctionId) == null) throw new RuntimeException("Auction not found");
         if (this.getUser.apply(userId) == null) throw new RuntimeException("User not found");
         if (bid < 0) throw new RuntimeException("Bid must be greater than 0");
 
         Auction auction = this.auctionRepository.get(auctionId);
-        if (bid <= auction.getCurrentPrice() || bid <= auction.getStartPrice()) throw new RuntimeException("Bid must be greater than current and start");
+        if (bid <= auction.getCurrentPrice() || bid <= auction.getStartPrice()) {
+            throw new RuntimeException("Bid must be greater than current and start");
+        }
 
         auction.setCurrentPrice(bid);
         auction.setCurrentBidderId(userId);
+        auction.setChargeCallback(chargeCallback);
+
         return this.auctionRepository.update(auctionId, auction);
     }
+
 
     public Auction closeAuction(String auctionId) {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
@@ -214,4 +220,78 @@ public class StoreFacade {
         if (!isInitialized()) throw new RuntimeException("Facade must be initialized");
         return this.auctionRepository.getAllProductAuctions(productId);
     }
+
+    public Item acceptBid(String storeId, String productId, String auctionId) {
+        if (!isInitialized()) {
+            throw new RuntimeException("StoreFacade is not initialized");
+        }
+
+        // Retrieve the item first and attempt to reserve one unit
+        Pair<String, String> itemKey = new Pair<>(storeId, productId);
+        Item item = itemRepository.get(itemKey);
+        if (item == null) {
+            throw new RuntimeException("Item not found for product " + productId + " in store " + storeId);
+        }
+
+        // Decrease the quantity (simulate reservation)
+        int currentAmount = item.getAmount();
+        if (currentAmount <= 0) {
+            throw new RuntimeException("Insufficient item quantity to fulfill auction sale");
+        }
+
+        item.setAmount(currentAmount - 1);
+        itemRepository.update(itemKey, item);
+
+        // Retrieve the auction directly by ID
+        Auction auction = this.auctionRepository.get(auctionId);
+        if (auction == null) {
+            // Rollback item amount
+            item.setAmount(currentAmount);
+            itemRepository.update(itemKey, item);
+            throw new IllegalArgumentException("Auction not found with ID: " + auctionId);
+        }
+
+        // Sanity check: match storeId and productId
+        if (!auction.getStoreId().equals(storeId) || !auction.getProductId().equals(productId)) {
+            // Rollback item amount
+            item.setAmount(currentAmount);
+            itemRepository.update(itemKey, item);
+            throw new IllegalArgumentException("Auction does not match provided store or product");
+        }
+
+        // Ensure there's a valid current bidder
+        if (auction.getCurrentBidderId() == null) {
+            // Rollback item amount
+            item.setAmount(currentAmount);
+            itemRepository.update(itemKey, item);
+            throw new IllegalStateException("No bidder to accept the bid from");
+        }
+
+        // Charge the user using stored callback
+        try {
+            boolean success = auction.triggerCharge();
+            if (!success) {
+                // Rollback item amount
+                item.setAmount(currentAmount);
+                itemRepository.update(itemKey, item);
+                throw new RuntimeException("Payment failed for accepted bid");
+            }
+        } catch (Exception ex) {
+            // Rollback item amount
+            item.setAmount(currentAmount);
+            itemRepository.update(itemKey, item);
+            throw new RuntimeException("Failed to charge the client for the accepted bid: " + ex.getMessage(), ex);
+        }
+
+        // Final update: optionally mark buyer (if you have a field), or leave updated amount
+        itemRepository.update(itemKey, item);
+
+        // Remove the auction as it's now fulfilled
+        this.auctionRepository.remove(auctionId);
+
+        return item;
+    }
+
+
+
 }
