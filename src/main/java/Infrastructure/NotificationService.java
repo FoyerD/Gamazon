@@ -1,8 +1,11 @@
 package Infrastructure;
 
 import Application.utils.Response;
+import org.springframework.stereotype.Service;
 import Domain.ExternalServices.INotificationService;
 
+
+@Service
 public class NotificationService implements INotificationService {
     
     @Override

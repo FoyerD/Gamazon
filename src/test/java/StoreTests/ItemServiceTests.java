@@ -46,7 +46,7 @@ public class ItemServiceTests {
     @Before
     public void setUp() {
         repoManager = new MemoryRepoManager();
-        paymentService = new PaymentService("test");
+        paymentService = new PaymentService();
         facadeManager = new FacadeManager(repoManager, paymentService);
         serviceManager = new ServiceManager(facadeManager);
         itemService = serviceManager.getItemService();
