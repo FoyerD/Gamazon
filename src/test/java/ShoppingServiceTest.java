@@ -6,14 +6,19 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+
+import static org.mockito.Mockito.mock;
 
 import Application.DTOs.CartDTO;
 import Application.ShoppingService;
 import Application.TokenService;
 import Application.utils.Response;
+import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartRepository;
+import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
 import Domain.Store.Product;
@@ -38,6 +43,9 @@ import Domain.Store.IStoreRepository;
 
 public class ShoppingServiceTest {
 
+    @Mock
+    private IPaymentService paymentService;
+        
     private ShoppingService shoppingService;
 
     private IShoppingCartRepository cartRepository;
@@ -94,7 +102,8 @@ public class ShoppingServiceTest {
         storeFacade.setAuctionRepository(auctionRepository);
         storeFacade.setFeedbackRepository(feedbackRepository);
         storeFacade.setGetUser(userRepository);
-
+        
+        // Initialize the ShoppingService with real repositories and facades
         shoppingService = new ShoppingService(
             cartRepository,
             basketRepository,
@@ -165,6 +174,35 @@ public class ShoppingServiceTest {
     }
 
     @Test
+    public void testCheckout_InsufficientStock() {
+        // First add a product to the cart with quantity greater than available stock
+        // From setup, we know the item has stock of 5
+        int requestedQuantity = 10; // More than the available 5
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, requestedQuantity);
+        
+        // Prepare checkout parameters
+        String cardNumber = "1234567890123456";
+        Date expiryDate = new Date();
+        String cvv = "123";
+        long transactionId = 12345L;
+        String clientName = "John Doe";
+        String deliveryAddress = "123 Main St";
+        
+        // Act - Attempt to checkout
+        Response<Boolean> response = shoppingService.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        
+        // Assert
+        assertTrue("Should have error due to insufficient stock", response.errorOccurred());
+        assertNull("Value should be null", response.getValue());
+        assertNotNull("Error message should not be null", response.getErrorMessage());
+        // Optionally, check that the error message mentions stock or inventory
+        assertTrue("Error should mention insufficient stock", 
+                response.getErrorMessage().toLowerCase().contains("stock") || 
+                response.getErrorMessage().toLowerCase().contains("inventory") ||
+                response.getErrorMessage().toLowerCase().contains("quantity"));
+    }
+
+    @Test
     public void testCheckout_PaymentError() {
         shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
         Response<Boolean> response = shoppingService.checkout(
@@ -173,6 +211,94 @@ public class ShoppingServiceTest {
         assertNull("Value should be null", response.getValue());
     }
 
+    //TODO! Refactor this test to use services
+    // @Test
+    // public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
+    //     // Create a product with limited stock (e.g., just 1 unit)
+    //     final String limitedProductId = "limitedProduct";
+    //     final String limitedStoreId = STORE_ID;
+    //     final int availableStock = 1;
+        
+    //     // Create a product with limited stock
+    //     Product limitedProduct = new Product(limitedProductId, "Limited Stock Product", new HashSet<>());
+    //     productRepository.add(limitedProductId, limitedProduct);
+        
+    //     // Create an item with just 1 unit available
+    //     Item limitedItem = new Item(limitedStoreId, limitedProductId, 10.0, availableStock, "Limited Stock Item");
+    //     itemFacade.add(new Pair<>(limitedStoreId, limitedProductId), limitedItem);
+        
+    //     // Create tokens for two different clients
+    //     String clientId1 = tokenService.generateToken(UUID.randomUUID().toString());
+    //     String clientId2 = tokenService.generateToken(UUID.randomUUID().toString());
+        
+    //     // Standard checkout parameters
+    //     final String cardNumber = "1234567890123456";
+    //     final Date expiryDate = new Date();
+    //     final String cvv = "123";
+    //     final long transactionId = 12345L;
+    //     final String clientName = "Test Client";
+    //     final String deliveryAddress = "123 Test St";
+        
+    //     // Add 1 unit of the limited product to each client's cart
+    //     shoppingService.addProductToCart(limitedStoreId, clientId1, limitedProductId, 1);
+    //     shoppingService.addProductToCart(limitedStoreId, clientId2, limitedProductId, 1);
+        
+    //     // Track the results for each thread
+    //     final boolean[] threadSuccess = new boolean[2];
+    //     final String[] threadErrors = new String[2];
+        
+    //     // Create two threads, each attempting to checkout
+    //     Thread thread1 = new Thread(() -> {
+    //         Response<Boolean> response = shoppingService.checkout(
+    //             clientId1, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+    //         threadSuccess[0] = !response.errorOccurred();
+    //         if (response.errorOccurred()) {
+    //             threadErrors[0] = response.getErrorMessage();
+    //         }
+    //     });
+        
+    //     Thread thread2 = new Thread(() -> {
+    //         Response<Boolean> response = shoppingService.checkout(
+    //             clientId2, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+    //         threadSuccess[1] = !response.errorOccurred();
+    //         if (response.errorOccurred()) {
+    //             threadErrors[1] = response.getErrorMessage();
+    //         }
+    //     });
+        
+    //     // Start both threads
+    //     thread1.start();
+    //     thread2.start();
+        
+    //     // Wait for both threads to complete
+    //     thread1.join(5000);  // Wait up to 5 seconds
+    //     thread2.join(5000);
+        
+    //     // Verify that exactly one thread succeeded and one failed
+    //     assertTrue("Either thread1 succeeded and thread2 failed, or vice versa",
+    //             (threadSuccess[0] && !threadSuccess[1]) || (!threadSuccess[0] && threadSuccess[1]));
+        
+    //     // At least one thread should have failed with a stock-related error
+    //     if (!threadSuccess[0]) {
+    //         assertNotNull("Thread 1 should have an error message", threadErrors[0]);
+    //         assertTrue("Thread 1 error should mention stock limitation", 
+    //                 threadErrors[0].toLowerCase().contains("stock") || 
+    //                 threadErrors[0].toLowerCase().contains("inventory") ||
+    //                 threadErrors[0].toLowerCase().contains("quantity"));
+    //     }
+        
+    //     if (!threadSuccess[1]) {
+    //         assertNotNull("Thread 2 should have an error message", threadErrors[1]);
+    //         assertTrue("Thread 2 error should mention stock limitation", 
+    //                 threadErrors[1].toLowerCase().contains("stock") || 
+    //                 threadErrors[1].toLowerCase().contains("inventory") ||
+    //                 threadErrors[1].toLowerCase().contains("quantity"));
+    //     }
+        
+    //     // Verify the item's stock is now 0 (all units purchased)
+    //     Item updatedItem = itemFacade.getItem(limitedStoreId, limitedProductId);
+    //     assertEquals("Stock should be depleted", 0, updatedItem.getAmount());
+    // }
     //
     // CART MANAGEMENT - REMOVE PRODUCT
     //
@@ -272,5 +398,155 @@ public class ShoppingServiceTest {
         } catch (Exception e) {
             fail("Unexpected exception: " + e.getMessage());
         }
+    }
+    @Test
+    public void testCheckout_PaymentServiceThrowsException() {
+        // Create a bad payment service that throws an exception
+        IPaymentService badPaymentService = new IPaymentService() {
+            @Override
+            public void updatePaymentServiceURL(String url) {
+                // Do nothing
+            }
+
+            @Override
+            public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv, 
+                                                double price, long andIncrement, String name, String deliveryAddress) {
+                throw new RuntimeException("Payment service connection failure");
+            }
+
+            @Override
+            public void initialize() {
+                // Do nothing
+            }
+        };
+
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
+        
+        // Replace the mocked payment service with our bad one
+        // We need to recreate the shopping service with our bad payment service
+        ShoppingService shoppingServiceWithBadPayment = new ShoppingService(
+            cartRepository,
+            basketRepository,
+            itemFacade,
+            storeFacade,
+            receiptRepository,
+            productRepository,
+            tokenService
+        );
+        
+        // Use reflection to set the bad payment service
+        try {
+            java.lang.reflect.Field cartFacadeField = ShoppingService.class.getDeclaredField("cartFacade");
+            cartFacadeField.setAccessible(true);
+            Object cartFacade = cartFacadeField.get(shoppingServiceWithBadPayment);
+            
+            java.lang.reflect.Field paymentServiceField = cartFacade.getClass().getDeclaredField("paymentService");
+            paymentServiceField.setAccessible(true);
+            paymentServiceField.set(cartFacade, badPaymentService);
+        } catch (Exception e) {
+            fail("Failed to set bad payment service: " + e.getMessage());
+        }
+        
+        // Prepare checkout parameters
+        String cardNumber = "1234567890123456";
+        Date expiryDate = new Date();
+        String cvv = "123";
+        long transactionId = 12345L;
+        String clientName = "John Doe";
+        String deliveryAddress = "123 Main St";
+        
+        // Act - attempt to checkout with the bad payment service
+        Response<Boolean> response = shoppingServiceWithBadPayment.checkout(
+            CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        
+        // Assert
+        assertTrue("Should have error due to payment service failure", response.errorOccurred());
+        assertNull("Value should be null", response.getValue());
+        assertNotNull("Error message should not be null", response.getErrorMessage());
+        assertTrue("Error should mention payment failure", 
+                response.getErrorMessage().toLowerCase().contains("payment") || 
+                response.getErrorMessage().toLowerCase().contains("failed") ||
+                response.getErrorMessage().toLowerCase().contains("exception"));
+        
+        // Verify that the inventory was rolled back (item quantity not decreased)
+        Item item = itemFacade.getItem(STORE_ID, PRODUCT_ID);
+        assertEquals("Item quantity should be unchanged after failed checkout", 5, item.getAmount());
+    }
+
+    @Test
+    public void testCheckout_PaymentServiceReturnsFailure() {
+        // Create a bad payment service that returns a failure response
+        IPaymentService badPaymentService = new IPaymentService() {
+            @Override
+            public void updatePaymentServiceURL(String url) {
+                // Do nothing
+            }
+
+            @Override
+            public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv, 
+                                                double price, long andIncrement, String name, String deliveryAddress) {
+                // Create a failure response using the Response class
+                return Response.error("Payment declined: Insufficient funds");
+            }
+
+            @Override
+            public void initialize() {
+                // Do nothing
+            }
+        };
+
+        // First add a product to the cart
+        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
+        
+        // Replace the mocked payment service with our bad one
+        // We need to recreate the shopping service with our bad payment service
+        ShoppingService shoppingServiceWithBadPayment = new ShoppingService(
+            cartRepository,
+            basketRepository,
+            itemFacade,
+            storeFacade,
+            receiptRepository,
+            productRepository,
+            tokenService
+        );
+        
+        // Use reflection to set the bad payment service
+        try {
+            java.lang.reflect.Field cartFacadeField = ShoppingService.class.getDeclaredField("cartFacade");
+            cartFacadeField.setAccessible(true);
+            Object cartFacade = cartFacadeField.get(shoppingServiceWithBadPayment);
+            
+            java.lang.reflect.Field paymentServiceField = cartFacade.getClass().getDeclaredField("paymentService");
+            paymentServiceField.setAccessible(true);
+            paymentServiceField.set(cartFacade, badPaymentService);
+        } catch (Exception e) {
+            fail("Failed to set bad payment service: " + e.getMessage());
+        }
+        
+        // Prepare checkout parameters
+        String cardNumber = "1234567890123456";
+        Date expiryDate = new Date();
+        String cvv = "123";
+        long transactionId = 12345L;
+        String clientName = "John Doe";
+        String deliveryAddress = "123 Main St";
+        
+        // Act - attempt to checkout with the bad payment service
+        Response<Boolean> response = shoppingServiceWithBadPayment.checkout(
+            CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        
+        // Assert
+        assertTrue("Should have error due to payment service failure", response.errorOccurred());
+        assertNull("Value should be null", response.getValue());
+        assertNotNull("Error message should not be null", response.getErrorMessage());
+        assertTrue("Error should mention payment declined", 
+                response.getErrorMessage().toLowerCase().contains("payment") || 
+                response.getErrorMessage().toLowerCase().contains("declined") ||
+                response.getErrorMessage().toLowerCase().contains("funds"));
+        
+        // Verify that the inventory was rolled back (item quantity not decreased)
+        Item item = itemFacade.getItem(STORE_ID, PRODUCT_ID);
+        assertEquals("Item quantity should be unchanged after failed checkout", 5, item.getAmount());
     }
 }
