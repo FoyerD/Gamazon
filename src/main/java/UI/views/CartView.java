@@ -168,7 +168,7 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
 
     private void decrementAmount(ItemDTO item) {
         Response<Boolean> response = purchasePresenter.removeProductFromCart(
-                        sessionToken, item.getProductId(), item.getStoreId(), item.getAmount() - 1);
+                        sessionToken, item.getProductId(), item.getStoreId(), 1);
 
         if (!response.errorOccurred() && response.getValue()) {
             Notification.show("Quantity decreased", 1000, Notification.Position.MIDDLE);
@@ -182,7 +182,7 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
 
     private void incrementAmount(ItemDTO item) {
         Response<Boolean> response = purchasePresenter.addProductToCart(
-                        sessionToken, item.getProductId(), item.getStoreId(), item.getAmount() + 1);
+                        sessionToken, item.getProductId(), item.getStoreId(), 1);
 
         if (!response.errorOccurred() && response.getValue()) {
             Notification.show("Quantity increased", 1000, Notification.Position.MIDDLE);

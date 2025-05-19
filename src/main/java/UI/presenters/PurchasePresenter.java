@@ -25,12 +25,12 @@ public class PurchasePresenter implements IPurchasePresenter {
 
     @Override
     public Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId) {
-        return this.shoppingService.removeProductFromCart(sessionToken, productId, storeId);
+        return this.shoppingService.removeProductFromCart(storeId, sessionToken, productId);
     }
 
     @Override
     public Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId, int amount) {
-        return this.shoppingService.removeProductFromCart(sessionToken, productId, storeId, amount);
+        return this.shoppingService.removeProductFromCart(storeId, sessionToken, productId, amount);
     }
 
     //This is the real viewCart
