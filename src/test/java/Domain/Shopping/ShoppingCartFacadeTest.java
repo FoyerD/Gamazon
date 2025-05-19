@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Store.Auction;
@@ -264,6 +265,12 @@ public class ShoppingCartFacadeTest {
         
         Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());
         when(mockProductRepo.get(PRODUCT_ID)).thenReturn(mockProduct);
+        
+        // Configure the payment service to return a successful response
+        when(mockPaymentService.processPayment(
+            anyString(), anyString(), any(Date.class), anyString(), 
+            anyDouble(), anyLong(), anyString(), anyString()
+        )).thenReturn(Response.success(true));
         
         // Act
         boolean result = facade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, 
