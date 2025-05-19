@@ -234,7 +234,6 @@ public class ShoppingCartFacadeTest {
     //
     // CHECKOUT TESTS
     //
-    //TODO! Refactor this test to use services
     @Test
     public void testCheckout_Success() {
         // Arrange
