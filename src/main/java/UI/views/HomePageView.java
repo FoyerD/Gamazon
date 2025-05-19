@@ -60,7 +60,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         Button logoutBtn = new Button("Logout", e -> {
             UI.getCurrent().getSession().close();
-            UI.getCurrent().navigate("login");
+            UI.getCurrent().navigate("");
         });
         logoutBtn.getStyle().set("background-color", "#e53e3e").set("color", "white");
 
@@ -131,7 +131,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
         if (sessionToken == null) {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
-            event.forwardTo("login");
+            event.forwardTo("");
         }
     }
 }
