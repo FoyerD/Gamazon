@@ -57,7 +57,7 @@ public class ProductPresenter implements IProductPresenter {
 
     @Override
     public Response<Void> rateProduct(String sessionToken, ItemDTO item) {
-        return this.itemService.addRating(sessionToken, item.getStoreId(), item.getProductId(), (float)item.getRating());
+        return this.itemService.addRating(sessionToken, item.getStoreId(), item.getProductId(), (int)item.getRating());
     }
 
     @Override
