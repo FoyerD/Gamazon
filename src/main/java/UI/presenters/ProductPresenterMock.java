@@ -4,6 +4,7 @@ import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
 import Domain.Store.FeedbackDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
 import Application.utils.Response;
 import Domain.Store.ItemFilter;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class ProductPresenterMock implements IProductPresenter {
     }
 
     @Override
-    public Response<List<ItemDTO>> showAllProducts(String sessionToken) {
+    public Response<List<ItemDTO>> showAllItems(String sessionToken) {
         return new Response<>(new ArrayList<>(mockProducts));
     }
 
@@ -78,5 +79,11 @@ public class ProductPresenterMock implements IProductPresenter {
     public Response<List<FeedbackDTO>> showFeedbacks(String sessionToken, ItemFilter filters) {
         // Mock: return empty feedback list
         return new Response<>(new ArrayList<>());
+    }
+
+    @Override
+    public Response<Set<ProductDTO>> showAllProducts(String sessionToken) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'showAllProducts'");
     }
 }

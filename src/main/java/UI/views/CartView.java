@@ -1,6 +1,7 @@
 package UI.views;
 
 import UI.presenters.IPurchasePresenter;
+import UI.views.components.BasketLayout;
 import UI.presenters.IProductPresenter;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 public class ManagementPresenterMock implements IManagementPresenter {
     private final Map<String, List<String>> storeManagers = new ConcurrentHashMap<>();
     private final Map<String, List<String>> storeOwners = new ConcurrentHashMap<>();

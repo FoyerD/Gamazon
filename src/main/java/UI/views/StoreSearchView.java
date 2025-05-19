@@ -145,6 +145,7 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         }
     }
 
+
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
