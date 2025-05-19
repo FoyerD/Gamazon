@@ -119,6 +119,18 @@ public class AppInitializer implements CommandLineRunner {
             return;
         }
 
+        var logoutResp = userService.exit(adminToken);
+        if (logoutResp.errorOccurred()) {
+            System.err.println("❌ Failed to log out admin: " + logoutResp.getErrorMessage());
+            return;
+        }
+
+        var logoutResp2 = userService.exit(buyerToken);
+        if (logoutResp2.errorOccurred()) {
+            System.err.println("❌ Failed to log out buyer: " + logoutResp2.getErrorMessage());
+            return;
+        }
+
         System.out.println("✅ App Initialization Complete");
     }
 }
