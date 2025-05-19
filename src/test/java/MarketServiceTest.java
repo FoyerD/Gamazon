@@ -7,6 +7,8 @@ import Domain.Store.IStoreRepository;
 import Domain.User.IUserRepository;
 import Domain.management.IMarketFacade;
 import Domain.management.IPermissionRepository;
+import Domain.management.Permission;
+import Domain.management.PermissionManager;
 import Domain.FacadeManager;
 import Domain.management.PermissionType;
 import Infrastructure.MemoryRepoManager;
@@ -332,39 +334,29 @@ public class MarketServiceTest {
             System.out.println("Thread 2 error: " + threadErrors[1]);
         }
         
-        // For verification, we would ideally use a service method to check owner status
-        // Since we don't have a direct service method in the provided code, we can use
-        // the permissions mechanism similar to what we did for managers
-        if (threadSuccess[0]) {
-            // We assume having store owner permissions is equivalent to being a store owner
-            // In a real implementation, there might be a specific service method for this check
-            Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
-            assertFalse(response.errorOccurred());
-            
-            // Check if the user has owner-specific permissions
-            boolean isOwner = false;
-            if (response.getValue().containsKey(appointee1Id)) {
-                List<PermissionType> permissions = response.getValue().get(appointee1Id);
-                isOwner = permissions.contains(PermissionType.ASSIGN_OR_REMOVE_OWNERS);
-            }
-            assertTrue(isOwner, "Candidate 1 should be an owner if appointment succeeded");
-        }
+        // Both appointments should succeed since multiple users can be owners
+        assertTrue(threadSuccess[0], "First owner appointment should succeed");
+        assertTrue(threadSuccess[1], "Second owner appointment should succeed");
         
-        if (threadSuccess[1]) {
-            Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
-            assertFalse(response.errorOccurred());
-            
-            boolean isOwner = false;
-            if (response.getValue().containsKey(appointee2Id)) {
-                List<PermissionType> permissions = response.getValue().get(appointee2Id);
-                isOwner = permissions.contains(PermissionType.ASSIGN_OR_REMOVE_OWNERS);
-            }
-            assertTrue(isOwner, "Candidate 2 should be an owner if appointment succeeded");
-        }
+        // Get the permission manager to check permissions properly
+        PermissionManager permissionManager = facadeManager.getPermissionManager();
         
-        // Verify at least one appointment succeeded
-        assertTrue(threadSuccess[0] || threadSuccess[1], 
-            "At least one owner appointment should succeed");
+        // Verify the first user is a store owner
+        Permission appointee1Permission = permissionManager.getPermission(storeId, appointee1Id);
+        assertNotNull(appointee1Permission, "Permission for appointee 1 should exist");
+        assertTrue(appointee1Permission.isStoreOwner(), "Appointee 1 should be a store owner");
+        
+        // Verify the second user is a store owner
+        Permission appointee2Permission = permissionManager.getPermission(storeId, appointee2Id);
+        assertNotNull(appointee2Permission, "Permission for appointee 2 should exist");
+        assertTrue(appointee2Permission.isStoreOwner(), "Appointee 2 should be a store owner");
+        
+        // Additional verification through the permissions API
+        // Print out the permissions for debugging
+        System.out.println("Appointee 1 role: " + appointee1Permission.getRoleType());
+        System.out.println("Appointee 1 permissions: " + appointee1Permission.getPermissions());
+        System.out.println("Appointee 2 role: " + appointee2Permission.getRoleType());
+        System.out.println("Appointee 2 permissions: " + appointee2Permission.getPermissions());
     }
 
     @Test
@@ -585,18 +577,16 @@ public class MarketServiceTest {
             tokenId1, appointerId, appointeeId, store1.getId());
         
         // Test the system's behavior with notification failures
-        // Two options based on how the system handles notification failures:
+        // The system uses a lenient approach where notification failures don't block the main operation
+        assertFalse(appointResponse.errorOccurred(), 
+            "Store manager appointment should succeed even if notifications fail");
         
-        // Option 1: If notification failures should cause the operation to fail
-        assertTrue(appointResponse.errorOccurred(), 
-            "Store manager appointment should fail when notifications fail");
-        assertTrue(appointResponse.getErrorMessage().contains("notification") || 
-                appointResponse.getErrorMessage().contains("failed"), 
-            "Error message should mention notification failure");
-        
-        // Option 2 (commented out): If notification failures should be logged but not stop the operation
-        // assertFalse(appointResponse.errorOccurred(), 
-        //    "Store manager appointment should succeed even if notifications fail");
+        // Verify the appointment was successful by checking if the user has manager permissions
+        Response<Map<String, List<PermissionType>>> permissionsResponse = 
+            marketService.getManagersPermissions(tokenId1, store1.getId());
+        assertFalse(permissionsResponse.errorOccurred(), "Getting manager permissions should succeed");
+        assertTrue(permissionsResponse.getValue().containsKey(appointeeId), 
+            "Appointee should be in the list of managers");
         
         // Verify we can still get the notification service
         Response<INotificationService> serviceResponse = marketService.getNotificationService(tokenId1);
@@ -607,6 +597,10 @@ public class MarketServiceTest {
         Response<Boolean> notifyResponse = retrievedService.sendNotification("testUser", "Test notification");
         assertTrue(notifyResponse.errorOccurred(), "Notification should fail with our service");
         assertEquals("Failed to notify user: testUser", notifyResponse.getErrorMessage());
+        
+        // Verify that the notification service was actually used during the appointment
+        // This is a more advanced check and might require additional mocking or logging checks
+        // to verify that the notification service was called with the appropriate parameters
     }
 
     @Test
