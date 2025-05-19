@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import Application.DTOs.AuctionDTO;
@@ -37,6 +38,7 @@ public class StoreService {
         this.notificationService = null;
     }
 
+    @Autowired
     public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, NotificationService notificationService) {
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;

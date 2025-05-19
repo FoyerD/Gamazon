@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Domain.Pair;
@@ -22,6 +23,7 @@ public class ItemFacade {
     /**
      * Constructs the facade with required repositories.
      */
+    @Autowired
     public ItemFacade(IItemRepository itemRepository, IProductRepository productRepository, IStoreRepository storeRepository) {
         this.itemRepository = itemRepository;
         this.productRepository = productRepository;

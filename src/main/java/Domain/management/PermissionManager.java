@@ -4,15 +4,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import Domain.User.Member;
 
-
+@Component
 public class PermissionManager {
     private IPermissionRepository permissionRepository;
 
     public PermissionManager() {
         this.permissionRepository = null;
     }
+    @Autowired
     public PermissionManager(IPermissionRepository permissionRepository) {
         this.permissionRepository = permissionRepository;
     }

@@ -11,9 +11,9 @@ import Application.utils.Response;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import Application.DTOs.OrderDTO;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Pair;
 import Domain.Shopping.IReceiptRepository;
@@ -30,6 +30,7 @@ import Domain.Store.StoreFacade;
 public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
+
     public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
      ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
       IProductRepository productRepository, TokenService tokenService) {
@@ -37,6 +38,7 @@ public class ShoppingService{
         cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
     }
 
+    @Autowired
     public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade) {
         this.cartFacade = cartFacade;
         this.tokenService = tokenService;

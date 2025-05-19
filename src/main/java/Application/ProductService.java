@@ -7,9 +7,12 @@ import Domain.Store.ProductFacade;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import Application.DTOs.ProductDTO;
 import Application.utils.Error;
 
+@Service
 public class ProductService {
     private final ProductFacade productFacade;
     private TokenService tokenService;

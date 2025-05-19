@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
@@ -33,6 +34,18 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final StoreFacade storeFacade;
     private final IProductRepository productRepo;
 
+    /**
+     * Constructor to initialize the ShoppingCartFacade with required repositories and services.
+     * 
+     * @param cartRepo The repository for shopping carts
+     * @param basketRepo The repository for shopping baskets
+     * @param paymentService The payment service for processing payments
+     * @param itemFacade The facade for item management
+     * @param storeFacade The facade for store management
+     * @param receiptRepo The repository for receipts
+     * @param productRepository The repository for products
+     */
+    @Autowired
     public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
