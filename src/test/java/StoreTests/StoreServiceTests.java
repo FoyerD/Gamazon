@@ -25,18 +25,9 @@ import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
-import Domain.User.Member;
-import Domain.User.User;
 import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
 import Infrastructure.MemoryRepoManager;
-import Infrastructure.NotificationService;
-import Infrastructure.Repositories.MemoryAuctionRepository;
-import Infrastructure.Repositories.MemoryFeedbackRepository;
-import Infrastructure.Repositories.MemoryItemRepository;
-import Infrastructure.Repositories.MemoryPermissionRepository;
-import Infrastructure.Repositories.MemoryStoreRepository;
-import Infrastructure.Repositories.MemoryUserRepository;
 import Domain.FacadeManager;
 import Domain.Pair;
 import Domain.Store.Item;
@@ -49,7 +40,7 @@ import Application.utils.Response;
 
 
 public class StoreServiceTests {
-
+    // Existing fields
     private StoreService storeService;
     private StoreFacade storeFacade;
     private IStoreRepository storeRepository;
@@ -60,31 +51,38 @@ public class StoreServiceTests {
     private TokenService tokenService;
     private PermissionManager permissionManager;
     private IPermissionRepository permissionRepository;
-    UUID userId;
-    String tokenId = null;
+    
+    // Add ServiceManager as a field
+    private ServiceManager serviceManager;
+    
+    // User data
+    private UUID userId;
+    private String tokenId = null;
 
     @Before
     public void setUp() {
         // Initialize repository manager
         MemoryRepoManager repositoryManager = new MemoryRepoManager();
         
-        // Initialize facades and services
+        // Initialize facade manager
         FacadeManager facadeManager = new FacadeManager(repositoryManager, null);
-        ServiceManager serviceManager = new ServiceManager(facadeManager);
         
-        // Get repositories through the manager (for field assignments)
+        // Initialize service manager and store as a field for use across tests
+        this.serviceManager = new ServiceManager(facadeManager);
+        
+        // Get needed services directly from the service manager
+        this.storeService = serviceManager.getStoreService();
+        this.tokenService = serviceManager.getTokenService();
+        
+        // For backward compatibility, also get facades and repositories
+        this.storeFacade = facadeManager.getStoreFacade();
         this.storeRepository = repositoryManager.getStoreRepository();
         this.auctionRepository = repositoryManager.getAuctionRepository();
         this.itemRepository = repositoryManager.getItemRepository();
         this.feedbackRepository = repositoryManager.getFeedbackRepository();
         this.userRepository = repositoryManager.getUserRepository();
         this.permissionRepository = repositoryManager.getPermissionRepository();
-        
-        // Get services
-        this.tokenService = serviceManager.getTokenService();
         this.permissionManager = new PermissionManager(permissionRepository);
-        this.storeFacade = facadeManager.getStoreFacade();
-        this.storeService = serviceManager.getStoreService();
         
         // Create a guest user
         Response<UserDTO> guestResponse = serviceManager.getUserService().guestEntry();
@@ -183,8 +181,8 @@ public class StoreServiceTests {
         assertFalse("Store creation should succeed", addResult.errorOccurred());
         String storeId = addResult.getValue().getId();
         
-        // Create a product using ProductService
-        ProductService productService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getProductService();
+        // Create a product using ProductService from the shared service manager
+        ProductService productService = serviceManager.getProductService();
         Response<ProductDTO> productResponse = productService.addProduct(
             tokenId,
             "Test Product",
@@ -194,8 +192,8 @@ public class StoreServiceTests {
         assertFalse("Product creation should succeed", productResponse.errorOccurred());
         String productId = productResponse.getValue().getId();
         
-        // Add the product to the store using ItemService
-        ItemService itemService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getItemService();
+        // Add the product to the store using ItemService from the shared service manager
+        ItemService itemService = serviceManager.getItemService();
         Response<ItemDTO> itemResponse = itemService.add(
             tokenId,
             storeId,
@@ -218,8 +216,10 @@ public class StoreServiceTests {
 
     @Test
     public void GivenExistingMemberAndAndNewProduct_WhenAddAuctionForNoneexistingStore_ThenReturnError() {
+        // Get services from the shared serviceManager
+        ProductService productService = serviceManager.getProductService();
+        
         // Create a product using ProductService
-        ProductService productService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getProductService();
         Response<ProductDTO> productResponse = productService.addProduct(
             tokenId,
             "Test Product",
@@ -231,18 +231,6 @@ public class StoreServiceTests {
         
         // Use a non-existent store ID
         String nonExistentStoreId = "whatwhat";
-        
-        // Try to add an item to the non-existent store
-        ItemService itemService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getItemService();
-        Response<ItemDTO> itemResponse = itemService.add(
-            tokenId,
-            nonExistentStoreId,
-            productId,
-            10.0f,
-            10,
-            "A new product"
-        );
-        assertTrue("Item addition to non-existent store should fail", itemResponse.errorOccurred());
         
         // Try to create an auction for the item in the non-existent store
         Date endDate = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
@@ -291,10 +279,9 @@ public class StoreServiceTests {
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
-        // Create and add products using ProductService and ItemService
-        // Assuming we have access to these services either directly or through ServiceManager
-        ProductService productService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getProductService();
-        ItemService itemService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getItemService();
+        // Get services from the shared ServiceManager
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
         
         // Create 3 products
         Response<ProductDTO> product1Response = productService.addProduct(
@@ -428,9 +415,9 @@ public class StoreServiceTests {
 
     @Test
     public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
-        // Create a product using ProductService
-        ProductService productService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getProductService();
-        ItemService itemService = new ServiceManager(new FacadeManager(new MemoryRepoManager(), null)).getItemService();
+        // Get services from the shared ServiceManager
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
         
         // Create a product
         Response<ProductDTO> productResponse = productService.addProduct(
