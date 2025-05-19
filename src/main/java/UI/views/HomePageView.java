@@ -1,6 +1,7 @@
 package UI.views;
 
 import UI.presenters.IProductPresenter;
+import UI.presenters.IPurchasePresenter;
 import Application.DTOs.ItemDTO;
 import Application.utils.Response;
 
@@ -24,14 +25,16 @@ import java.util.stream.Collectors;
 public class HomePageView extends VerticalLayout implements BeforeEnterObserver {
 
     private final IProductPresenter productPresenter;
+    private final IPurchasePresenter purchasePresenter;
     private String sessionToken = null;
     private String currentUsername = null;
 
     private final TextField searchBar = new TextField();
     private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
 
-    public HomePageView(IProductPresenter productPresenter) {
+    public HomePageView(IProductPresenter productPresenter, IPurchasePresenter purchasePresenter) {
         this.productPresenter = productPresenter;
+        this.purchasePresenter = purchasePresenter;
 
         setSizeFull();
         setSpacing(true);
@@ -82,6 +85,23 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
                 .set("color", "white");
             return reviewButton;
         }).setHeader("Actions");
+
+        // Add to cart button column
+        productGrid.addComponentColumn(item -> {
+            Button addToCartButton = new Button("Add to Cart", e -> {
+                Response<Boolean> response = purchasePresenter.addProductToCart(sessionToken, item.getProductId(), item.getStoreId(), 1);
+                if (!response.errorOccurred()) {
+                    Notification.show("Product added to cart successfully!", 3000, Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Failed to add product to cart: " + response.getErrorMessage(), 
+                                    3000, Notification.Position.MIDDLE);
+                }
+            });
+            addToCartButton.getStyle()
+                .set("background-color", "#38a169")
+                .set("color", "white");
+            return addToCartButton;
+        }).setHeader("Cart");
 
         productGrid.setWidthFull();
         productGrid.getStyle().set("background-color", "#f7fafc");

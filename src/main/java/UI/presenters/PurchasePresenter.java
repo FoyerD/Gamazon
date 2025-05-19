@@ -20,7 +20,7 @@ public class PurchasePresenter implements IPurchasePresenter {
 
     @Override
     public Response<Boolean> addProductToCart(String sessionToken, String productId, String storeId, int amount) {
-        return this.shoppingService.addProductToCart(sessionToken, productId, storeId, amount);
+        return this.shoppingService.addProductToCart(storeId, sessionToken, productId, amount);
     }
 
     @Override
