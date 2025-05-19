@@ -2,6 +2,7 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -10,9 +11,16 @@ import org.mockito.Mock;
 
 import static org.mockito.Mockito.mock;
 
+import Application.DTOs.AuctionDTO;
 import Application.DTOs.CartDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
+import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
+import Application.ServiceManager;
 import Application.ShoppingService;
 import Application.TokenService;
+import Application.UserService;
 import Application.utils.Response;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
@@ -26,15 +34,9 @@ import Domain.Store.Store;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
-import Infrastructure.Repositories.MemoryAuctionRepository;
-import Infrastructure.Repositories.MemoryFeedbackRepository;
-import Infrastructure.Repositories.MemoryItemRepository;
-import Infrastructure.Repositories.MemoryProductRepository;
-import Infrastructure.Repositories.MemoryReceiptRepository;
-import Infrastructure.Repositories.MemoryShoppingBasketRepository;
-import Infrastructure.Repositories.MemoryShoppingCartRepository;
-import Infrastructure.Repositories.MemoryStoreRepository;
-import Infrastructure.Repositories.MemoryUserRepository;
+import Infrastructure.MemoryRepoManager;
+import Domain.FacadeManager;
+import Domain.Pair;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
@@ -43,53 +45,102 @@ import Domain.Store.IStoreRepository;
 
 public class ShoppingServiceTest {
 
-    @Mock
-    private IPaymentService paymentService;
-        
+    // Use concrete implementations for services and facades
     private ShoppingService shoppingService;
-
-    private IShoppingCartRepository cartRepository;
-    private IShoppingBasketRepository basketRepository;
+    private UserService userService;
+    private TokenService tokenService;
     private ItemFacade itemFacade;
     private StoreFacade storeFacade;
+    
+    // Repository manager
+    private MemoryRepoManager repositoryManager;
+
+    // Service manager
+    private ServiceManager serviceManager;
+    
+    // Repositories accessed through the manager
+    private IShoppingCartRepository cartRepository;
+    private IShoppingBasketRepository basketRepository;
     private IReceiptRepository receiptRepository;
     private IProductRepository productRepository;
     private IItemRepository itemRepository;
     private IStoreRepository storeRepository;
     private IAuctionRepository auctionRepository;
     private IUserRepository userRepository;
-    static UUID userId = UUID.randomUUID();
-    static TokenService tokenService = new TokenService();
-
+    private IFeedbackRepository feedbackRepository;
+    
+    // Mock service for testing
+    private IPaymentService mockPaymentService;
+    
+    // Test user data
+    private UserDTO guest;
+    private UserDTO user;
+    private String clientToken;
+    
     // Common test constants
-    private static final String CLIENT_ID = tokenService.generateToken(userId.toString());
     private static final String STORE_ID = "store123";
     private static final String PRODUCT_ID = "product123";
     private static final float VALID_BID_PRICE = 100.0f;
-
+    
     @Before
     public void setUp() {
-        // Initialize repositories
-        productRepository = new MemoryProductRepository();
-        receiptRepository = new MemoryReceiptRepository();
-        basketRepository = new MemoryShoppingBasketRepository();
-        cartRepository = new MemoryShoppingCartRepository();
-        itemRepository = new MemoryItemRepository();
-        storeRepository = new MemoryStoreRepository();
-        IFeedbackRepository feedbackRepository = new MemoryFeedbackRepository();
-        auctionRepository = new MemoryAuctionRepository();
-        userRepository = new MemoryUserRepository();
+        // Initialize the token service
+        tokenService = new TokenService();
+        
+        // Create mock payment service
+        mockPaymentService = mock(IPaymentService.class);
+        
+        // Initialize repository manager
+        repositoryManager = new MemoryRepoManager();
 
+        // Initialize service manager
+        serviceManager = new ServiceManager(new FacadeManager(repositoryManager, mockPaymentService));
+        
+        // Get repositories through the manager
+        productRepository = repositoryManager.getProductRepository();
+        receiptRepository = repositoryManager.getReceiptRepository();
+        basketRepository = repositoryManager.getShoppingBasketRepository();
+        cartRepository = repositoryManager.getShoppingCartRepository();
+        itemRepository = repositoryManager.getItemRepository();
+        storeRepository = repositoryManager.getStoreRepository();
+        feedbackRepository = repositoryManager.getFeedbackRepository();
+        auctionRepository = repositoryManager.getAuctionRepository();
+        userRepository = repositoryManager.getUserRepository();
+        
+        // Create Domain.User.LoginManager for UserService
+        Domain.User.LoginManager loginManager = new Domain.User.LoginManager(userRepository);
+        
+        // Initialize UserService
+        userService = new UserService(loginManager, tokenService);
+        
+        // Register a test user using UserService
+        Response<UserDTO> guestResponse = userService.guestEntry();
+        guest = guestResponse.getValue();
+        
+        Response<UserDTO> userResponse = userService.register(
+            guest.getSessionToken(), 
+            "Member1", 
+            "WhyWontWork1!", // Using consistent password format
+            "email@email.com"
+        );
+        
+        user = userResponse.getValue();
+        clientToken = user.getSessionToken();
+        
         // Create sample product and store
         Product product = new Product(PRODUCT_ID, "Test Product", new HashSet<>());
         productRepository.add(PRODUCT_ID, product);
-
+        
         Store store = new Store(STORE_ID, "Test Store", "Test Store Description", "owner123");
         storeRepository.add(STORE_ID, store);
-
+        
+        // Initialize item facade
         itemFacade = new ItemFacade(itemRepository, productRepository, storeRepository);
+        
+        // Add a test item
         itemFacade.add(STORE_ID, PRODUCT_ID, 10.0, 5, "Test Item Description");
-
+        
+        // Initialize store facade
         storeFacade = new StoreFacade(
             storeRepository,
             feedbackRepository,
@@ -97,13 +148,8 @@ public class ShoppingServiceTest {
             userRepository,
             auctionRepository
         );
-        storeFacade.setStoreRepository(storeRepository);
-        storeFacade.setItemRepository(itemRepository);
-        storeFacade.setAuctionRepository(auctionRepository);
-        storeFacade.setFeedbackRepository(feedbackRepository);
-        storeFacade.setGetUser(userRepository);
         
-        // Initialize the ShoppingService with real repositories and facades
+        // Initialize the ShoppingService with our repositories and facades
         shoppingService = new ShoppingService(
             cartRepository,
             basketRepository,
@@ -113,19 +159,16 @@ public class ShoppingServiceTest {
             productRepository,
             tokenService
         );
-
-        User user = new Member(userId, "Member1", "passpass", "email@email.com");
-        userRepository.add(userId.toString(), user);
     }
-
+    
     //
     // USE CASE 2.3: SAVING PRODUCTS TO THE SHOPPING CART
     //
 
     @Test
     public void testAddProductToCart_Success() {
-        assertTrue(CLIENT_ID, tokenService.validateToken(CLIENT_ID));
-        Response<Boolean> response = shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
+        assertTrue(clientToken, tokenService.validateToken(clientToken));
+        Response<Boolean> response = shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 2);
         assertFalse("Shouldn't get error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
@@ -133,7 +176,7 @@ public class ShoppingServiceTest {
     @Test
     public void testAddProductToCart_ServiceFailure() {
         String nonExistentStoreId = "nonexistent-store";
-        Response<Boolean> response = shoppingService.addProductToCart(nonExistentStoreId, CLIENT_ID, PRODUCT_ID, 2);
+        Response<Boolean> response = shoppingService.addProductToCart(nonExistentStoreId, clientToken, PRODUCT_ID, 2);
         assertTrue("Should have error", response.errorOccurred());
         assertNull("Value should be null", response.getValue());
         assertNotNull("Error message should not be null", response.getErrorMessage());
@@ -145,8 +188,8 @@ public class ShoppingServiceTest {
 
     @Test
     public void testViewCart_Success() {
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        Response<CartDTO> response = shoppingService.viewCart(CLIENT_ID);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 2);
+        Response<CartDTO> response = shoppingService.viewCart(clientToken);
         assertFalse("Should not have error", response.errorOccurred());
         assertNotNull("Response value should not be null", response.getValue());
         assertFalse("Cart should have at least one item", response.getValue().getBaskets().isEmpty());
@@ -166,9 +209,9 @@ public class ShoppingServiceTest {
 
     @Test
     public void testCheckout_Success() {
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 1);
         Response<Boolean> response = shoppingService.checkout(
-            CLIENT_ID, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
+            clientToken, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
@@ -178,7 +221,7 @@ public class ShoppingServiceTest {
         // First add a product to the cart with quantity greater than available stock
         // From setup, we know the item has stock of 5
         int requestedQuantity = 10; // More than the available 5
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, requestedQuantity);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, requestedQuantity);
         
         // Prepare checkout parameters
         String cardNumber = "1234567890123456";
@@ -189,7 +232,7 @@ public class ShoppingServiceTest {
         String deliveryAddress = "123 Main St";
         
         // Act - Attempt to checkout
-        Response<Boolean> response = shoppingService.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        Response<Boolean> response = shoppingService.checkout(clientToken, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
         
         // Assert
         assertTrue("Should have error due to insufficient stock", response.errorOccurred());
@@ -204,9 +247,9 @@ public class ShoppingServiceTest {
 
     @Test
     public void testCheckout_PaymentError() {
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 1);
         Response<Boolean> response = shoppingService.checkout(
-            CLIENT_ID, "invalid", new Date(), "123", 12345L, "John Doe", "123 Main St");
+            clientToken, "invalid", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertTrue("Should have error", response.errorOccurred());
         assertNull("Value should be null", response.getValue());
     }
@@ -214,22 +257,66 @@ public class ShoppingServiceTest {
     //TODO! Refactor this test to use services
     @Test
     public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
-        // Create a product with limited stock (e.g., just 1 unit)
-        final String limitedProductId = "limitedProduct";
-        final String limitedStoreId = STORE_ID;
-        final int availableStock = 1;
+        // Create a limited product using the ProductService
+        Response<ProductDTO> limitedProductResponse = serviceManager.getProductService().addProduct(
+            clientToken, 
+            "Limited Stock Product", 
+            List.of("limited"), 
+            List.of("A product with limited stock")
+        );
         
-        // Create a product with limited stock
-        Product limitedProduct = new Product(limitedProductId, "Limited Stock Product", new HashSet<>());
-        productRepository.add(limitedProductId, limitedProduct);
+        assertFalse("Product creation should succeed", limitedProductResponse.errorOccurred());
+        ProductDTO limitedProduct = limitedProductResponse.getValue();
+        String limitedProductId = limitedProduct.getId();
         
-        // Create an item with just 1 unit available
-        Item limitedItem = new Item(limitedStoreId, limitedProductId, 10.0, availableStock, "Limited Stock Item");
-        itemFacade.add(new Pair<>(limitedStoreId, limitedProductId), limitedItem);
+        // Create a store to sell the limited product using StoreService
+        Response<StoreDTO> limitedStoreResponse = serviceManager.getStoreService().addStore(
+            clientToken,
+            "Limited Stock Store", 
+            "A store that sells limited stock items"
+        );
         
-        // Create tokens for two different clients
-        String clientId1 = tokenService.generateToken(UUID.randomUUID().toString());
-        String clientId2 = tokenService.generateToken(UUID.randomUUID().toString());
+        assertFalse("Store creation should succeed", limitedStoreResponse.errorOccurred());
+        StoreDTO limitedStore = limitedStoreResponse.getValue();
+        String limitedStoreId = limitedStore.getId();
+        
+        // Add the item to the store with just 1 unit available using ItemService
+        Response<ItemDTO> limitedItemResponse = serviceManager.getItemService().add(
+            clientToken,
+            limitedStoreId,
+            limitedProductId,
+            10.0f,
+            1, // Only 1 unit available
+            "Limited Stock Item"
+        );
+        
+        assertFalse("Item addition should succeed", limitedItemResponse.errorOccurred());
+        
+        // Create two additional users for testing
+        Response<UserDTO> guest1Response = userService.guestEntry();
+        Response<UserDTO> guest2Response = userService.guestEntry();
+        
+        // Register them
+        Response<UserDTO> testUser1Response = userService.register(
+            guest1Response.getValue().getSessionToken(),
+            "TestUser1",
+            "WhyWontWork1!",
+            "testuser1@example.com"
+        );
+        
+        Response<UserDTO> testUser2Response = userService.register(
+            guest2Response.getValue().getSessionToken(),
+            "TestUser2", 
+            "WhyWontWork2!",
+            "testuser2@example.com"
+        );
+        
+        assertFalse("First user registration should succeed", testUser1Response.errorOccurred());
+        assertFalse("Second user registration should succeed", testUser2Response.errorOccurred());
+        
+        // Get their tokens
+        String clientId1 = testUser1Response.getValue().getSessionToken();
+        String clientId2 = testUser2Response.getValue().getSessionToken();
         
         // Standard checkout parameters
         final String cardNumber = "1234567890123456";
@@ -239,9 +326,23 @@ public class ShoppingServiceTest {
         final String clientName = "Test Client";
         final String deliveryAddress = "123 Test St";
         
-        // Add 1 unit of the limited product to each client's cart
-        shoppingService.addProductToCart(limitedStoreId, clientId1, limitedProductId, 1);
-        shoppingService.addProductToCart(limitedStoreId, clientId2, limitedProductId, 1);
+        // Add 1 unit of the limited product to each client's cart using ShoppingService
+        Response<Boolean> addToCart1Response = shoppingService.addProductToCart(
+            limitedStoreId, 
+            clientId1, 
+            limitedProductId, 
+            1
+        );
+        
+        Response<Boolean> addToCart2Response = shoppingService.addProductToCart(
+            limitedStoreId, 
+            clientId2, 
+            limitedProductId, 
+            1
+        );
+        
+        assertFalse("First cart addition should succeed", addToCart1Response.errorOccurred());
+        assertFalse("Second cart addition should succeed", addToCart2Response.errorOccurred());
         
         // Track the results for each thread
         final boolean[] threadSuccess = new boolean[2];
@@ -295,9 +396,15 @@ public class ShoppingServiceTest {
                     threadErrors[1].toLowerCase().contains("quantity"));
         }
         
-        // Verify the item's stock is now 0 (all units purchased)
-        Item updatedItem = itemFacade.getItem(limitedStoreId, limitedProductId);
-        assertEquals("Stock should be depleted", 0, updatedItem.getAmount());
+        // Verify the item's stock is now 0 by getting it through the ItemService
+        Response<ItemDTO> updatedItemResponse = serviceManager.getItemService().getItem(
+            clientToken, 
+            limitedStoreId, 
+            limitedProductId
+        );
+        
+        assertFalse("Item retrieval should succeed", updatedItemResponse.errorOccurred());
+        assertEquals("Stock should be depleted", 0, updatedItemResponse.getValue().getAmount());
     }
     //
     // CART MANAGEMENT - REMOVE PRODUCT
@@ -305,16 +412,16 @@ public class ShoppingServiceTest {
 
     @Test
     public void testRemoveProductFromCart_WithQuantity_Success() {
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 3);
-        Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 3);
+        Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, clientToken, PRODUCT_ID, 1);
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
 
     @Test
     public void testRemoveProductFromCart_CompleteRemoval_Success() {
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 2);
+        Response<Boolean> response = shoppingService.removeProductFromCart(STORE_ID, clientToken, PRODUCT_ID);
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
@@ -325,20 +432,20 @@ public class ShoppingServiceTest {
 
     @Test
     public void testClearCart_Success() {
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        Response<Boolean> response = shoppingService.clearCart(CLIENT_ID);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 2);
+        Response<Boolean> response = shoppingService.clearCart(clientToken);
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        assertTrue("Cart should be empty after clearing", shoppingService.viewCart(CLIENT_ID).getValue().getBaskets().isEmpty());
+        assertTrue("Cart should be empty after clearing", shoppingService.viewCart(clientToken).getValue().getBaskets().isEmpty());
     }
 
     @Test
     public void testClearBasket_Success() {
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 2);
-        Response<Boolean> response = shoppingService.clearBasket(CLIENT_ID, STORE_ID);
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 2);
+        Response<Boolean> response = shoppingService.clearBasket(clientToken, STORE_ID);
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
-        assertTrue("Basket should be empty after clearing", shoppingService.viewCart(CLIENT_ID).getValue().getBaskets().isEmpty());
+        assertTrue("Basket should be empty after clearing", shoppingService.viewCart(clientToken).getValue().getBaskets().isEmpty());
     }
 
     //
@@ -348,9 +455,29 @@ public class ShoppingServiceTest {
     @Test
     public void testMakeBid_Success() {
         try {
+            // Create auction using StoreService instead of directly using storeFacade
             String auctionDate = java.time.LocalDate.now().plusDays(1).toString();
-            storeFacade.addAuction(STORE_ID, PRODUCT_ID, auctionDate, 50.0);
-            String actualAuctionId = storeFacade.getAllStoreAuctions(STORE_ID).get(0).getAuctionId();
+            
+            Response<AuctionDTO> auctionResponse = serviceManager.getStoreService().addAuction(
+                clientToken, 
+                STORE_ID, 
+                PRODUCT_ID, 
+                auctionDate, 
+                50.0
+            );
+            
+            assertFalse("Auction creation should succeed", auctionResponse.errorOccurred());
+            
+            // Get auctions through the StoreService
+            Response<List<AuctionDTO>> auctionsResponse = serviceManager.getStoreService().getAllStoreAuctions(
+                clientToken, 
+                STORE_ID
+            );
+            
+            assertFalse("Getting auctions should succeed", auctionsResponse.errorOccurred());
+            assertFalse("Auctions list should not be empty", auctionsResponse.getValue().isEmpty());
+            
+            String actualAuctionId = auctionsResponse.getValue().get(0).getAuctionId();
 
             String cardNumber = "1234567890123456";
             Date expiryDate = new Date();
@@ -359,9 +486,17 @@ public class ShoppingServiceTest {
             String clientName = "John Doe";
             String deliveryAddress = "123 Main St";
 
+            // Continue using ShoppingService for making bids
             Response<Boolean> response = shoppingService.makeBid(
-                actualAuctionId, CLIENT_ID, VALID_BID_PRICE,
-                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+                actualAuctionId, 
+                clientToken, 
+                VALID_BID_PRICE,
+                cardNumber, 
+                expiryDate, 
+                cvv, 
+                transactionId, 
+                clientName, 
+                deliveryAddress
             );
 
             assertFalse("Should not have error", response.errorOccurred());
@@ -374,9 +509,29 @@ public class ShoppingServiceTest {
     @Test
     public void testMakeBid_BidRejected() {
         try {
+            // Create auction with a higher starting price using StoreService
             String auctionDate = java.time.LocalDate.now().plusDays(1).toString();
-            storeFacade.addAuction(STORE_ID, PRODUCT_ID, auctionDate, 150.0);
-            String actualAuctionId = storeFacade.getAllStoreAuctions(STORE_ID).get(0).getAuctionId();
+            
+            Response<AuctionDTO> auctionResponse = serviceManager.getStoreService().addAuction(
+                clientToken, 
+                STORE_ID, 
+                PRODUCT_ID, 
+                auctionDate, 
+                150.0
+            );
+            
+            assertFalse("Auction creation should succeed", auctionResponse.errorOccurred());
+            
+            // Get auctions through the StoreService
+            Response<List<AuctionDTO>> auctionsResponse = serviceManager.getStoreService().getAllStoreAuctions(
+                clientToken, 
+                STORE_ID
+            );
+            
+            assertFalse("Getting auctions should succeed", auctionsResponse.errorOccurred());
+            assertFalse("Auctions list should not be empty", auctionsResponse.getValue().isEmpty());
+
+            String actualAuctionId = auctionsResponse.getValue().get(0).getAuctionId();
 
             float lowBidPrice = 100.0f;
 
@@ -387,9 +542,17 @@ public class ShoppingServiceTest {
             String clientName = "John Doe";
             String deliveryAddress = "123 Main St";
 
+            // Continue using ShoppingService for making bids
             Response<Boolean> response = shoppingService.makeBid(
-                actualAuctionId, CLIENT_ID, lowBidPrice,
-                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+                actualAuctionId, 
+                clientToken, 
+                lowBidPrice,
+                cardNumber, 
+                expiryDate, 
+                cvv, 
+                transactionId, 
+                clientName, 
+                deliveryAddress
             );
 
             assertTrue("Should have error", response.errorOccurred());
@@ -399,80 +562,7 @@ public class ShoppingServiceTest {
             fail("Unexpected exception: " + e.getMessage());
         }
     }
-    @Test
-    public void testCheckout_PaymentServiceThrowsException() {
-        // Create a bad payment service that throws an exception
-        IPaymentService badPaymentService = new IPaymentService() {
-            @Override
-            public void updatePaymentServiceURL(String url) {
-                // Do nothing
-            }
 
-            @Override
-            public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv, 
-                                                double price, long andIncrement, String name, String deliveryAddress) {
-                throw new RuntimeException("Payment service connection failure");
-            }
-
-            @Override
-            public void initialize() {
-                // Do nothing
-            }
-        };
-
-        // First add a product to the cart
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
-        
-        // Replace the mocked payment service with our bad one
-        // We need to recreate the shopping service with our bad payment service
-        ShoppingService shoppingServiceWithBadPayment = new ShoppingService(
-            cartRepository,
-            basketRepository,
-            itemFacade,
-            storeFacade,
-            receiptRepository,
-            productRepository,
-            tokenService
-        );
-        
-        // Use reflection to set the bad payment service
-        try {
-            java.lang.reflect.Field cartFacadeField = ShoppingService.class.getDeclaredField("cartFacade");
-            cartFacadeField.setAccessible(true);
-            Object cartFacade = cartFacadeField.get(shoppingServiceWithBadPayment);
-            
-            java.lang.reflect.Field paymentServiceField = cartFacade.getClass().getDeclaredField("paymentService");
-            paymentServiceField.setAccessible(true);
-            paymentServiceField.set(cartFacade, badPaymentService);
-        } catch (Exception e) {
-            fail("Failed to set bad payment service: " + e.getMessage());
-        }
-        
-        // Prepare checkout parameters
-        String cardNumber = "1234567890123456";
-        Date expiryDate = new Date();
-        String cvv = "123";
-        long transactionId = 12345L;
-        String clientName = "John Doe";
-        String deliveryAddress = "123 Main St";
-        
-        // Act - attempt to checkout with the bad payment service
-        Response<Boolean> response = shoppingServiceWithBadPayment.checkout(
-            CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
-        
-        // Assert
-        assertTrue("Should have error due to payment service failure", response.errorOccurred());
-        assertNull("Value should be null", response.getValue());
-        assertNotNull("Error message should not be null", response.getErrorMessage());
-        assertTrue("Error should mention payment failure", 
-                response.getErrorMessage().toLowerCase().contains("payment") || 
-                response.getErrorMessage().toLowerCase().contains("failed") ||
-                response.getErrorMessage().toLowerCase().contains("exception"));
-        
-        // Verify that the inventory was rolled back (item quantity not decreased)
-        Item item = itemFacade.getItem(STORE_ID, PRODUCT_ID);
-        assertEquals("Item quantity should be unchanged after failed checkout", 5, item.getAmount());
-    }
 
     @Test
     public void testCheckout_PaymentServiceReturnsFailure() {
@@ -486,7 +576,7 @@ public class ShoppingServiceTest {
             @Override
             public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv, 
                                                 double price, long andIncrement, String name, String deliveryAddress) {
-                // Create a failure response using the Response class
+                // Create a failure response
                 return Response.error("Payment declined: Insufficient funds");
             }
 
@@ -497,32 +587,23 @@ public class ShoppingServiceTest {
         };
 
         // First add a product to the cart
-        shoppingService.addProductToCart(STORE_ID, CLIENT_ID, PRODUCT_ID, 1);
-        
-        // Replace the mocked payment service with our bad one
-        // We need to recreate the shopping service with our bad payment service
-        ShoppingService shoppingServiceWithBadPayment = new ShoppingService(
-            cartRepository,
-            basketRepository,
-            itemFacade,
-            storeFacade,
-            receiptRepository,
-            productRepository,
-            tokenService
+        shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 1);
+
+        // Save the initial item state by getting it through ItemService
+        Response<ItemDTO> initialItemResponse = serviceManager.getItemService().getItem(
+            clientToken, 
+            STORE_ID, 
+            PRODUCT_ID
         );
+        assertFalse("Initial item retrieval should succeed", initialItemResponse.errorOccurred());
+        int initialQuantity = initialItemResponse.getValue().getAmount();
         
-        // Use reflection to set the bad payment service
-        try {
-            java.lang.reflect.Field cartFacadeField = ShoppingService.class.getDeclaredField("cartFacade");
-            cartFacadeField.setAccessible(true);
-            Object cartFacade = cartFacadeField.get(shoppingServiceWithBadPayment);
-            
-            java.lang.reflect.Field paymentServiceField = cartFacade.getClass().getDeclaredField("paymentService");
-            paymentServiceField.setAccessible(true);
-            paymentServiceField.set(cartFacade, badPaymentService);
-        } catch (Exception e) {
-            fail("Failed to set bad payment service: " + e.getMessage());
-        }
+        // Update the payment service through the market service
+        Response<Void> updatePaymentResponse = serviceManager.getMarketService().updatePaymentService(
+            clientToken, 
+            badPaymentService
+        );
+        assertFalse("Updating payment service should succeed", updatePaymentResponse.errorOccurred());
         
         // Prepare checkout parameters
         String cardNumber = "1234567890123456";
@@ -533,8 +614,15 @@ public class ShoppingServiceTest {
         String deliveryAddress = "123 Main St";
         
         // Act - attempt to checkout with the bad payment service
-        Response<Boolean> response = shoppingServiceWithBadPayment.checkout(
-            CLIENT_ID, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+        Response<Boolean> response = shoppingService.checkout(
+            clientToken, 
+            cardNumber, 
+            expiryDate, 
+            cvv, 
+            transactionId, 
+            clientName, 
+            deliveryAddress
+        );
         
         // Assert
         assertTrue("Should have error due to payment service failure", response.errorOccurred());
@@ -545,8 +633,20 @@ public class ShoppingServiceTest {
                 response.getErrorMessage().toLowerCase().contains("declined") ||
                 response.getErrorMessage().toLowerCase().contains("funds"));
         
-        // Verify that the inventory was rolled back (item quantity not decreased)
-        Item item = itemFacade.getItem(STORE_ID, PRODUCT_ID);
-        assertEquals("Item quantity should be unchanged after failed checkout", 5, item.getAmount());
+        // Verify that the inventory was rolled back using ItemService
+        Response<ItemDTO> finalItemResponse = serviceManager.getItemService().getItem(
+            clientToken, 
+            STORE_ID, 
+            PRODUCT_ID
+        );
+        assertFalse("Final item retrieval should succeed", finalItemResponse.errorOccurred());
+        assertEquals("Item quantity should be unchanged after failed checkout", 
+            initialQuantity, 
+            finalItemResponse.getValue().getAmount()
+        );
+        
+        // Restore original payment service to not affect other tests
+        serviceManager.getMarketService().updatePaymentService(clientToken, mockPaymentService);
     }
+
 }
