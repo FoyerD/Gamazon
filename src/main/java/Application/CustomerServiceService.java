@@ -3,6 +3,7 @@ package Application;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import Application.utils.Error;
@@ -16,6 +17,7 @@ public class CustomerServiceService {
     private StoreFacade storeFacade;
     private TokenService tokenService;
     
+    @Autowired
     public CustomerServiceService(StoreFacade storeFacade, TokenService tokenService) {
         this.tokenService = tokenService;
         this.storeFacade = storeFacade;
