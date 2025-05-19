@@ -1,5 +1,6 @@
 package Domain.management;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,5 +109,11 @@ public class PermissionManager {
         Permission founder = new Permission("system", manager.getId());
         PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
         permissionRepository.add("1", manager.getId(), founder);
+    }
+
+    public boolean banUser(String bannerId, String userId, Date endDate) {
+        checkPermission("1", bannerId, PermissionType.BAN_USERS);
+
+        getOrCreatePermission(bannerId, userId, "1", RoleType.BANNED_USER);
     }
 }

@@ -8,6 +8,7 @@ import Domain.ExternalServices.ISupplyService;
 import Domain.Shopping.Receipt;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -222,6 +223,22 @@ public class MarketService {
             return new Response<>(exists);
         } catch (Exception e) {
             TradingLogger.logError(CLASS_NAME, "userExists", "Failed to check if user exists: %s", e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    public Response<Boolean> banUser(String sessionToken, String userId, Date endDate) {
+        if (isInvalid(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, "banUser", "Invalid session token");
+            return new Response<>(new Error("Invalid session token"));
+        }
+        try {
+            marketFacade.checkPermission(tokenService.extractId(sessionToken), "1", PermissionType.BAN_USERS);
+            marketFacade.banUser(userId, endDate);
+            TradingLogger.logEvent(CLASS_NAME, "banUser", "User banned successfully: " + userId);
+            return new Response<>(null);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "banUser", "Failed to ban user: %s", e.getMessage());
             return new Response<>(new Error(e.getMessage()));
         }
     }
