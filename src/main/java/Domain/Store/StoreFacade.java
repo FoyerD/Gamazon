@@ -73,8 +73,7 @@ public class StoreFacade {
         if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
         if (this.getStoreByName(name) != null) throw new RuntimeException("Store name already exists");
         if (this.getUser.apply(founderId) == null) throw new RuntimeException("User not found");
-
-        String storeId = System.currentTimeMillis() + "";
+        String storeId = UUID.randomUUID().toString();
         Store store = new Store(storeId, name, description, founderId);
         if (!this.storeRepository.add(storeId, store)) throw new RuntimeException("Store not added");
         return store;
