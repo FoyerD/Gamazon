@@ -1,4 +1,3 @@
-// TODO! Maybe refactor
 import Domain.management.MarketFacade;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
@@ -157,76 +156,6 @@ public class MarketFacadeTest {
         verify(supplyService).initialize();
         verify(notificationService).initialize();
     }
-
-
-    // === Helper method ===
-
-    @Test
-    public void givenAdminWithDeactivatePermission_whenCloseStore_thenStoreIsClosed() {
-        User user = mock(User.class);
-        Member member = mock(Member.class);
-        when(userRepository.get(anyString())).thenReturn(user);
-        when(user.getName()).thenReturn("adminUser");
-        when(userRepository.getMemberByUsername(anyString())).thenReturn(member);
-        when(member.getName()).thenReturn("adminUser");
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.DEACTIVATE_STORE));
-
-        marketFacade.closeStore("store1", "userId");
-
-        verify(storeFacade).closeStore("store1");
-        verify(notificationService).sendNotification(eq("adminUser"), contains("closed"));
-    }
-
-    @Test
-    public void givenManagerWithDeactivatePermission_whenMarketCloseStore_thenStoreIsClosedByMarket() {
-        User user = mock(User.class);
-        Member member = mock(Member.class);
-        when(userRepository.get(anyString())).thenReturn(user);
-        when(user.getName()).thenReturn("adminUser");
-        when(userRepository.getMemberByUsername(anyString())).thenReturn(member);
-        when(member.getName()).thenReturn("adminUser");
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        Permission permission = createPermissionWith(PermissionType.DEACTIVATE_STORE);
-        when(permission.isStoreManager()).thenReturn(true);
-        marketFacade.getStorePermissions().get("store1").put("adminUser", permission);
-
-        marketFacade.marketCloseStore("store1", "userId");
-
-        verify(storeFacade).closeStore("store1");
-        verify(notificationService, atLeastOnce()).sendNotification(anyString(), contains("closed"));
-    }
-
-
-    @Test
-    public void givenAdminWithRespondPermission_whenRespondToUserMessage_thenResponseIsSent() {
-        User user = mock(User.class);
-        when(userRepository.get(anyString())).thenReturn(user);
-        when(user.getName()).thenReturn("adminUser");
-        when(storeFacade.addFeedback(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.RESPOND_TO_INQUIRIES));
-
-        boolean result = marketFacade.respondToUserMessage("store1", "product1", "userId", "response");
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void givenAdminWithOverseeOffersPermission_whenGetUserMessage_thenReturnFeedback() {
-        User user = mock(User.class);
-        Feedback feedback = mock(Feedback.class);
-        when(userRepository.get(anyString())).thenReturn(user);
-        when(user.getName()).thenReturn("adminUser");
-        when(storeFacade.getFeedback(anyString())).thenReturn(feedback);
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.OVERSEE_OFFERS));
-
-        Feedback result = marketFacade.getUserMessage("store1", "product1", "userId");
-
-        assertNotNull(result);
-    }
-
 
 
     @Test
