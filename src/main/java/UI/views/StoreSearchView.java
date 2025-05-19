@@ -1,6 +1,7 @@
 package UI.views;
 
 import UI.presenters.IStorePresenter;
+import UI.presenters.IManagementPresenter;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.Route;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
 
     private final IStorePresenter storePresenter;
+    private final IManagementPresenter managementPresenter;
     private String sessionToken;
 
     private final TextField storeNameField = new TextField("Search Store by Name");
@@ -36,10 +39,12 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
     private final Button homeButton = new Button("Return to Homepage");
     private final Button ownerDashboardButton;
     private final Button managerButton;
+    private final Button createStoreButton;
 
     @Autowired
-    public StoreSearchView(IStorePresenter storePresenter) {
+    public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter) {
         this.storePresenter = storePresenter;
+        this.managementPresenter = managementPresenter;
 
         setSizeFull();
         setSpacing(true);
@@ -103,10 +108,24 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             .set("color", "white")
             .set("margin-left", "10px");
 
+        // Initialize Create Store button
+        createStoreButton = new Button("Create New Store", VaadinIcon.PLUS.create());
+        createStoreButton.getStyle()
+            .set("background-color", "#4caf50")
+            .set("color", "white")
+            .set("margin-left", "10px");
+        createStoreButton.addClickListener(e -> showCreateStoreDialog());
+
         productGrid.setColumns("productName", "price", "amount", "description");
         productGrid.getStyle().set("background-color", "#f3e5f5");
 
-        HorizontalLayout actionsLayout = new HorizontalLayout(fetchSupplyButton, homeButton, ownerDashboardButton, managerButton);
+        HorizontalLayout actionsLayout = new HorizontalLayout(
+            fetchSupplyButton, 
+            homeButton, 
+            ownerDashboardButton, 
+            managerButton,
+            createStoreButton
+        );
         actionsLayout.setSpacing(true);
 
         add(title, storeNameField, storeIdField, actionsLayout, productGrid);
@@ -143,6 +162,41 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         } else {
             productGrid.setItems(response.getValue());
         }
+    }
+
+    private void showCreateStoreDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Create New Store");
+
+        VerticalLayout dialogLayout = new VerticalLayout();
+        TextField nameField = new TextField("Store Name");
+        TextField descriptionField = new TextField("Store Description");
+        Button createButton = new Button("Create Store", e -> {
+            String name = nameField.getValue();
+            String description = descriptionField.getValue();
+            
+            if (name == null || name.isEmpty()) {
+                Notification.show("Store name is required", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+
+            Response<StoreDTO> response = managementPresenter.addStore(sessionToken, name, description);
+            if (response.errorOccurred()) {
+                Notification.show("Failed to create store: " + response.getErrorMessage(), 
+                    3000, Notification.Position.MIDDLE);
+            } else {
+                Notification.show("Store created successfully!", 
+                    3000, Notification.Position.MIDDLE);
+                dialog.close();
+                // // Refresh the view or update as needed
+                // storeNameField.setValue(name);
+                // fetchStoreByName();
+            }
+        });
+
+        dialogLayout.add(nameField, descriptionField, createButton);
+        dialog.add(dialogLayout);
+        dialog.open();
     }
 
     @Override
