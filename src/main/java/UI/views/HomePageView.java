@@ -2,6 +2,7 @@ package UI.views;
 
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
+import UI.presenters.ILoginPresenter;
 import Application.DTOs.ItemDTO;
 import Application.utils.Response;
 
@@ -26,15 +27,17 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
     private final IProductPresenter productPresenter;
     private final IPurchasePresenter purchasePresenter;
+    private final ILoginPresenter loginPresenter;
     private String sessionToken = null;
     private String currentUsername = null;
 
     private final TextField searchBar = new TextField();
     private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
 
-    public HomePageView(IProductPresenter productPresenter, IPurchasePresenter purchasePresenter) {
+    public HomePageView(IProductPresenter productPresenter, IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter) {
         this.productPresenter = productPresenter;
         this.purchasePresenter = purchasePresenter;
+        this.loginPresenter = loginPresenter;
 
         setSizeFull();
         setSpacing(true);
@@ -61,13 +64,22 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         Button cartBtn = new Button("View Cart", e -> UI.getCurrent().navigate("cart"));
         cartBtn.getStyle().set("background-color", "#38a169").set("color", "white");
 
+        Button registerBtn = new Button("Register New Account", e -> UI.getCurrent().navigate("register"));
+        registerBtn.getStyle().set("background-color", "#6b46c1").set("color", "white");
+
         Button logoutBtn = new Button("Logout", e -> {
-            UI.getCurrent().getSession().close();
-            UI.getCurrent().navigate("");
+            Response<Void> response = loginPresenter.logout(sessionToken);
+            if (!response.errorOccurred()) {
+                UI.getCurrent().getSession().close();
+                UI.getCurrent().navigate("");
+            } else {
+                Notification.show("Failed to logout: " + response.getErrorMessage(), 
+                                3000, Notification.Position.MIDDLE);
+            }
         });
         logoutBtn.getStyle().set("background-color", "#e53e3e").set("color", "white");
 
-        HorizontalLayout topBar = new HorizontalLayout(userInfo, title, searchBar, refreshBtn, goToSearchBtn, cartBtn, logoutBtn);
+        HorizontalLayout topBar = new HorizontalLayout(userInfo, title, searchBar, refreshBtn, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
         topBar.setAlignItems(Alignment.BASELINE);
         topBar.setWidthFull();
         topBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
