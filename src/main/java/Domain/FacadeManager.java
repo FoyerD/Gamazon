@@ -1,6 +1,10 @@
 package Domain;
 
 
+
+
+import Application.utils.Response;
+import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingCartFacade;
@@ -22,6 +26,7 @@ public class FacadeManager {
     private IPaymentService paymentService;
     private LoginManager loginManager;
     private PermissionManager permissionManager;
+    private INotificationService notificationService;
     public FacadeManager(IRepoManager repoManager, IPaymentService paymentService) {
         this.repoManager = repoManager;
         this.paymentService = paymentService;
@@ -42,13 +47,24 @@ public class FacadeManager {
         return marketFacade;
     }
 
+    public INotificationService getNotificationService() {
+        if (notificationService == null) {
+            notificationService = (userId, message) -> {
+                // Mock implementation of the notification service
+                System.out.println("Notification sent to user " + userId + ": " + message);
+                return Response.success(true);
+            };
+        }
+        return notificationService;
+    }
+
     public StoreFacade getStoreFacade() {
         if (storeFacade == null) {
             storeFacade = new StoreFacade(repoManager.getStoreRepository(),
                                         repoManager.getFeedbackRepository(),
                                         repoManager.getItemRepository(),
                                         repoManager.getUserRepository(),
-                                        repoManager.getAuctionRepository());
+                                        repoManager.getAuctionRepository(), getNotificationService());
         }
         return storeFacade;
     }

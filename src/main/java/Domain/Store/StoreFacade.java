@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import Domain.User.IUserRepository;
 import Domain.User.User;
 import Domain.Pair;
+import Domain.ExternalServices.INotificationService;
 
 
 
@@ -23,14 +24,16 @@ public class StoreFacade {
     private IItemRepository itemRepository;
     private IAuctionRepository auctionRepository;
     private Function<String, User> getUser;
+    private INotificationService notificationService;
 
     @Autowired
-    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository) {
+    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, INotificationService notificationService) {
         this.itemRepository = itemRepository;
         this.storeRepository = storeRepository;
         this.feedbackRepository = feedbackRepository;
         this.auctionRepository = auctionRepository;
         this.getUser = userRepository::get;
+        this.notificationService = notificationService;
     }
 
     public StoreFacade() {
@@ -178,7 +181,7 @@ public class StoreFacade {
         if (auctionEndDateParsed.before(auctionStartDate)) throw new RuntimeException("Auction end date must be after the start date");
         if (startPrice < 0) throw new RuntimeException("Start price must be greater than 0");
         
-        String auctionId = System.currentTimeMillis() + "";
+        String auctionId = UUID.randomUUID().toString();
         Auction auction = new Auction(auctionId, auctionStartDate, auctionEndDateParsed, startPrice, startPrice, storeId, productId);
         if (!this.auctionRepository.add(auctionId, auction)) throw new RuntimeException("Auction not added");
         return auction;
@@ -200,6 +203,9 @@ public class StoreFacade {
         if (bid <= auction.getCurrentPrice() || bid <= auction.getStartPrice()) {
             throw new RuntimeException("Bid must be greater than current and start");
         }
+
+        if (auction.currentBidderId != null)
+            notificationService.sendNotification(auction.getCurrentBidderId(), "You have been outbid on auction " + auctionId + " womp womp :(");
 
         auction.setCurrentPrice(bid);
         auction.setCurrentBidderId(userId);
@@ -282,13 +288,15 @@ public class StoreFacade {
                 itemRepository.update(itemKey, item);
                 throw new RuntimeException("Payment failed for accepted bid");
             }
+
         } catch (Exception ex) {
             // Rollback item amount
             item.setAmount(currentAmount);
             itemRepository.update(itemKey, item);
-            throw new RuntimeException("Failed to charge the client for the accepted bid: " + ex.getMessage(), ex);
+            throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);
         }
 
+        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! in auction " + auctionId + " 🎉 🔔");
         // Final update: optionally mark buyer (if you have a field), or leave updated amount
         itemRepository.update(itemKey, item);
 

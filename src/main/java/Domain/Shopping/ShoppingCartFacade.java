@@ -323,6 +323,10 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
                 totalPrice, andIncrement, clientName, deliveryAddress
             );
             
+            if (paymentResponse == null) {
+                throw new RuntimeException("Payment failed: service returned null response");
+            }
+
             // If payment service returned an error, throw an exception to trigger rollback
             if (paymentResponse.errorOccurred()) {
                 throw new RuntimeException("Payment failed: " + paymentResponse.getErrorMessage());

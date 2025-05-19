@@ -1,6 +1,7 @@
 package StoreTests;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -8,10 +9,14 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import Application.ItemService;
+import Application.ProductService;
+import Application.ServiceManager;
 import Application.StoreService;
 import Application.TokenService;
 import Domain.Store.IAuctionRepository;
@@ -20,26 +25,22 @@ import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
-import Domain.User.Member;
-import Domain.User.User;
 import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
-import Infrastructure.NotificationService;
-import Infrastructure.Repositories.MemoryAuctionRepository;
-import Infrastructure.Repositories.MemoryFeedbackRepository;
-import Infrastructure.Repositories.MemoryItemRepository;
-import Infrastructure.Repositories.MemoryPermissionRepository;
-import Infrastructure.Repositories.MemoryStoreRepository;
-import Infrastructure.Repositories.MemoryUserRepository;
+import Infrastructure.MemoryRepoManager;
+import Domain.FacadeManager;
 import Domain.Pair;
 import Domain.Store.Item;
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
 
 
 public class StoreServiceTests {
-
+    // Existing fields
     private StoreService storeService;
     private StoreFacade storeFacade;
     private IStoreRepository storeRepository;
@@ -50,28 +51,57 @@ public class StoreServiceTests {
     private TokenService tokenService;
     private PermissionManager permissionManager;
     private IPermissionRepository permissionRepository;
-    UUID userId;
-    String tokenId = null;
+    
+    // Add ServiceManager as a field
+    private ServiceManager serviceManager;
+    
+    // User data
+    private UUID userId;
+    private String tokenId = null;
 
     @Before
     public void setUp() {
-        userId = UUID.randomUUID();
-        this.storeRepository = new MemoryStoreRepository();
-        this.auctionRepository = new MemoryAuctionRepository();
-        this.itemRepository = new MemoryItemRepository();
-        this.feedbackRepository= new MemoryFeedbackRepository();
-        this.userRepository = new MemoryUserRepository();
-        this.permissionRepository = new MemoryPermissionRepository();
+        // Initialize repository manager
+        MemoryRepoManager repositoryManager = new MemoryRepoManager();
         
-        this.tokenService = new TokenService();
+        // Initialize facade manager
+        FacadeManager facadeManager = new FacadeManager(repositoryManager, null);
+        
+        // Initialize service manager and store as a field for use across tests
+        this.serviceManager = new ServiceManager(facadeManager);
+        
+        // Get needed services directly from the service manager
+        this.storeService = serviceManager.getStoreService();
+        this.tokenService = serviceManager.getTokenService();
+        
+        // For backward compatibility, also get facades and repositories
+        this.storeFacade = facadeManager.getStoreFacade();
+        this.storeRepository = repositoryManager.getStoreRepository();
+        this.auctionRepository = repositoryManager.getAuctionRepository();
+        this.itemRepository = repositoryManager.getItemRepository();
+        this.feedbackRepository = repositoryManager.getFeedbackRepository();
+        this.userRepository = repositoryManager.getUserRepository();
+        this.permissionRepository = repositoryManager.getPermissionRepository();
         this.permissionManager = new PermissionManager(permissionRepository);
-        this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
-        storeService = new StoreService(storeFacade, tokenService, permissionManager, new NotificationService());
-
         
-        tokenId = this.tokenService.generateToken(userId.toString());
-        User user = new Member(userId, "Member1", "passpass", "email@email.com");
-        this.userRepository.add(userId.toString(), user);
+        // Create a guest user
+        Response<UserDTO> guestResponse = serviceManager.getUserService().guestEntry();
+        assertFalse("Guest creation should succeed", guestResponse.errorOccurred());
+        
+        // Register a test user
+        Response<UserDTO> userResponse = serviceManager.getUserService().register(
+            guestResponse.getValue().getSessionToken(),
+            "Member1",
+            "WhyWontWork1!",
+            "email@email.com"
+        );
+        assertFalse("User registration should succeed", userResponse.errorOccurred());
+        
+        // Get the token for the registered user
+        this.tokenId = userResponse.getValue().getSessionToken();
+        
+        // Get the user ID from the token
+        this.userId = UUID.fromString(tokenService.extractId(tokenId));
     }
 
     @Test
@@ -145,64 +175,224 @@ public class StoreServiceTests {
 
     @Test
     public void GivenExistingMemberAndNewStoreAndNewProduct_WhenAddAuction_ThenReturnAuction() {
+        // Create a store
         String storeName = "NewStore";
         Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        assertFalse("Store creation should succeed", addResult.errorOccurred());
         String storeId = addResult.getValue().getId();
-        String productId = UUID.randomUUID().toString();
-        this.itemRepository.add(new Pair<>(storeId, productId), new Item(storeId, productId, 10.0, 10, "A new product"));
+        
+        // Create a product using ProductService from the shared service manager
+        ProductService productService = serviceManager.getProductService();
+        Response<ProductDTO> productResponse = productService.addProduct(
+            tokenId,
+            "Test Product",
+            List.of("category1"),
+            List.of("A test product description")
+        );
+        assertFalse("Product creation should succeed", productResponse.errorOccurred());
+        String productId = productResponse.getValue().getId();
+        
+        // Add the product to the store using ItemService from the shared service manager
+        ItemService itemService = serviceManager.getItemService();
+        Response<ItemDTO> itemResponse = itemService.add(
+            tokenId,
+            storeId,
+            productId,
+            10.0f,
+            10,
+            "A new product"
+        );
+        assertFalse("Item addition should succeed", itemResponse.errorOccurred());
 
+        // Create an auction for the product
         String endDate = "2077-01-01";
         Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate, 5.0);
-        assertEquals(auctionResult.getValue().getStoreId(), storeId);
-        assertEquals(auctionResult.getValue().getProductId(), productId);
+        
+        // Verify the auction was created successfully with correct details
+        assertFalse("Auction creation should succeed", auctionResult.errorOccurred());
+        assertEquals("Auction should be for the correct store", storeId, auctionResult.getValue().getStoreId());
+        assertEquals("Auction should be for the correct product", productId, auctionResult.getValue().getProductId());
     }
 
     @Test
     public void GivenExistingMemberAndAndNewProduct_WhenAddAuctionForNoneexistingStore_ThenReturnError() {
-        String storeId = "whatwhat";
-        String productId = UUID.randomUUID().toString();
-        this.itemRepository.add(new Pair<>(storeId, productId), new Item(storeId, productId, 10.0, 10, "A new product"));
-
+        // Get services from the shared serviceManager
+        ProductService productService = serviceManager.getProductService();
+        
+        // Create a product using ProductService
+        Response<ProductDTO> productResponse = productService.addProduct(
+            tokenId,
+            "Test Product",
+            List.of("category1"),
+            List.of("A test product description")
+        );
+        assertFalse("Product creation should succeed", productResponse.errorOccurred());
+        String productId = productResponse.getValue().getId();
+        
+        // Use a non-existent store ID
+        String nonExistentStoreId = "whatwhat";
+        
+        // Try to create an auction for the item in the non-existent store
         Date endDate = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
-        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate.toString(), 5.0);
-        assertTrue(auctionResult.errorOccurred());
+        Response<AuctionDTO> auctionResult = storeService.addAuction(
+            this.tokenId, 
+            nonExistentStoreId, 
+            productId, 
+            endDate.toString(), 
+            5.0
+        );
+        
+        // Verify the auction creation fails
+        assertTrue("Auction creation for non-existent store should fail", auctionResult.errorOccurred());
     }
 
     @Test
     public void GivenExistingMemberAndNewStore_WhenAddAuctionForNonExistingItem_ThenReturnError() {
+        // Create a store
         String storeName = "NewStore";
         Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        assertFalse("Store creation should succeed", addResult.errorOccurred());
         String storeId = addResult.getValue().getId();
+        
+        // Use a non-existent product ID
         String nonExistingProductId = UUID.randomUUID().toString();
-
+        
+        // Try to create an auction for a non-existent product
         Date endDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
-        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, nonExistingProductId, endDate.toString(), 5.0);
-        assertTrue(auctionResult.errorOccurred());
+        Response<AuctionDTO> auctionResult = storeService.addAuction(
+            this.tokenId, 
+            storeId, 
+            nonExistingProductId, 
+            endDate.toString(), 
+            5.0
+        );
+        
+        // Verify the auction creation fails
+        assertTrue("Auction creation for non-existent product should fail", auctionResult.errorOccurred());
     }
 
-    // @Test
-    // public void GivenExistingStoreWithAuctions_WhenGetAllAuctions_ThenReturnAllAuctions() {
-    //     String storeName = "AuctionStore";
-    //     Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
-    //     String storeId = storeResponse.getValue().getId();
+    @Test
+    public void GivenExistingStoreWithAuctions_WhenGetAllAuctions_ThenReturnAllAuctions() {
+        // Create a store through the service
+        String storeName = "AuctionStore";
+        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
+        assertFalse("Store creation should succeed", storeResponse.errorOccurred());
+        String storeId = storeResponse.getValue().getId();
 
-    //     String productId1 = UUID.randomUUID().toString();
-    //     String productId2 = UUID.randomUUID().toString();
-    //     String productId3 = UUID.randomUUID().toString();
+        // Get services from the shared ServiceManager
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        
+        // Create 3 products
+        Response<ProductDTO> product1Response = productService.addProduct(
+            tokenId, 
+            "Product 1", 
+            List.of("category1"), 
+            List.of("Description for product 1")
+        );
+        Response<ProductDTO> product2Response = productService.addProduct(
+            tokenId, 
+            "Product 2", 
+            List.of("category2"), 
+            List.of("Description for product 2")
+        );
+        Response<ProductDTO> product3Response = productService.addProduct(
+            tokenId, 
+            "Product 3", 
+            List.of("category3"), 
+            List.of("Description for product 3")
+        );
+        
+        assertFalse("Product 1 creation should succeed", product1Response.errorOccurred());
+        assertFalse("Product 2 creation should succeed", product2Response.errorOccurred());
+        assertFalse("Product 3 creation should succeed", product3Response.errorOccurred());
+        
+        String productId1 = product1Response.getValue().getId();
+        String productId2 = product2Response.getValue().getId();
+        String productId3 = product3Response.getValue().getId();
+        
+        // Add items to the store using ItemService
+        Response<ItemDTO> item1Response = itemService.add(
+            tokenId, 
+            storeId, 
+            productId1, 
+            10.0f, 
+            10, 
+            "Product 1 in store"
+        );
+        Response<ItemDTO> item2Response = itemService.add(
+            tokenId, 
+            storeId, 
+            productId2, 
+            20.0f, 
+            5, 
+            "Product 2 in store"
+        );
+        Response<ItemDTO> item3Response = itemService.add(
+            tokenId, 
+            storeId, 
+            productId3, 
+            30.0f, 
+            15, 
+            "Product 3 in store"
+        );
+        
+        assertFalse("Item 1 addition should succeed", item1Response.errorOccurred());
+        assertFalse("Item 2 addition should succeed", item2Response.errorOccurred());
+        assertFalse("Item 3 addition should succeed", item3Response.errorOccurred());
 
-    //     itemRepository.add(new Pair<>(storeId, productId1), new Item(storeId, productId1, 10.0, 10, "Product 1"));
-    //     itemRepository.add(new Pair<>(storeId, productId2), new Item(storeId, productId2, 20.0, 5, "Product 2"));
-    //     itemRepository.add(new Pair<>(storeId, productId3), new Item(storeId, productId3, 30.0, 15, "Product 3"));
+        // Add auctions for the products using StoreService
+        String endDate = "2077-01-01";
+        Response<AuctionDTO> auction1Response = storeService.addAuction(
+            tokenId, 
+            storeId, 
+            productId1, 
+            endDate, 
+            5.0
+        );
+        Response<AuctionDTO> auction2Response = storeService.addAuction(
+            tokenId, 
+            storeId, 
+            productId2, 
+            endDate, 
+            10.0
+        );
+        Response<AuctionDTO> auction3Response = storeService.addAuction(
+            tokenId, 
+            storeId, 
+            productId3, 
+            endDate, 
+            15.0
+        );
+        
+        assertFalse("Auction 1 creation should succeed", auction1Response.errorOccurred());
+        assertFalse("Auction 2 creation should succeed", auction2Response.errorOccurred());
+        assertFalse("Auction 3 creation should succeed", auction3Response.errorOccurred());
 
-    //     String endDate = "2077-01-01";
-    //     storeService.addAuction(this.tokenId, storeId, productId1, endDate, 5.0);
-    //     storeService.addAuction(this.tokenId, storeId, productId2, endDate, 10.0);
-    //     storeService.addAuction(this.tokenId, storeId, productId3, endDate, 15.0);
-
-    //     Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
-    //     assertTrue(auctionsResponse.getValue() != null);
-    //     assertEquals(3, auctionsResponse.getValue().size());
-    // }
+        // Get all auctions for the store using StoreService
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(tokenId, storeId);
+        
+        // Verify results
+        assertFalse("Getting auctions should succeed", auctionsResponse.errorOccurred());
+        assertNotNull("Auctions list should not be null", auctionsResponse.getValue());
+        assertEquals("Should have 3 auctions", 3, auctionsResponse.getValue().size());
+        
+        // Verify auction details if needed
+        boolean foundAuction1 = false, foundAuction2 = false, foundAuction3 = false;
+        for (AuctionDTO auction : auctionsResponse.getValue()) {
+            if (auction.getProductId().equals(productId1) && auction.getStoreId().equals(storeId)) {
+                foundAuction1 = true;
+            } else if (auction.getProductId().equals(productId2) && auction.getStoreId().equals(storeId)) {
+                foundAuction2 = true;
+            } else if (auction.getProductId().equals(productId3) && auction.getStoreId().equals(storeId)) {
+                foundAuction3 = true;
+            }
+        }
+        
+        assertTrue("Should find auction for product 1", foundAuction1);
+        assertTrue("Should find auction for product 2", foundAuction2);
+        assertTrue("Should find auction for product 3", foundAuction3);
+    }
 
     @Test
     public void GivenStoreWithNoAuctions_WhenGetAllAuctions_ThenReturnEmptyList() {
@@ -223,28 +413,105 @@ public class StoreServiceTests {
         assertTrue(auctionsResponse.errorOccurred());
     }
 
-    // @Test
-    // public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
-    //     String productId1 = UUID.randomUUID().toString();
-    //     Response<StoreDTO> storeRes = storeService.addStore(this.tokenId, "storestore", "Store with auctions");
-    //     Response<StoreDTO> storeRes2 = storeService.addStore(this.tokenId, "storestore2", "Store with auctions");
+    @Test
+    public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
+        // Get services from the shared ServiceManager
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        
+        // Create a product
+        Response<ProductDTO> productResponse = productService.addProduct(
+            tokenId, 
+            "Shared Product", 
+            List.of("category1"), 
+            List.of("A product sold in multiple stores")
+        );
+        assertFalse("Product creation should succeed", productResponse.errorOccurred());
+        String productId = productResponse.getValue().getId();
+        
+        // Create two stores through the service
+        Response<StoreDTO> storeRes1 = storeService.addStore(
+            tokenId, 
+            "storestore", 
+            "Store with auctions"
+        );
+        Response<StoreDTO> storeRes2 = storeService.addStore(
+            tokenId, 
+            "storestore2", 
+            "Store with auctions"
+        );
+        
+        assertFalse("First store creation should succeed", storeRes1.errorOccurred());
+        assertFalse("Second store creation should succeed", storeRes2.errorOccurred());
+        
+        String storeId1 = storeRes1.getValue().getId();
+        String storeId2 = storeRes2.getValue().getId();
+        
+        // Add the product to both stores using ItemService
+        Response<ItemDTO> item1Response = itemService.add(
+            tokenId, 
+            storeId1, 
+            productId, 
+            10.0f, 
+            10, 
+            "Product in first store"
+        );
+        Response<ItemDTO> item2Response = itemService.add(
+            tokenId, 
+            storeId2, 
+            productId, 
+            20.0f, 
+            5, 
+            "Product in second store"
+        );
+        
+        assertFalse("Adding item to first store should succeed", item1Response.errorOccurred());
+        assertFalse("Adding item to second store should succeed", item2Response.errorOccurred());
 
-    //     String storeId1 = storeRes.getValue().getId();
-    //     String storeId2 = storeRes2.getValue().getId();
-    //     itemRepository.add(new Pair<>(storeId1, productId1), new Item(storeId1, productId1, 10.0, 10, "Product 1"));
-    //     itemRepository.add(new Pair<>(storeId2, productId1), new Item(storeId2, productId1, 20.0, 5, "Product 2"));
+        // Add auctions for the product in both stores using StoreService
+        String endDate = "2077-01-01";
+        Response<AuctionDTO> aucRes1 = storeService.addAuction(
+            tokenId, 
+            storeId1, 
+            productId, 
+            endDate, 
+            5.0
+        );
+        Response<AuctionDTO> aucRes2 = storeService.addAuction(
+            tokenId, 
+            storeId2, 
+            productId, 
+            endDate, 
+            10.0
+        );
+        
+        assertFalse("First auction creation should succeed", aucRes1.errorOccurred());
+        assertFalse("Second auction creation should succeed", aucRes2.errorOccurred());
 
-    //     String endDate = "2077-01-01";
-    //     Response<AuctionDTO> aucRes1 = storeService.addAuction(tokenId, storeId1, productId1, endDate, 5.0);
-    //     Response<AuctionDTO> aucRes2 = storeService.addAuction(tokenId, storeId2, productId1, endDate, 10.0);
-
-    //     assertFalse(aucRes1.errorOccurred());
-    //     assertFalse(aucRes2.errorOccurred());
-
-    //     Response<List<AuctionDTO>> auctionsResponse = storeService.getAllProductAuctions(tokenId, productId1);
-    //     assertTrue(auctionsResponse.getValue() != null);
-    //     assertEquals(2, auctionsResponse.getValue().size());
-    // }
+        // Get all auctions for the product using StoreService
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllProductAuctions(
+            tokenId, 
+            productId
+        );
+        
+        // Verify results
+        assertFalse("Getting product auctions should succeed", auctionsResponse.errorOccurred());
+        assertNotNull("Auctions list should not be null", auctionsResponse.getValue());
+        assertEquals("Should have 2 auctions for the product", 2, auctionsResponse.getValue().size());
+        
+        // Verify auction details if needed
+        boolean foundAuction1 = false, foundAuction2 = false;
+        for (AuctionDTO auction : auctionsResponse.getValue()) {
+            if (auction.getStoreId().equals(storeId1) && auction.getProductId().equals(productId)) {
+                foundAuction1 = true;
+            } else if (auction.getStoreId().equals(storeId2) && auction.getProductId().equals(productId)) {
+                foundAuction2 = true;
+            }
+        }
+        
+        assertTrue("Should find auction in first store", foundAuction1);
+        assertTrue("Should find auction in second store", foundAuction2);
+    }
 
     @Test
     public void GivenStoreWithNoAuctions_WhenGetAllProductAuctions_ThenReturnEmptyList() {

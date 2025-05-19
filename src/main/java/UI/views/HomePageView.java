@@ -1,6 +1,7 @@
 package UI.views;
 
 import UI.presenters.IProductPresenter;
+import UI.presenters.IUserSessionPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.ILoginPresenter;
 import Application.DTOs.ItemDTO;
@@ -8,6 +9,7 @@ import Application.utils.Response;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
@@ -22,6 +24,7 @@ import com.vaadin.flow.router.Route;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@JsModule("./ws-client.js")
 @Route("home")
 public class HomePageView extends VerticalLayout implements BeforeEnterObserver {
 
@@ -34,8 +37,12 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final TextField searchBar = new TextField();
     private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
 
-    public HomePageView(IProductPresenter productPresenter, IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter) {
+    private final IUserSessionPresenter sessionPresenter;
+
+    public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
+                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter) {
         this.productPresenter = productPresenter;
+        this.sessionPresenter = sessionPresenter;
         this.purchasePresenter = purchasePresenter;
         this.loginPresenter = loginPresenter;
 
@@ -121,6 +128,13 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         add(topBar, productGrid);
 
         this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
+
+        if (sessionToken != null) {
+            String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
+            UI.getCurrent().getPage().executeJs("window.currentUserId = $0;", userId);
+        }
+
+
         this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
         userInfo.setText("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"));
 

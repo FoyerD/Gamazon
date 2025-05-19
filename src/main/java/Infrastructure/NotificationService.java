@@ -14,9 +14,4 @@ public class NotificationService implements INotificationService {
         System.out.println("Notification sent to " + name + ": " + content);
         return new Response<Boolean>(true);
     }
-
-    public void initialize() {
-        // Initialization logic for the notification service
-        System.out.println("Notification service initialized.");
-    }
 }
