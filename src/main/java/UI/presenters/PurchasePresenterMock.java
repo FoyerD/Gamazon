@@ -1,8 +1,13 @@
 package UI.presenters;
 
+import Application.DTOs.CartDTO;
+import Application.DTOs.ItemDTO;
 import Application.DTOs.OrderDTO;
+import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Response;
 import Domain.Store.Category;
+import Domain.Store.Item;
+
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -11,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class PurchasePresenterMock implements IPurchasePresenter {
 
-    private final Map<String, Set<OrderDTO>> userCarts = new ConcurrentHashMap<>();
+    private final Map<String, CartDTO> userCarts = new ConcurrentHashMap<>();
 
     private final Set<Category> electronicsCategories = Set.of(
             new Category("Electronics", "Electronic devices and gadgets"),
@@ -44,96 +49,83 @@ public class PurchasePresenterMock implements IPurchasePresenter {
     @Override
     public Response<Boolean> addProductToCart(String sessionToken, String productId, String storeId, int amount) {
         ensureCartExists(sessionToken);
-        Set<OrderDTO> cart = userCarts.get(sessionToken);
-
-        Optional<OrderDTO> existing = cart.stream()
-                .filter(o -> o.getStoreName().equals(storeId))
-                .findFirst();
-
-        if (existing.isPresent()) {
-            cart.remove(existing.get());
-            OrderDTO updated = new OrderDTO(
-                    productId,
-                    existing.get().getName(),
-                    existing.get().getCategories(),
-                    storeId,
-                    existing.get().getQuantity() + amount
-            );
-            cart.add(updated);
-        } else {
-            // Add new with fake category and name for simplicity
-            Set<Category> categories = productId.contains("3") ? clothingCategories :
-                    productId.contains("5") ? homeCategories : electronicsCategories;
-            String name = "Mock Product " + productId;
-            cart.add(new OrderDTO(productId, name, categories, storeId, amount));
-        }
-
-        return new Response<>(true);
+        CartDTO cart = userCarts.get(sessionToken);
+        Map<String, ShoppingBasketDTO> orders = cart.getBaskets();
+        ShoppingBasketDTO basket = orders.get(storeId);
+        Map<String, ItemDTO> items = basket.getOrders();
+        //items.add(productId);
+        return Response.success(true);
     }
 
     @Override
     public Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId) {
         ensureCartExists(sessionToken);
-        Set<OrderDTO> cart = userCarts.get(sessionToken);
-        boolean removed = cart.removeIf(o -> o.getStoreName().equals(storeId));
-        return new Response<>(removed);
+        CartDTO cart = userCarts.get(sessionToken);
+        Map<String, ShoppingBasketDTO> orders = cart.getBaskets();
+        ShoppingBasketDTO basket = orders.get(storeId);
+        Map<String, ItemDTO> items = basket.getOrders();
+        items.remove(productId);
+        
+        return Response.success(true);
     }
 
     @Override
     public Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId, int amount) {
         ensureCartExists(sessionToken);
-        Set<OrderDTO> cart = userCarts.get(sessionToken);
-
-        Optional<OrderDTO> existing = cart.stream()
-                .filter(o ->o.getStoreName().equals(storeId))
-                .findFirst();
-
-        if (existing.isPresent()) {
-            OrderDTO current = existing.get();
-            cart.remove(current);
-            int remaining = current.getQuantity() - amount;
-            if (remaining > 0) {
-                OrderDTO updated = new OrderDTO(
-                        current.getName(),
-                        current.getCategories().stream().anyMatch(c -> c.getName().equals("Electronics")) ? 
-                            "Electronic device" : (current.getCategories().stream().anyMatch(c -> c.getName().equals("Clothing")) ?
-                            "Clothing item" : "Home item"),
-                        current.getCategories(),
-                        current.getStoreName(),
-                        remaining
-                );
-                cart.add(updated);
-            }
-            return new Response<>(true);
-        }
-
-        return new Response<>(false);
+                CartDTO cart = userCarts.get(sessionToken);
+        Map<String, ShoppingBasketDTO> orders = cart.getBaskets();
+        ShoppingBasketDTO basket = orders.get(storeId);
+        Map<String, ItemDTO> items = basket.getOrders();
+        ItemDTO item = items.get(productId);
+        item.setAmount(amount);
+        return Response.success(true);
     }
 
+    // public Response<Set<OrderDTO>> viewCart(String sessionToken) {
+    //     ensureCartExists(sessionToken);
+    //     return new Response<>(new HashSet<>(userCarts.get(sessionToken)));
+    // }
     @Override
-    public Response<Set<OrderDTO>> viewCart(String sessionToken) {
+    public Response<CartDTO> viewCart(String sessionToken) {
         ensureCartExists(sessionToken);
-        return new Response<>(new HashSet<>(userCarts.get(sessionToken)));
+        return new Response<>(userCarts.get(sessionToken));
     }
+
 
     @Override
     public Response<Boolean> clearCart(String sessionToken) {
-        userCarts.put(sessionToken, new HashSet<>());
+        userCarts.put(sessionToken, new CartDTO(sessionToken, new HashMap<>()));
         return new Response<>(true);
     }
 
     @Override
     public Response<Boolean> clearBasket(String sessionToken, String storeId) {
         ensureCartExists(sessionToken);
-        Set<OrderDTO> cart = userCarts.get(sessionToken);
-        boolean changed = cart.removeIf(o -> o.getStoreName().equals(storeId));
-        return new Response<>(changed);
+        CartDTO cart = userCarts.get(sessionToken);
+        cart.getBaskets().remove(storeId);
+        return Response.success(true);
     }
 
-    @Override
+    
     public Response<Boolean> makeBid(String sessionToken, String auctionId, float bid) {
         boolean success = bid > 0;
         return new Response<>(success);
+    }
+
+    @Override
+    public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
+                                    String cardNumber, Date expiryDate, String cvv,
+                                    long andIncrement, String clientName, String deliveryAddress) {
+        throw new UnsupportedOperationException("Not relevant in mock");
+        // boolean valid = cardNumber != null && !cardNumber.isEmpty()
+        //              && expiryDate != null
+        //              && cvv != null && cvv.length() >= 3;
+
+        // if (valid) {
+        //     return new Response<>(true);
+        // }
+
+        // return new Response<>(false);
     }
 
     @Override
@@ -153,6 +145,6 @@ public class PurchasePresenterMock implements IPurchasePresenter {
     }
 
     private void ensureCartExists(String sessionToken) {
-        userCarts.putIfAbsent(sessionToken, new HashSet<>(defaultCartItems));
+        userCarts.putIfAbsent(sessionToken, new CartDTO(sessionToken, new HashMap<>()));
     }
 }
