@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Domain.Pair;
+import Domain.ExternalServices.INotificationService;
 import Domain.Store.Auction;
 import Domain.Store.Feedback;
 import Domain.Store.IAuctionRepository;
@@ -32,7 +33,7 @@ public class StoreFacadeTests {
     private IFeedbackRepository feedbackRepository;
     private IAuctionRepository auctionRepository;
     private IUserRepository userRepository;
-
+    private INotificationService notificationService;
 
     @Before
     public void setUp(){
@@ -41,13 +42,15 @@ public class StoreFacadeTests {
         itemRepository = mock(IItemRepository.class);
         feedbackRepository = mock(IFeedbackRepository.class);
         auctionRepository = mock(IAuctionRepository.class);
+        notificationService = mock(INotificationService.class);
         
         storeFacade = new StoreFacade(
             storeRepository,
             feedbackRepository,
             itemRepository,
             userRepository,
-            auctionRepository
+            auctionRepository,
+            notificationService
         );
     }
     

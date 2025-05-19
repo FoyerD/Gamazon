@@ -241,7 +241,7 @@ public class MarketFacadeTest {
 
         verify(paymentService).initialize();
         verify(supplyService).initialize();
-        verify(notificationService).initialize();
+
     }
 
 

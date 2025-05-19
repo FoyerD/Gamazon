@@ -23,6 +23,7 @@ import Application.ShoppingService;
 import Application.TokenService;
 import Application.UserService;
 import Application.utils.Response;
+import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
@@ -52,6 +53,7 @@ public class ShoppingServiceTest {
     private TokenService tokenService;
     private ItemFacade itemFacade;
     private StoreFacade storeFacade;
+    private INotificationService notificationService;
     
     // Repository manager
     private MemoryRepoManager repositoryManager;
@@ -85,6 +87,8 @@ public class ShoppingServiceTest {
     
     @Before
     public void setUp() {
+        notificationService = mock(INotificationService.class);
+
         // Initialize the token service
         tokenService = new TokenService();
         
@@ -147,7 +151,8 @@ public class ShoppingServiceTest {
             feedbackRepository,
             itemRepository,
             userRepository,
-            auctionRepository
+            auctionRepository,
+            notificationService
         );
         
         // Initialize the ShoppingService with our repositories and facades

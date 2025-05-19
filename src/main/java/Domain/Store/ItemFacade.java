@@ -123,19 +123,10 @@ public class ItemFacade {
 
         Item item = new Item(storeId, productId, price, amount, description);
 
-        item.setNameFetcher(() ->
-            itemRepository.getByProductId(productId).stream()
-                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
-                .findFirst()
-                .map(Item::getProductName)
-                .orElse("Unknown Product")
-        );
+        item.setNameFetcher(() ->  productRepository.get(productId).getName());
 
         item.setCategoryFetcher(() ->
-            itemRepository.getByProductId(productId).stream()
-                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
-                .flatMap(i -> i.getCategories().stream())
-                .collect(Collectors.toSet())
+            productRepository.get(productId).getCategories()
         );
 
         if (!itemRepository.add(id, item)) {
@@ -187,6 +178,25 @@ public class ItemFacade {
         Object lock = getOrCreateLockSafe(id);
         synchronized (lock) {
             item.decreaseAmount(amount);
+        }
+    }
+
+    public void addRating(String storeId, String productId, int rating){
+        validateStoreAndProductExist(storeId, productId);
+        if (rating < 0 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 0 and 5");
+        }
+        Object lock = itemRepository.getLock(new Pair<>(storeId, productId));
+        if (lock == null) {
+            throw new IllegalStateException("Lock not found for storeId: " + storeId + ", productId: " + productId);
+        }
+        synchronized (lock) {
+            Item item = itemRepository.getItem(storeId, productId);
+            if (item == null) {
+                throw new NoSuchElementException("Item not found for storeId: " + storeId + ", productId: " + productId);
+            }
+            item.addRating(rating);
+            itemRepository.update(new Pair<>(storeId, productId), item);
         }
     }
 

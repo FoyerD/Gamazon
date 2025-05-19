@@ -20,26 +20,22 @@ public class PurchasePresenter implements IPurchasePresenter {
 
     @Override
     public Response<Boolean> addProductToCart(String sessionToken, String productId, String storeId, int amount) {
-        return this.shoppingService.addProductToCart(sessionToken, productId, storeId, amount);
+        return this.shoppingService.addProductToCart(storeId, sessionToken, productId, amount);
     }
 
     @Override
     public Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId) {
-        return this.shoppingService.removeProductFromCart(sessionToken, productId, storeId);
+        return this.shoppingService.removeProductFromCart(storeId, sessionToken, productId);
     }
 
     @Override
     public Response<Boolean> removeProductFromCart(String sessionToken, String productId, String storeId, int amount) {
-        return this.shoppingService.removeProductFromCart(sessionToken, productId, storeId, amount);
+        return this.shoppingService.removeProductFromCart(storeId, sessionToken, productId, amount);
     }
 
     //This is the real viewCart
-    // public Response<CartDTO> viewCart(String sessionToken) {
-    //     return this.shoppingService.viewCart(sessionToken);
-    // }
-
-    public Response<Set<OrderDTO>> viewCart(String sessionToken) {
-        throw new UnsupportedOperationException("viewCart is wrong");
+    public Response<CartDTO> viewCart(String sessionToken) {
+        return this.shoppingService.viewCart(sessionToken);
     }
 
     @Override
@@ -52,11 +48,12 @@ public class PurchasePresenter implements IPurchasePresenter {
         return this.shoppingService.clearBasket(sessionToken, storeId);
     }
 
-    @Override
+
     public Response<Boolean> makeBid(String sessionToken, String auctionId, float bid) {
         throw new UnsupportedOperationException("bid is wrong");
     }
 
+    @Override
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
                                     long andIncrement, String clientName, String deliveryAddress) {

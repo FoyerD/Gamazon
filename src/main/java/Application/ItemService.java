@@ -130,13 +130,14 @@ public class ItemService {
         }
     }
 
-    public Response<Void> addRating(String sessionToken, String storeId, String productId, float rating) {
+    public Response<Void> addRating(String sessionToken, String storeId, String productId, int rating) {
         String method = "addRating";
         try {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            throw new UnsupportedOperationException("Not Implemented.");
+            itemFacade.addRating(storeId, productId, rating);
+            return new Response<>(null);
         } catch (UnsupportedOperationException ex) {
             TradingLogger.logError("ItemService", method, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));

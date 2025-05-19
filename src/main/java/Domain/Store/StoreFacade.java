@@ -181,7 +181,7 @@ public class StoreFacade {
         if (auctionEndDateParsed.before(auctionStartDate)) throw new RuntimeException("Auction end date must be after the start date");
         if (startPrice < 0) throw new RuntimeException("Start price must be greater than 0");
         
-        String auctionId = System.currentTimeMillis() + "";
+        String auctionId = UUID.randomUUID().toString();
         Auction auction = new Auction(auctionId, auctionStartDate, auctionEndDateParsed, startPrice, startPrice, storeId, productId);
         if (!this.auctionRepository.add(auctionId, auction)) throw new RuntimeException("Auction not added");
         return auction;

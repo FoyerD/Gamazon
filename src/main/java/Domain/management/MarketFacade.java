@@ -137,7 +137,6 @@ public class MarketFacade implements IMarketFacade {
         }
         paymentService.initialize();
         supplyService.initialize();
-        notificationService.initialize();
         Member manager = userRepository.getMember(userId);
         permissionManager.addMarketManager(manager);
     }

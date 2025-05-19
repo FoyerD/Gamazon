@@ -28,8 +28,4 @@ public class WebSocketNotificationService implements INotificationService {
         }
     }
 
-    @Override
-    public void initialize() {
-        // No-op for WebSocket-based implementation
-    }
 }

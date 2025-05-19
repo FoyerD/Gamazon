@@ -480,11 +480,6 @@ public class MarketServiceTest {
                 return Response.error("Notification service unavailable");
             }
 
-            @Override
-            public void initialize() {
-                // For this test, we'll make initialize() work but return failures for notifications
-                // This simulates a service that initializes but has trouble sending notifications
-            }
         };
 
         // Replace the mock notification service with our bad one
@@ -508,36 +503,6 @@ public class MarketServiceTest {
 
 
     @Test
-    public void testNotificationService_FailsDuringInitialization() {
-        // Create a notification service that fails during initialization
-        INotificationService badNotificationService = new INotificationService() {
-            @Override
-            public Response<Boolean> sendNotification(String name, String content) {
-                return Response.success(true);
-            }
-
-            @Override
-            public void initialize() {
-                throw new RuntimeException("Failed to initialize notification service");
-            }
-        };
-
-        // Replace the mock notification service with our bad one
-        Response<Void> updateResponse = marketService.updateNotificationService(tokenId1, badNotificationService);
-        assertFalse(updateResponse.errorOccurred(), "Updating notification service should succeed");
-
-        // Try to open the market, which should trigger notification service initialization
-        Response<Void> response = marketService.openMarket(tokenId1);
-        
-        // Assert
-        assertTrue(response.errorOccurred(), 
-            "Market opening should fail when notification service fails to initialize");
-        assertTrue(response.getErrorMessage().contains("initialize") || 
-                response.getErrorMessage().contains("notification"), 
-            "Error message should mention initialization failure");
-    }
-
-    @Test
     public void testAppointStoreManager_WithNotificationFailure() {
         // Create a notification service that always returns failures
         INotificationService failingNotificationService = new INotificationService() {
@@ -547,10 +512,6 @@ public class MarketServiceTest {
                 return Response.error("Failed to notify user: " + name);
             }
 
-            @Override
-            public void initialize() {
-                // Initialize successfully
-            }
         };
 
         // Replace the mock notification service with our failing service
@@ -610,11 +571,6 @@ public class MarketServiceTest {
             @Override
             public Response<Boolean> sendNotification(String name, String content) {
                 return Response.error("Notification service unavailable");
-            }
-
-            @Override
-            public void initialize() {
-                // Do nothing
             }
         };
 
