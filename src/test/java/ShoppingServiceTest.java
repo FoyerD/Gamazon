@@ -212,93 +212,93 @@ public class ShoppingServiceTest {
     }
 
     //TODO! Refactor this test to use services
-    // @Test
-    // public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
-    //     // Create a product with limited stock (e.g., just 1 unit)
-    //     final String limitedProductId = "limitedProduct";
-    //     final String limitedStoreId = STORE_ID;
-    //     final int availableStock = 1;
+    @Test
+    public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
+        // Create a product with limited stock (e.g., just 1 unit)
+        final String limitedProductId = "limitedProduct";
+        final String limitedStoreId = STORE_ID;
+        final int availableStock = 1;
         
-    //     // Create a product with limited stock
-    //     Product limitedProduct = new Product(limitedProductId, "Limited Stock Product", new HashSet<>());
-    //     productRepository.add(limitedProductId, limitedProduct);
+        // Create a product with limited stock
+        Product limitedProduct = new Product(limitedProductId, "Limited Stock Product", new HashSet<>());
+        productRepository.add(limitedProductId, limitedProduct);
         
-    //     // Create an item with just 1 unit available
-    //     Item limitedItem = new Item(limitedStoreId, limitedProductId, 10.0, availableStock, "Limited Stock Item");
-    //     itemFacade.add(new Pair<>(limitedStoreId, limitedProductId), limitedItem);
+        // Create an item with just 1 unit available
+        Item limitedItem = new Item(limitedStoreId, limitedProductId, 10.0, availableStock, "Limited Stock Item");
+        itemFacade.add(new Pair<>(limitedStoreId, limitedProductId), limitedItem);
         
-    //     // Create tokens for two different clients
-    //     String clientId1 = tokenService.generateToken(UUID.randomUUID().toString());
-    //     String clientId2 = tokenService.generateToken(UUID.randomUUID().toString());
+        // Create tokens for two different clients
+        String clientId1 = tokenService.generateToken(UUID.randomUUID().toString());
+        String clientId2 = tokenService.generateToken(UUID.randomUUID().toString());
         
-    //     // Standard checkout parameters
-    //     final String cardNumber = "1234567890123456";
-    //     final Date expiryDate = new Date();
-    //     final String cvv = "123";
-    //     final long transactionId = 12345L;
-    //     final String clientName = "Test Client";
-    //     final String deliveryAddress = "123 Test St";
+        // Standard checkout parameters
+        final String cardNumber = "1234567890123456";
+        final Date expiryDate = new Date();
+        final String cvv = "123";
+        final long transactionId = 12345L;
+        final String clientName = "Test Client";
+        final String deliveryAddress = "123 Test St";
         
-    //     // Add 1 unit of the limited product to each client's cart
-    //     shoppingService.addProductToCart(limitedStoreId, clientId1, limitedProductId, 1);
-    //     shoppingService.addProductToCart(limitedStoreId, clientId2, limitedProductId, 1);
+        // Add 1 unit of the limited product to each client's cart
+        shoppingService.addProductToCart(limitedStoreId, clientId1, limitedProductId, 1);
+        shoppingService.addProductToCart(limitedStoreId, clientId2, limitedProductId, 1);
         
-    //     // Track the results for each thread
-    //     final boolean[] threadSuccess = new boolean[2];
-    //     final String[] threadErrors = new String[2];
+        // Track the results for each thread
+        final boolean[] threadSuccess = new boolean[2];
+        final String[] threadErrors = new String[2];
         
-    //     // Create two threads, each attempting to checkout
-    //     Thread thread1 = new Thread(() -> {
-    //         Response<Boolean> response = shoppingService.checkout(
-    //             clientId1, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
-    //         threadSuccess[0] = !response.errorOccurred();
-    //         if (response.errorOccurred()) {
-    //             threadErrors[0] = response.getErrorMessage();
-    //         }
-    //     });
+        // Create two threads, each attempting to checkout
+        Thread thread1 = new Thread(() -> {
+            Response<Boolean> response = shoppingService.checkout(
+                clientId1, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+            threadSuccess[0] = !response.errorOccurred();
+            if (response.errorOccurred()) {
+                threadErrors[0] = response.getErrorMessage();
+            }
+        });
         
-    //     Thread thread2 = new Thread(() -> {
-    //         Response<Boolean> response = shoppingService.checkout(
-    //             clientId2, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
-    //         threadSuccess[1] = !response.errorOccurred();
-    //         if (response.errorOccurred()) {
-    //             threadErrors[1] = response.getErrorMessage();
-    //         }
-    //     });
+        Thread thread2 = new Thread(() -> {
+            Response<Boolean> response = shoppingService.checkout(
+                clientId2, cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress);
+            threadSuccess[1] = !response.errorOccurred();
+            if (response.errorOccurred()) {
+                threadErrors[1] = response.getErrorMessage();
+            }
+        });
         
-    //     // Start both threads
-    //     thread1.start();
-    //     thread2.start();
+        // Start both threads
+        thread1.start();
+        thread2.start();
         
-    //     // Wait for both threads to complete
-    //     thread1.join(5000);  // Wait up to 5 seconds
-    //     thread2.join(5000);
+        // Wait for both threads to complete
+        thread1.join(5000);  // Wait up to 5 seconds
+        thread2.join(5000);
         
-    //     // Verify that exactly one thread succeeded and one failed
-    //     assertTrue("Either thread1 succeeded and thread2 failed, or vice versa",
-    //             (threadSuccess[0] && !threadSuccess[1]) || (!threadSuccess[0] && threadSuccess[1]));
+        // Verify that exactly one thread succeeded and one failed
+        assertTrue("Either thread1 succeeded and thread2 failed, or vice versa",
+                (threadSuccess[0] && !threadSuccess[1]) || (!threadSuccess[0] && threadSuccess[1]));
         
-    //     // At least one thread should have failed with a stock-related error
-    //     if (!threadSuccess[0]) {
-    //         assertNotNull("Thread 1 should have an error message", threadErrors[0]);
-    //         assertTrue("Thread 1 error should mention stock limitation", 
-    //                 threadErrors[0].toLowerCase().contains("stock") || 
-    //                 threadErrors[0].toLowerCase().contains("inventory") ||
-    //                 threadErrors[0].toLowerCase().contains("quantity"));
-    //     }
+        // At least one thread should have failed with a stock-related error
+        if (!threadSuccess[0]) {
+            assertNotNull("Thread 1 should have an error message", threadErrors[0]);
+            assertTrue("Thread 1 error should mention stock limitation", 
+                    threadErrors[0].toLowerCase().contains("stock") || 
+                    threadErrors[0].toLowerCase().contains("inventory") ||
+                    threadErrors[0].toLowerCase().contains("quantity"));
+        }
         
-    //     if (!threadSuccess[1]) {
-    //         assertNotNull("Thread 2 should have an error message", threadErrors[1]);
-    //         assertTrue("Thread 2 error should mention stock limitation", 
-    //                 threadErrors[1].toLowerCase().contains("stock") || 
-    //                 threadErrors[1].toLowerCase().contains("inventory") ||
-    //                 threadErrors[1].toLowerCase().contains("quantity"));
-    //     }
+        if (!threadSuccess[1]) {
+            assertNotNull("Thread 2 should have an error message", threadErrors[1]);
+            assertTrue("Thread 2 error should mention stock limitation", 
+                    threadErrors[1].toLowerCase().contains("stock") || 
+                    threadErrors[1].toLowerCase().contains("inventory") ||
+                    threadErrors[1].toLowerCase().contains("quantity"));
+        }
         
-    //     // Verify the item's stock is now 0 (all units purchased)
-    //     Item updatedItem = itemFacade.getItem(limitedStoreId, limitedProductId);
-    //     assertEquals("Stock should be depleted", 0, updatedItem.getAmount());
-    // }
+        // Verify the item's stock is now 0 (all units purchased)
+        Item updatedItem = itemFacade.getItem(limitedStoreId, limitedProductId);
+        assertEquals("Stock should be depleted", 0, updatedItem.getAmount());
+    }
     //
     // CART MANAGEMENT - REMOVE PRODUCT
     //
