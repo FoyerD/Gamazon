@@ -254,7 +254,6 @@ public class ShoppingServiceTest {
         assertNull("Value should be null", response.getValue());
     }
 
-    //TODO! Refactor this test to use services
     @Test
     public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
         // Create a limited product using the ProductService
