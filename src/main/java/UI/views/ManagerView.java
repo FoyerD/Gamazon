@@ -9,6 +9,9 @@ import Application.DTOs.ProductDTO;
 import Application.utils.Response;
 import Domain.Store.Item;
 import Domain.management.PermissionType;
+import Application.UserService;
+import Application.DTOs.UserDTO;
+import Application.MarketService;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -39,6 +42,10 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private final IProductPresenter productPresenter;
     private final IStorePresenter storePresenter;
 
+
+    private final UserService userService;
+    private final MarketService marketService;
+
     private String sessionToken;
     private String currentUsername;
     private String currentStoreId;
@@ -53,10 +60,14 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private Grid<UserRole> managersPermissionGrid;
 
     @Autowired
-    public ManagerView(IManagementPresenter managementPresenter, IProductPresenter productPresenter, IStorePresenter storePresenter) {
+
+    public ManagerView(IManagementPresenter managementPresenter, UserService userService, MarketService marketService, 
+                       IStorePresenter storePresenter, IProductPresenter productPresenter) {
         this.storePresenter = storePresenter;
         this.productPresenter = productPresenter;
         this.managementPresenter = managementPresenter;
+        this.userService = userService;
+        this.marketService = marketService;
         
         setSizeFull();
         setSpacing(false);
@@ -322,10 +333,6 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         if (itemsResponse.errorOccurred()) {
             Notification.show("Failed to fetch items: " + itemsResponse.getErrorMessage());
         } else {
-            List<ItemDTO> items = itemsResponse.getValue();
-            Notification.show(items.stream()
-                .map(ItemDTO::getProductName)
-                .collect(Collectors.joining(", ")));
             itemsGrid.setItems(itemsResponse.getValue());
         }
     }
@@ -354,6 +361,12 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             Button saveButton = new Button("Save", e -> {
                 String username = usernameField.getValue();
                 if (username != null && !username.isEmpty()) {
+                    // Check if user exists
+                    Response<Boolean> existsResponse = marketService.userExists(username);
+                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                        Notification.show("User does not exist in the system");
+                        return;
+                    }
                     Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
                     dialog.close(); // Close first
                     appointManagerWithPermissions(username, initialPermissions);
@@ -375,6 +388,12 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             Button saveButton = new Button("Save", e -> {
                 String username = usernameField.getValue();
                 if (username != null && !username.isEmpty()) {
+                    // Check if user exists
+                    Response<Boolean> existsResponse = marketService.userExists(username);
+                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                        Notification.show("User does not exist in the system");
+                        return;
+                    }
                     dialog.close(); // Close first
                     Response<Void> response = managementPresenter.appointStoreOwner(
                         sessionToken, currentUsername, username, currentStoreId);

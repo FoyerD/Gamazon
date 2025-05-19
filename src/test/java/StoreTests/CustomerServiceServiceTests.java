@@ -2,6 +2,7 @@ package StoreTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import Application.CustomerServiceService;
 import Application.StoreService;
 import Application.TokenService;
 import Domain.Pair;
+import Domain.ExternalServices.INotificationService;
 import Domain.Store.FeedbackDTO;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
@@ -47,6 +49,7 @@ public class CustomerServiceServiceTests {
     private TokenService tokenService;
     private PermissionManager permissionManager;
     private IPermissionRepository permissionRepository;
+    private INotificationService notificationService;
 
     UUID userId = UUID.randomUUID();
     String storeId;
@@ -58,6 +61,8 @@ public class CustomerServiceServiceTests {
 
     @Before
     public void setUp() {
+        this.notificationService = mock(INotificationService.class);
+
         this.storeRepository = new MemoryStoreRepository();
         this.auctionRepository = new MemoryAuctionRepository();
         this.itemRepository = new MemoryItemRepository();
@@ -67,7 +72,7 @@ public class CustomerServiceServiceTests {
         
         this.tokenService = new TokenService();
         this.permissionManager = new PermissionManager(this.permissionRepository);
-        this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository);
+        this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository, notificationService);
         customerServiceService = new CustomerServiceService(this.storeFacade, this.tokenService);
         storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager, new NotificationService());
 

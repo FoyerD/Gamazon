@@ -85,6 +85,10 @@ public class MarketFacade implements IMarketFacade {
         return notificationService;
     }
 
+    @Override
+    public boolean userExists(String username) {
+        return userRepository.getMemberByUsername(username) != null;
+    }
 
     @Override
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
@@ -137,7 +141,6 @@ public class MarketFacade implements IMarketFacade {
         }
         paymentService.initialize();
         supplyService.initialize();
-        notificationService.initialize();
         Member manager = userRepository.getMember(userId);
         permissionManager.addMarketManager(manager);
     }
