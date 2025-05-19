@@ -24,6 +24,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,8 +44,7 @@ public class MarketFacadeTest {
 
     @Before
     public void setUp() {
-        marketFacade = MarketFacade.getInstance();
-
+        // Create the mock objects
         userRepository = mock(IUserRepository.class);
         itemRepository = mock(IItemRepository.class);
         storeFacade = mock(StoreFacade.class);
@@ -53,95 +53,182 @@ public class MarketFacadeTest {
         notificationService = mock(INotificationService.class);
         shoppingCartFacade = mock(ShoppingCartFacade.class);
         permissionManager = mock(PermissionManager.class);
-    
+        
+        // Create a real map for permissions that we'll use in tests
+        Map<String, Map<String, Permission>> permissionsMap = new HashMap<>();
+        when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
+        
+        // Get the singleton instance
+        marketFacade = MarketFacade.getInstance();
+        
+        // Initialize with our mocks
         marketFacade.initFacades(userRepository, shoppingCartFacade, permissionManager);
         marketFacade.updatePaymentService(paymentService);
         marketFacade.updateSupplyService(supplyService);
         marketFacade.updateNotificationService(notificationService);
-
-        marketFacade.getStorePermissions().clear(); // Clear previous tests
     }
 
     @Test
     public void givenAdminWithSupervisePermission_whenAppointStoreManager_thenManagerIsAppointed() {
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.SUPERVISE_MANAGERS));
-
+        // Setup: Create the store map directly in the permissions map
+        Map<String, Map<String, Permission>> permissionsMap = new HashMap<>();
+        Map<String, Permission> storeMap = new HashMap<>();
+        storeMap.put("admin", createPermissionWith(PermissionType.SUPERVISE_MANAGERS));
+        permissionsMap.put("store1", storeMap);
+        
+        // Set up the mock to return our map
+        when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
+        
+        // Set up the mock behavior for appointStoreManager
+        doAnswer(invocation -> {
+            String appointerId = invocation.getArgument(0);
+            String appointeeId = invocation.getArgument(1);
+            String storeId = invocation.getArgument(2);
+            
+            // Simulate appointing a manager
+            permissionsMap.get(storeId).put(appointeeId, createPermissionWith(PermissionType.HANDLE_INVENTORY));
+            return null;
+        }).when(permissionManager).appointStoreManager(anyString(), anyString(), anyString());
+        
+        // Act
         marketFacade.appointStoreManager("admin", "newManager", "store1");
-
-        assertTrue(marketFacade.getStorePermissions().get("store1").containsKey("newManager"));
+        
+        // Assert: verify that the manager was appointed
+        assertTrue(permissionsMap.get("store1").containsKey("newManager"));
     }
 
     @Test
     public void givenAdminWithSupervisePermission_whenRemoveStoreManager_thenManagerIsRemoved() {
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        Permission managerPermission = createPermissionWith(PermissionType.SUPERVISE_MANAGERS);
-        when(managerPermission.isStoreManager()).thenReturn(true);
-        marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.SUPERVISE_MANAGERS));
-        marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
-
-        marketFacade.removeStoreManager("admin", "managerUser", "store1");
-
-        verify(managerPermission).setPermissions(eq(Collections.emptySet()));
-        verify(managerPermission).setRole(null);
+        // Setup
+        String storeId = "store1";
+        String removerId = "admin";
+        String managerId = "managerUser";
+        
+        // Execute
+        marketFacade.removeStoreManager(removerId, managerId, storeId);
+        
+        // Verify that permissionManager.removeStoreManager was called with the correct parameters
+        verify(permissionManager).removeStoreManager(removerId, managerId, storeId);
     }
 
     @Test
     public void givenAdminWithAssignOwnerPermission_whenAppointStoreOwner_thenOwnerIsAppointed() {
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
-
+        // Create permissions map with admin having ASSIGN_OR_REMOVE_OWNERS permission
+        Map<String, Map<String, Permission>> permissionsMap = new HashMap<>();
+        Map<String, Permission> storePermissions = new HashMap<>();
+        storePermissions.put("admin", createPermissionWith(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
+        permissionsMap.put("store1", storePermissions);
+        
+        // Set up the permissionManager mock to use our map
+        when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
+        
+        // Set up the appointStoreOwner method behavior to modify our map
+        doAnswer(invocation -> {
+            String appointerId = invocation.getArgument(0);
+            String appointeeId = invocation.getArgument(1);
+            String storeId = invocation.getArgument(2);
+            
+            // Add the new owner to our permissions map
+            permissionsMap.get(storeId).put(appointeeId, createPermissionWith(PermissionType.ASSIGN_OR_REMOVE_OWNERS));
+            return null;
+        }).when(permissionManager).appointStoreOwner(anyString(), anyString(), anyString());
+        
+        // Execute the method
         marketFacade.appointStoreOwner("admin", "newOwner", "store1");
-
-        assertTrue(marketFacade.getStorePermissions().get("store1").containsKey("newOwner"));
+        
+        // Verify the result
+        assertTrue(permissionsMap.get("store1").containsKey("newOwner"), 
+                "The new owner should be added to the permissions map");
     }
 
     @Test
     public void givenAdminWithModifyRightsPermission_whenChangeManagerPermissions_thenPermissionsAreChanged() {
-        Permission managerPermission = createPermissionWith(PermissionType.MODIFY_OWNER_RIGHTS);
-        when(managerPermission.isStoreManager()).thenReturn(true);
-
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.MODIFY_OWNER_RIGHTS));
-        marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
-
+        // Setup
+        String storeId = "store1";
+        String ownerId = "admin";
+        String managerId = "managerUser";
         List<PermissionType> newPermissions = List.of(PermissionType.HANDLE_INVENTORY);
-
-        marketFacade.changeManagerPermissions("admin", "managerUser", "store1", newPermissions);
-
-        verify(managerPermission).setPermissions(new HashSet<>(newPermissions));
+        
+        // Create a doAnswer to capture the call to changeManagerPermissions
+        doAnswer(invocation -> {
+            // This verifies that permissionManager.changeManagerPermissions was called with the expected parameters
+            String calledOwnerId = invocation.getArgument(0);
+            String calledManagerId = invocation.getArgument(1);
+            String calledStoreId = invocation.getArgument(2);
+            List<PermissionType> calledNewPermissions = invocation.getArgument(3);
+            
+            assertEquals(ownerId, calledOwnerId, "Owner ID should match");
+            assertEquals(managerId, calledManagerId, "Manager ID should match");
+            assertEquals(storeId, calledStoreId, "Store ID should match");
+            assertEquals(newPermissions, calledNewPermissions, "New permissions should match");
+            
+            return null;
+        }).when(permissionManager).changeManagerPermissions(anyString(), anyString(), anyString(), anyList());
+        
+        // Execute
+        marketFacade.changeManagerPermissions(ownerId, managerId, storeId, newPermissions);
+        
+        // Verify that permissionManager.changeManagerPermissions was called
+        verify(permissionManager).changeManagerPermissions(ownerId, managerId, storeId, newPermissions);
     }
 
     @Test
     public void givenAdminWithSupervisePermission_whenGetManagersPermissions_thenReturnManagerPermissions() {
+        // Create test data
         User user = mock(User.class);
         when(user.getName()).thenReturn("admin");
         when(userRepository.get(anyString())).thenReturn(user);
 
-        Permission managerPermission = createPermissionWith(PermissionType.SUPERVISE_MANAGERS);
+        // Create permissions for testing
+        Permission adminPermission = createPermissionWith(PermissionType.SUPERVISE_MANAGERS);
+        Permission managerPermission = createPermissionWith(PermissionType.HANDLE_INVENTORY);
         when(managerPermission.isStoreManager()).thenReturn(true);
-
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("admin", createPermissionWith(PermissionType.SUPERVISE_MANAGERS));
-        marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
-
+        
+        // Mock the permissions structure
+        Map<String, Permission> storePermissions = new HashMap<>();
+        storePermissions.put("admin", adminPermission);
+        storePermissions.put("managerUser", managerPermission);
+        
+        // Mock the permission manager behavior
+        when(permissionManager.getAllPermissionsForStore("store1")).thenReturn(storePermissions);
+        
+        // Mock the permissions for the manager
+        Set<PermissionType> managerPermissions = new HashSet<>();
+        managerPermissions.add(PermissionType.HANDLE_INVENTORY);
+        when(managerPermission.getPermissions()).thenReturn(managerPermissions);
+        
+        // Execute the method
         Map<String, List<PermissionType>> result = marketFacade.getManagersPermissions("store1", "userId");
-
-        assertTrue(result.containsKey("managerUser"));
+        
+        // Verify the result
+        assertTrue(result.containsKey("managerUser"), "Result should contain managerUser");
+        assertEquals(1, result.get("managerUser").size(), "Manager should have 1 permission");
+        assertEquals(PermissionType.HANDLE_INVENTORY, result.get("managerUser").get(0), 
+                    "Manager should have HANDLE_INVENTORY permission");
     }
 
     @Test
     public void givenAdminWithAccessRecordsPermission_whenGetStorePurchaseHistory_thenReturnNull() {
+        // Setup user mock
         User user = mock(User.class);
         when(user.getName()).thenReturn("adminUser");
         when(userRepository.get(anyString())).thenReturn(user);
-
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
-
+        
+        // Setup permission manager mock
+        Map<String, Map<String, Permission>> permissionsMap = new HashMap<>();
+        Map<String, Permission> storeMap = new HashMap<>();
+        storeMap.put("adminUser", createPermissionWith(PermissionType.ACCESS_PURCHASE_RECORDS));
+        permissionsMap.put("store1", storeMap);
+        when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
+        
+        // Important: Setup the shoppingCartFacade to return null specifically
+        when(shoppingCartFacade.getStorePurchaseHistory("store1")).thenReturn(null);
+        
+        // Execute
         List<Receipt> result = marketFacade.getStorePurchaseHistory("store1", "userId");
-
-        assertNull(result);  // As per original behavior
+        
+        // Assert
+        assertNull(result);
     }
 
     @Test
@@ -161,16 +248,18 @@ public class MarketFacadeTest {
     @Test
     public void givenUserIsStoreManager_whenCheckIsStoreManager_thenReturnTrue() {
         // Setup
+        String storeId = "store1";
+        String username = "managerUser";
+        
+        // Create a mock permission that will return true for isStoreManager
         Permission managerPermission = mock(Permission.class);
         when(managerPermission.isStoreManager()).thenReturn(true);
         
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("managerUser", managerPermission);
-
-        // Add implementation for the isStoreManager method to MarketFacade
+        // Set up the permissionManager to return our mock permission
+        when(permissionManager.getPermission(storeId, username)).thenReturn(managerPermission);
         
         // Execute
-        boolean isManager = marketFacade.isStoreManager("managerUser", "store1");
+        boolean isManager = marketFacade.isStoreManager(username, storeId);
         
         // Verify
         assertTrue(isManager, "User should be identified as a store manager");
@@ -180,14 +269,18 @@ public class MarketFacadeTest {
     @Test
     public void givenUserIsNotStoreManager_whenCheckIsStoreManager_thenReturnFalse() {
         // Setup
+        String storeId = "store1";
+        String username = "regularUser";
+        
+        // Create a mock permission that will return false for isStoreManager
         Permission nonManagerPermission = mock(Permission.class);
         when(nonManagerPermission.isStoreManager()).thenReturn(false);
         
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("regularUser", nonManagerPermission);
-
+        // Set up the permissionManager to return our mock permission
+        when(permissionManager.getPermission(storeId, username)).thenReturn(nonManagerPermission);
+        
         // Execute
-        boolean isManager = marketFacade.isStoreManager("regularUser", "store1");
+        boolean isManager = marketFacade.isStoreManager(username, storeId);
         
         // Verify
         assertFalse(isManager, "User should not be identified as a store manager");
@@ -210,14 +303,18 @@ public class MarketFacadeTest {
     @Test
     public void givenUserIsStoreOwner_whenCheckIsStoreOwner_thenReturnTrue() {
         // Setup
+        String storeId = "store1";
+        String username = "ownerUser";
+        
+        // Create a mock permission that will return true for isStoreOwner
         Permission ownerPermission = mock(Permission.class);
         when(ownerPermission.isStoreOwner()).thenReturn(true);
         
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("ownerUser", ownerPermission);
+        // Set up the permissionManager to return our mock permission
+        when(permissionManager.getPermission(storeId, username)).thenReturn(ownerPermission);
         
         // Execute
-        boolean isOwner = marketFacade.isStoreOwner("ownerUser", "store1");
+        boolean isOwner = marketFacade.isStoreOwner(username, storeId);
         
         // Verify
         assertTrue(isOwner, "User should be identified as a store owner");
@@ -227,14 +324,18 @@ public class MarketFacadeTest {
     @Test
     public void givenUserIsNotStoreOwner_whenCheckIsStoreOwner_thenReturnFalse() {
         // Setup
+        String storeId = "store1";
+        String username = "regularUser";
+        
+        // Create a mock permission that will return false for isStoreOwner
         Permission nonOwnerPermission = mock(Permission.class);
         when(nonOwnerPermission.isStoreOwner()).thenReturn(false);
         
-        marketFacade.getStorePermissions().put("store1", new HashMap<>());
-        marketFacade.getStorePermissions().get("store1").put("regularUser", nonOwnerPermission);
+        // Set up the permissionManager to return our mock permission
+        when(permissionManager.getPermission(storeId, username)).thenReturn(nonOwnerPermission);
         
         // Execute
-        boolean isOwner = marketFacade.isStoreOwner("regularUser", "store1");
+        boolean isOwner = marketFacade.isStoreOwner(username, storeId);
         
         // Verify
         assertFalse(isOwner, "User should not be identified as a store owner");
