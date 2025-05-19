@@ -3,6 +3,9 @@ package UI.views;
 import UI.presenters.IManagementPresenter;
 import Application.utils.Response;
 import Domain.management.PermissionType;
+import Application.UserService;
+import Application.DTOs.UserDTO;
+import Application.MarketService;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
 public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
 
     private final IManagementPresenter managementPresenter;
+    private final UserService userService;
+    private final MarketService marketService;
     private String sessionToken;
     private String currentUsername;
     private String currentStoreId;
@@ -44,8 +49,10 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private Grid<UserRole> managersPermissionGrid;
 
     @Autowired
-    public ManagerView(IManagementPresenter managementPresenter) {
+    public ManagerView(IManagementPresenter managementPresenter, UserService userService, MarketService marketService) {
         this.managementPresenter = managementPresenter;
+        this.userService = userService;
+        this.marketService = marketService;
         
         setSizeFull();
         setSpacing(false);
@@ -265,6 +272,12 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             Button saveButton = new Button("Save", e -> {
                 String username = usernameField.getValue();
                 if (username != null && !username.isEmpty()) {
+                    // Check if user exists
+                    Response<Boolean> existsResponse = marketService.userExists(username);
+                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                        Notification.show("User does not exist in the system");
+                        return;
+                    }
                     Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
                     dialog.close(); // Close first
                     appointManagerWithPermissions(username, initialPermissions);
@@ -286,6 +299,12 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             Button saveButton = new Button("Save", e -> {
                 String username = usernameField.getValue();
                 if (username != null && !username.isEmpty()) {
+                    // Check if user exists
+                    Response<Boolean> existsResponse = marketService.userExists(username);
+                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                        Notification.show("User does not exist in the system");
+                        return;
+                    }
                     dialog.close(); // Close first
                     Response<Void> response = managementPresenter.appointStoreOwner(
                         sessionToken, currentUsername, username, currentStoreId);

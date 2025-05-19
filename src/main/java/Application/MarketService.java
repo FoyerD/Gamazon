@@ -214,4 +214,15 @@ public class MarketService {
             return new Response<>(new Error(e.getMessage()));
         }
     }
+
+    public Response<Boolean> userExists(String username) {
+        try {
+            boolean exists = marketFacade.userExists(username);
+            TradingLogger.logEvent(CLASS_NAME, "userExists", "Checked if user exists: " + username);
+            return new Response<>(exists);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "userExists", "Failed to check if user exists: %s", e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
 }

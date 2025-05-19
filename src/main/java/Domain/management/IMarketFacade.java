@@ -61,6 +61,14 @@ public interface IMarketFacade {
     INotificationService getNotificationService();
 
     /**
+     * Checks if a user exists in the system by their username.
+     * 
+     * @param username The username to check
+     * @return true if the user exists, false otherwise
+     */
+    boolean userExists(String username);
+
+    /**
      * Initialize facades with required repositories and services.
      * 
      * @param userRepository Repository for user data
