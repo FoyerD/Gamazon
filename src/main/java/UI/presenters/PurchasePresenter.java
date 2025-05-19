@@ -34,12 +34,8 @@ public class PurchasePresenter implements IPurchasePresenter {
     }
 
     //This is the real viewCart
-    // public Response<CartDTO> viewCart(String sessionToken) {
-    //     return this.shoppingService.viewCart(sessionToken);
-    // }
-
-    public Response<Set<OrderDTO>> viewCart(String sessionToken) {
-        throw new UnsupportedOperationException("viewCart is wrong");
+    public Response<CartDTO> viewCart(String sessionToken) {
+        return this.shoppingService.viewCart(sessionToken);
     }
 
     @Override
@@ -52,11 +48,12 @@ public class PurchasePresenter implements IPurchasePresenter {
         return this.shoppingService.clearBasket(sessionToken, storeId);
     }
 
-    @Override
+
     public Response<Boolean> makeBid(String sessionToken, String auctionId, float bid) {
         throw new UnsupportedOperationException("bid is wrong");
     }
 
+    @Override
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
                                     long andIncrement, String clientName, String deliveryAddress) {
