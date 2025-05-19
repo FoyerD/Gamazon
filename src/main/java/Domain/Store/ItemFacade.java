@@ -123,19 +123,10 @@ public class ItemFacade {
 
         Item item = new Item(storeId, productId, price, amount, description);
 
-        item.setNameFetcher(() ->
-            itemRepository.getByProductId(productId).stream()
-                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
-                .findFirst()
-                .map(Item::getProductName)
-                .orElse("Unknown Product")
-        );
+        item.setNameFetcher(() ->  productRepository.get(productId).getName());
 
         item.setCategoryFetcher(() ->
-            itemRepository.getByProductId(productId).stream()
-                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
-                .flatMap(i -> i.getCategories().stream())
-                .collect(Collectors.toSet())
+            productRepository.get(productId).getCategories()
         );
 
         if (!itemRepository.add(id, item)) {
