@@ -193,6 +193,13 @@ public class StoreFacade {
         return this.auctionRepository.get(auctionId);
     }
 
+    public String getStoreName(String storeId) {
+        if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found");
+        return store.getName();
+    }
+
     public Auction addBid(String auctionId, String userId, float bid, Supplier<Boolean> chargeCallback) {
         if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
         if (this.auctionRepository.get(auctionId) == null) throw new RuntimeException("Auction not found");
