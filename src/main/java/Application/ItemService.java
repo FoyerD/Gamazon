@@ -172,6 +172,7 @@ public class ItemService {
     public Response<ItemDTO> remove(String sessionToken, Pair<String, String> id) {
         String method = "remove";
         try {
+            TradingLogger.logEvent("ItemService", method, "ATTEMPTING TO REMOVE ITEM");
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }

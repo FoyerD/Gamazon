@@ -1,4 +1,4 @@
-package UI.views;
+package UI.views.components;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +20,7 @@ import com.vaadin.flow.router.QueryParameters;
 
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ShoppingBasketDTO;
+import UI.views.StoreSearchView;
 
 
 public  class BasketLayout extends VerticalLayout{

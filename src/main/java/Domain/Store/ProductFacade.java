@@ -1,5 +1,6 @@
 package Domain.Store;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,11 @@ public class ProductFacade {
             throw new RuntimeException("Product not added");
         }
         return product;
+    }
+
+    public Set<Product> getAllProducts() {
+        if (!isInitialized()) throw new RuntimeException("Product facade must be initialized");
+        return productRepository.getAll();
     }
     
 }

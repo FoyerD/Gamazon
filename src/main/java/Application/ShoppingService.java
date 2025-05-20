@@ -77,7 +77,9 @@ public class ShoppingService{
                 if(baskets.containsKey(item.getFirst().getStoreId())){
                     baskets.get(item.getFirst().getStoreId()).getOrders().put(item.getFirst().getProductId(), itemDTO);
                 } else {
-                    ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>());
+                    String storeId = item.getFirst().getStoreId();
+                    String storeName = this.cartFacade.getStoreName(storeId);
+                    ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>(), storeName);
                     basket.getOrders().put(item.getFirst().getProductId(), itemDTO);
                     baskets.put(item.getFirst().getStoreId(), basket);
                 }
@@ -154,6 +156,7 @@ public class ShoppingService{
         }
     }
 
+    
 
     // Make Immidiate Purchase Use Case 2.5
     public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,

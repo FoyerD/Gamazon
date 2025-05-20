@@ -6,6 +6,8 @@ import Domain.Store.Product;
 import Domain.Store.ProductFacade;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,24 @@ public class ProductService {
             Product product = productFacade.getProductByName(name);
             TradingLogger.logEvent("ProductService", method, "Fetched product by name: " + name);
             return new Response<>(new ProductDTO(product));
+        } catch (Exception ex) {
+            TradingLogger.logError("ProductService", method, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<Set<ProductDTO>> getAllProducts(String sessionToken) {
+        String method = "getAllProducts";
+        try {
+            if (!tokenService.validateToken(sessionToken)) {
+                return Response.error("Invalid token");
+            }
+            // String userId = this.tokenService.extractId(sessionToken);
+
+            Set<Product> products = productFacade.getAllProducts();
+
+            TradingLogger.logEvent("ProductService", method, "Fetched all products.");
+            return new Response<>(products.stream().map(ProductDTO::new).collect(Collectors.toSet()));
         } catch (Exception ex) {
             TradingLogger.logError("ProductService", method, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));

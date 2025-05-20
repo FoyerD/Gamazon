@@ -164,6 +164,7 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         }
     }
 
+
     private void showCreateStoreDialog() {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Create New Store");
