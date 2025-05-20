@@ -9,7 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CartDTO;
@@ -95,7 +99,6 @@ public class ShoppingServiceTest {
     @Before
     public void setUp() {
         notificationService = mock(INotificationService.class);
-
         // Initialize the token service
         tokenService = new TokenService();
         
@@ -165,7 +168,7 @@ public class ShoppingServiceTest {
         cartFacade = new ShoppingCartFacade(
             cartRepository,
             basketRepository,
-            mock(IPaymentService.class),
+            mockPaymentService,
             itemFacade,
             storeFacade,
             receiptRepository,
@@ -228,9 +231,10 @@ public class ShoppingServiceTest {
 
     @Test
     public void testCheckout_Success() {
+        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), anyDouble(), anyLong(), any(), any())).thenReturn(new Response<>(true));
         shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 1);
         Response<Boolean> response = shoppingService.checkout(
-            clientToken, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
+        clientToken, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
@@ -276,8 +280,11 @@ public class ShoppingServiceTest {
     @Test
     public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
         // Use the existing product and store from the setup
+        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), anyDouble(), anyLong(), any(), any())).thenReturn(new Response<>(true));
         String limitedProductId = PRODUCT_ID;  // Use the constant from the setup
         String limitedStoreId = STORE_ID;      // Use the constant from the setup
+        when(notificationService.sendNotification(any(), any())).thenReturn(new Response<>(true));
+
         
         // Update the item to have limited stock (just 1 unit)
         try {

@@ -62,7 +62,6 @@ public class CustomerServiceServiceTests {
 
     @Before
     public void setUp() {
-        this.notificationService = mock(INotificationService.class);
 
         this.repoManager = new MemoryRepoManager();
         this.facadeManager = new FacadeManager(repoManager, mock(PaymentService.class));
