@@ -602,5 +602,9 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
         }
         
         return true;
+    } 
+
+    public String getStoreName(String storeId) {
+        return storeFacade.getStore(storeId).getName();
     }
 }

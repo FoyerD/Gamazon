@@ -135,4 +135,6 @@ public interface IShoppingCartFacade {
      * @return List of receipt objects for the store
      */
     List<Receipt> getStorePurchaseHistory(String storeId);
+
+    String getStoreName(String storeId);
 }
