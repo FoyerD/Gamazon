@@ -24,16 +24,13 @@ import UI.views.StoreSearchView;
 
 
 public  class BasketLayout extends VerticalLayout{
-    String storeName;
     ShoppingBasketDTO basketDTO;
-    public BasketLayout(String storeName,
-                        ShoppingBasketDTO basketDTO,
+    public BasketLayout(ShoppingBasketDTO basketDTO,
                         Consumer<String> basketRemover,
                         Consumer<ItemDTO> itemRemover,
                         Consumer<ItemDTO> itemDecrement, Consumer<ItemDTO> itemIncrement) {
 
 
-        this.storeName = storeName;
         this.basketDTO = basketDTO;
         this.outlineStoreLayout();
         this.add(this.storeHeader(basketRemover));
@@ -43,7 +40,7 @@ public  class BasketLayout extends VerticalLayout{
 
     private HorizontalLayout storeHeader(Consumer<String> basketRemover) {
         // Store header with name and remove basket button
-        Button storeLink = new Button(storeName + "'s basket");
+        Button storeLink = new Button(this.basketDTO.getStoreName() + "'s basket");
         storeLink.getStyle()
             .set("font-size", "var(--lumo-font-size-l)")
             .set("font-weight", "bold")
@@ -57,7 +54,7 @@ public  class BasketLayout extends VerticalLayout{
         storeLink.addClickListener(e -> {
             // Create query parameters with the store name
             Map<String, List<String>> parameters = new HashMap<>();
-            parameters.put("storeName", Collections.singletonList(storeName));
+            parameters.put("storeName", Collections.singletonList(basketDTO.getStoreName()));
             
             // Navigate to the store search view with the parameters
             UI.getCurrent().navigate(StoreSearchView.class, new QueryParameters(parameters));

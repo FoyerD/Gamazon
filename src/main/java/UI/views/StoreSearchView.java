@@ -1,7 +1,10 @@
 package UI.views;
 
 import UI.presenters.IStorePresenter;
+import UI.views.components.ItemLayout;
+import UI.views.components.StoreLayout;
 import UI.presenters.IManagementPresenter;
+import UI.presenters.IPurchasePresenter;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -11,7 +14,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -24,27 +26,26 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @Route("store-search")
 public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
 
     private final IStorePresenter storePresenter;
     private final IManagementPresenter managementPresenter;
+    private final IPurchasePresenter purchasePresenter;
     private String sessionToken;
 
     private final TextField storeNameField = new TextField("Search Store by Name");
-    private final TextField storeIdField = new TextField("Store ID");
-    private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
-    private final Button fetchSupplyButton;
     private final Button homeButton = new Button("Return to Homepage");
-    private final Button ownerDashboardButton;
-    private final Button managerButton;
+
     private final Button createStoreButton;
 
     @Autowired
-    public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter) {
+    public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter, IPurchasePresenter purchasePresenter) {
         this.storePresenter = storePresenter;
         this.managementPresenter = managementPresenter;
+        this.purchasePresenter = purchasePresenter;
 
         setSizeFull();
         setSpacing(true);
@@ -59,54 +60,9 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         storeNameField.getStyle().set("background-color", "#ffffff");
         storeNameField.addValueChangeListener(e -> fetchStoreByName());
 
-        storeIdField.setPlaceholder("Auto-filled upon search");
-        storeIdField.setReadOnly(true);
-
-        // Initialize Check Supply button
-        fetchSupplyButton = new Button("Check Supply Amounts");
-        fetchSupplyButton.getStyle()
-            .set("background-color", "#ab47bc")
-            .set("color", "white")
-            .set("cursor", "pointer");
-        fetchSupplyButton.addClickListener(e -> {
-            if (storeIdField.getValue() == null || storeIdField.getValue().isEmpty()) {
-                Notification.show("Please search for a store first!", 3000, Notification.Position.TOP_CENTER);
-            } else {
-                fetchStoreInventory();
-            }
-        });
 
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
         homeButton.getStyle().set("background-color", "#7e57c2").set("color", "white");
-
-        // Initialize owner dashboard button
-        ownerDashboardButton = new Button("Store Owner Dashboard", e -> {
-            if (storeIdField.getValue() == null || storeIdField.getValue().isEmpty()) {
-                Notification.show("Please search for a store first!", 3000, Notification.Position.TOP_CENTER);
-            } else {
-                UI.getCurrent().navigate("owner");
-            }
-        });
-        ownerDashboardButton.getStyle()
-            .set("background-color", "#6b46c1")
-            .set("color", "white")
-            .set("margin-left", "10px")
-            .set("cursor", "pointer");
-
-        // Initialize manager button
-        managerButton = new Button("Store Management", VaadinIcon.COGS.create(), e -> {
-            String storeId = storeIdField.getValue();
-            if (storeId == null || storeId.isEmpty()) {
-                Notification.show("Please select a store first!", 3000, Notification.Position.TOP_CENTER);
-                return;
-            }
-            UI.getCurrent().getSession().setAttribute("currentStoreId", storeId);
-            UI.getCurrent().navigate("manager");
-        });
-        managerButton.getStyle()
-            .set("background-color", "#2196f3")
-            .set("color", "white")
-            .set("margin-left", "10px");
 
         // Initialize Create Store button
         createStoreButton = new Button("Create New Store", VaadinIcon.PLUS.create());
@@ -116,19 +72,9 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             .set("margin-left", "10px");
         createStoreButton.addClickListener(e -> showCreateStoreDialog());
 
-        productGrid.setColumns("productName", "price", "amount", "description");
-        productGrid.getStyle().set("background-color", "#f3e5f5");
 
-        HorizontalLayout actionsLayout = new HorizontalLayout(
-            fetchSupplyButton, 
-            homeButton, 
-            ownerDashboardButton, 
-            managerButton,
-            createStoreButton
-        );
-        actionsLayout.setSpacing(true);
-
-        add(title, storeNameField, storeIdField, actionsLayout, productGrid);
+        
+        add(title, storeNameField);
     }
 
     private void fetchStoreByName() {
@@ -143,27 +89,51 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             Notification.show("Store not found: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
             StoreDTO store = response.getValue();
-            storeIdField.setValue(store.getId());
+            showStoreLayout(store);
             Notification.show("Store found: " + store.getName());
-            // Automatically fetch inventory when store is found
-            fetchStoreInventory();
+
         }
     }
 
-    private void fetchStoreInventory() {
-        String storeId = storeIdField.getValue();
-        if (storeId == null || storeId.isEmpty()) {
-            return;
-        }
 
-        Response<List<ItemDTO>> response = storePresenter.getItemsByStoreId(sessionToken, storeId);
-        if (response.errorOccurred()) {
-            Notification.show("Failed to fetch items: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
-        } else {
-            productGrid.setItems(response.getValue());
-        }
+    private void showStoreLayout(StoreDTO store) {
+        Function<StoreDTO, List<ItemDTO>> refresher = s -> {
+            Response<List<ItemDTO>> response = storePresenter.getItemsByStoreId(sessionToken, s.getId());
+            if (response.errorOccurred()) {
+                Notification.show("Failed to fetch items: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
+                return null;
+            } else {
+                Notification.show("Fetched items", 3000, Notification.Position.MIDDLE);
+                return response.getValue();
+            }
+        };
+
+
+        ItemLayout itemLayout = new ItemLayout(store,
+            refresher,
+            i -> {
+                    Response<Boolean> response = purchasePresenter.addProductToCart(sessionToken, i.getProductId(), i.getStoreId(), 1);
+                    if (!response.errorOccurred()) {
+                        Notification.show("Product added to cart successfully!", 3000, Notification.Position.MIDDLE);
+                    } else {
+                        Notification.show("Failed to add product to cart: " + response.getErrorMessage(), 
+                                        3000, Notification.Position.MIDDLE);
+                    }
+            },
+            i -> UI.getCurrent().navigate("product-review/" + i.getProductId())
+        );
+
+        StoreLayout storelayout = new StoreLayout(store,
+        itemLayout,
+        s -> UI.getCurrent().navigate("owner"),
+        s -> {            
+            UI.getCurrent().getSession().setAttribute("currentStoreId", s.getId());
+            UI.getCurrent().navigate("manager");
+        });
+
+        this.add(storelayout);
+        itemLayout.setItems(refresher.apply(store));
     }
-
 
     private void showCreateStoreDialog() {
         Dialog dialog = new Dialog();

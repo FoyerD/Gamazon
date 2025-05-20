@@ -148,14 +148,11 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         // Create a panel for each store basket
         for (Map.Entry<String, ShoppingBasketDTO> basket : cart.getBaskets().entrySet()) {
             BasketLayout basketLayout = new BasketLayout(
-                basket.getKey(),
                 basket.getValue(),
                 this::removeBasket,
                 this::removeProduct,
                 this::decrementAmount,
                 this::incrementAmount
-
-
                 );
             
             cartTotal += basketLayout.calculateBasketTotal();
