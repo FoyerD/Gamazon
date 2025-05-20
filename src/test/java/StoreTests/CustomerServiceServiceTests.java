@@ -27,7 +27,6 @@ import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
-import Infrastructure.NotificationService;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
@@ -74,7 +73,13 @@ public class CustomerServiceServiceTests {
         this.permissionManager = new PermissionManager(this.permissionRepository);
         this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository, notificationService);
         customerServiceService = new CustomerServiceService(this.storeFacade, this.tokenService);
-        storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager, new NotificationService());
+        storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager, new INotificationService() {
+            @Override
+            public Response<Boolean> sendNotification(String userId, String message) {
+                System.out.println("Notification sent: " + message);
+                return new Response<>(true);
+            }
+        });
 
         tokenId = this.tokenService.generateToken(userId.toString());
         User user = new Member(userId, "Member1", "passpass", "email@email.com");
