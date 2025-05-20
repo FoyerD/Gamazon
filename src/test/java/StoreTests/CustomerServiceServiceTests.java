@@ -11,44 +11,32 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.CustomerServiceService;
+import Application.ServiceManager;
 import Application.StoreService;
 import Application.TokenService;
+import Domain.FacadeManager;
+import Domain.IRepoManager;
 import Domain.Pair;
-import Domain.ExternalServices.INotificationService;
 import Domain.Store.FeedbackDTO;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
-import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
-import Domain.management.IPermissionRepository;
-import Domain.management.PermissionManager;
-import Infrastructure.Repositories.MemoryAuctionRepository;
-import Infrastructure.Repositories.MemoryFeedbackRepository;
-import Infrastructure.Repositories.MemoryItemRepository;
-import Infrastructure.Repositories.MemoryPermissionRepository;
-import Infrastructure.Repositories.MemoryStoreRepository;
-import Infrastructure.Repositories.MemoryUserRepository;
+import Infrastructure.MemoryRepoManager;
+import Infrastructure.PaymentService;
 import Application.utils.Response;
 
 
 public class CustomerServiceServiceTests {
     private CustomerServiceService customerServiceService;
     private StoreService storeService;
-    private StoreFacade storeFacade;
-    private IStoreRepository storeRepository;
-    private IAuctionRepository auctionRepository;
     private IItemRepository itemRepository;
-    private IFeedbackRepository feedbackRepository;
     private IUserRepository userRepository;
     private TokenService tokenService;
-    private PermissionManager permissionManager;
-    private IPermissionRepository permissionRepository;
-    private INotificationService notificationService;
+    private ServiceManager serviceManager;
+    private FacadeManager facadeManager;
+    private IRepoManager repoManager;
 
     UUID userId = UUID.randomUUID();
     String storeId;
@@ -60,26 +48,17 @@ public class CustomerServiceServiceTests {
 
     @Before
     public void setUp() {
-        this.notificationService = mock(INotificationService.class);
 
-        this.storeRepository = new MemoryStoreRepository();
-        this.auctionRepository = new MemoryAuctionRepository();
-        this.itemRepository = new MemoryItemRepository();
-        this.feedbackRepository= new MemoryFeedbackRepository();
-        this.userRepository = new MemoryUserRepository();
-        this.permissionRepository = new MemoryPermissionRepository();
+        this.repoManager = new MemoryRepoManager();
+        this.facadeManager = new FacadeManager(repoManager, mock(PaymentService.class));
+        this.serviceManager = new ServiceManager(facadeManager);
+        userRepository = repoManager.getUserRepository();
+        itemRepository = repoManager.getItemRepository();
         
-        this.tokenService = new TokenService();
-        this.permissionManager = new PermissionManager(this.permissionRepository);
-        this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository, notificationService);
-        customerServiceService = new CustomerServiceService(this.storeFacade, this.tokenService);
-        storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager, new INotificationService() {
-            @Override
-            public Response<Boolean> sendNotification(String userId, String message) {
-                System.out.println("Notification sent: " + message);
-                return new Response<>(true);
-            }
-        });
+        
+        customerServiceService = serviceManager.getCustomerService();
+        this.tokenService = serviceManager.getTokenService();
+        storeService = serviceManager.getStoreService();
 
         tokenId = this.tokenService.generateToken(userId.toString());
         User user = new Member(userId, "Member1", "passpass", "email@email.com");

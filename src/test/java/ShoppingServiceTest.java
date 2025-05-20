@@ -9,7 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CartDTO;
@@ -28,6 +32,7 @@ import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartRepository;
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
@@ -36,7 +41,10 @@ import Domain.Store.Store;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.IPermissionRepository;
+import Domain.management.PermissionManager;
 import Infrastructure.MemoryRepoManager;
+import Infrastructure.PaymentService;
 import Domain.FacadeManager;
 import Domain.Pair;
 import Domain.Store.IAuctionRepository;
@@ -71,6 +79,9 @@ public class ShoppingServiceTest {
     private IAuctionRepository auctionRepository;
     private IUserRepository userRepository;
     private IFeedbackRepository feedbackRepository;
+    private IPermissionRepository permissionRepository;
+    private PermissionManager permissionManager;
+    private ShoppingCartFacade cartFacade;
     
     // Mock service for testing
     private IPaymentService mockPaymentService;
@@ -88,7 +99,6 @@ public class ShoppingServiceTest {
     @Before
     public void setUp() {
         notificationService = mock(INotificationService.class);
-
         // Initialize the token service
         tokenService = new TokenService();
         
@@ -111,7 +121,8 @@ public class ShoppingServiceTest {
         feedbackRepository = repositoryManager.getFeedbackRepository();
         auctionRepository = repositoryManager.getAuctionRepository();
         userRepository = repositoryManager.getUserRepository();
-        
+        permissionRepository = repositoryManager.getPermissionRepository();
+        permissionManager = new PermissionManager(permissionRepository);
         // Create Domain.User.LoginManager for UserService
         Domain.User.LoginManager loginManager = new Domain.User.LoginManager(userRepository);
         
@@ -154,16 +165,21 @@ public class ShoppingServiceTest {
             auctionRepository,
             notificationService
         );
-        
-        // Initialize the ShoppingService with our repositories and facades
-        shoppingService = new ShoppingService(
+        cartFacade = new ShoppingCartFacade(
             cartRepository,
             basketRepository,
+            mockPaymentService,
             itemFacade,
             storeFacade,
             receiptRepository,
-            productRepository,
-            tokenService
+            productRepository
+        );
+        // Initialize the ShoppingService with our repositories and facades
+        shoppingService = new ShoppingService(
+            cartFacade,
+            tokenService,
+            storeFacade,
+            permissionManager
         );
     }
     
@@ -215,9 +231,10 @@ public class ShoppingServiceTest {
 
     @Test
     public void testCheckout_Success() {
+        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), anyDouble(), anyLong(), any(), any())).thenReturn(new Response<>(true));
         shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 1);
         Response<Boolean> response = shoppingService.checkout(
-            clientToken, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
+        clientToken, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
     }
@@ -263,8 +280,11 @@ public class ShoppingServiceTest {
     @Test
     public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
         // Use the existing product and store from the setup
+        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), anyDouble(), anyLong(), any(), any())).thenReturn(new Response<>(true));
         String limitedProductId = PRODUCT_ID;  // Use the constant from the setup
         String limitedStoreId = STORE_ID;      // Use the constant from the setup
+        when(notificationService.sendNotification(any(), any())).thenReturn(new Response<>(true));
+
         
         // Update the item to have limited stock (just 1 unit)
         try {
@@ -456,13 +476,10 @@ public class ShoppingServiceTest {
             
             // Create a shopping service that accepts valid bids
             ShoppingService testShoppingService = new ShoppingService(
-                cartRepository,
-                basketRepository,
-                itemFacade,
+                cartFacade,
+                tokenService,
                 storeFacade,
-                receiptRepository,
-                productRepository,
-                tokenService
+                permissionManager
             ) {
                 @Override
                 public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
@@ -533,13 +550,10 @@ public class ShoppingServiceTest {
             
             // Create a shopping service that rejects bids below a certain threshold
             ShoppingService testShoppingService = new ShoppingService(
-                cartRepository,
-                basketRepository,
-                itemFacade,
+                cartFacade,
+                tokenService,
                 storeFacade,
-                receiptRepository,
-                productRepository,
-                tokenService
+                permissionManager
             ) {
                 @Override
                 public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,

@@ -26,25 +26,23 @@ import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
+import Domain.management.PermissionManager;
 
 @Service
 public class ShoppingService{
     private static final String CLASS_NAME = ShoppingService.class.getSimpleName();
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
-
-    public ShoppingService(IShoppingCartRepository cartRepository, IShoppingBasketRepository basketRepository,
-     ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepository,
-      IProductRepository productRepository, TokenService tokenService) {
-        this.tokenService = tokenService;
-        cartFacade = new ShoppingCartFacade(cartRepository, basketRepository, new MockPaymentService(), itemFacade, storeFacade, receiptRepository, productRepository);
-        TradingLogger.logEvent(CLASS_NAME, "Constructor", "ShoppingService initialized with repositories");
-    }
+    private StoreFacade storeFacade;
+    private PermissionManager permissionManager;
 
     @Autowired
-    public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade) {
+    public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade, PermissionManager permissionManager) {
         this.cartFacade = cartFacade;
         this.tokenService = tokenService;
+        this.storeFacade = storeFacade;
+        this.permissionManager = permissionManager;
+        
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "ShoppingService initialized with cart facade");
     }
 
@@ -61,7 +59,13 @@ public class ShoppingService{
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
-
+            if(this.permissionManager.isBanned(clientId)){
+                throw new Exception("User is banned from adding products to cart.");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from adding products to cart.");
+            }
             cartFacade.addProductToCart(storeId, clientId, productId, quantity);
             TradingLogger.logEvent(CLASS_NAME, method, "Product " + productId + " added to cart for user " + clientId + " with quantity " + quantity);
             return new Response<>(true);
@@ -122,8 +126,10 @@ public class ShoppingService{
             if(this.cartFacade == null) {
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
+            }            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(permissionManager.isBanned(clientId)){
+                throw new Exception("User is banned from removing products from cart.");
             }
-
             cartFacade.removeProductFromCart(storeId, clientId, productId, quantity);
             TradingLogger.logEvent(CLASS_NAME, method, "Removed " + quantity + " units of product " + productId + " from cart for user " + clientId);
             return new Response<>(true);
@@ -145,8 +151,10 @@ public class ShoppingService{
             if(this.cartFacade == null) {
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
+            }            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(permissionManager.isBanned(clientId)){
+                throw new Exception("User is banned from removing products from cart.");
             }
-
             cartFacade.removeProductFromCart(storeId, clientId, productId);
             TradingLogger.logEvent(CLASS_NAME, method, "Completely removed product " + productId + " from cart for user " + clientId);
             return new Response<>(true);
@@ -169,7 +177,10 @@ public class ShoppingService{
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
-
+            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(permissionManager.isBanned(clientId)){
+                throw new Exception("User is banned from clearing cart.");
+            }
             cartFacade.clearCart(clientId);
             TradingLogger.logEvent(CLASS_NAME, method, "Cart cleared for user " + clientId);
             return new Response<>(true);
@@ -186,7 +197,10 @@ public class ShoppingService{
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
-        
+        String userId = this.tokenService.extractId(sessionToken);
+        if (permissionManager.isBanned(userId)) {
+            return Response.error("User is banned from clearing basket.");
+        }
         try {
             if(this.cartFacade == null) {
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
@@ -215,6 +229,10 @@ public class ShoppingService{
         String clientId = this.tokenService.extractId(sessionToken);
         
         try {
+            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(permissionManager.isBanned(clientId)){
+                throw new Exception("User is banned from checking out.");
+            }
             if(this.cartFacade == null) {
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));

@@ -169,4 +169,28 @@ public class MarketFacade implements IMarketFacade {
         return permission != null && permission.isStoreOwner();
     }
     
+
+    @Override
+    public void checkPermission(String userId, String storeId, PermissionType permissionType) {
+        permissionManager.checkPermission(userId, storeId, permissionType);
+    }
+
+    @Override
+    public boolean banUser(String bannerId, String userId, Date endDate) {
+        Member member = userRepository.getMember(userId);
+        if (member == null) {
+            throw new IllegalArgumentException("User not found: " + userId);
+        }
+        return permissionManager.banUser(bannerId, userId, endDate);
+    }
+
+    @Override
+    public boolean unbanUser(String unbannerId, String userId) {
+        Member member = userRepository.getMember(userId);
+        if (member == null) {
+            throw new IllegalArgumentException("User not found: " + userId);
+        }
+        return permissionManager.unbanUser(unbannerId, userId);
+    }
+
 }

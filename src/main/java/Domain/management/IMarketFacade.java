@@ -1,6 +1,7 @@
 package Domain.management;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import Domain.ExternalServices.INotificationService;
@@ -135,4 +136,8 @@ public interface IMarketFacade {
      * @return List of Receipts representing purchases
      */
     List<Receipt> getStorePurchaseHistory(String storeId, String userId);
+
+    boolean banUser(String bannerId, String userId, Date endDate);
+    boolean unbanUser(String bannerId, String userId);
+    void checkPermission(String userId, String storeId, PermissionType permissionType);
 }

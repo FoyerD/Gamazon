@@ -5,4 +5,5 @@ public enum RoleType {
     STORE_OWNER,
     STORE_MANAGER,
     TRADING_MANAGER,
+    BANNED_USER,
 }

@@ -1,5 +1,6 @@
 package Domain.management;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,5 +109,30 @@ public class PermissionManager {
         Permission founder = new Permission("system", manager.getId());
         PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
         permissionRepository.add("1", manager.getId(), founder);
+    }
+
+    public boolean banUser(String bannerId, String userId, Date endDate) {
+        checkPermission(bannerId, "1", PermissionType.BAN_USERS);
+
+        Permission perm = getOrCreatePermission(bannerId, userId, "1", RoleType.BANNED_USER);
+        return perm.hasPermission(PermissionType.BAN_USERS);
+    }
+
+    public boolean unbanUser(String unbannerId, String userId) {
+        checkPermission(unbannerId, "1", PermissionType.BAN_USERS);
+
+        Permission perm = permissionRepository.get("1", userId);
+        if (perm == null || !perm.hasPermission(PermissionType.BAN_USERS)) {
+            throw new IllegalStateException(userId + " is not banned.");
+        }
+        perm.setPermissions(Set.of());
+        perm.setRole(null);
+        permissionRepository.update("1", userId, perm);
+        return true;
+    }
+
+    public boolean isBanned(String userId) {
+        Permission permission = permissionRepository.get("1", userId);
+        return permission != null && permission.hasPermission(PermissionType.BANNED);
     }
 }
