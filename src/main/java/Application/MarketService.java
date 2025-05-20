@@ -233,8 +233,9 @@ public class MarketService {
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            marketFacade.checkPermission(tokenService.extractId(sessionToken), "1", PermissionType.BAN_USERS);
-            marketFacade.banUser(userId, endDate);
+            String bannerId = tokenService.extractId(sessionToken);
+            marketFacade.checkPermission(bannerId, "1", PermissionType.BAN_USERS);
+            marketFacade.banUser(bannerId, userId, endDate);
             TradingLogger.logEvent(CLASS_NAME, "banUser", "User banned successfully: " + userId);
             return new Response<>(null);
         } catch (Exception e) {

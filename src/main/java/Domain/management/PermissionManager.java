@@ -112,8 +112,22 @@ public class PermissionManager {
     }
 
     public boolean banUser(String bannerId, String userId, Date endDate) {
-        checkPermission("1", bannerId, PermissionType.BAN_USERS);
+        checkPermission(bannerId, "1", PermissionType.BAN_USERS);
 
-        getOrCreatePermission(bannerId, userId, "1", RoleType.BANNED_USER);
+        Permission perm = getOrCreatePermission(bannerId, userId, "1", RoleType.BANNED_USER);
+        return perm.hasPermission(PermissionType.BAN_USERS);
+    }
+
+    public boolean unbanUser(String unbannerId, String userId) {
+        checkPermission(unbannerId, "1", PermissionType.BAN_USERS);
+
+        Permission perm = permissionRepository.get("1", userId);
+        if (perm == null || !perm.hasPermission(PermissionType.BAN_USERS)) {
+            throw new IllegalStateException(userId + " is not banned.");
+        }
+        perm.setPermissions(Set.of());
+        perm.setRole(null);
+        permissionRepository.update("1", userId, perm);
+        return true;
     }
 }

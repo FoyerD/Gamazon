@@ -181,7 +181,16 @@ public class MarketFacade implements IMarketFacade {
         if (member == null) {
             throw new IllegalArgumentException("User not found: " + userId);
         }
-        permissionManager.banUser(bannerId, userId, endDate);
-        return true;
+        return permissionManager.banUser(bannerId, userId, endDate);
     }
+
+    @Override
+    public boolean unbanUser(String unbannerId, String userId) {
+        Member member = userRepository.getMember(userId);
+        if (member == null) {
+            throw new IllegalArgumentException("User not found: " + userId);
+        }
+        return permissionManager.unbanUser(unbannerId, userId);
+    }
+
 }
