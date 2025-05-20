@@ -28,6 +28,7 @@ import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartRepository;
+import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
@@ -36,7 +37,10 @@ import Domain.Store.Store;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
+import Domain.management.IPermissionRepository;
+import Domain.management.PermissionManager;
 import Infrastructure.MemoryRepoManager;
+import Infrastructure.PaymentService;
 import Domain.FacadeManager;
 import Domain.Pair;
 import Domain.Store.IAuctionRepository;
@@ -71,6 +75,9 @@ public class ShoppingServiceTest {
     private IAuctionRepository auctionRepository;
     private IUserRepository userRepository;
     private IFeedbackRepository feedbackRepository;
+    private IPermissionRepository permissionRepository;
+    private PermissionManager permissionManager;
+    private ShoppingCartFacade cartFacade;
     
     // Mock service for testing
     private IPaymentService mockPaymentService;
@@ -111,7 +118,8 @@ public class ShoppingServiceTest {
         feedbackRepository = repositoryManager.getFeedbackRepository();
         auctionRepository = repositoryManager.getAuctionRepository();
         userRepository = repositoryManager.getUserRepository();
-        
+        permissionRepository = repositoryManager.getPermissionRepository();
+        permissionManager = new PermissionManager(permissionRepository);
         // Create Domain.User.LoginManager for UserService
         Domain.User.LoginManager loginManager = new Domain.User.LoginManager(userRepository);
         
@@ -154,16 +162,21 @@ public class ShoppingServiceTest {
             auctionRepository,
             notificationService
         );
-        
-        // Initialize the ShoppingService with our repositories and facades
-        shoppingService = new ShoppingService(
+        cartFacade = new ShoppingCartFacade(
             cartRepository,
             basketRepository,
+            mock(IPaymentService.class),
             itemFacade,
             storeFacade,
             receiptRepository,
-            productRepository,
-            tokenService
+            productRepository
+        );
+        // Initialize the ShoppingService with our repositories and facades
+        shoppingService = new ShoppingService(
+            cartFacade,
+            tokenService,
+            storeFacade,
+            permissionManager
         );
     }
     
@@ -456,13 +469,10 @@ public class ShoppingServiceTest {
             
             // Create a shopping service that accepts valid bids
             ShoppingService testShoppingService = new ShoppingService(
-                cartRepository,
-                basketRepository,
-                itemFacade,
+                cartFacade,
+                tokenService,
                 storeFacade,
-                receiptRepository,
-                productRepository,
-                tokenService
+                permissionManager
             ) {
                 @Override
                 public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
@@ -533,13 +543,10 @@ public class ShoppingServiceTest {
             
             // Create a shopping service that rejects bids below a certain threshold
             ShoppingService testShoppingService = new ShoppingService(
-                cartRepository,
-                basketRepository,
-                itemFacade,
+                cartFacade,
+                tokenService,
                 storeFacade,
-                receiptRepository,
-                productRepository,
-                tokenService
+                permissionManager
             ) {
                 @Override
                 public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,

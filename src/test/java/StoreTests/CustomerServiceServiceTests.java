@@ -11,8 +11,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.CustomerServiceService;
+import Application.ServiceManager;
 import Application.StoreService;
 import Application.TokenService;
+import Domain.FacadeManager;
+import Domain.IRepoManager;
 import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.Store.FeedbackDTO;
@@ -27,7 +30,9 @@ import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
+import Infrastructure.MemoryRepoManager;
 import Infrastructure.NotificationService;
+import Infrastructure.PaymentService;
 import Infrastructure.Repositories.MemoryAuctionRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
@@ -40,16 +45,12 @@ import Application.utils.Response;
 public class CustomerServiceServiceTests {
     private CustomerServiceService customerServiceService;
     private StoreService storeService;
-    private StoreFacade storeFacade;
-    private IStoreRepository storeRepository;
-    private IAuctionRepository auctionRepository;
     private IItemRepository itemRepository;
-    private IFeedbackRepository feedbackRepository;
     private IUserRepository userRepository;
     private TokenService tokenService;
-    private PermissionManager permissionManager;
-    private IPermissionRepository permissionRepository;
-    private INotificationService notificationService;
+    private ServiceManager serviceManager;
+    private FacadeManager facadeManager;
+    private IRepoManager repoManager;
 
     UUID userId = UUID.randomUUID();
     String storeId;
@@ -63,18 +64,16 @@ public class CustomerServiceServiceTests {
     public void setUp() {
         this.notificationService = mock(INotificationService.class);
 
-        this.storeRepository = new MemoryStoreRepository();
-        this.auctionRepository = new MemoryAuctionRepository();
-        this.itemRepository = new MemoryItemRepository();
-        this.feedbackRepository= new MemoryFeedbackRepository();
-        this.userRepository = new MemoryUserRepository();
-        this.permissionRepository = new MemoryPermissionRepository();
+        this.repoManager = new MemoryRepoManager();
+        this.facadeManager = new FacadeManager(repoManager, mock(PaymentService.class));
+        this.serviceManager = new ServiceManager(facadeManager);
+        userRepository = repoManager.getUserRepository();
+        itemRepository = repoManager.getItemRepository();
         
-        this.tokenService = new TokenService();
-        this.permissionManager = new PermissionManager(this.permissionRepository);
-        this.storeFacade = new StoreFacade(storeRepository, feedbackRepository, itemRepository, userRepository, auctionRepository, notificationService);
-        customerServiceService = new CustomerServiceService(this.storeFacade, this.tokenService);
-        storeService = new StoreService(this.storeFacade, this.tokenService, this.permissionManager, new NotificationService());
+        
+        customerServiceService = serviceManager.getCustomerService();
+        this.tokenService = serviceManager.getTokenService();
+        storeService = serviceManager.getStoreService();
 
         tokenId = this.tokenService.generateToken(userId.toString());
         User user = new Member(userId, "Member1", "passpass", "email@email.com");

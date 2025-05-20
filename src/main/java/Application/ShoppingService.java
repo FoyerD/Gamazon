@@ -1,5 +1,4 @@
 package Application;
-import java.security.Permission;
 import java.util.Date;
 import java.util.Set;
 
@@ -8,6 +7,7 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
+import Application.utils.TradingLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,11 +30,11 @@ import Domain.management.PermissionManager;
 
 @Service
 public class ShoppingService{
+    private static final String CLASS_NAME = ShoppingService.class.getSimpleName();
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
     private StoreFacade storeFacade;
     private PermissionManager permissionManager;
-
 
     @Autowired
     public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade, PermissionManager permissionManager) {
@@ -43,16 +43,22 @@ public class ShoppingService{
         this.storeFacade = storeFacade;
         this.permissionManager = permissionManager;
         
+        TradingLogger.logEvent(CLASS_NAME, "Constructor", "ShoppingService initialized with cart facade");
     }
 
     public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {
+        String method = "addProductToCart";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
 
         try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
             if(this.permissionManager.isBanned(clientId)){
                 throw new Exception("User is banned from adding products to cart.");
             }
@@ -61,20 +67,27 @@ public class ShoppingService{
                 throw new Exception("User is banned from adding products to cart.");
             }
             cartFacade.addProductToCart(storeId, clientId, productId, quantity);
+            TradingLogger.logEvent(CLASS_NAME, method, "Product " + productId + " added to cart for user " + clientId + " with quantity " + quantity);
             return new Response<>(true);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error adding product to cart: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
     public Response<CartDTO> viewCart(String sessionToken) {
+        String method = "viewCart";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
         
         try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
             Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
             for (Pair<Item, Integer> item : itemsMap) {
@@ -92,72 +105,95 @@ public class ShoppingService{
                 }
             }
             CartDTO cart = new CartDTO(clientId, baskets);
+            TradingLogger.logEvent(CLASS_NAME, method, "Cart viewed for user " + clientId + " with " + itemsMap.size() + " items");
             return new Response<>(cart);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error viewing cart: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
 
     public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId, int quantity) {
+        String method = "removeProductFromCart";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
         
         try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
-            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
             if(permissionManager.isBanned(clientId)){
                 throw new Exception("User is banned from removing products from cart.");
             }
             cartFacade.removeProductFromCart(storeId, clientId, productId, quantity);
+            TradingLogger.logEvent(CLASS_NAME, method, "Removed " + quantity + " units of product " + productId + " from cart for user " + clientId);
             return new Response<>(true);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error removing product from cart: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
     public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId) {
+        String method = "removeProductFromCart";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
         
         try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
-            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
             if(permissionManager.isBanned(clientId)){
                 throw new Exception("User is banned from removing products from cart.");
             }
             cartFacade.removeProductFromCart(storeId, clientId, productId);
+            TradingLogger.logEvent(CLASS_NAME, method, "Completely removed product " + productId + " from cart for user " + clientId);
             return new Response<>(true);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error removing product from cart: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
     public Response<Boolean> clearCart(String sessionToken) {
+        String method = "clearCart";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
         
         try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
             if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
             if(permissionManager.isBanned(clientId)){
                 throw new Exception("User is banned from clearing cart.");
             }
             cartFacade.clearCart(clientId);
+            TradingLogger.logEvent(CLASS_NAME, method, "Cart cleared for user " + clientId);
             return new Response<>(true);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error clearing cart: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
     public Response<Boolean> clearBasket(String sessionToken, String storeId) {
+        String method = "clearBasket";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
@@ -166,11 +202,16 @@ public class ShoppingService{
             return Response.error("User is banned from clearing basket.");
         }
         try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
 
             cartFacade.clearBasket(clientId, storeId);
+            TradingLogger.logEvent(CLASS_NAME, method, "Basket cleared for user " + clientId + " and store " + storeId);
             return new Response<>(true);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error clearing basket: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
@@ -180,20 +221,28 @@ public class ShoppingService{
     // Make Immidiate Purchase Use Case 2.5
     public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
          String clientName, String deliveryAddress) {
+        String method = "checkout";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
         
         try {
-            if(this.cartFacade == null) return new Response<>(new Error("cartFacade is not initialized."));
-
-
-            //  public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv) {
+            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(permissionManager.isBanned(clientId)){
+                throw new Exception("User is banned from checking out.");
+            }
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
 
             cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+            TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
             return new Response<>(true);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error during checkout: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
@@ -202,7 +251,9 @@ public class ShoppingService{
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
                                     long andIncrement, String clientName, String deliveryAddress) {
+        String method = "makeBid";
         if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
         }
 
@@ -210,15 +261,17 @@ public class ShoppingService{
 
         try {
             if (this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
 
             cartFacade.makeBid(auctionId, clientId, price,
                             cardNumber, expiryDate, cvv,
                             andIncrement, clientName, deliveryAddress);
-
+            TradingLogger.logEvent(CLASS_NAME, method, "Bid made successfully for auction " + auctionId + " by user " + clientId + " with price " + price);
             return new Response<>(true);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error making bid: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
@@ -229,21 +282,20 @@ public class ShoppingService{
         public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv,
             double price, long andIncrement, String name, String deliveryAddress) {
             // Mock payment processing logic
+            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.processPayment", "Processing mock payment for " + card_owner + " of $" + price);
             return new Response<>(true); // Assume payment is always successful for testing
         }
 
         @Override
         public void updatePaymentServiceURL(String url) {
             // Mock implementation for updating payment service URL
-            System.out.println("Payment service URL updated to: " + url);
+            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.updatePaymentServiceURL", "Payment service URL updated to: " + url);
         }
 
         @Override
         public void initialize() {
             // Mock initialization logic
-            System.out.println("MockPaymentService initialized.");
+            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.initialize", "MockPaymentService initialized");
         }
-
     }
-
 }
