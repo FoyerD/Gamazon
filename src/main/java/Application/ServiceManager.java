@@ -4,8 +4,9 @@ package Application;
 
 import org.springframework.stereotype.Service;
 
+import Application.utils.Response;
 import Domain.FacadeManager;
-import Infrastructure.NotificationService;
+import Domain.ExternalServices.INotificationService;
 
 
 public class ServiceManager {
@@ -18,7 +19,7 @@ public class ServiceManager {
     private CustomerServiceService customerService;
     private ShoppingService shoppingService;
     private FacadeManager facadeManager;
-    private NotificationService notificationService;
+    private INotificationService notificationService;
 
     public ServiceManager(FacadeManager facadeManager) {
         this.facadeManager = facadeManager;
@@ -40,9 +41,17 @@ public class ServiceManager {
         return itemService;
     }
 
-    public NotificationService getNotificationService() {
+    public INotificationService getINotificationService() {
         if (notificationService == null) {
-            notificationService = new NotificationService();
+            notificationService = new INotificationService() {
+                @Override
+                public Response<Boolean> sendNotification(String userId, String message) {
+                    // Implementation for sending notification
+                    System.out.println("Sending notification to user " + userId + ": " + message);
+                    return new Response<>(true);
+                }
+
+            };
         }
         return notificationService;
     }
@@ -52,7 +61,7 @@ public class ServiceManager {
             storeService = new StoreService(facadeManager.getStoreFacade(),
                                             getTokenService(),
                                             facadeManager.getPermissionManager(),
-                                            getNotificationService());
+                                            getINotificationService());
         }
         return storeService;
     }
