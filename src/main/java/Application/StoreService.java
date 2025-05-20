@@ -14,12 +14,12 @@ import Application.utils.Error;
 import Application.utils.Response;
 
 import Application.TokenService;
+import Domain.ExternalServices.INotificationService;
 import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
-import Infrastructure.NotificationService;
 import Domain.management.Permission;
 
 @Service
@@ -28,7 +28,7 @@ public class StoreService {
     private StoreFacade storeFacade;
     private TokenService tokenService;
     private PermissionManager permissionManager;
-    private NotificationService notificationService;
+    private INotificationService notificationService;
 
 
     public StoreService() {
@@ -39,7 +39,7 @@ public class StoreService {
     }
 
     @Autowired
-    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, NotificationService notificationService) {
+    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, INotificationService notificationService) {
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
