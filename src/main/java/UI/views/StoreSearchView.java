@@ -9,13 +9,11 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 
-import com.vaadin.flow.component.ItemLabelGenerator;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -28,6 +26,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @Route("store-search")
 public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
@@ -38,7 +37,6 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
     private String sessionToken;
 
     private final TextField storeNameField = new TextField("Search Store by Name");
-    private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
     private final Button homeButton = new Button("Return to Homepage");
 
     private final Button createStoreButton;
@@ -99,15 +97,20 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
 
 
     private void showStoreLayout(StoreDTO store) {
+        Function<StoreDTO, List<ItemDTO>> refresher = s -> {
+            Response<List<ItemDTO>> response = storePresenter.getItemsByStoreId(sessionToken, s.getId());
+            if (response.errorOccurred()) {
+                Notification.show("Failed to fetch items: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
+                return null;
+            } else {
+                Notification.show("Fetched items", 3000, Notification.Position.MIDDLE);
+                return response.getValue();
+            }
+        };
+
+
         ItemLayout itemLayout = new ItemLayout(store,
-            s -> {
-                Response<List<ItemDTO>> response = storePresenter.getItemsByStoreId(sessionToken, s.getId());
-                if (response.errorOccurred()) {
-                    Notification.show("Failed to fetch items: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
-                } else {
-                    productGrid.setItems(response.getValue());
-                }
-            },
+            refresher,
             i -> {
                     Response<Boolean> response = purchasePresenter.addProductToCart(sessionToken, i.getProductId(), i.getStoreId(), 1);
                     if (!response.errorOccurred()) {
@@ -129,6 +132,7 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
         });
 
         this.add(storelayout);
+        itemLayout.setItems(refresher.apply(store));
     }
 
     private void showCreateStoreDialog() {

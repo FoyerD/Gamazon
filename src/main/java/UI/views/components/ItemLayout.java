@@ -2,6 +2,7 @@ package UI.views.components;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -17,10 +18,10 @@ public class ItemLayout extends VerticalLayout {
     private final Grid<ItemDTO> grid;
     private final Button refreshButton;
 
-    public ItemLayout(StoreDTO store, Consumer<StoreDTO> itemRefresher, Consumer<ItemDTO> onAddToCart, Consumer<ItemDTO> itemReviewer) {
+    public ItemLayout(StoreDTO store, Function<StoreDTO, List<ItemDTO>> itemRefresher, Consumer<ItemDTO> onAddToCart, Consumer<ItemDTO> itemReviewer) {
 
         grid = new Grid<>(ItemDTO.class);
-        grid.setColumns("productId", "description", "price", "amount");
+        grid.setColumns("productName", "description", "price", "amount");
         grid.getStyle().set("background-color", "#f3e5f5");
 
                 // Add review button column
@@ -47,14 +48,18 @@ public class ItemLayout extends VerticalLayout {
             .set("color", "white")
             .set("cursor", "pointer");
         refreshButton.addClickListener(e -> {
-            itemRefresher.accept(store);
+            this.setItems(itemRefresher.apply(store));
+  
         });
 
         this.add(refreshButton, grid);
     }
 
+
     public void setItems(List<ItemDTO> items) {
-        grid.setItems(items);
+        if (items != null) {
+            grid.setItems(items);
+        }
     }
 
     public void addItemClickListener(ItemClickListener<ItemDTO> listener) {

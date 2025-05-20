@@ -104,7 +104,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         Button cartBtn = new Button("View Cart", e -> UI.getCurrent().navigate("cart"));
         cartBtn.getStyle().set("background-color", "#38a169").set("color", "white");
 
-        Button registerBtn = new Button("Register New Account", e -> UI.getCurrent().navigate("register"));
+        Button registerBtn = new Button("Register", e -> UI.getCurrent().navigate("register"));
         registerBtn.getStyle().set("background-color", "#6b46c1").set("color", "white");
 
         Button logoutBtn = new Button("Logout", e -> {
