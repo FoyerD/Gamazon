@@ -50,7 +50,7 @@ public class ItemLayout extends VerticalLayout {
             itemRefresher.accept(store);
         });
 
-
+        this.add(refreshButton, grid);
     }
 
     public void setItems(List<ItemDTO> items) {
