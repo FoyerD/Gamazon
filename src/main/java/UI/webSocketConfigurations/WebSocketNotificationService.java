@@ -10,17 +10,21 @@ public class WebSocketNotificationService implements INotificationService {
 
     private final WebSocketNotifier webSocketNotifier;
     private final ConnectedUserRegistry connectedUserRegistry;
+    private final PendingMessageStore pendingMessageStore;
 
-    public WebSocketNotificationService(WebSocketNotifier webSocketNotifier,
-                                        ConnectedUserRegistry connectedUserRegistry) {
-        this.webSocketNotifier = webSocketNotifier;
-        this.connectedUserRegistry = connectedUserRegistry;
+    public WebSocketNotificationService(WebSocketNotifier notifier,
+                                        ConnectedUserRegistry registry,
+                                        PendingMessageStore store) {
+        this.webSocketNotifier = notifier;
+        this.connectedUserRegistry = registry;
+        this.pendingMessageStore = store;
     }
 
     @Override
     public Response<Boolean> sendNotification(String userId, String content) {
         if (!connectedUserRegistry.isConnected(userId)) {
-            return new Response<>(false); // User not connected
+            pendingMessageStore.store(userId, content);
+            return new Response<>(false); // Not delivered now
         }
 
         try {
