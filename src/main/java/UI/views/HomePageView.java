@@ -143,7 +143,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
     private void loadAllProducts() {
         if (sessionToken == null) return;
-        Response<List<ItemDTO>> response = productPresenter.showAllProducts(sessionToken);
+        Response<List<ItemDTO>> response = productPresenter.showAllItems(sessionToken);
         if (!response.errorOccurred()) {
             productGrid.setItems(response.getValue());
         } else {
@@ -160,7 +160,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             return;
         }
         
-        Response<List<ItemDTO>> response = productPresenter.showAllProducts(sessionToken);
+        Response<List<ItemDTO>> response = productPresenter.showAllItems(sessionToken);
         if (!response.errorOccurred()) {
             List<ItemDTO> filtered = response.getValue().stream()
                     .filter(p -> p.getProductName().toLowerCase().contains(query.toLowerCase()))

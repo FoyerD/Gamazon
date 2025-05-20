@@ -1,5 +1,7 @@
 package Infrastructure.Repositories;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -77,4 +79,10 @@ public class MemoryProductRepository extends IProductRepository {
         return null;
     }
     
+
+    /** Retrieves all products. */
+    @Override
+    public Set<Product> getAll() {
+        return new HashSet<>(products.values());
+    }
 }

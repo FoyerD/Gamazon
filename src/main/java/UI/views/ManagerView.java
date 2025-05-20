@@ -1,7 +1,13 @@
 package UI.views;
 
 import UI.presenters.IManagementPresenter;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IStorePresenter;
+import UI.views.components.AddItemForm;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
 import Application.utils.Response;
+import Domain.Store.Item;
 import Domain.management.PermissionType;
 import Application.UserService;
 import Application.DTOs.UserDTO;
@@ -33,8 +39,13 @@ import java.util.stream.Collectors;
 public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
 
     private final IManagementPresenter managementPresenter;
+    private final IProductPresenter productPresenter;
+    private final IStorePresenter storePresenter;
+
+
     private final UserService userService;
     private final MarketService marketService;
+
     private String sessionToken;
     private String currentUsername;
     private String currentStoreId;
@@ -49,7 +60,11 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private Grid<UserRole> managersPermissionGrid;
 
     @Autowired
-    public ManagerView(IManagementPresenter managementPresenter, UserService userService, MarketService marketService) {
+
+    public ManagerView(IManagementPresenter managementPresenter, UserService userService, MarketService marketService, 
+                       IStorePresenter storePresenter, IProductPresenter productPresenter) {
+        this.storePresenter = storePresenter;
+        this.productPresenter = productPresenter;
         this.managementPresenter = managementPresenter;
         this.userService = userService;
         this.marketService = marketService;
@@ -79,8 +94,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         Tab managersTab = new Tab(VaadinIcon.USERS.create(), new Span("Managers"));
         Tab ownersTab = new Tab(VaadinIcon.USER_STAR.create(), new Span("Owners"));
         Tab permissionsTab = new Tab(VaadinIcon.KEY.create(), new Span("Permissions"));
+        Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         
-        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab);
+        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab);
         tabs.getStyle().set("margin", "1rem 0");
 
         // Setup grids
@@ -95,8 +111,10 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
                 showManagersView();
             } else if (event.getSelectedTab().equals(ownersTab)) {
                 showOwnersView();
-            } else {
+            } else if( event.getSelectedTab().equals(permissionsTab)) {
                 showPermissionsView();
+            } else {
+                showItemsView();
             }
         });
 
@@ -246,6 +264,77 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         managersPermissionGrid.setHeight("300px");
 
         mainContent.add(new H3("Manager Permissions"), managersPermissionGrid);
+    }
+
+    private void showItemsView() {
+        mainContent.removeAll();
+        Grid<ItemDTO> itemsGrid = new Grid<>();
+
+        itemsGrid.addColumn(ItemDTO::getProductName).setHeader("Item Name");
+        itemsGrid.addColumn(ItemDTO::getPrice).setHeader("Price");
+        itemsGrid.addColumn(ItemDTO::getAmount).setHeader("Amount");
+        itemsGrid.addColumn(ItemDTO::getDescription).setHeader("Description");
+        itemsGrid.addColumn(ItemDTO::getRating).setHeader("Rating");
+
+        itemsGrid.addComponentColumn(item -> {
+            Button deleteButton = new Button("Delete", VaadinIcon.TRASH.create());
+            styleButton(deleteButton, "#f44336");
+            deleteButton.addClickListener(e -> {
+                Response<ItemDTO> response = managementPresenter.removeItem(sessionToken, currentStoreId, item.getProductId());
+                if (response.errorOccurred()) {
+                    Notification.show("Failed to delete item: " + response.getErrorMessage());
+                } else {
+                    Notification.show("Item deleted successfully");
+                    loadItems(itemsGrid); 
+                }
+            });
+
+            return new HorizontalLayout(deleteButton);
+        });
+
+        itemsGrid.setHeight("300px");
+
+        loadItems(itemsGrid);
+
+        Button addButton = new Button("Add Item", VaadinIcon.PLUS.create());
+        styleButton(addButton, "#4caf50");
+        addButton.addClickListener(e -> {
+            Dialog dialog = new Dialog();
+            AddItemForm addItemForm = new AddItemForm(
+                () -> {
+                    Response<Set<ProductDTO>> response = productPresenter.showAllProducts(sessionToken);
+                    if (response.errorOccurred()) {
+                        Notification.show("Failed to fetch products: " + response.getErrorMessage());
+                        return Collections.emptySet();
+                    }
+                    return response.getValue();
+                }, 
+                newItem -> {
+                    Response<ItemDTO> response = managementPresenter.addItem(sessionToken, currentStoreId, newItem.productId, newItem.price, newItem.amount, newItem.description);
+                    if (response.errorOccurred()) {
+                        Notification.show("Failed to add item: " + response.getErrorMessage());
+                    } else {
+                        Notification.show("Item added successfully");
+                        dialog.close(); // Close first
+                        loadItems(itemsGrid);
+                    }
+                },                
+                dialog::close
+            );
+            dialog.add(addItemForm);
+            dialog.open();
+        });
+
+        mainContent.add(new H3("Store Managers"), addButton, itemsGrid);
+    }
+
+    private void loadItems(Grid<ItemDTO> itemsGrid) {
+        Response<List<ItemDTO>> itemsResponse = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+        if (itemsResponse.errorOccurred()) {
+            Notification.show("Failed to fetch items: " + itemsResponse.getErrorMessage());
+        } else {
+            itemsGrid.setItems(itemsResponse.getValue());
+        }
     }
 
     private void showAddUserDialog(boolean isManager) {
@@ -436,11 +525,13 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         // Create lists to store our data
         List<UserRole> managers = new ArrayList<>();
         List<UserRole> owners = new ArrayList<>();
+        List<ItemDTO> items = new ArrayList<>();
 
         // Add the current store's managers and owners
         if (currentStoreId != null) {
             managers.addAll(getStoreManagers());
             owners.addAll(getStoreOwners());
+            items.addAll(storePresenter.getItemsByStoreId(sessionToken, currentStoreId).getValue());
         }
 
         // Update the grids

@@ -103,7 +103,7 @@ public class ProductReviewView extends VerticalLayout implements BeforeEnterObse
     private void loadProductDetails(String productId) {
         if (sessionToken == null) return;
         
-        Response<List<ItemDTO>> response = productPresenter.showAllProducts(sessionToken);
+        Response<List<ItemDTO>> response = productPresenter.showAllItems(sessionToken);
         if (!response.errorOccurred()) {
             List<ItemDTO> products = response.getValue();
             currentProduct = products.stream()

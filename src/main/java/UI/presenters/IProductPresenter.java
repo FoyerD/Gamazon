@@ -1,9 +1,11 @@
 package UI.presenters;
 
 import java.util.List;
+import java.util.Set;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
 import Application.utils.Response;
 import Domain.Store.FeedbackDTO;
 import Domain.Store.ItemFilter;
@@ -34,12 +36,21 @@ public interface IProductPresenter {
     Response<List<ItemDTO>> showProductDetailsOfaStore(String sessionToken, ItemFilter filters, String storeId);
 
     /**
-     * Retrieves all available products across all stores.
+     * Retrieves all available items across all stores.
      *
      * @param sessionToken the token representing the current authenticated user session
      * @return a {@link Response} containing a set of all {@link ItemDTO} in the marketplace
      */
-    Response<List<ItemDTO>> showAllProducts(String sessionToken);
+    Response<List<ItemDTO>> showAllItems(String sessionToken);
+    
+    /**
+     * Retrieves all products available in the system.
+     *
+     * @param sessionToken the token representing the current authenticated user session
+     * @return a {@link Response} containing a set of all {@link ProductDTO} in the marketplace
+     */
+
+    Response<Set<ProductDTO>> showAllProducts(String sessionToken);
 
     /**
      * Allows a user to rate and leave feedback for a product in a specific store.

@@ -2,14 +2,17 @@ package UI.presenters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
 import Application.CustomerServiceService;
 import Application.ItemService;
+import Application.ProductService;
 import Application.StoreService;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Domain.Store.FeedbackDTO;
@@ -20,8 +23,10 @@ public class ProductPresenter implements IProductPresenter {
     private final StoreService storeService;
     private final ItemService itemService;
     private final CustomerServiceService customerServiceService;
+    private final ProductService productService;
     
-    public ProductPresenter(StoreService storeService, ItemService itemService, CustomerServiceService customerServiceService) {
+    public ProductPresenter(StoreService storeService, ItemService itemService, CustomerServiceService customerServiceService, ProductService productService) {
+        this.productService = productService;
         this.storeService = storeService;
         this.itemService = itemService;
         this.customerServiceService = customerServiceService;
@@ -50,9 +55,13 @@ public class ProductPresenter implements IProductPresenter {
     }
 
     @Override
-    public Response<List<ItemDTO>> showAllProducts(String sessionToken) {
+    public Response<List<ItemDTO>> showAllItems(String sessionToken) {
         ItemFilter filters = new ItemFilter.Builder().build();
         return this.itemService.filterItems(sessionToken, filters);
+    }
+
+    public Response<Set<ProductDTO>> showAllProducts(String sessionToken) {
+        return this.productService.getAllProducts(sessionToken);
     }
 
     @Override

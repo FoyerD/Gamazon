@@ -2,6 +2,8 @@ package UI.presenters;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import Application.ItemService;
 import Application.MarketService;
 import Application.StoreService;
@@ -11,6 +13,7 @@ import Application.utils.Response;
 import Domain.management.PermissionType;
 import Domain.Pair;
 
+@Component
 public class ManagementPresenter implements IManagementPresenter {
 
     private final MarketService marketService;
