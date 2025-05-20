@@ -58,7 +58,9 @@ public class StoreService {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
-
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from creating stores.");
+            }
             Store store = storeFacade.addStore(name, description, userId);
             if(store == null) {
                 return new Response<>(new Error("Failed to create store."));
@@ -81,6 +83,9 @@ public class StoreService {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from opening stores.");
+            }
             permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
             boolean result = this.storeFacade.openStore(storeId);
             return new Response<>(result);
@@ -96,6 +101,9 @@ public class StoreService {
                 return Response.error("Invalid token");
             }
             String userId = this.tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from closing stores.");
+            }
             permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
             boolean result = this.storeFacade.closeStore(storeId);
             Map<String, Permission> storePermissions = permissionManager.getStorePermissions(storeId);
@@ -140,6 +148,9 @@ public class StoreService {
                 return new Response<>(new Error("Invalid token"));
             }
             String userId = this.tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from adding auctions.");
+            }
             permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
             return new Response<>(new AuctionDTO(this.storeFacade.addAuction(storeId, productId, auctionEndDate, startPrice)));
         } catch (Exception ex) {
@@ -186,7 +197,9 @@ public class StoreService {
             }
 
             String userId = tokenService.extractId(sessionToken);
-
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from accepting bids.");
+            }
             // Check that the user has permission to accept bids
             permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
 

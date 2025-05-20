@@ -11,20 +11,25 @@ import Application.utils.Response;
 import Domain.Store.Feedback;
 import Domain.Store.FeedbackDTO;
 import Domain.Store.StoreFacade;
+import Domain.management.PermissionManager;
+import Domain.management.PermissionType;
 
 @Service
 public class CustomerServiceService {
     private StoreFacade storeFacade;
     private TokenService tokenService;
-    
+    private PermissionManager permissionManager;
+
     @Autowired
-    public CustomerServiceService(StoreFacade storeFacade, TokenService tokenService) {
+    public CustomerServiceService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager) {
         this.tokenService = tokenService;
         this.storeFacade = storeFacade;
+        this.permissionManager = permissionManager;
     }
     public CustomerServiceService() {
         this.storeFacade = null;
         this.tokenService = null;
+        this.permissionManager = null;
     }
     public void setStoreFacade(StoreFacade storeFacade) {
         this.storeFacade = storeFacade;
@@ -32,6 +37,10 @@ public class CustomerServiceService {
 
     public void setTokenService(TokenService tokenService) {
         this.tokenService = tokenService;
+    }
+
+    public void setPermissionManager(PermissionManager permissionManager) {
+        this.permissionManager = permissionManager;
     }
 
     public boolean isInitialized() {
@@ -46,7 +55,9 @@ public class CustomerServiceService {
                 return Response.error("Invalid token");
             }
             String customerId = this.tokenService.extractId(sessionToken);
-            
+            if (permissionManager.isBanned(customerId)){
+                throw new Exception("User is banned from adding feedback.");
+            }
             boolean result = this.storeFacade.addFeedback(storeId, productId, customerId, comment);
             if(!result) {
                 return new Response<>(new Error("Failed to add feedback."));

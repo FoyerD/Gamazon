@@ -130,4 +130,9 @@ public class PermissionManager {
         permissionRepository.update("1", userId, perm);
         return true;
     }
+
+    public boolean isBanned(String userId) {
+        Permission permission = permissionRepository.get("1", userId);
+        return permission != null && permission.hasPermission(PermissionType.BANNED);
+    }
 }

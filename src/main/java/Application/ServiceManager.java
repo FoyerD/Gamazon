@@ -59,7 +59,8 @@ public class ServiceManager {
     public ProductService getProductService() {
         if (productService == null) {
             productService = new ProductService(facadeManager.getProductFacade(),
-                                                getTokenService());
+                                                getTokenService(),
+                                                facadeManager.getPermissionManager());
         }
         return productService;
     }
@@ -67,7 +68,8 @@ public class ServiceManager {
     public MarketService getMarketService() {
         if (marketService == null) {
             marketService = new MarketService(facadeManager.getMarketFacade(),
-                                            getTokenService());
+                                            getTokenService(),
+                                            facadeManager.getPermissionManager());
         }
         return marketService;
     }
@@ -82,7 +84,8 @@ public class ServiceManager {
     public CustomerServiceService getCustomerService() {
         if (customerService == null) {
             customerService = new CustomerServiceService(facadeManager.getStoreFacade(),
-                                                        getTokenService());
+                                                        getTokenService(),
+                                                        facadeManager.getPermissionManager());
         }
         return customerService;
     }
@@ -91,7 +94,8 @@ public class ServiceManager {
         if (shoppingService == null) {
             shoppingService = new ShoppingService(facadeManager.getShoppingCartFacade(),
                                                 getTokenService(),
-                                                facadeManager.getStoreFacade());
+                                                facadeManager.getStoreFacade(),
+                                                facadeManager.getPermissionManager());
         }
         return shoppingService;
     }

@@ -4,7 +4,9 @@ import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Store.Product;
 import Domain.Store.ProductFacade;
+import Domain.management.PermissionManager;
 
+import java.security.Permission;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,12 +19,14 @@ import Application.utils.Error;
 @Service
 public class ProductService {
     private final ProductFacade productFacade;
+    private PermissionManager permissionManager;
     private TokenService tokenService;
 
 
-    public ProductService(ProductFacade productFacade, TokenService tokenService) {
+    public ProductService(ProductFacade productFacade, TokenService tokenService, PermissionManager permissionManager) {
         this.productFacade = productFacade;
         this.tokenService = tokenService;
+        this.permissionManager = permissionManager;
     }
 
     public Response<ProductDTO> addProduct(String sessionToken, String name, List<String> categories, List<String> catDesc) {
@@ -31,7 +35,10 @@ public class ProductService {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
-            //String userId = this.tokenService.extractId(sessionToken);
+            String userId = this.tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from adding products.");
+            }
             Product product = productFacade.addProduct(name, categories, catDesc);
             TradingLogger.logEvent("ProductService", method, "Product added successfully.");
             return new Response<>(new ProductDTO(product));

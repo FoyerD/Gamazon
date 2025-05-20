@@ -1,6 +1,7 @@
 package Application;
 
 import Domain.management.IMarketFacade;
+import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IPaymentService;
@@ -22,14 +23,17 @@ import Application.utils.TradingLogger;
 @Service
 public class MarketService {
 
+    private final PermissionManager permissionManager;
+
     private static final String CLASS_NAME = MarketService.class.getSimpleName();
 
     private final IMarketFacade marketFacade;
     private final TokenService tokenService;
 
-    public MarketService(IMarketFacade marketFacade, TokenService tokenService) {
+    public MarketService(IMarketFacade marketFacade, TokenService tokenService, PermissionManager permissionManager) {
         this.marketFacade = marketFacade;
         this.tokenService = tokenService;
+        this.permissionManager = permissionManager;
     }
 
     private boolean isInvalid(String sessionToken) {
@@ -117,6 +121,11 @@ public class MarketService {
             return new Response<>(new Error("Invalid session token"));
         }
         try {
+            String ownerId = tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(ownerId)){
+                TradingLogger.logError(CLASS_NAME, "appointStoreManager", "User is banned from appointing store manager.");
+                return new Response<>(new Error("User is banned from appointing store manager."));
+            }
             marketFacade.appointStoreManager(appointerId, appointeeId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "appointStoreManager", "Store manager appointed successfully.");
             return new Response<>(null);
@@ -132,6 +141,11 @@ public class MarketService {
             return new Response<>(new Error("Invalid session token"));
         }
         try {
+            String ownerId = tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(ownerId)){
+                TradingLogger.logError(CLASS_NAME, "removeStoreManager", "User is banned from removing store manager.");
+                return new Response<>(new Error("User is banned from removing store manager."));
+            }
             marketFacade.removeStoreManager(removerId, managerId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "removeStoreManager", "Store manager removed successfully.");
             return new Response<>(null);
@@ -147,6 +161,11 @@ public class MarketService {
             return new Response<>(new Error("Invalid session token"));
         }
         try {
+            String ownerId = tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(ownerId)){
+                TradingLogger.logError(CLASS_NAME, "appointStoreOwner", "User is banned from appointing store owner.");
+                return new Response<>(new Error("User is banned from appointing store owner."));
+            }
             marketFacade.appointStoreOwner(appointerId, appointeeId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "appointStoreOwner", "Store owner appointed successfully.");
             return new Response<>(null);
@@ -162,6 +181,11 @@ public class MarketService {
             return new Response<>(new Error("Invalid session token"));
         }
         try {
+            String userId = tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(userId)){
+                TradingLogger.logError(CLASS_NAME, "changeManagerPermissions", "User is banned from changing manager permissions.");
+                return new Response<>(new Error("User is banned from changing manager permissions."));
+            }
             marketFacade.changeManagerPermissions(ownerId, managerId, storeId, newPermissions);
             TradingLogger.logEvent(CLASS_NAME, "changeManagerPermissions", "Manager permissions changed successfully.");
             return new Response<>(null);
@@ -234,6 +258,10 @@ public class MarketService {
         }
         try {
             String bannerId = tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(bannerId)) {
+                TradingLogger.logError(CLASS_NAME, "banUser", "User is banned from banning other users.");
+                return new Response<>(new Error("User is banned from banning other users."));
+            }
             marketFacade.checkPermission(bannerId, "1", PermissionType.BAN_USERS);
             marketFacade.banUser(bannerId, userId, endDate);
             TradingLogger.logEvent(CLASS_NAME, "banUser", "User banned successfully: " + userId);

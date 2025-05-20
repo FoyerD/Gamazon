@@ -42,6 +42,9 @@ public class ItemService {
             }
             String userId = this.tokenService.extractId(sessionToken);
             permissionManager.checkPermission(userId, storeId, PermissionType.HANDLE_INVENTORY);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from changing price.");
+            }
             itemFacade.getItem(storeId, productId).setPrice(newPrice);
             TradingLogger.logEvent("ItemService", method, "Price changed successfully.");
             return new Response<>(true);
@@ -130,15 +133,19 @@ public class ItemService {
         }
     }
 
-    public Response<Void> addRating(String sessionToken, String storeId, String productId, int rating) {
+    public Response<Void> addRating(String sessionToken, String storeId, String productId, int rating){
         String method = "addRating";
         try {
             if (!tokenService.validateToken(sessionToken)) {
                 return Response.error("Invalid token");
             }
+            String userId = this.tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from adding rating.");
+            }
             itemFacade.addRating(storeId, productId, rating);
             return new Response<>(null);
-        } catch (UnsupportedOperationException ex) {
+        } catch (Exception ex) {
             TradingLogger.logError("ItemService", method, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
@@ -156,6 +163,9 @@ public class ItemService {
             }
             String userId = this.tokenService.extractId(sessionToken);
             permissionManager.checkPermission(userId, storeId, PermissionType.HANDLE_INVENTORY);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from adding items.");
+            }
             Item item = itemFacade.add(storeId, productId, price, amount, description);
             if(item == null) {
                 throw new RuntimeException("Item not added");
@@ -195,6 +205,9 @@ public class ItemService {
             }
             String userId = this.tokenService.extractId(sessionToken);
             permissionManager.checkPermission(userId, id.getFirst(), PermissionType.HANDLE_INVENTORY);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from increasing amount.");
+            }
             itemFacade.increaseAmount(id, amount);
             TradingLogger.logEvent("ItemService", method, "Amount increased.");
             return new Response<>(null);
@@ -212,6 +225,9 @@ public class ItemService {
             }
             String userId = this.tokenService.extractId(sessionToken);
             permissionManager.checkPermission(userId, id.getFirst(), PermissionType.HANDLE_INVENTORY);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from decreasing amount.");
+            }
             itemFacade.decreaseAmount(id, amount);
             TradingLogger.logEvent("ItemService", method, "Amount decreased.");
             return new Response<>(null);
