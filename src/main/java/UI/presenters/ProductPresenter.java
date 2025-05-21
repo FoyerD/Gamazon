@@ -33,6 +33,11 @@ public class ProductPresenter implements IProductPresenter {
     }
 
     @Override
+    public Response<ProductDTO> addProduct(String sessionToken, String name, List<String> categories, List<String> catDesc){
+        return this.productService.addProduct(sessionToken, name, categories, catDesc);
+    }
+
+    @Override
     public Response<List<ItemDTO>> showProductDetails(String sessionToken, ItemFilter filters) {
         return this.itemService.filterItems(sessionToken, filters);
     }
