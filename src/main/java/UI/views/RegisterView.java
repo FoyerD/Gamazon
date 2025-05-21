@@ -54,7 +54,8 @@ public class RegisterView extends VerticalLayout {
             
             if (!response.errorOccurred()) {
                 Notification.show("Registration successful!", 3000, Notification.Position.MIDDLE);
-                UI.getCurrent().navigate("home");
+                loginPresenter.logout(sessionToken);
+                UI.getCurrent().navigate("");
             } else {
                 Notification.show("Registration failed: " + response.getErrorMessage(), 
                                 3000, Notification.Position.MIDDLE);

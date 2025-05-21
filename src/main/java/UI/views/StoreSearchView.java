@@ -74,7 +74,7 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
 
 
         
-        add(title, storeNameField);
+        add(title, storeNameField, createStoreButton, homeButton);
     }
 
     private void fetchStoreByName() {
