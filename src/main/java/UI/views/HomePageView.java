@@ -2,7 +2,6 @@ package UI.views;
 
 import UI.presenters.IProductPresenter;
 import UI.presenters.IUserSessionPresenter;
-import UI.webSocketConfigurations.PendingMessageStore;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.ILoginPresenter;
 import Application.DTOs.ItemDTO;
@@ -59,11 +58,9 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final Span activeFiltersLabel = new Span();
 
     private final IUserSessionPresenter sessionPresenter;
-    private final PendingMessageStore pendingStore;
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
-                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, PendingMessageStore pendingStore) {
-        this.pendingStore = pendingStore;
+                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter) {
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;
         this.purchasePresenter = purchasePresenter;
@@ -177,14 +174,9 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         if (sessionToken != null) {
             String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
 
-            // 🔁 Inject userId to JavaScript for WebSocket
+            // Inject userId to JavaScript for WebSocket
             UI.getCurrent().getPage().executeJs("window.currentUserId = $0;", userId);
 
-            // 💬 Flush pending messages
-            List<String> messages = pendingStore.consume(userId);
-            for (String msg : messages) {
-                Notification.show("🔔 " + msg, 4000, Notification.Position.TOP_CENTER);
-            }
         }
 
         this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
