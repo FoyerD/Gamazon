@@ -8,6 +8,8 @@ import UI.presenters.IPurchasePresenter;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
+import Application.DTOs.ProductDTO;
+import UI.presenters.IProductPresenter;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -23,10 +25,12 @@ import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.html.H3;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.ArrayList;
 
 @Route("store-search")
 public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
@@ -34,18 +38,21 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
     private final IStorePresenter storePresenter;
     private final IManagementPresenter managementPresenter;
     private final IPurchasePresenter purchasePresenter;
+    private final IProductPresenter productPresenter;
     private String sessionToken;
 
     private final TextField storeNameField = new TextField("Search Store by Name");
     private final Button homeButton = new Button("Return to Homepage");
-
     private final Button createStoreButton;
+    private final Button addProductButton;
 
     @Autowired
-    public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter, IPurchasePresenter purchasePresenter) {
+    public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter, 
+                          IPurchasePresenter purchasePresenter, IProductPresenter productPresenter) {
         this.storePresenter = storePresenter;
         this.managementPresenter = managementPresenter;
         this.purchasePresenter = purchasePresenter;
+        this.productPresenter = productPresenter;
 
         setSizeFull();
         setSpacing(true);
@@ -72,9 +79,20 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             .set("margin-left", "10px");
         createStoreButton.addClickListener(e -> showCreateStoreDialog());
 
+        // Initialize Add Product button
+        addProductButton = new Button("Add New Product", VaadinIcon.PLUS_CIRCLE.create());
+        addProductButton.getStyle()
+            .set("background-color", "#2196f3")
+            .set("color", "white")
+            .set("margin-left", "10px");
+        addProductButton.addClickListener(e -> showAddProductDialog());
 
+        // Create a horizontal layout for buttons
+        com.vaadin.flow.component.orderedlayout.HorizontalLayout buttonLayout = new com.vaadin.flow.component.orderedlayout.HorizontalLayout();
+        buttonLayout.setSpacing(true);
+        buttonLayout.add(createStoreButton, addProductButton, homeButton);
         
-        add(title, storeNameField);
+        add(title, storeNameField, buttonLayout);
     }
 
     private void fetchStoreByName() {
@@ -91,10 +109,8 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             StoreDTO store = response.getValue();
             showStoreLayout(store);
             Notification.show("Store found: " + store.getName());
-
         }
     }
-
 
     private void showStoreLayout(StoreDTO store) {
         Function<StoreDTO, List<ItemDTO>> refresher = s -> {
@@ -107,7 +123,6 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
                 return response.getValue();
             }
         };
-
 
         ItemLayout itemLayout = new ItemLayout(store,
             refresher,
@@ -159,13 +174,73 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
                 Notification.show("Store created successfully!", 
                     3000, Notification.Position.MIDDLE);
                 dialog.close();
-                // // Refresh the view or update as needed
-                // storeNameField.setValue(name);
-                // fetchStoreByName();
             }
         });
 
         dialogLayout.add(nameField, descriptionField, createButton);
+        dialog.add(dialogLayout);
+        dialog.open();
+    }
+
+    private void showAddProductDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Add New Product");
+
+        VerticalLayout dialogLayout = new VerticalLayout();
+        TextField nameField = new TextField("Product Name");
+        
+        // Create components for categories
+        TextField categoryField = new TextField("Category");
+        TextField categoryDescField = new TextField("Category Description");
+        
+        List<String> categories = new ArrayList<>();
+        List<String> categoryDescriptions = new ArrayList<>();
+        
+        Button addCategoryButton = new Button("Add Category", e -> {
+            String category = categoryField.getValue();
+            String description = categoryDescField.getValue();
+            if (!category.isEmpty() && !description.isEmpty()) {
+                categories.add(category);
+                categoryDescriptions.add(description);
+                categoryField.clear();
+                categoryDescField.clear();
+                Notification.show("Category added", 2000, Notification.Position.MIDDLE);
+            }
+        });
+
+        Button createButton = new Button("Create Product", e -> {
+            String name = nameField.getValue();
+            
+            if (name == null || name.isEmpty()) {
+                Notification.show("Product name is required", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+            
+            if (categories.isEmpty()) {
+                Notification.show("At least one category is required", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+
+            Response<ProductDTO> response = productPresenter.addProduct(sessionToken, name, categories, categoryDescriptions);
+            if (response.errorOccurred()) {
+                Notification.show("Failed to create product: " + response.getErrorMessage(), 
+                    3000, Notification.Position.MIDDLE);
+            } else {
+                Notification.show("Product created successfully!", 
+                    3000, Notification.Position.MIDDLE);
+                dialog.close();
+            }
+        });
+
+        dialogLayout.add(
+            nameField,
+            new H3("Add Categories"),
+            categoryField,
+            categoryDescField,
+            addCategoryButton,
+            createButton
+        );
+        
         dialog.add(dialogLayout);
         dialog.open();
     }
