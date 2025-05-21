@@ -1,6 +1,9 @@
 package Domain.User;
 import java.util.UUID;
+import jakarta.persistence.MappedSuperclass;
 
+
+@MappedSuperclass
 public abstract class User {
 
     protected UUID id;

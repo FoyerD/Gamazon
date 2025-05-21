@@ -3,6 +3,7 @@ package Domain.Shopping;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import Domain.Pair;
 import Domain.Store.Item;
@@ -11,16 +12,26 @@ import Domain.Store.Item;
  * Interface for shopping cart operations
  */
 public interface IShoppingCartFacade {
+
     /**
-     * Makes a bid on an auction
-     * 
-     * @param auctionId The auction ID
-     * @param clientId The client making the bid
-     * @param price The bid price
-     * @return true if the bid was successful
+     * Places a bid on the specified auction with deferred payment details.
+     * The bid will be stored along with the provided payment information.
+     * If the bid is later accepted by a store manager, the payment will be processed automatically.
+     *
+     * @param auctionId The ID of the auction to bid on
+     * @param clientId The ID of the client placing the bid
+     * @param price The amount of the bid
+     * @param cardNumber The client's credit card number (used for payment if bid is accepted)
+     * @param expiryDate The expiration date of the credit card
+     * @param cvv The CVV code of the credit card
+     * @param andIncrement An identifier used for secure payment tracking
+     * @param clientName The name of the client (used for billing)
+     * @param deliveryAddress The address for delivery if the bid is accepted
+     * @return true if the bid was successfully placed
      */
-    boolean makeBid(String auctionId, String clientId, float price);
-    
+    boolean makeBid(String auctionId, String clientId, float price,
+                            String cardNumber, Date expiryDate, String cvv,
+                            long andIncrement, String clientName, String deliveryAddress);
     /**
      * Adds a product to the shopping cart
      * 
@@ -124,4 +135,6 @@ public interface IShoppingCartFacade {
      * @return List of receipt objects for the store
      */
     List<Receipt> getStorePurchaseHistory(String storeId);
+
+    String getStoreName(String storeId);
 }

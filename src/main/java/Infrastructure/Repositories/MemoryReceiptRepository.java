@@ -1,18 +1,22 @@
 package Infrastructure.Repositories;
 
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.Receipt;
-import Domain.Store.Product;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Repository;
+
+import Domain.Shopping.IReceiptRepository;
+import Domain.Shopping.Receipt;
+import Domain.Store.Product;
+
 
 /**
  * Repository for storing and retrieving purchase receipts.
  */
+@Repository
 public class MemoryReceiptRepository implements IReceiptRepository {
     // Main storage for all receipts: receiptId -> Receipt
     private final Map<String, Receipt> receipts;

@@ -3,10 +3,13 @@ package Infrastructure.Repositories;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Repository;
+
 import Domain.Pair;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.ShoppingBasket;
 
+@Repository
 public class MemoryShoppingBasketRepository extends IShoppingBasketRepository {
     
     private Map<Pair<String, String>, ShoppingBasket> baskets;

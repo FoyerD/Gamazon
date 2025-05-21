@@ -6,7 +6,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Store.Item;
@@ -19,6 +24,7 @@ import Domain.Store.IProductRepository;
  * Implementation of the IShoppingCartFacade interface.
  * Orchestrates interactions between shopping carts, baskets, payment services, and item management.
  */
+@Component
 public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;
@@ -28,6 +34,18 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final StoreFacade storeFacade;
     private final IProductRepository productRepo;
 
+    /**
+     * Constructor to initialize the ShoppingCartFacade with required repositories and services.
+     * 
+     * @param cartRepo The repository for shopping carts
+     * @param basketRepo The repository for shopping baskets
+     * @param paymentService The payment service for processing payments
+     * @param itemFacade The facade for item management
+     * @param storeFacade The facade for store management
+     * @param receiptRepo The repository for receipts
+     * @param productRepository The repository for products
+     */
+    @Autowired
     public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
@@ -167,160 +185,201 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         return true;
     }
 
-
+    /**
+     * Places a bid on the specified auction with deferred payment details.
+     * The bid will be stored along with the provided payment information.
+     * If the bid is later accepted by a store manager, the payment will be processed automatically.
+     *
+     * @param auctionId The ID of the auction to bid on
+     * @param clientId The ID of the client placing the bid
+     * @param price The amount of the bid
+     * @param cardNumber The client's credit card number (used for payment if bid is accepted)
+     * @param expiryDate The expiration date of the credit card
+     * @param cvv The CVV code of the credit card
+     * @param andIncrement An identifier used for secure payment tracking
+     * @param clientName The name of the client (used for billing)
+     * @param deliveryAddress The address for delivery if the bid is accepted
+     * @return true if the bid was successfully placed
+     */
     @Override
-    public boolean makeBid(String auctionId, String clientId, float price) {
-        storeFacade.addBid(auctionId, clientId, price);
+    public boolean makeBid(String auctionId, String clientId, float price,
+                        String cardNumber, Date expiryDate, String cvv,
+                        long andIncrement, String clientName, String deliveryAddress) {
+
+        Supplier<Boolean> chargeSupplier = () -> {
+            if (!isCardNumber(cardNumber)) {
+                throw new IllegalArgumentException("Invalid card number");
+            }
+
+            paymentService.processPayment(clientName, cardNumber, expiryDate, cvv,
+                                        price, andIncrement, clientName, deliveryAddress);
+            return true;
+        };
+
+        storeFacade.addBid(auctionId, clientId, price, chargeSupplier);
         return true;
     }
 
+
     @Override
-    public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,
-                    long andIncrement, String clientName, String deliveryAddress) {
-        
-        
-        // check for valid arguments
-        if (clientId == null || card_number == null || expiry_date == null || cvv == null) {
-            throw new IllegalArgumentException("Invalid arguments for checkout");
-        }
-        if (!isCardNumber(card_number)){
-            throw new IllegalArgumentException("Invalid card number");
-        }
+public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,
+                long andIncrement, String clientName, String deliveryAddress) {
+    
+    
+    // check for valid arguments
+    if (clientId == null || card_number == null || expiry_date == null || cvv == null) {
+        throw new IllegalArgumentException("Invalid arguments for checkout");
+    }
+    if (!isCardNumber(card_number)){
+        throw new IllegalArgumentException("Invalid card number");
+    }
 
-        IShoppingCart cart = getCart(clientId);
+    IShoppingCart cart = getCart(clientId);
 
-        Map<Pair<String, String>, Integer> itemsrollbackData = new HashMap<>(); // To store rollback information
-        Set<ShoppingBasket> basketsrollbackdata = new HashSet<>();
-        Set<String> cartrollbackdata = new HashSet<>();
+    Map<Pair<String, String>, Integer> itemsrollbackData = new HashMap<>(); // To store rollback information
+    Set<ShoppingBasket> basketsrollbackdata = new HashSet<>();
+    Set<String> cartrollbackdata = new HashSet<>();
+    
+    // Store purchase information for receipt creation
+    Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
+
+    try {
+        // Iterate over all stores in the cart
+        boolean purchaseSuccess = false;
+        double totalPrice = 0;
+        Set<String> storeIds = cart.getCart();
         
-        // Store purchase information for receipt creation
-        Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
-
-        try {
-            // Iterate over all stores in the cart
-            boolean purchaseSuccess = false;
-            double totalPrice = 0;
-            Set<String> storeIds = cart.getCart();
-            
-            // Added null check for cart.getCart()
-            if (storeIds != null) {
-                for (String storeId : storeIds) {
-                    ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
-                    if (basket != null && !basket.isEmpty()) {
-                        // Track products and prices for this store
-                        Map<Product, Integer> storeProducts = new HashMap<>();
-                        
-                        // Added null check for basket.getOrders()
-                        Map<String, Integer> orders = basket.getOrders();
-                        if (orders != null) {
-                            // Fix: Wrap everything in try/catch to handle any potential NPEs due to null collections
-                            try {
-                                // Iterate over all items in the basket with defensive coding
-                                for (Map.Entry<String, Integer> entry : orders.entrySet()) {
-                                    if (entry != null) {
-                                        String productId = entry.getKey();
-                                        Integer quantityObj = entry.getValue();
+        // Added null check for cart.getCart()
+        if (storeIds != null) {
+            for (String storeId : storeIds) {
+                ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+                if (basket != null && !basket.isEmpty()) {
+                    // Track products and prices for this store
+                    Map<Product, Integer> storeProducts = new HashMap<>();
+                    
+                    // Added null check for basket.getOrders()
+                    Map<String, Integer> orders = basket.getOrders();
+                    if (orders != null) {
+                        // Fix: Wrap everything in try/catch to handle any potential NPEs due to null collections
+                        try {
+                            // Iterate over all items in the basket with defensive coding
+                            for (Map.Entry<String, Integer> entry : orders.entrySet()) {
+                                if (entry != null) {
+                                    String productId = entry.getKey();
+                                    Integer quantityObj = entry.getValue();
+                                    
+                                    if (productId != null && quantityObj != null) {
+                                        int quantity = quantityObj;
                                         
-                                        if (productId != null && quantityObj != null) {
-                                            int quantity = quantityObj;
-                                            
-                                            // Attempt to decrease the item quantity
-                                            itemFacade.decreaseAmount(new Pair<>(storeId, productId), quantity);
-                                            
-                                            // Get the product object and calculate price
-                                            Product product = productRepo.get(productId);
-                                            if (product != null) {
-                                                // Create a new product object to avoid modifying the original
-                                                Product productCopy = new Product(product);
-                                                Item item = itemFacade.getItem(storeId, productCopy.getProductId());
-                                                if (item != null) {
-                                                    purchaseSuccess = true;
-                                                    double productPrice = item.getPrice() * quantity;
-                                                    totalPrice += productPrice;
-                                                    
-                                                    // Store product in the store's product map
-                                                    storeProducts.put(productCopy, quantity);
-                                                    
-                                                    // Store rollback data
-                                                    itemsrollbackData.put(new Pair<>(storeId, productCopy.getProductId()), quantity);
-                                                }
+                                        // Attempt to decrease the item quantity
+                                        itemFacade.decreaseAmount(new Pair<>(storeId, productId), quantity);
+                                        
+                                        // Get the product object and calculate price
+                                        Product product = productRepo.get(productId);
+                                        if (product != null) {
+                                            // Create a new product object to avoid modifying the original
+                                            Product productCopy = new Product(product);
+                                            Item item = itemFacade.getItem(storeId, productCopy.getProductId());
+                                            if (item != null) {
+                                                purchaseSuccess = true;
+                                                double productPrice = item.getPrice() * quantity;
+                                                totalPrice += productPrice;
+                                                
+                                                // Store product in the store's product map
+                                                storeProducts.put(productCopy, quantity);
+                                                
+                                                // Store rollback data
+                                                itemsrollbackData.put(new Pair<>(storeId, productCopy.getProductId()), quantity);
                                             }
                                         }
                                     }
                                 }
-                            } catch (NullPointerException e) {
-                                // Catch any NPEs that might occur due to null collections
-                                // Log the error and continue with empty collections
-                                System.err.println("Caught NPE during checkout processing: " + e.getMessage());
                             }
-                        }
-
-                        // Store products for this store
-                        if (!storeProducts.isEmpty()) {
-                            storeProductsMap.put(storeId, storeProducts);
-                        }
-                        
-                        // Mark the basket as checked out
-                        basketsrollbackdata.add(basket);
-                        basket.clear();
-                        basketRepo.update(new Pair<>(clientId, storeId), basket);
-                    }
-                }
-            }
-
-            // Process payment only if there are items to checkout
-            if (purchaseSuccess) {
-                paymentService.processPayment(clientName, card_number, expiry_date, cvv, 
-                                            totalPrice, andIncrement, clientName, deliveryAddress);
-            }
-
-            // Clear the cart
-            if (storeIds != null) {
-                cartrollbackdata.addAll(storeIds);
-            }
-            cart.clear();
-            cartRepo.update(clientId, cart);
-            
-            // Create receipts only if there was a purchase
-            if (purchaseSuccess) {
-                // Create masked payment details (only show last 4 digits of card)
-                String maskedCardNumber = "xxxx-xxxx-xxxx-" + card_number.substring(card_number.length() - 4);
-                String paymentDetails = "Card: " + maskedCardNumber;
-                
-                // Now that everything has succeeded, create the receipt records
-                for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
-                    String storeId = entry.getKey();
-                    Map<Product, Integer> products = entry.getValue();
-                    
-                    // Calculate store-specific total safely with null checks
-                    double storeTotal = 0.0;
-                    if (products != null) {
-                        for (Map.Entry<Product, Integer> productEntry : products.entrySet()) {
-                            if (productEntry.getKey() != null && productEntry.getValue() != null) {
-                                Product product = productEntry.getKey();
-                                int qty = productEntry.getValue();
-                                Item item = itemFacade.getItem(storeId, product.getProductId());
-                                if (item != null) {
-                                    storeTotal += item.getPrice() * qty;
-                                }
-                            }
+                        } catch (NullPointerException e) {
+                            // Catch any NPEs that might occur due to null collections
+                            // Log the error and continue with empty collections
+                            System.err.println("Caught NPE during checkout processing: " + e.getMessage());
                         }
                     }
+
+                    // Store products for this store
+                    if (!storeProducts.isEmpty()) {
+                        storeProductsMap.put(storeId, storeProducts);
+                    }
                     
-                    // Create and save receipt
-                    receiptRepo.savePurchase(clientId, storeId, products, storeTotal, paymentDetails);
+                    // Mark the basket as checked out
+                    basketsrollbackdata.add(basket);
+                    basket.clear();
+                    basketRepo.update(new Pair<>(clientId, storeId), basket);
                 }
             }
-
-            return true;
-        } catch (Exception e) {
-            // Rollback all changes
-            checkoutRollBack(clientId, cart, itemsrollbackData, cartrollbackdata, basketsrollbackdata);
-            
-            // Throw the exception to indicate failure
-            throw new RuntimeException("Checkout failed: " + e.getMessage(), e);
         }
+
+        // Process payment only if there are items to checkout
+        if (purchaseSuccess) {
+            // Call payment service and check for error response
+            Response<Boolean> paymentResponse = paymentService.processPayment(
+                clientName, card_number, expiry_date, cvv, 
+                totalPrice, andIncrement, clientName, deliveryAddress
+            );
+            
+            if (paymentResponse == null) {
+                throw new RuntimeException("Payment failed: service returned null response");
+            }
+
+            // If payment service returned an error, throw an exception to trigger rollback
+            if (paymentResponse.errorOccurred()) {
+                throw new RuntimeException("Payment failed: " + paymentResponse.getErrorMessage());
+            }
+        }
+
+        // Clear the cart
+        if (storeIds != null) {
+            cartrollbackdata.addAll(storeIds);
+        }
+        cart.clear();
+        cartRepo.update(clientId, cart);
+        
+        // Create receipts only if there was a purchase
+        if (purchaseSuccess) {
+            // Create masked payment details (only show last 4 digits of card)
+            String maskedCardNumber = "xxxx-xxxx-xxxx-" + card_number.substring(card_number.length() - 4);
+            String paymentDetails = "Card: " + maskedCardNumber;
+            
+            // Now that everything has succeeded, create the receipt records
+            for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
+                String storeId = entry.getKey();
+                Map<Product, Integer> products = entry.getValue();
+                
+                // Calculate store-specific total safely with null checks
+                double storeTotal = 0.0;
+                if (products != null) {
+                    for (Map.Entry<Product, Integer> productEntry : products.entrySet()) {
+                        if (productEntry.getKey() != null && productEntry.getValue() != null) {
+                            Product product = productEntry.getKey();
+                            int qty = productEntry.getValue();
+                            Item item = itemFacade.getItem(storeId, product.getProductId());
+                            if (item != null) {
+                                storeTotal += item.getPrice() * qty;
+                            }
+                        }
+                    }
+                }
+                
+                // Create and save receipt
+                receiptRepo.savePurchase(clientId, storeId, products, storeTotal, paymentDetails);
+            }
+        }
+
+        return true;
+    } catch (Exception e) {
+        // Rollback all changes
+        checkoutRollBack(clientId, cart, itemsrollbackData, cartrollbackdata, basketsrollbackdata);
+        
+        // Throw the exception to indicate failure
+        throw new RuntimeException("Checkout failed: " + e.getMessage(), e);
     }
+}
 
     /**
      * Helper method to handle rollback operations during checkout failure
@@ -543,5 +602,9 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         }
         
         return true;
+    } 
+
+    public String getStoreName(String storeId) {
+        return storeFacade.getStore(storeId).getName();
     }
 }

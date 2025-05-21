@@ -4,12 +4,17 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import Domain.Pair;
+
 
 /**
  * Facade for managing item-related operations, including validation,
  * inventory updates, filtering, and dynamic property assignment.
  */
+@Component
 public class ItemFacade {
     private final IItemRepository itemRepository;
     private final IProductRepository productRepository;
@@ -18,6 +23,7 @@ public class ItemFacade {
     /**
      * Constructs the facade with required repositories.
      */
+    @Autowired
     public ItemFacade(IItemRepository itemRepository, IProductRepository productRepository, IStoreRepository storeRepository) {
         this.itemRepository = itemRepository;
         this.productRepository = productRepository;
@@ -78,32 +84,56 @@ public class ItemFacade {
      * Adds a new item to the repository and sets its name and category fetchers.
      * Returns false if the item already exists.
      */
-    public boolean add(Pair<String, String> id, Item item) {
-        validateStoreAndProductExist(id.getFirst(), id.getSecond());
-
+    public Item add(String storeId, String productId, String description) {
+        validateStoreAndProductExist(storeId, productId);
+        Pair<String, String> id = new Pair<>(storeId, productId);
         if (itemRepository.get(id) != null) {
-            return false;
+            return null;
         }
 
-        String itemStoreId = item.getStoreId();
-        String itemProductId = item.getProductId();
+        Item item = new Item(storeId, productId, 0, 0, description);
 
         item.setNameFetcher(() ->
-            itemRepository.getByProductId(itemProductId).stream()
-                .filter(i -> !(i.getStoreId().equals(itemStoreId) && i.getProductId().equals(itemProductId)))
+            itemRepository.getByProductId(productId).stream()
+                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
                 .findFirst()
                 .map(Item::getProductName)
                 .orElse("Unknown Product")
         );
 
         item.setCategoryFetcher(() ->
-            itemRepository.getByProductId(itemProductId).stream()
-                .filter(i -> !(i.getStoreId().equals(itemStoreId) && i.getProductId().equals(itemProductId)))
+            itemRepository.getByProductId(productId).stream()
+                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
                 .flatMap(i -> i.getCategories().stream())
                 .collect(Collectors.toSet())
         );
 
-        return itemRepository.add(id, item);
+        if (!itemRepository.add(id, item)) {
+            throw new RuntimeException("Item not added");
+        }
+        
+        return item;
+    }
+    public Item add(String storeId, String productId, double price, int amount, String description) {
+        validateStoreAndProductExist(storeId, productId);
+        Pair<String, String> id = new Pair<>(storeId, productId);
+        if (itemRepository.get(id) != null) {
+            return null;
+        }
+
+        Item item = new Item(storeId, productId, price, amount, description);
+
+        item.setNameFetcher(() ->  productRepository.get(productId).getName());
+
+        item.setCategoryFetcher(() ->
+            productRepository.get(productId).getCategories()
+        );
+
+        if (!itemRepository.add(id, item)) {
+            return null;
+        }
+        
+        return item;
     }
 
     /**
@@ -148,6 +178,25 @@ public class ItemFacade {
         Object lock = getOrCreateLockSafe(id);
         synchronized (lock) {
             item.decreaseAmount(amount);
+        }
+    }
+
+    public void addRating(String storeId, String productId, int rating){
+        validateStoreAndProductExist(storeId, productId);
+        if (rating < 0 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 0 and 5");
+        }
+        Object lock = itemRepository.getLock(new Pair<>(storeId, productId));
+        if (lock == null) {
+            throw new IllegalStateException("Lock not found for storeId: " + storeId + ", productId: " + productId);
+        }
+        synchronized (lock) {
+            Item item = itemRepository.getItem(storeId, productId);
+            if (item == null) {
+                throw new NoSuchElementException("Item not found for storeId: " + storeId + ", productId: " + productId);
+            }
+            item.addRating(rating);
+            itemRepository.update(new Pair<>(storeId, productId), item);
         }
     }
 

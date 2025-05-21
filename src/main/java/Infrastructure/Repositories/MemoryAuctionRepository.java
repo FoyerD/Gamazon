@@ -2,8 +2,12 @@ package Infrastructure.Repositories;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Repository;
+
 import Domain.Store.Auction;
 import Domain.Store.IAuctionRepository;
+
+@Repository
 public class MemoryAuctionRepository extends IAuctionRepository {
     private Map<String, Auction> auctions;
     

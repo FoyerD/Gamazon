@@ -1,7 +1,11 @@
 package Infrastructure.Repositories;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import org.springframework.stereotype.Repository;
 
 import Domain.Store.IProductRepository;
 import Domain.Store.Product;
@@ -10,6 +14,7 @@ import Domain.Store.Product;
  * In-memory implementation of {@link IProductRepository}.
  * Provides thread-safe CRUD operations on products.
  */
+@Repository
 public class MemoryProductRepository extends IProductRepository {
     private final ConcurrentMap<String, Product> products;
 
@@ -60,5 +65,24 @@ public class MemoryProductRepository extends IProductRepository {
         }
         products.put(id, value);
         return value;
+    }
+    @Override
+    public Product getByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return null;
+        }
+        for (Product product : products.values()) {
+            if (product.getName().equals(name)) {
+                return product;
+            }
+        }
+        return null;
+    }
+    
+
+    /** Retrieves all products. */
+    @Override
+    public Set<Product> getAll() {
+        return new HashSet<>(products.values());
     }
 }

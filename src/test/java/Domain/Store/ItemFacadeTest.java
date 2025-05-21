@@ -5,12 +5,13 @@ import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -114,10 +115,10 @@ public void givenExistingItem_whenAdd_thenReturnsFalseAndSkipsAdd() {
     ))).thenReturn(existingItem);
 
     // Act
-    boolean result = facade.add(id, existingItem);
+    Item result = facade.add(id.getFirst(), id.getSecond(), existingItem.getPrice(), existingItem.getAmount(), existingItem.getDescription());
 
     // Assert
-    assertFalse("Expected add(...) to return false since item exists", result);
+    assertFalse("Expected add(...) to return false since item exists", result != null);
 
     // Don't throw if it was called — capture and inspect
     verify(repo, times(1)).get(any());
@@ -136,11 +137,15 @@ public void givenExistingItem_whenAdd_thenReturnsFalseAndSkipsAdd() {
         when(productRepo.get("p")).thenReturn(mock(Product.class));
         when(repo.get(id)).thenReturn(null);
         when(repo.getByProductId("p")).thenReturn(List.of(it));
-        when(repo.add(id, it)).thenReturn(true);
+        when(repo.add(eq(id), any(Item.class))).thenReturn(true);
         when(it.getProductId()).thenReturn("p");
+        when(it.getStoreId()).thenReturn("s");
+        when(it.getPrice()).thenReturn(10.0);
+        when(it.getAmount()).thenReturn(5);
+        when(it.getDescription()).thenReturn("Test Item");
 
-        assertTrue(facade.add(id, it));
-        verify(repo).add(id, it);
+        assertNotEquals(facade.add(id.getFirst(), id.getSecond(), it.getPrice(), it.getAmount(), it.getDescription()), null);
+        verify(repo).add(eq(id), any(Item.class));
     }
 
     @Test

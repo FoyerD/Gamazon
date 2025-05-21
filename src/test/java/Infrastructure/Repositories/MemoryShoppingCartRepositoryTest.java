@@ -1,8 +1,6 @@
 package Infrastructure.Repositories;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import java.util.HashSet;
 import java.util.Set;
 

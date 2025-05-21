@@ -1,9 +1,8 @@
 package Domain.ExternalServices;
 
+import Application.utils.Response;
+
 public interface INotificationService {
 
-    void sendNotification(String name, String content);
-
-    void initialize();
-
+    Response<Boolean> sendNotification(String name, String content);
 }

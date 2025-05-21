@@ -17,11 +17,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.IPaymentService;
 import Domain.Store.Auction;
@@ -233,7 +235,6 @@ public class ShoppingCartFacadeTest {
     //
     // CHECKOUT TESTS
     //
-    
     @Test
     public void testCheckout_Success() {
         // Arrange
@@ -264,6 +265,12 @@ public class ShoppingCartFacadeTest {
         
         Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());
         when(mockProductRepo.get(PRODUCT_ID)).thenReturn(mockProduct);
+        
+        // Configure the payment service to return a successful response
+        when(mockPaymentService.processPayment(
+            anyString(), anyString(), any(Date.class), anyString(), 
+            anyDouble(), anyLong(), anyString(), anyString()
+        )).thenReturn(Response.success(true));
         
         // Act
         boolean result = facade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, 
@@ -356,7 +363,6 @@ public class ShoppingCartFacadeTest {
         
         // Mock null cart, which will cause a new empty cart to be created
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(null);
-        IShoppingCart newCart = ShoppingCartFactory.createShoppingCart(CLIENT_ID);
         Set<String> emptyStores = new HashSet<>();
         when(mockCart.getCart()).thenReturn(emptyStores);
         
@@ -381,8 +387,6 @@ public class ShoppingCartFacadeTest {
         long transactionId = 12345L;
         String clientName = "John Doe";
         String deliveryAddress = "123 Main St";
-        double itemPrice = 50.0;
-        
         // Mock cart and basket with items
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
         Set<String> stores = new HashSet<>();
@@ -550,15 +554,22 @@ public class ShoppingCartFacadeTest {
     @Test
     public void testMakeBid_Success() {
         // Arrange
-        when(mockStoreFacade.addBid(AUCTION_ID, CLIENT_ID, BID_PRICE)).thenReturn(mock(Auction.class));
-        
+        Supplier<Boolean> mockChargeCallback = mock(Supplier.class);
+        when(mockChargeCallback.get()).thenReturn(true);
+
+        Auction mockAuction = mock(Auction.class);
+        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class)))
+            .thenReturn(mockAuction);
+
         // Act
-        boolean result = facade.makeBid(AUCTION_ID, CLIENT_ID, BID_PRICE);
-        
+        boolean result = facade.makeBid(AUCTION_ID, CLIENT_ID, BID_PRICE,
+            "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
+
         // Assert
         assertTrue("Should return true for successful bid", result);
-        verify(mockStoreFacade).addBid(AUCTION_ID, CLIENT_ID, BID_PRICE);
+        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class));
     }
+
     
     //
     // PURCHASE HISTORY TESTS

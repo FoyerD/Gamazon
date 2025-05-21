@@ -10,7 +10,7 @@ public class ItemDTO {
     private final String storeId;
     private final String productId;
     private final double price;
-    private final int amount;
+    private int amount;
     private final String description;
     private final Set<CategoryDTO> categories;
     private final String productName;
@@ -73,5 +73,9 @@ public class ItemDTO {
 
     public double getRating() {
         return rating;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 }
