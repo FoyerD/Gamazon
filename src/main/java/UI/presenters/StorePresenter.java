@@ -59,5 +59,10 @@ public class StorePresenter implements IStorePresenter {
     public Response<AuctionDTO> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, double startPrice){
         return storeService.addAuction(sessionToken, storeId, productId, auctionEndDate, startPrice);
     }
+
+    @Override
+    public Response<ItemDTO> acceptBid(String sessionToken, String storeId, String productId, String auctionId){
+        return storeService.acceptBid(sessionToken, storeId, productId, auctionId);
+    }
     
 }

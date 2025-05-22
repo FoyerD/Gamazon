@@ -79,7 +79,17 @@ public interface IStorePresenter {
      * @param productId ID of the product to be auctioned.
      * @param auctionEndDate The end date of the auction format.
      * @param startPrice The starting price of the auction.
-     * @return
+     * @return Response containing the created {@link AuctionDTO} or an error.
      */
     Response<AuctionDTO> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, double startPrice);
+
+    /**
+     * Accepts a bid for a specific auction.
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store where the auction is held.
+     * @param productId ID of the product being auctioned.
+     * @param auctionId ID of the auction.
+     * @return Response containing the updated {@link ItemDTO} or an error.
+     */
+    Response<ItemDTO> acceptBid(String sessionToken, String storeId, String productId, String auctionId);
 }
