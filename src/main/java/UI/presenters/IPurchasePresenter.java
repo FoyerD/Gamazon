@@ -1,7 +1,10 @@
 package UI.presenters;
 
 import java.util.Date;
+import java.util.List;
+
 import Application.DTOs.CartDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
 
 /**
@@ -84,16 +87,6 @@ public interface IPurchasePresenter {
                                     String cardNumber, Date expiryDate, String cvv,
                                     long andIncrement, String clientName, String deliveryAddress);
 
-    // TODO: Remove this method
-    // /**
-    //  * Submits a bid for an auctioned product.
-    //  *
-    //  * @param sessionToken the token representing the current authenticated user session
-    //  * @param auctionId the unique identifier of the auction
-    //  * @param bid the value of the bid being placed
-    //  * @return a {@link Response} indicating whether the bid was successfully placed
-    //  */
-    // Response<Boolean> makeBid(String sessionToken, String auctionId, float bid);
 
     /**
      * Finalizes the purchase of the entire cart using the provided payment and shipping details.
@@ -111,6 +104,11 @@ public interface IPurchasePresenter {
          String clientName, String deliveryAddress);
     
 
-
-
+    /**
+     * Retrieves a list of all purchases made by the user.
+     * 
+     * @param sessionToken the token representing the current authenticated user session
+     * @return a {@link Response} containing a list of {@link ReceiptDTO} representing the user's purchases
+     */
+    Response<List<ReceiptDTO>> getPersonalPurcahses(String sessionToken);
 }

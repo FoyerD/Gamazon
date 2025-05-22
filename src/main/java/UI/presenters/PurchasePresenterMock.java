@@ -2,6 +2,7 @@ package UI.presenters;
 
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Response;
 import Domain.Store.Category;
@@ -145,5 +146,11 @@ public class PurchasePresenterMock implements IPurchasePresenter {
 
     private void ensureCartExists(String sessionToken) {
         userCarts.putIfAbsent(sessionToken, new CartDTO(sessionToken, new HashMap<>()));
+    }
+
+    @Override
+    public Response<List<ReceiptDTO>> getPersonalPurcahses(String sessionToken) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPersonalPurcahses'");
     }
 }
