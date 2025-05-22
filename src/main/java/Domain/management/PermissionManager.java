@@ -66,6 +66,17 @@ public class PermissionManager {
         return permission;
     }
 
+    public Permission getOrCreatePermission(String giver, String member, String storeId, RoleType role, Date expDate) {
+        Permission permission = permissionRepository.get(storeId, member);
+        if (permission == null) {
+            permission = new Permission(giver, member);
+            PermissionFactory.initPermissionAsRole(permission, role);
+            permission.setExpirationDate(expDate);
+            permissionRepository.add(storeId, member, permission);
+        }
+        return permission;
+    }
+
     public Permission getPermission(String storeId, String userId) {
         return permissionRepository.get(storeId, userId);
     }
@@ -125,14 +136,15 @@ public class PermissionManager {
         if (perm == null || !perm.hasPermission(PermissionType.BAN_USERS)) {
             throw new IllegalStateException(userId + " is not banned.");
         }
-        perm.setPermissions(Set.of());
-        perm.setRole(null);
-        permissionRepository.update("1", userId, perm);
-        return true;
+        removeAllPermissions("1", userId);
+        return perm.hasPermission(PermissionType.BANNED);
     }
 
     public boolean isBanned(String userId) {
         Permission permission = permissionRepository.get("1", userId);
+        if (permission != null && permission.hasPermission(PermissionType.BANNED) && permission.getExpirationDate().before(new Date())) {
+            removeAllPermissions("1", userId);
+        }
         return permission != null && permission.hasPermission(PermissionType.BANNED);
     }
 }
