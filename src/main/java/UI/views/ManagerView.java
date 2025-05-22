@@ -345,7 +345,19 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         
         // Create grid for existing auctions
         Grid<AuctionDTO> auctionsGrid = new Grid<>();
-        auctionsGrid.addColumn(AuctionDTO::getProductId).setHeader("Product ID");
+        
+        // Get all items for product name lookup
+        Map<String, String> productNames = new HashMap<>();
+        Response<List<ItemDTO>> itemsResponse = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+        if (!itemsResponse.errorOccurred()) {
+            itemsResponse.getValue().forEach(item -> 
+                productNames.put(item.getProductId(), item.getProductName())
+            );
+        }
+        
+        auctionsGrid.addColumn(auction -> 
+            productNames.getOrDefault(auction.getProductId(), "Unknown Product")
+        ).setHeader("Product");
         auctionsGrid.addColumn(auction -> {
             Date startDate = auction.getAuctionStartDate();
             return startDate != null ? startDate.toString() : "";
@@ -371,9 +383,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         
         // Product selection
         ComboBox<ItemDTO> productSelect = new ComboBox<>("Select Product");
-        Response<List<ItemDTO>> itemsResponse = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
-        if (!itemsResponse.errorOccurred()) {
-            productSelect.setItems(itemsResponse.getValue());
+        Response<List<ItemDTO>> itemsResponse2 = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+        if (!itemsResponse2.errorOccurred()) {
+            productSelect.setItems(itemsResponse2.getValue());
             productSelect.setItemLabelGenerator(item -> item.getProductName() + " (ID: " + item.getProductId() + ")");
         }
         

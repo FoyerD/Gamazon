@@ -7,6 +7,7 @@ import UI.presenters.IPurchasePresenter;
 import UI.presenters.ILoginPresenter;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.CategoryDTO;
+import Application.DTOs.AuctionDTO;
 import Application.utils.Response;
 import Domain.Store.ItemFilter;
 
@@ -29,11 +30,16 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
 
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 @JsModule("./ws-client.js")
 @Route("home")
@@ -146,6 +152,122 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
                 .set("color", "white");
             return reviewButton;
         }).setHeader("Actions");
+
+        // Add bid button column for auctions
+        productGrid.addComponentColumn(item -> {
+            Response<List<AuctionDTO>> auctionsResponse = productPresenter.showAuctionedProduct(sessionToken, 
+                new ItemFilter.Builder().itemName(item.getProductName()).build());
+            
+            if (!auctionsResponse.errorOccurred() && !auctionsResponse.getValue().isEmpty()) {
+                AuctionDTO auction = auctionsResponse.getValue().get(0); // Get the first auction for this product
+                
+                Button bidButton = new Button("Bid", e -> {
+                    Dialog bidDialog = new Dialog();
+                    bidDialog.setHeaderTitle("Place Bid for " + item.getProductName());
+
+                    // Create bid form similar to checkout form
+                    FormLayout bidForm = new FormLayout();
+                    
+                    // Bid amount field
+                    NumberField bidAmount = new NumberField("Bid Amount");
+                    bidAmount.setMin(auction.getCurrentPrice() + 0.01); // Must be higher than current price
+                    bidAmount.setStep(0.01);
+                    bidAmount.setValue(auction.getCurrentPrice() + 1.0); // Default to current price + 1
+                    
+                    // Payment details
+                    TextField cardNumber = new TextField("Credit Card Number");
+                    DatePicker expiryDate = new DatePicker("Expiration Date");
+                    expiryDate.setMin(LocalDate.now());
+                    TextField cvv = new TextField("CVV");
+                    cvv.setMaxLength(3);
+                    
+                    // Delivery details
+                    TextField name = new TextField("Full Name");
+                    TextField address = new TextField("Delivery Address");
+                    
+                    bidForm.add(
+                        bidAmount,
+                        cardNumber,
+                        expiryDate,
+                        cvv,
+                        name,
+                        address
+                    );
+                    
+                    Button placeBidButton = new Button("Place Bid", event -> {
+                        if (bidAmount.getValue() == null || cardNumber.isEmpty() || 
+                            expiryDate.isEmpty() || cvv.isEmpty() || 
+                            name.isEmpty() || address.isEmpty()) {
+                            Notification.show("Please fill in all fields");
+                            return;
+                        }
+                        
+                        // Convert expiry date to Date object
+                        Date expiryDateValue = Date.from(
+                            expiryDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()
+                        );
+                        
+                        // Use timestamp as unique increment
+                        long increment = System.currentTimeMillis();
+                        
+                        Response<Boolean> response = purchasePresenter.makeBid(
+                            auction.getAuctionId(),
+                            sessionToken,
+                            bidAmount.getValue().floatValue(),
+                            cardNumber.getValue(),
+                            expiryDateValue,
+                            cvv.getValue(),
+                            increment,
+                            name.getValue(),
+                            address.getValue()
+                        );
+                        
+                        if (!response.errorOccurred() && response.getValue()) {
+                            Notification.show("Bid placed successfully!");
+                            bidDialog.close();
+                            loadAllProducts(); // Refresh to show updated prices
+                        } else {
+                            Notification.show(
+                                "Failed to place bid: " + 
+                                (response.errorOccurred() ? response.getErrorMessage() : "Unknown error")
+                            );
+                        }
+                    });
+                    
+                    placeBidButton.getStyle()
+                        .set("background-color", "#38a169")
+                        .set("color", "white");
+                    
+                    Button cancelButton = new Button("Cancel", evt -> bidDialog.close());
+                    cancelButton.getStyle()
+                        .set("background-color", "#e53e3e")
+                        .set("color", "white");
+                    
+                    HorizontalLayout buttons = new HorizontalLayout(placeBidButton, cancelButton);
+                    buttons.setJustifyContentMode(JustifyContentMode.END);
+                    
+                    VerticalLayout dialogLayout = new VerticalLayout(
+                        new H3("Current Price: $" + auction.getCurrentPrice()),
+                        bidForm,
+                        buttons
+                    );
+                    dialogLayout.setPadding(true);
+                    dialogLayout.setSpacing(true);
+                    
+                    bidDialog.add(dialogLayout);
+                    bidDialog.open();
+                });
+                
+                bidButton.getStyle()
+                    .set("background-color", "#9f7aea")
+                    .set("color", "white");
+                
+                return new HorizontalLayout(
+                    bidButton
+                );
+            }
+            return new Span(); // Return empty if no auction
+        }).setHeader("Auction");
 
         // Add to cart button column
         productGrid.addComponentColumn(item -> {

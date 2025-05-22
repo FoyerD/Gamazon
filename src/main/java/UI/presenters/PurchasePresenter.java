@@ -47,11 +47,7 @@ public class PurchasePresenter implements IPurchasePresenter {
     public Response<Boolean> clearBasket(String sessionToken, String storeId) {
         return this.shoppingService.clearBasket(sessionToken, storeId);
     }
-
-
-    public Response<Boolean> makeBid(String sessionToken, String auctionId, float bid) {
-        throw new UnsupportedOperationException("bid is wrong");
-    }
+    
 
     @Override
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
