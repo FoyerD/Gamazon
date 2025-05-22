@@ -2,7 +2,6 @@ package UI.presenters;
 
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
-import Application.DTOs.OrderDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Response;
 import Domain.Store.Category;
@@ -33,18 +32,18 @@ public class PurchasePresenterMock implements IPurchasePresenter {
             new Category("Kitchen", "Kitchen appliances and tools")
     );
 
-    private final Set<OrderDTO> defaultCartItems;
+    // private final Set<OrderDTO> defaultCartItems;
 
-    public PurchasePresenterMock() {
-        defaultCartItems = Set.of(
-            new OrderDTO("prod1", "Smartphone", electronicsCategories, "TechStore", 1),
-            new OrderDTO("prod2", "Speaker", electronicsCategories, "TechStore", 2),
-            new OrderDTO("prod3", "T-Shirt", clothingCategories, "ClothingShop", 3),
-            new OrderDTO("prod4", "Jeans", clothingCategories, "ClothingShop", 1),
-            new OrderDTO("prod5", "Coffee Maker", homeCategories, "HomeGoods", 1),
-            new OrderDTO("prod6", "Toaster", homeCategories, "HomeGoods", 1)
-        );
-    }
+    // public PurchasePresenterMock() {
+    //     defaultCartItems = Set.of(
+    //         new OrderDTO("prod1", "Smartphone", electronicsCategories, "TechStore", 1),
+    //         new OrderDTO("prod2", "Speaker", electronicsCategories, "TechStore", 2),
+    //         new OrderDTO("prod3", "T-Shirt", clothingCategories, "ClothingShop", 3),
+    //         new OrderDTO("prod4", "Jeans", clothingCategories, "ClothingShop", 1),
+    //         new OrderDTO("prod5", "Coffee Maker", homeCategories, "HomeGoods", 1),
+    //         new OrderDTO("prod6", "Toaster", homeCategories, "HomeGoods", 1)
+    //     );
+    // }
 
     @Override
     public Response<Boolean> addProductToCart(String sessionToken, String productId, String storeId, int amount) {

@@ -109,4 +109,8 @@ public interface IPurchasePresenter {
      */
     Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
          String clientName, String deliveryAddress);
+    
+
+
+
 }

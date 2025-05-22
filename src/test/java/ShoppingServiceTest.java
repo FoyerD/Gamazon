@@ -39,6 +39,7 @@ import Domain.Store.StoreFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.User.IUserRepository;
+import Domain.User.LoginManager;
 import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.IPermissionRepository;
@@ -82,6 +83,7 @@ public class ShoppingServiceTest {
     private IPermissionRepository permissionRepository;
     private PermissionManager permissionManager;
     private ShoppingCartFacade cartFacade;
+    private LoginManager loginManager;
     
     // Mock service for testing
     private IPaymentService mockPaymentService;
@@ -124,7 +126,7 @@ public class ShoppingServiceTest {
         permissionRepository = repositoryManager.getPermissionRepository();
         permissionManager = new PermissionManager(permissionRepository);
         // Create Domain.User.LoginManager for UserService
-        Domain.User.LoginManager loginManager = new Domain.User.LoginManager(userRepository);
+        loginManager = new Domain.User.LoginManager(userRepository);
         
         // Initialize UserService
         userService = new UserService(loginManager, tokenService);
@@ -179,7 +181,8 @@ public class ShoppingServiceTest {
             cartFacade,
             tokenService,
             storeFacade,
-            permissionManager
+            permissionManager,
+            loginManager
         );
     }
     
@@ -479,7 +482,8 @@ public class ShoppingServiceTest {
                 cartFacade,
                 tokenService,
                 storeFacade,
-                permissionManager
+                permissionManager,
+                loginManager
             ) {
                 @Override
                 public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
@@ -553,7 +557,8 @@ public class ShoppingServiceTest {
                 cartFacade,
                 tokenService,
                 storeFacade,
-                permissionManager
+                permissionManager,
+                loginManager
             ) {
                 @Override
                 public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
