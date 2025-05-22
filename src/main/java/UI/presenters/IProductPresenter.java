@@ -15,6 +15,17 @@ import Domain.Store.ItemFilter;
  * Provides methods to view, filter, and rate both regular and auctioned products.
  */
 public interface IProductPresenter {
+    
+    /**
+     * Adds a new product to the system.
+     *
+     * @param sessionToken the token representing the current authenticated user session
+     * @param name the name of the product
+     * @param categories a list of categories associated with the product
+     * @param catDesc a list of descriptions for each category
+     * @return a {@link Response} containing the added {@link ProductDTO}
+     */
+    Response<ProductDTO> addProduct(String sessionToken, String name, List<String> categories, List<String> catDesc);
 
     /**
      * Retrieves a set of products that match the given filters.

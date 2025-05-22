@@ -171,11 +171,11 @@ public class StoreFacade {
 
         Date auctionStartDate = new Date();
         Date auctionEndDateParsed = null;
-        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         try {
             auctionEndDateParsed = parser.parse(auctionEndDate);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid date format. Expected format: yyyy-MM-dd");
+            throw new RuntimeException("Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
         
         if (auctionEndDateParsed.before(auctionStartDate)) throw new RuntimeException("Auction end date must be after the start date");
