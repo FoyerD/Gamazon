@@ -2,8 +2,6 @@ package Application.DTOs;
 
 import java.util.List;
 
-import Domain.Shopping.Receipt;
-
 public class ReceiptDTO {
     private final String receiptId;
     private final String clientName;
@@ -13,7 +11,18 @@ public class ReceiptDTO {
         this.receiptId = receiptId;
         this.clientName = clientName;
         this.items = items;
+    }
 
+    public String getReceiptId() {
+        return receiptId;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public List<OrderedItemDTO> getItems() {
+        return items;
     }
 
 }

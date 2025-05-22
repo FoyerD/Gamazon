@@ -110,5 +110,5 @@ public interface IPurchasePresenter {
      * @param sessionToken the token representing the current authenticated user session
      * @return a {@link Response} containing a list of {@link ReceiptDTO} representing the user's purchases
      */
-    Response<List<ReceiptDTO>> getPersonalPurcahses(String sessionToken);
+    public Response<List<ReceiptDTO>> getPersonalPurcahses(String sessionToken);
 }

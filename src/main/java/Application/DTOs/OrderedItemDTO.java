@@ -5,7 +5,6 @@ import java.util.Set;
 
 
 import Domain.Store.Category;
-import Domain.Store.Item;
 import Domain.Store.Product;
 
 public class OrderedItemDTO {

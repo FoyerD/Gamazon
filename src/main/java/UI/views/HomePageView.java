@@ -30,6 +30,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoUtility.Margin.Vertical;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 
@@ -82,8 +83,14 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         H1 title = new H1("Gamazon Home");
         title.getStyle().set("color", "#1a202c");
+        
+        this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
 
-        Span userInfo = new Span();
+        Button userInfo = new Button("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"),
+                                        VaadinIcon.USER.create(),
+                                        e -> {
+                                            UI.getCurrent().navigate("user-profile");
+                                        });
         userInfo.getStyle().set("color", "#2d3748").set("font-weight", "bold");
 
         // Configure filter components
@@ -125,15 +132,21 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         });
         logoutBtn.getStyle().set("background-color", "#e53e3e").set("color", "white");
 
-        HorizontalLayout searchAndFilter = new HorizontalLayout(searchBar, filterBtn);
+        HorizontalLayout searchAndFilter = new HorizontalLayout(searchBar, filterBtn, refreshBtn);
         searchAndFilter.setAlignItems(Alignment.BASELINE);
 
-        HorizontalLayout topBar = new HorizontalLayout(userInfo, title, searchAndFilter, refreshBtn, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
-        topBar.setAlignItems(Alignment.BASELINE);
-        topBar.setWidthFull();
-        topBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        topBar.getStyle().set("padding", "10px");
+        HorizontalLayout welcomeLayout = new HorizontalLayout(title, userInfo);
+        welcomeLayout.setAlignItems(Alignment.BASELINE);
+        welcomeLayout.setWidthFull();
+        welcomeLayout.setJustifyContentMode(JustifyContentMode.START);
+        HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
+        navButtons.setJustifyContentMode(JustifyContentMode.END);
+        navButtons.getStyle().set("padding", "10px");
 
+        HorizontalLayout toptopBar = new HorizontalLayout(welcomeLayout, navButtons);
+        toptopBar.setWidthFull();
+        toptopBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        VerticalLayout topBar = new VerticalLayout(toptopBar, searchAndFilter);
         // Style active filters label
         activeFiltersLabel.getStyle()
             .set("color", "#4a5568")
@@ -308,9 +321,6 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
                 Notification.show("🔔 " + msg, 4000, Notification.Position.TOP_CENTER);
             }
         }
-
-        this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
-        userInfo.setText("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"));
 
         loadAllProducts();
     }

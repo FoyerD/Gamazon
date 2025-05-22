@@ -1,11 +1,13 @@
 package UI.presenters;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import Application.ShoppingService;
 import Application.DTOs.CartDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
 
 @Component
@@ -31,7 +33,6 @@ public class PurchasePresenter implements IPurchasePresenter {
         return this.shoppingService.removeProductFromCart(storeId, sessionToken, productId, amount);
     }
 
-    //This is the real viewCart
     public Response<CartDTO> viewCart(String sessionToken) {
         return this.shoppingService.viewCart(sessionToken);
     }
@@ -59,6 +60,11 @@ public class PurchasePresenter implements IPurchasePresenter {
     public Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
          String clientName, String deliveryAddress) {
         return this.shoppingService.checkout(sessionToken, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+    }
+
+    @Override
+    public Response<List<ReceiptDTO>> getPersonalPurcahses(String sessionToken) {
+        return this.shoppingService.getUserPurchaseHistory(sessionToken);
     }
     
 }
