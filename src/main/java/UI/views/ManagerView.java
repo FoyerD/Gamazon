@@ -12,11 +12,14 @@ import Domain.management.PermissionType;
 import Application.UserService;
 import Application.DTOs.UserDTO;
 import Application.MarketService;
+import Application.DTOs.AuctionDTO;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
@@ -26,12 +29,18 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -95,8 +104,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         Tab ownersTab = new Tab(VaadinIcon.USER_STAR.create(), new Span("Owners"));
         Tab permissionsTab = new Tab(VaadinIcon.KEY.create(), new Span("Permissions"));
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
+        Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
         
-        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab);
+        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab);
         tabs.getStyle().set("margin", "1rem 0");
 
         // Setup grids
@@ -111,10 +121,12 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
                 showManagersView();
             } else if (event.getSelectedTab().equals(ownersTab)) {
                 showOwnersView();
-            } else if( event.getSelectedTab().equals(permissionsTab)) {
+            } else if (event.getSelectedTab().equals(permissionsTab)) {
                 showPermissionsView();
-            } else {
+            } else if (event.getSelectedTab().equals(itemsTab)) {
                 showItemsView();
+            } else if (event.getSelectedTab().equals(auctionsTab)) {
+                showAuctionsView();
             }
         });
 
@@ -326,6 +338,233 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         });
 
         mainContent.add(new H3("Store Managers"), addButton, itemsGrid);
+    }
+
+    private void showAuctionsView() {
+        mainContent.removeAll();
+        
+        // Create grid for existing auctions
+        Grid<AuctionDTO> auctionsGrid = new Grid<>();
+        
+        // Get all items for product name lookup
+        Map<String, String> productNames = new HashMap<>();
+        Response<List<ItemDTO>> itemsResponse = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+        if (!itemsResponse.errorOccurred()) {
+            itemsResponse.getValue().forEach(item -> 
+                productNames.put(item.getProductId(), item.getProductName())
+            );
+        }
+        
+        auctionsGrid.addColumn(auction -> 
+            productNames.getOrDefault(auction.getProductId(), "Unknown Product")
+        ).setHeader("Product");
+        auctionsGrid.addColumn(auction -> {
+            Date startDate = auction.getAuctionStartDate();
+            return startDate != null ? startDate.toString() : "";
+        }).setHeader("Start Date");
+        auctionsGrid.addColumn(auction -> {
+            Date endDate = auction.getAuctionEndDate();
+            return endDate != null ? endDate.toString() : "";
+        }).setHeader("End Date");
+        auctionsGrid.addColumn(AuctionDTO::getStartPrice).setHeader("Start Price");
+        auctionsGrid.addColumn(AuctionDTO::getCurrentPrice).setHeader("Current Price");
+        auctionsGrid.addColumn(auction -> auction.getCurrentBidderId() != null ? 
+            "Yes" : "No"
+        ).setHeader("Has Bidder");
+        
+        // Add Accept Bid button column
+        auctionsGrid.addComponentColumn(auction -> {
+            if (auction.getCurrentBidderId() != null) {
+                Button acceptButton = new Button("Accept Bid", e -> {
+                    // Confirm dialog
+                    Dialog confirmDialog = new Dialog();
+                    confirmDialog.setHeaderTitle("Confirm Bid Acceptance");
+                    
+                    VerticalLayout dialogLayout = new VerticalLayout();
+                    dialogLayout.setSpacing(true);
+                    dialogLayout.setPadding(true);
+                    
+                    dialogLayout.add(new H4("Are you sure you want to accept the current bid?"));
+                    dialogLayout.add(new Span("Product: " + productNames.getOrDefault(auction.getProductId(), "Unknown Product")));
+                    dialogLayout.add(new Span("Current Price: $" + auction.getCurrentPrice()));
+                    
+                    Button confirmButton = new Button("Accept", event -> {
+                        Response<ItemDTO> response = storePresenter.acceptBid(
+                            sessionToken,
+                            currentStoreId,
+                            auction.getProductId(),
+                            auction.getAuctionId()
+                        );
+                        
+                        if (!response.errorOccurred()) {
+                            Notification.show("Bid accepted successfully!");
+                            confirmDialog.close();
+                            
+                            // Refresh the auctions grid
+                            Response<List<AuctionDTO>> refreshResponse = storePresenter.getAllStoreAuctions(sessionToken, currentStoreId);
+                            if (!refreshResponse.errorOccurred()) {
+                                auctionsGrid.setItems(refreshResponse.getValue());
+                            }
+                        } else {
+                            Notification.show("Failed to accept bid: " + response.getErrorMessage());
+                        }
+                    });
+                    
+                    Button cancelButton = new Button("Cancel", event -> confirmDialog.close());
+                    
+                    // Style buttons
+                    confirmButton.getStyle()
+                        .set("background-color", "#38a169")
+                        .set("color", "white");
+                    cancelButton.getStyle()
+                        .set("background-color", "#e53e3e")
+                        .set("color", "white");
+                    
+                    HorizontalLayout buttons = new HorizontalLayout(confirmButton, cancelButton);
+                    buttons.setJustifyContentMode(JustifyContentMode.END);
+                    dialogLayout.add(buttons);
+                    
+                    confirmDialog.add(dialogLayout);
+                    confirmDialog.open();
+                });
+                
+                acceptButton.getStyle()
+                    .set("background-color", "#38a169")
+                    .set("color", "white");
+                
+                return acceptButton;
+            }
+            return new Span("No bids yet");
+        }).setHeader("Actions");
+        
+        // Load existing auctions
+        Response<List<AuctionDTO>> auctionsResponse = storePresenter.getAllStoreAuctions(sessionToken, currentStoreId);
+        if (!auctionsResponse.errorOccurred()) {
+            auctionsGrid.setItems(auctionsResponse.getValue());
+        } else {
+            Notification.show("Failed to load auctions: " + auctionsResponse.getErrorMessage());
+        }
+        
+        // Create form for new auction
+        Dialog addAuctionDialog = new Dialog();
+        addAuctionDialog.setHeaderTitle("Add New Auction");
+        
+        // Product selection
+        ComboBox<ItemDTO> productSelect = new ComboBox<>("Select Product");
+        Response<List<ItemDTO>> itemsResponse2 = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+        if (!itemsResponse2.errorOccurred()) {
+            productSelect.setItems(itemsResponse2.getValue());
+            productSelect.setItemLabelGenerator(item -> item.getProductName());
+        }
+        
+        // Date and Time pickers for end date
+        DatePicker endDatePicker = new DatePicker("Auction End Date");
+        endDatePicker.setMin(LocalDate.now()); // Today is allowed if time is later
+        
+        TimePicker endTimePicker = new TimePicker("Auction End Time");
+        endTimePicker.setStep(Duration.ofMinutes(1)); // Allow 1-minute intervals
+        endTimePicker.setMin(LocalTime.now().plusMinutes(1)); // At least 1 minute from now
+        
+        // If today is selected, ensure time is in the future
+        endDatePicker.addValueChangeListener(e -> {
+            if (e.getValue() != null && e.getValue().equals(LocalDate.now())) {
+                endTimePicker.setMin(LocalTime.now().plusMinutes(1));
+            } else {
+                endTimePicker.setMin(null);
+            }
+        });
+        
+        // Price field
+        NumberField startPriceField = new NumberField("Start Price");
+        startPriceField.setMin(0);
+        startPriceField.setStep(0.01);
+        
+        // Add auction button
+        Button addButton = new Button("Add Auction", e -> {
+            if (productSelect.getValue() == null || endDatePicker.getValue() == null || 
+                endTimePicker.getValue() == null || startPriceField.getValue() == null) {
+                Notification.show("Please fill in all fields");
+                return;
+            }
+            
+            // Validate that if date is today, time must be in the future
+            LocalDateTime selectedDateTime = LocalDateTime.of(endDatePicker.getValue(), endTimePicker.getValue());
+            if (selectedDateTime.isBefore(LocalDateTime.now())) {
+                Notification.show("End time must be in the future");
+                return;
+            }
+            
+            String productId = productSelect.getValue().getProductId();
+            // Format the date and time as required by the backend (yyyy-MM-dd HH:mm)
+            String endDateTime = selectedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            double startPrice = startPriceField.getValue();
+            
+            Response<AuctionDTO> response = storePresenter.addAuction(
+                sessionToken,
+                currentStoreId,
+                productId,
+                endDateTime,
+                startPrice
+            );
+            
+            if (response.errorOccurred()) {
+                Notification.show("Failed to create auction: " + response.getErrorMessage());
+            } else {
+                Notification.show("Auction created successfully");
+                addAuctionDialog.close();
+                
+                // Refresh the grid
+                Response<List<AuctionDTO>> refreshResponse = storePresenter.getAllStoreAuctions(sessionToken, currentStoreId);
+                if (!refreshResponse.errorOccurred()) {
+                    auctionsGrid.setItems(refreshResponse.getValue());
+                }
+            }
+        });
+        
+        Button cancelButton = new Button("Cancel", e -> addAuctionDialog.close());
+        
+        // Layout for the dialog
+        VerticalLayout dialogLayout = new VerticalLayout(
+            productSelect,
+            new HorizontalLayout(endDatePicker, endTimePicker),
+            startPriceField,
+            new HorizontalLayout(addButton, cancelButton)
+        );
+        dialogLayout.setSpacing(true);
+        dialogLayout.setPadding(true);
+        addAuctionDialog.add(dialogLayout);
+        
+        // Button to open the dialog
+        Button openDialogButton = new Button("Add New Auction", VaadinIcon.PLUS.create());
+        styleButton(openDialogButton, "#4caf50");
+        openDialogButton.addClickListener(e -> addAuctionDialog.open());
+        
+        // Add refresh button
+        Button refreshButton = new Button("Refresh", VaadinIcon.REFRESH.create());
+        styleButton(refreshButton, "#2196f3");
+        refreshButton.addClickListener(e -> {
+            // Refresh the auctions grid
+            Response<List<AuctionDTO>> refreshResponse = storePresenter.getAllStoreAuctions(sessionToken, currentStoreId);
+            if (!refreshResponse.errorOccurred()) {
+                auctionsGrid.setItems(refreshResponse.getValue());
+                Notification.show("Auctions refreshed", 2000, Notification.Position.BOTTOM_START);
+            } else {
+                Notification.show("Failed to refresh auctions: " + refreshResponse.getErrorMessage());
+            }
+        });
+        
+        // Create button layout
+        HorizontalLayout buttonLayout = new HorizontalLayout(openDialogButton, refreshButton);
+        buttonLayout.setSpacing(true);
+        
+        // Add components to the main content
+        mainContent.add(
+            new H3("Store Auctions"),
+            buttonLayout,
+            auctionsGrid
+        );
+        
+        auctionsGrid.setHeight("300px");
     }
 
     private void loadItems(Grid<ItemDTO> itemsGrid) {

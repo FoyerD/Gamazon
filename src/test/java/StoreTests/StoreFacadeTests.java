@@ -387,7 +387,7 @@ public class StoreFacadeTests {
     public void givenInitializedFacade_whenAddAuction_thenReturnAuction(){
         String storeId = "storeId";
         String productId = "productId";
-        String endDate = "2077-12-31";
+        String endDate = "2077-12-31 00:00";
         Pair<String, String> itemId = new Pair<>(storeId, productId);
         Store store = mock(Store.class);
         when(storeRepository.get(storeId)).thenReturn(store);
@@ -430,7 +430,7 @@ public class StoreFacadeTests {
         try {
             assertTrue(storeFacade.addAuction(storeId, productId, endDate, 0) == null);
         } catch (Exception e) {
-            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd");
+            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
     }
 
@@ -453,7 +453,7 @@ public class StoreFacadeTests {
         try {
             assertTrue(storeFacade.addAuction(storeId, productId, endDate, 0) == null);
         } catch (Exception e) {
-            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd");
+            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
     }
 
