@@ -71,4 +71,15 @@ public interface IStorePresenter {
      * @return Response containing a list of {@link FeedbackDTO}s or an error.
      */
     Response<List<FeedbackDTO>> getAllFeedbacksByStoreId(String sessionToken, String storeId);
+
+    /**
+     * Adds a new auction for a product in a store.
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store where the auction will be created.
+     * @param productId ID of the product to be auctioned.
+     * @param auctionEndDate The end date of the auction format.
+     * @param startPrice The starting price of the auction.
+     * @return
+     */
+    Response<AuctionDTO> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, double startPrice);
 }

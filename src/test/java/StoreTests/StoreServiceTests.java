@@ -205,7 +205,7 @@ public class StoreServiceTests {
         assertFalse("Item addition should succeed", itemResponse.errorOccurred());
 
         // Create an auction for the product
-        String endDate = "2077-01-01";
+        String endDate = "2077-01-01 00:00";
         Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate, 5.0);
         
         // Verify the auction was created successfully with correct details
@@ -342,7 +342,7 @@ public class StoreServiceTests {
         assertFalse("Item 3 addition should succeed", item3Response.errorOccurred());
 
         // Add auctions for the products using StoreService
-        String endDate = "2077-01-01";
+        String endDate = "2077-01-01 00:00";
         Response<AuctionDTO> auction1Response = storeService.addAuction(
             tokenId, 
             storeId, 
@@ -469,7 +469,7 @@ public class StoreServiceTests {
         assertFalse("Adding item to second store should succeed", item2Response.errorOccurred());
 
         // Add auctions for the product in both stores using StoreService
-        String endDate = "2077-01-01";
+        String endDate = "2077-01-01 00:00";
         Response<AuctionDTO> aucRes1 = storeService.addAuction(
             tokenId, 
             storeId1, 
