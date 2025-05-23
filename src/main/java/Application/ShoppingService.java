@@ -335,7 +335,10 @@ public class ShoppingService{
             if (user != null) {
                 clientName = user.getName();
             }
-            ReceiptDTO receiptDTO = new ReceiptDTO(receipt.getReceiptId(), clientName, items);
+            ReceiptDTO receiptDTO = new ReceiptDTO(receipt.getReceiptId(),
+                                                    clientName,
+                                                    this.storeFacade.getStoreName(receipt.getStoreId()),
+                                                    items);
             purchaseHistoryDTO.add(receiptDTO);
         }
         return purchaseHistoryDTO;

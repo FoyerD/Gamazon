@@ -1,10 +1,12 @@
 package UI.views;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
@@ -17,7 +19,11 @@ import com.vaadin.flow.router.Route;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Application.DTOs.ReceiptDTO;
+import Application.DTOs.StoreDTO;
 import UI.presenters.IPurchasePresenter;
+import UI.presenters.IStorePresenter;
+import UI.views.components.StorePreviewDialog;
+
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.NativeButton;
@@ -28,7 +34,13 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
     private String sessionToken = null;
     private UserDTO userDTO = null;
 
-    public UserProfileView(IPurchasePresenter purchasePresenter) {
+    private final IStorePresenter storePresenter;
+    private final IPurchasePresenter purchasePresenter;
+
+    public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter) {
+        this.storePresenter = storePresenter;
+        this.purchasePresenter = purchasePresenter;
+
         // Set yellow-themed layout styles
         setWidthFull();
         setHeightFull();
@@ -36,15 +48,9 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
         setJustifyContentMode(JustifyContentMode.START);
         setPadding(true);
         getStyle().set("background", " #fffbe7"); // light yellow background
+    }
 
-        this.userDTO = (UserDTO) UI.getCurrent().getSession().getAttribute("user");
-        this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
-
-        if (sessionToken == null || userDTO == null) {
-            Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
-            UI.getCurrent().navigate("");
-        }
-
+    public void setupPage() {
         // Header
         H1 header = new H1("Hello " + userDTO.getUsername() + "!");
         header.getStyle()
@@ -155,6 +161,7 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
         // Add components to the layout
         add(receiptGrid);
     }
+
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
@@ -162,6 +169,9 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
         if (sessionToken == null || userDTO == null) {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
+        }
+        else {
+            setupPage();
         }
     }
     
@@ -172,16 +182,14 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
             Notification.show("Error fetching purchase history: " + receipts.getErrorMessage(), 3000, Notification.Position.BOTTOM_END);
         } else if (receipts.getValue().isEmpty()) {
             Notification.show("No purchase history found.", 3000, Notification.Position.BOTTOM_END);
+        }
         else {
 
-            // Configure the grid
-            receiptGrid.addColumn(ReceiptDTO::getReceiptId).setHeader("Receipt ID").setAutoWidth(true);
-            receiptGrid.addColumn(ReceiptDTO::getTotalPrice).setHeader("Total Price").setAutoWidth(true);
 
+            receiptGrid.addColumn(ReceiptDTO::getStoreName).setHeader("Store").setAutoWidth(true);
+            receiptGrid.addColumn(r -> String.valueOf(r.getTotalPrice()) + "$").setHeader("Total Price").setAutoWidth(true);
             receiptGrid.addComponentColumn(receipt -> {
-                NativeButton dropButton = new NativeButton("Details");
                 Div detailsDiv = new Div();
-                detailsDiv.setVisible(false);
 
                 // Populate receipt details
                 receipt.getItems().forEach(item -> {
@@ -190,11 +198,8 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
                     detailsDiv.add(itemDetail);
                 });
 
-                // Toggle visibility of details
-                dropButton.addClickListener(e -> detailsDiv.setVisible(!detailsDiv.isVisible()));
-                Div container = new Div(dropButton, detailsDiv);
-                return container;
-            }).setHeader("Actions");
+                return detailsDiv;
+            }).setHeader("Items");
 
             receiptGrid.setItems(receipts.getValue());
             receiptGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
