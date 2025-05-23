@@ -263,9 +263,9 @@ public class MarketService {
                 return new Response<>(new Error("User is banned from banning other users."));
             }
             marketFacade.checkPermission(bannerId, "1", PermissionType.BAN_USERS);
-            marketFacade.banUser(bannerId, userId, endDate);
+            boolean success = marketFacade.banUser(bannerId, userId, endDate);
             TradingLogger.logEvent(CLASS_NAME, "banUser", "User banned successfully: " + userId);
-            return new Response<>(null);
+            return new Response<>(success);
         } catch (Exception e) {
             TradingLogger.logError(CLASS_NAME, "banUser", "Failed to ban user: %s", e.getMessage());
             return new Response<>(new Error(e.getMessage()));
@@ -284,11 +284,11 @@ public class MarketService {
                 return new Response<>(new Error("User is banned from banning other users."));
             }
             marketFacade.checkPermission(unbannerId, "1", PermissionType.BAN_USERS);
-            marketFacade.unbanUser(unbannerId, userId);
-            TradingLogger.logEvent(CLASS_NAME, "banUser", "User banned successfully: " + userId);
-            return new Response<>(null);
+            boolean success = marketFacade.unbanUser(unbannerId, userId);
+            TradingLogger.logEvent(CLASS_NAME, "banUser", "User unbanned successfully: " + userId);
+            return new Response<>(success);
         } catch (Exception e) {
-            TradingLogger.logError(CLASS_NAME, "banUser", "Failed to ban user: %s", e.getMessage());
+            TradingLogger.logError(CLASS_NAME, "banUser", "Failed to unban user: %s", e.getMessage());
             return new Response<>(new Error(e.getMessage()));
         }
     }

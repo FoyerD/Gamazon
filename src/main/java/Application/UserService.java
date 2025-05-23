@@ -21,6 +21,9 @@ public class UserService {
         this.tokenService = tokenService;
     }
 
+    public LoginManager getLoginManager() {
+        return loginManager;
+    }
 
     /***
      * Creates a guest user and returns a token for it.

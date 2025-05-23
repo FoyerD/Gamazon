@@ -16,7 +16,7 @@ public class PermissionFactory {
         PermissionType.OVERSEE_OFFERS,
         PermissionType.CONTROL_CONTRACTS,
         PermissionType.OPEN_DEACTIVATE_STORE,
-        PermissionType.RESPOND_TO_INQUIRIES 
+        PermissionType.RESPOND_TO_INQUIRIES
     );
 
     public static final Set<PermissionType> FOUNDER_PERMISSIONS = Set.of(

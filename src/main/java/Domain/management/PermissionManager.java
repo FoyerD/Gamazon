@@ -124,27 +124,36 @@ public class PermissionManager {
 
     public boolean banUser(String bannerId, String userId, Date endDate) {
         checkPermission(bannerId, "1", PermissionType.BAN_USERS);
-
-        Permission perm = getOrCreatePermission(bannerId, userId, "1", RoleType.BANNED_USER);
-        return perm.hasPermission(PermissionType.BAN_USERS);
+        Permission perm = new Permission(bannerId, userId);
+        PermissionFactory.initPermissionAsRole(perm, RoleType.BANNED_USER);
+        perm.setExpirationDate(endDate);
+        permissionRepository.add("1", userId, perm);
+        return perm.hasPermission(PermissionType.BANNED);
     }
 
     public boolean unbanUser(String unbannerId, String userId) {
         checkPermission(unbannerId, "1", PermissionType.BAN_USERS);
-
         Permission perm = permissionRepository.get("1", userId);
-        if (perm == null || !perm.hasPermission(PermissionType.BAN_USERS)) {
+        if (perm == null || !perm.hasPermission(PermissionType.BANNED)) {
             throw new IllegalStateException(userId + " is not banned.");
         }
-        removeAllPermissions("1", userId);
-        return perm.hasPermission(PermissionType.BANNED);
+        permissionRepository.remove("1", userId);
+        return true;
     }
 
     public boolean isBanned(String userId) {
         Permission permission = permissionRepository.get("1", userId);
-        if (permission != null && permission.hasPermission(PermissionType.BANNED) && permission.getExpirationDate().before(new Date())) {
-            removeAllPermissions("1", userId);
+        if (permission == null || !permission.hasPermission(PermissionType.BANNED)) {
+            return false;
         }
-        return permission != null && permission.hasPermission(PermissionType.BANNED);
+        
+        // If the ban has expired, remove it and return false
+        if (permission.getExpirationDate() != null && permission.getExpirationDate().before(new Date())) {
+            removeAllPermissions("1", userId);
+            return false;
+        }
+        
+        // User is banned and ban hasn't expired
+        return true;
     }
 }
