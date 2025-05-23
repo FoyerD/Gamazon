@@ -313,6 +313,8 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         userInfo.setText("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"));
 
         loadAllProducts();
+
+        setupNavigation();
     }
 
     private void setupFilterComponents() {
@@ -523,5 +525,13 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
         }
+    }
+
+    private void setupNavigation() {
+        Button tradingButton = new Button("Trading Operations", e -> UI.getCurrent().navigate("trading"));
+        tradingButton.getStyle()
+            .set("background-color", "#4299e1")
+            .set("color", "white");
+        add(tradingButton);
     }
 }
