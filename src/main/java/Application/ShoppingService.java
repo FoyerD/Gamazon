@@ -341,26 +341,4 @@ public class ShoppingService{
         }
         return purchaseHistoryDTO;
     }
-
-    class MockPaymentService implements IPaymentService {
-        @Override
-        public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv,
-            double price, long andIncrement, String name, String deliveryAddress) {
-            // Mock payment processing logic
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.processPayment", "Processing mock payment for " + card_owner + " of $" + price);
-            return new Response<>(true); // Assume payment is always successful for testing
-        }
-
-        @Override
-        public void updatePaymentServiceURL(String url) {
-            // Mock implementation for updating payment service URL
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.updatePaymentServiceURL", "Payment service URL updated to: " + url);
-        }
-
-        @Override
-        public void initialize() {
-            // Mock initialization logic
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.initialize", "MockPaymentService initialized");
-        }
-    }
 }
