@@ -16,6 +16,7 @@ import Domain.User.IUserRepository;
 import Domain.User.User;
 import java.util.Set;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class TradingPresenter implements ITradingPresenter {
@@ -116,6 +117,15 @@ public class TradingPresenter implements ITradingPresenter {
                 webSocketNotifier.notifyUser(userId, "Your ban has been lifted. You can now use the system again.");
             }
             return response;
+        } catch (Exception e) {
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Response<Map<String, Date>> getBannedUsers(String sessionToken) {
+        try {
+            return marketService.getBannedUsers(sessionToken);
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
         }

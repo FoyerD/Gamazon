@@ -271,7 +271,24 @@ public class MarketService {
             return new Response<>(new Error(e.getMessage()));
         }
     }
-    
+
+    public Response<Map<String, Date>> getBannedUsers(String sessionToken) {
+        if (isInvalid(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, "getBannedUsers", "Invalid session token");
+            return new Response<>(new Error("Invalid session token"));
+        }
+        try {
+            String userId = tokenService.extractId(sessionToken);
+            marketFacade.checkPermission(userId, "1", PermissionType.BAN_USERS);
+            Map<String, Date> bannedUsers = marketFacade.getBannedUsers();
+            TradingLogger.logEvent(CLASS_NAME, "getBannedUsers", "Retrieved banned users successfully");
+            return new Response<>(bannedUsers);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "getBannedUsers", "Failed to get banned users: %s", e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
     public Response<Boolean> unbanUser(String sessionToken, String userId){
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "banUser", "Invalid session token");

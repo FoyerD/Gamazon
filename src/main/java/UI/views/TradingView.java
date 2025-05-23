@@ -13,6 +13,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import UI.presenters.ITradingPresenter;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Map;
 
 @Route("trading")
 public class TradingView extends VerticalLayout implements BeforeEnterObserver {
@@ -37,6 +39,7 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
     private final Button banUserButton;
     private final TextField usernameToUnbanField;
     private final Button unbanUserButton;
+    private final Button viewBannedUsersButton;
 
     @Autowired
     public TradingView(ITradingPresenter tradingPresenter) {
@@ -82,6 +85,12 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
             .set("background-color", "#4caf50")
             .set("color", "white");
 
+        // View banned users section
+        viewBannedUsersButton = new Button("View Banned Users", e -> showBannedUsers());
+        viewBannedUsersButton.getStyle()
+            .set("background-color", "#2196f3")
+            .set("color", "white");
+
         Button homeButton = new Button("Return to Homepage", e -> UI.getCurrent().navigate("home"));
         homeButton.getStyle()
             .set("background-color", "#4caf50")
@@ -97,7 +106,10 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
         HorizontalLayout unbanSection = new HorizontalLayout(usernameToUnbanField, unbanUserButton);
         unbanSection.setAlignItems(Alignment.BASELINE);
 
-        add(title, storeSection, banTitle, banSection, unbanSection, homeButton);
+        HorizontalLayout bannedUsersSection = new HorizontalLayout(viewBannedUsersButton);
+        bannedUsersSection.setAlignItems(Alignment.BASELINE);
+
+        add(title, storeSection, banTitle, banSection, unbanSection, bannedUsersSection, homeButton);
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
         
@@ -106,6 +118,57 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
         setSpacing(true);
         setPadding(true);
         getStyle().set("background", "linear-gradient(to right, #fce4ec, #f3e5f5)");
+    }
+
+    private void showBannedUsers() {
+        Response<Map<String, Date>> response = tradingPresenter.getBannedUsers(sessionToken);
+        
+        if (response.errorOccurred()) {
+            Notification.show("Failed to get banned users: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
+            return;
+        }
+
+        Map<String, Date> bannedUsers = response.getValue();
+        
+        if (bannedUsers.isEmpty()) {
+            Notification.show("No users are currently banned", 3000, Notification.Position.MIDDLE);
+            return;
+        }
+
+        // Create a dialog to display the banned users
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Banned Users");
+        dialog.setWidth("500px");
+        dialog.setHeight("400px");
+        dialog.getElement().getStyle().set("padding", "24px");
+
+        // Create a grid to display the banned users
+        Grid<Map.Entry<String, Date>> grid = new Grid<>();
+        grid.setWidthFull();
+        grid.setHeight("300px");
+        grid.addColumn(Map.Entry::getKey)
+            .setHeader("Username")
+            .setAutoWidth(true)
+            .setFlexGrow(1)
+            .setResizable(true)
+            .setSortable(true);
+        grid.addColumn(entry -> new java.text.SimpleDateFormat("EEE, MMM d, yyyy HH:mm").format(entry.getValue()))
+            .setHeader("Ban Expiration")
+            .setAutoWidth(true)
+            .setFlexGrow(2)
+            .setResizable(true)
+            .setSortable(true);
+        grid.getStyle().set("font-size", "16px");
+        grid.setItems(bannedUsers.entrySet());
+
+        dialog.add(grid);
+
+        // Add a close button with spacing
+        Button closeButton = new Button("Close", e -> dialog.close());
+        closeButton.getStyle().set("margin-top", "16px");
+        dialog.getFooter().add(closeButton);
+
+        dialog.open();
     }
 
     private void banUser() {
