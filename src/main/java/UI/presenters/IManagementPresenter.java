@@ -141,4 +141,13 @@ public interface IManagementPresenter {
      * @return Void response indicating success or failure.
      */
     Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions);
+
+    /**
+     * Closes a store (sets it to inactive/unavailable).
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store to close.
+     * @return Response with true if successful.
+     */
+    Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId);
 }

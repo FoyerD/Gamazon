@@ -20,6 +20,7 @@ public class Store {
     private Set<String> owners;
     private Set<String> managers;
     private boolean isOpen;
+    private boolean isPermanentlyClosed;
     
 
     public Store(){
@@ -30,6 +31,7 @@ public class Store {
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
         this.isOpen = true;
+        this.isPermanentlyClosed = false;
     }
     
     public Store(String id, String name, String description, String foudnerId) {
@@ -40,6 +42,7 @@ public class Store {
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
         this.isOpen = true;
+        this.isPermanentlyClosed = false;
     }
 
     public String getId() {
@@ -89,6 +92,13 @@ public class Store {
     }
     public void setOpen(boolean isOpen) {
         this.isOpen = isOpen;
+    }
+
+    public boolean isPermanentlyClosed() {
+        return isPermanentlyClosed;
+    }
+    public void setPermanentlyClosed(boolean isPermanentlyClosed) {
+        this.isPermanentlyClosed = isPermanentlyClosed;
     }
     
     public boolean removeOwner(String userId) {

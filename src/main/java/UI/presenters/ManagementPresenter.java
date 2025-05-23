@@ -42,6 +42,11 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
+    public Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId) {
+        return storeService.closeStoreNotPermanent(sessionToken, storeId);
+    }
+
+    @Override
     public Response<ItemDTO> addItem(String sessionToken, String storeId, String productId, String description) {
         return itemService.add(sessionToken, storeId, productId, description);
     }
