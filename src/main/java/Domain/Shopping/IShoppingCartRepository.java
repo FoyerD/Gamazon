@@ -1,6 +1,7 @@
 package Domain.Shopping;
 
 import Domain.ILockbasedRepository;
+import java.util.Map;
 
 /**
  * Abstract repository class for managing shopping carts.
@@ -13,4 +14,11 @@ public abstract class IShoppingCartRepository extends ILockbasedRepository<IShop
      * This method should clear the entire repository state.
      */
     abstract public void clear();
+
+    /**
+     * Gets all shopping carts in the repository.
+     * 
+     * @return A map of client IDs to their shopping carts
+     */
+    abstract public Map<String, IShoppingCart> getAll();
 }

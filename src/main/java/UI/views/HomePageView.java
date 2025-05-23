@@ -19,6 +19,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -32,6 +33,9 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.component.page.PendingJavaScriptResult;
+import com.vaadin.flow.component.ClientCallable;
 
 import java.util.List;
 import java.util.Set;
@@ -313,6 +317,8 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         userInfo.setText("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"));
 
         loadAllProducts();
+
+        setupNavigation();
     }
 
     private void setupFilterComponents() {
@@ -523,5 +529,30 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
         }
+    }
+
+    private void setupNavigation() {
+        Button tradingButton = new Button("Trading Operations", e -> UI.getCurrent().navigate("trading"));
+        tradingButton.getStyle()
+            .set("background-color", "#4299e1")
+            .set("color", "white");
+        add(tradingButton);
+    }
+
+    @ClientCallable
+    private void showNotification(String message, String type, Integer duration, String position) {
+        Notification notification = new Notification(message);
+        notification.setDuration(duration > 0 ? duration : 4000);
+        notification.setPosition(Notification.Position.valueOf(position.toUpperCase().replace('-', '_')));
+        
+        if ("error".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        } else if ("warning".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
+        } else if ("success".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        }
+        
+        notification.open();
     }
 }

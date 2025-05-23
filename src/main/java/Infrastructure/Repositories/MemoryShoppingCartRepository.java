@@ -83,4 +83,14 @@ public class MemoryShoppingCartRepository extends IShoppingCartRepository {
     public void clear() {
         carts.clear(); 
     }
+
+    /**
+     * Gets all shopping carts in the repository.
+     * 
+     * @return A map of client IDs to their shopping carts
+     */
+    @Override
+    public Map<String, IShoppingCart> getAll() {
+        return new ConcurrentHashMap<>(carts); // Return a copy to prevent external modification
+    }
 }
