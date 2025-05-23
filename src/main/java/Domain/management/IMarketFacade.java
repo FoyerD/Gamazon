@@ -140,4 +140,11 @@ public interface IMarketFacade {
     boolean banUser(String bannerId, String userId, Date endDate);
     boolean unbanUser(String bannerId, String userId);
     void checkPermission(String userId, String storeId, PermissionType permissionType);
+
+    /**
+     * Get all currently banned users and their ban expiration dates.
+     * 
+     * @return A map of usernames to their ban expiration dates
+     */
+    Map<String, Date> getBannedUsers();
 }

@@ -9,7 +9,9 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.AuctionDTO;
 import Application.utils.Response;
+import Application.MarketService;
 import Domain.Store.ItemFilter;
+import Domain.management.PermissionManager;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -44,6 +46,7 @@ import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.ArrayList;
 
 @JsModule("./ws-client.js")
 @Route("home")
@@ -52,8 +55,12 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final IProductPresenter productPresenter;
     private final IPurchasePresenter purchasePresenter;
     private final ILoginPresenter loginPresenter;
+    private final IUserSessionPresenter sessionPresenter;
+    private final MarketService marketService;
+    private final PermissionManager permissionManager;
     private String sessionToken = null;
     private String currentUsername = null;
+    private boolean isBanned = false;
 
     private final TextField searchBar = new TextField();
     private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
@@ -68,27 +75,40 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final Dialog filterDialog = new Dialog();
     private final Span activeFiltersLabel = new Span();
 
-    private final IUserSessionPresenter sessionPresenter;
+    private final Button filterBtn = new Button("Filters");
+    private final Button refreshBtn = new Button("Refresh");
+    private final Button cartBtn = new Button("View Cart");
+    private final Button goToSearchBtn = new Button("Search Stores");
+
     private final PendingMessageStore pendingStore;
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
-                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, PendingMessageStore pendingStore) {
+                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, PendingMessageStore pendingStore,
+                        MarketService marketService, PermissionManager permissionManager) {
         this.pendingStore = pendingStore;
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;
         this.purchasePresenter = purchasePresenter;
         this.loginPresenter = loginPresenter;
+        this.marketService = marketService;
+        this.permissionManager = permissionManager;
 
         setSizeFull();
-        setSpacing(true);
+        setSpacing(false);
         setPadding(true);
-        getStyle().set("background", "linear-gradient(to right, #edf2f7, #e2e8f0)");
+        
+        // Modern gradient background
+        getStyle()
+            .set("background", "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)")
+            .set("--lumo-primary-color", "#2196f3");
 
         H1 title = new H1("Gamazon Home");
-        title.getStyle().set("color", "#1a202c");
+        title.getStyle().set("color", "#ffffff");
 
         Span userInfo = new Span();
-        userInfo.getStyle().set("color", "#2d3748").set("font-weight", "bold");
+        userInfo.getStyle()
+            .set("color", "#ffffff")
+            .set("font-weight", "bold");
 
         // Configure filter components
         setupFilterComponents();
@@ -99,20 +119,26 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         searchBar.getStyle().set("background-color", "#ffffff");
         searchBar.addValueChangeListener(e -> applyFilters());
 
-        Button filterBtn = new Button(new Icon(VaadinIcon.FILTER), e -> filterDialog.open());
-        filterBtn.setText("Filters");
+        // Initialize buttons with click handlers
+        filterBtn.addClickListener(e -> filterDialog.open());
         filterBtn.getStyle()
             .set("background-color", "#4299e1")
             .set("color", "white");
 
-        Button refreshBtn = new Button("Refresh", e -> loadAllProducts());
-        refreshBtn.getStyle().set("background-color", "#2b6cb0").set("color", "white");
+        refreshBtn.addClickListener(e -> loadAllProducts());
+        refreshBtn.getStyle()
+            .set("background-color", "#2b6cb0")
+            .set("color", "white");
 
-        Button goToSearchBtn = new Button("Search Stores", e -> UI.getCurrent().navigate("store-search"));
-        goToSearchBtn.getStyle().set("background-color", "#3182ce").set("color", "white");
-        
-        Button cartBtn = new Button("View Cart", e -> UI.getCurrent().navigate("cart"));
-        cartBtn.getStyle().set("background-color", "#38a169").set("color", "white");
+        goToSearchBtn.addClickListener(e -> UI.getCurrent().navigate("store-search"));
+        goToSearchBtn.getStyle()
+            .set("background-color", "#3182ce")
+            .set("color", "white");
+
+        cartBtn.addClickListener(e -> UI.getCurrent().navigate("cart"));
+        cartBtn.getStyle()
+            .set("background-color", "#38a169")
+            .set("color", "white");
 
         Button registerBtn = new Button("Register", e -> UI.getCurrent().navigate("register"));
         registerBtn.getStyle().set("background-color", "#6b46c1").set("color", "white");
@@ -528,6 +554,8 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         if (sessionToken == null) {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
+        } else {
+            checkBanStatus();
         }
     }
 
@@ -554,5 +582,45 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         }
         
         notification.open();
+    }
+
+    private void checkBanStatus() {
+        if (sessionToken != null && currentUsername != null) {
+            String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
+            Response<Boolean> response = marketService.userExists(currentUsername);
+            if (!response.errorOccurred() && response.getValue()) {
+                boolean wasBanned = isBanned;  // Store previous state
+                isBanned = permissionManager.isBanned(userId);
+                
+                // If ban status changed, update UI
+                if (wasBanned != isBanned) {
+                    if (isBanned) {
+                        // Remove action columns
+                        List<Grid.Column<ItemDTO>> columnsToRemove = new ArrayList<>();
+                        productGrid.getColumns().forEach(column -> {
+                            String header = column.getHeaderText();
+                            if (header != null && (header.equals("Actions") || header.equals("Cart") || header.equals("Auction"))) {
+                                columnsToRemove.add(column);
+                            }
+                        });
+                        columnsToRemove.forEach(column -> productGrid.removeColumn(column));
+                        
+                        // Disable interactive components
+                        searchBar.setEnabled(false);
+                        filterBtn.setEnabled(false);
+                        refreshBtn.setEnabled(false);
+                        cartBtn.setEnabled(false);
+                        goToSearchBtn.setEnabled(false);
+                        
+                        // Show ban notification
+                        Notification.show("Your account has been banned. Some features are disabled.", 
+                                       5000, Notification.Position.MIDDLE);
+                    } else {
+                        // Refresh the page to restore all functionality
+                        UI.getCurrent().getPage().reload();
+                    }
+                }
+            }
+        }
     }
 }

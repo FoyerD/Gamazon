@@ -193,4 +193,24 @@ public class MarketFacade implements IMarketFacade {
         return permissionManager.unbanUser(unbannerId, userId);
     }
 
+    @Override
+    public Map<String, Date> getBannedUsers() {
+        Map<String, Date> bannedUsers = new HashMap<>();
+        Map<String, Permission> systemPermissions = permissionManager.getAllPermissionsForStore("1");
+        
+        for (Map.Entry<String, Permission> entry : systemPermissions.entrySet()) {
+            String userId = entry.getKey();
+            Permission permission = entry.getValue();
+            
+            if (permission.hasPermission(PermissionType.BANNED)) {
+                Member member = userRepository.getMember(userId);
+                if (member != null) {
+                    bannedUsers.put(member.getName(), permission.getExpirationDate());
+                }
+            }
+        }
+        
+        return bannedUsers;
+    }
+
 }
