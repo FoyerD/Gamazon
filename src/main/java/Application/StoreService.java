@@ -3,6 +3,8 @@ package Application;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.Permission;
+import Domain.Shopping.IShoppingCartFacade;
 
 @Service
 public class StoreService {
@@ -30,21 +33,24 @@ public class StoreService {
     private TokenService tokenService;
     private PermissionManager permissionManager;
     private INotificationService notificationService;
-
+    private IShoppingCartFacade shoppingCartFacade;
 
     public StoreService() {
         this.storeFacade = null;
         this.tokenService = null;
         this.permissionManager = null;
         this.notificationService = null;
+        this.shoppingCartFacade = null;
     }
 
     @Autowired
-    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, INotificationService notificationService) {
+    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, 
+                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade) {
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
         this.permissionManager = permissionManager;
+        this.shoppingCartFacade = shoppingCartFacade;
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "StoreService initialized with dependencies");
     }
 
@@ -138,6 +144,32 @@ public class StoreService {
                     }
                 }
             }
+            TradingLogger.logEvent(CLASS_NAME, method, "Store " + storeId + " closed by user " + userId);
+            return new Response<>(result);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error closing store %s: %s", storeId, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId){
+        String method = "closeStoreNotPermanent";
+        try {
+            if(!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from closing stores.");
+            }
+            permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
+            boolean result = this.storeFacade.closeStoreNotPermanent(storeId);
             TradingLogger.logEvent(CLASS_NAME, method, "Store " + storeId + " closed by user " + userId);
             return new Response<>(result);
         } catch (Exception ex) {
@@ -272,6 +304,27 @@ public class StoreService {
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error accepting bid for auction %s: %s", auctionId, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    /**
+     * Gets all users who have shopping baskets in a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @return A set of user IDs who have baskets in the store
+     */
+    public Set<String> getUsersWithBaskets(String storeId) {
+        String method = "getUsersWithBaskets";
+        try {
+            if(!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                throw new RuntimeException("StoreService is not initialized.");
+            }
+            
+            return shoppingCartFacade.getUsersWithBaskets(storeId);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error getting users with baskets for store %s: %s", storeId, ex.getMessage());
+            return new HashSet<>(); // Return empty set in case of error
         }
     }
 }

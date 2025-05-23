@@ -26,9 +26,10 @@ import Application.ServiceManager;
 import Application.ShoppingService;
 import Application.TokenService;
 import Application.UserService;
+import Application.utils.Error;
 import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartRepository;
@@ -45,7 +46,7 @@ import Domain.User.User;
 import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
 import Infrastructure.MemoryRepoManager;
-import Infrastructure.PaymentService;
+import Infrastructure.ExternalPaymentService;
 import Domain.FacadeManager;
 import Domain.Pair;
 import Domain.Store.IAuctionRepository;
@@ -86,7 +87,7 @@ public class ShoppingServiceTest {
     private LoginManager loginManager;
     
     // Mock service for testing
-    private IPaymentService mockPaymentService;
+    private IExternalPaymentService mockPaymentService;
     
     // Test user data
     private UserDTO guest;
@@ -105,7 +106,7 @@ public class ShoppingServiceTest {
         tokenService = new TokenService();
         
         // Create mock payment service
-        mockPaymentService = mock(IPaymentService.class);
+        mockPaymentService = mock(IExternalPaymentService.class);
         
         // Initialize repository manager
         repositoryManager = new MemoryRepoManager();
@@ -234,7 +235,7 @@ public class ShoppingServiceTest {
 
     @Test
     public void testCheckout_Success() {
-        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), anyDouble(), anyLong(), any(), any())).thenReturn(new Response<>(true));
+        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
         shoppingService.addProductToCart(STORE_ID, clientToken, PRODUCT_ID, 1);
         Response<Boolean> response = shoppingService.checkout(
         clientToken, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
@@ -283,7 +284,7 @@ public class ShoppingServiceTest {
     @Test
     public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
         // Use the existing product and store from the setup
-        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), anyDouble(), anyLong(), any(), any())).thenReturn(new Response<>(true));
+        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
         String limitedProductId = PRODUCT_ID;  // Use the constant from the setup
         String limitedStoreId = STORE_ID;      // Use the constant from the setup
         when(notificationService.sendNotification(any(), any())).thenReturn(new Response<>(true));
@@ -648,28 +649,10 @@ public class ShoppingServiceTest {
         // Create a distinctive error message for easy identification
         final String DISTINCTIVE_ERROR_MESSAGE = "XYZ_TEST_PAYMENT_DECLINED_123";
         
-        // Create a bad payment service with a distinctive error message
-        IPaymentService badPaymentService = new IPaymentService() {
-            @Override
-            public void updatePaymentServiceURL(String url) {
-                // Do nothing
-            }
-
-            @Override
-            public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv, 
-                                                double price, long andIncrement, String name, String deliveryAddress) {
-                // Use our distinctive error message
-                return Response.error(DISTINCTIVE_ERROR_MESSAGE);
-            }
-
-            @Override
-            public void initialize() {
-                // Do nothing
-            }
-        };
+        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(new Error(DISTINCTIVE_ERROR_MESSAGE)));
         
         // Create a facade manager that uses our bad payment service
-        FacadeManager testFacadeManager = new FacadeManager(repositoryManager, badPaymentService);
+        FacadeManager testFacadeManager = new FacadeManager(repositoryManager, mockPaymentService);
         
         // Create a custom service manager that uses our test facade manager
         ServiceManager testServiceManager = new ServiceManager(testFacadeManager);

@@ -1,11 +1,10 @@
-// src/main/frontend/vite.config.ts
 import { applyTheme } from './theme';
 
 export default {
   plugins: [
     {
       name: 'apply-theme',
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         return applyTheme(html);
       }
     }

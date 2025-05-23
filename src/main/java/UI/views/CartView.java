@@ -6,8 +6,9 @@ import UI.presenters.IProductPresenter;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ShoppingBasketDTO;
+import Application.DTOs.StoreDTO;
 import Application.utils.Response;
-
+import UI.presenters.IStorePresenter;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class CartView extends VerticalLayout implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
+    private final IStorePresenter storePresenter;
     private String sessionToken;
     private String currentUsername;
 
@@ -44,8 +46,9 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
     private double cartTotal = 0.0;
 
     @Autowired
-    public CartView(IPurchasePresenter purchasePresenter, IProductPresenter productPresenter) {
+    public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter) {
         this.purchasePresenter = purchasePresenter;
+        this.storePresenter = storePresenter;
 
         setSizeFull();
         setSpacing(true);
@@ -147,6 +150,28 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
 
         // Create a panel for each store basket
         for (Map.Entry<String, ShoppingBasketDTO> basket : cart.getBaskets().entrySet()) {
+            // Check if the store is closed
+            Response<StoreDTO> storeResponse = storePresenter.getStoreByName(sessionToken, basket.getValue().getStoreName());
+            if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen() && storeResponse.getValue().isPermanentlyClosed()) {
+                // Store is permanently closed, remove the basket
+                purchasePresenter.clearBasket(sessionToken, basket.getKey());
+                Notification.show(
+                    String.format("Basket from store '%s' has been removed because the store is permanently closed", 
+                    basket.getValue().getStoreName()),
+                    5000, 
+                    Notification.Position.MIDDLE
+                );
+                continue;
+            } else if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen() && !storeResponse.getValue().isPermanentlyClosed()) {
+                // Store is temporarily closed, show notification but keep basket
+                Notification.show(
+                    String.format("Note: Store '%s' is temporarily closed. Your basket is preserved.", 
+                    basket.getValue().getStoreName()),
+                    5000, 
+                    Notification.Position.MIDDLE
+                );
+            }
+
             BasketLayout basketLayout = new BasketLayout(
                 basket.getValue(),
                 this::removeBasket,

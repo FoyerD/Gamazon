@@ -19,10 +19,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import Domain.ExternalServices.IPaymentService;
 import Domain.Pair;
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.Receipt;
@@ -285,6 +282,7 @@ public class ShoppingService{
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+
 
     // View personal purchase history 3.7
     public Response<List<ReceiptDTO>> getUserPurchaseHistory(String sessionToken) {

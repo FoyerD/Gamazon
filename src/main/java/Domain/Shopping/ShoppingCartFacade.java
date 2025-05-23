@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
 import Domain.Pair;
-import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
@@ -29,7 +29,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingCartRepository cartRepo;
     private final IShoppingBasketRepository basketRepo;
     private final IReceiptRepository receiptRepo;
-    private final IPaymentService paymentService;
+    private final IExternalPaymentService paymentService;
     private final ItemFacade itemFacade;
     private final StoreFacade storeFacade;
     private final IProductRepository productRepo;
@@ -46,7 +46,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @param productRepository The repository for products
      */
     @Autowired
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IExternalPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
@@ -211,8 +211,11 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                 throw new IllegalArgumentException("Invalid card number");
             }
 
-            paymentService.processPayment(clientName, cardNumber, expiryDate, cvv,
-                                        price, andIncrement, clientName, deliveryAddress);
+            paymentService.processPayment(
+                clientName, cardNumber, expiryDate, cvv, 
+                deliveryAddress, price
+            );
+
             return true;
         };
 
@@ -242,6 +245,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     
     // Store purchase information for receipt creation
     Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
+
+    Response<Integer> paymentResponse = new Response<>(-1);
 
     try {
         // Iterate over all stores in the cart
@@ -314,13 +319,12 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                 }
             }
         }
-
         // Process payment only if there are items to checkout
         if (purchaseSuccess) {
             // Call payment service and check for error response
-            Response<Boolean> paymentResponse = paymentService.processPayment(
+            paymentResponse = paymentService.processPayment(
                 clientName, card_number, expiry_date, cvv, 
-                totalPrice, andIncrement, clientName, deliveryAddress
+                deliveryAddress, totalPrice
             );
             
             if (paymentResponse == null) {
@@ -329,7 +333,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
             // If payment service returned an error, throw an exception to trigger rollback
             if (paymentResponse.errorOccurred()) {
-                throw new RuntimeException("Payment failed: " + paymentResponse.getErrorMessage());
+                throw new RuntimeException(paymentResponse.getErrorMessage());
             }
         }
 
@@ -376,7 +380,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
         return true;
     } catch (Exception e) {
-        // Rollback all changes
+        // Rollback all changes and cancel payment if necessary
+        if (paymentResponse.getValue() != -1) {
+           paymentService.cancelPayment(paymentResponse.getValue());
+        }
         checkoutRollBack(clientId, cart, itemsrollbackData, cartrollbackdata, basketsrollbackdata);
         
         // Throw the exception to indicate failure
@@ -609,5 +616,31 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
     public String getStoreName(String storeId) {
         return storeFacade.getStore(storeId).getName();
+    }
+
+    /**
+     * Gets all users who have shopping baskets in a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @return A set of user IDs who have baskets in the store
+     */
+    @Override
+    public Set<String> getUsersWithBaskets(String storeId) {
+        Set<String> usersWithBaskets = new HashSet<>();
+        
+        // Get all carts
+        Map<String, IShoppingCart> allCarts = cartRepo.getAll();
+        
+        // For each cart, check if it contains the store
+        for (Map.Entry<String, IShoppingCart> entry : allCarts.entrySet()) {
+            String userId = entry.getKey();
+            IShoppingCart cart = entry.getValue();
+            
+            if (cart.hasStore(storeId)) {
+                usersWithBaskets.add(userId);
+            }
+        }
+        
+        return usersWithBaskets;
     }
 }

@@ -26,12 +26,16 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.dependency.JsModule;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.ArrayList;
 
+@JsModule("./ws-client.js")
 @Route("store-search")
 public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
 
@@ -107,6 +111,10 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
             Notification.show("Store not found: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
             StoreDTO store = response.getValue();
+            if (!store.isOpen()) {
+                Notification.show("This store is currently closed", 3000, Notification.Position.MIDDLE);
+                return;
+            }
             showStoreLayout(store);
             Notification.show("Store found: " + store.getName());
         }
@@ -266,5 +274,22 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
                 // fetchStoreByName will be triggered by the value change listener
             }
         }
+    }
+
+    @ClientCallable
+    private void showNotification(String message, String type, Integer duration, String position) {
+        Notification notification = new Notification(message);
+        notification.setDuration(duration > 0 ? duration : 10000);
+        notification.setPosition(Notification.Position.valueOf(position.toUpperCase().replace('-', '_')));
+        
+        if ("error".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        } else if ("warning".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
+        } else if ("success".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        }
+        
+        notification.open();
     }
 }

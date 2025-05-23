@@ -1,4 +1,3 @@
-
 package Domain.User;
 
 import java.util.NoSuchElementException;
@@ -27,6 +26,20 @@ public class LoginManager {
             throw new NoSuchElementException("User not found");
         }
         return user;
+    }
+
+    /***
+     * Retrieves a user by their username.
+     * @param username The username of the user to retrieve.
+     * @return The user associated with the given username.
+     * @throws NoSuchElementException if no user is found with the given username.
+     ***/
+    public User getUserByUsername(String username) {
+        Member member = userRepository.getMemberByUsername(username);
+        if (member == null) {
+            throw new NoSuchElementException("User not found");
+        }
+        return member;
     }
 
     /***

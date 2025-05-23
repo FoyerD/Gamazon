@@ -3,9 +3,11 @@ package Domain.management;
 import java.io.IOException;
 import java.util.*;
 import org.springframework.stereotype.Component;
+
+import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
 import Domain.User.IUserRepository;
@@ -16,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Component
 public class MarketFacade implements IMarketFacade {
 
-    private IPaymentService paymentService;
-    private ISupplyService supplyService;
+    private IExternalPaymentService paymentService;
+    private IExternalSupplyService supplyService;
     private INotificationService notificationService;
     private IUserRepository userRepository;
     private PermissionManager permissionManager;
@@ -31,8 +33,8 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Autowired
-    public MarketFacade(IPaymentService paymentService,
-                        ISupplyService supplyService,
+    public MarketFacade(IExternalPaymentService paymentService,
+                        IExternalSupplyService supplyService,
                         INotificationService notificationService,
                         IUserRepository userRepository,
                         IShoppingCartFacade shoppingCartFacade,
@@ -61,7 +63,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void updatePaymentService(IPaymentService paymentService) {
+    public void updatePaymentService(IExternalPaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
@@ -71,7 +73,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void updateSupplyService(ISupplyService supplyService) {
+    public void updateSupplyService(IExternalSupplyService supplyService) {
         this.supplyService = supplyService;
     }
 
@@ -139,8 +141,15 @@ public class MarketFacade implements IMarketFacade {
         if (paymentService == null || supplyService == null || notificationService == null || userRepository == null) {
             throw new IllegalStateException("Services not initialized.");
         }
-        paymentService.initialize();
-        supplyService.initialize();
+        Response<Boolean> paymentCheck = paymentService.handshake();
+        Response<Boolean> supplyCheck = supplyService.handshake();
+
+        if (paymentCheck.errorOccurred() || supplyCheck.errorOccurred() ||
+            !Boolean.TRUE.equals(paymentCheck.getValue()) ||
+            !Boolean.TRUE.equals(supplyCheck.getValue())) {
+            
+            throw new IllegalStateException("Handshake failed with external API.");
+        }
         Member manager = userRepository.getMember(userId);
         permissionManager.addMarketManager(manager);
     }
@@ -191,6 +200,26 @@ public class MarketFacade implements IMarketFacade {
             throw new IllegalArgumentException("User not found: " + userId);
         }
         return permissionManager.unbanUser(unbannerId, userId);
+    }
+
+    @Override
+    public Map<String, Date> getBannedUsers() {
+        Map<String, Date> bannedUsers = new HashMap<>();
+        Map<String, Permission> systemPermissions = permissionManager.getAllPermissionsForStore("1");
+        
+        for (Map.Entry<String, Permission> entry : systemPermissions.entrySet()) {
+            String userId = entry.getKey();
+            Permission permission = entry.getValue();
+            
+            if (permission.hasPermission(PermissionType.BANNED)) {
+                Member member = userRepository.getMember(userId);
+                if (member != null) {
+                    bannedUsers.put(member.getName(), permission.getExpirationDate());
+                }
+            }
+        }
+        
+        return bannedUsers;
     }
 
 }

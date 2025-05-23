@@ -137,4 +137,12 @@ public interface IShoppingCartFacade {
     List<Receipt> getStorePurchaseHistory(String storeId);
 
     String getStoreName(String storeId);
+
+    /**
+     * Gets all users who have shopping baskets in a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @return A set of user IDs who have baskets in the store
+     */
+    Set<String> getUsersWithBaskets(String storeId);
 }
