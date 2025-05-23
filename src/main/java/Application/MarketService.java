@@ -4,8 +4,8 @@ import Domain.management.IMarketFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.Receipt;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class MarketService {
         return !tokenService.validateToken(sessionToken);
     }
 
-    public Response<Void> updatePaymentService(String sessionToken, IPaymentService paymentService) {
+    public Response<Void> updatePaymentService(String sessionToken, IExternalPaymentService paymentService) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updatePaymentService", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -70,7 +70,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> updateSupplyService(String sessionToken, ISupplyService supplyService) {
+    public Response<Void> updateSupplyService(String sessionToken, IExternalSupplyService supplyService) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updateSupplyService", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));

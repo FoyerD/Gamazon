@@ -20,16 +20,16 @@ import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
 import Domain.Pair;
-import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Store.ItemFilter;
 import Infrastructure.MemoryRepoManager;
-import Infrastructure.PaymentService;
+import Infrastructure.ExternalPaymentService;
 
 
 public class ItemServiceTests {
 
     private IRepoManager repoManager;
-    private IPaymentService paymentService;
+    private IExternalPaymentService paymentService;
     private FacadeManager facadeManager;
     private ServiceManager serviceManager;
     private ItemService itemService;
@@ -46,7 +46,7 @@ public class ItemServiceTests {
     @Before
     public void setUp() {
         repoManager = new MemoryRepoManager();
-        paymentService = new PaymentService();
+        paymentService = new ExternalPaymentService();
         facadeManager = new FacadeManager(repoManager, paymentService);
         serviceManager = new ServiceManager(facadeManager);
         itemService = serviceManager.getItemService();

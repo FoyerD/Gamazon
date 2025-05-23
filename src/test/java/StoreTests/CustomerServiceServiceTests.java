@@ -24,7 +24,7 @@ import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
 import Infrastructure.MemoryRepoManager;
-import Infrastructure.PaymentService;
+import Infrastructure.ExternalPaymentService;
 import Application.utils.Response;
 
 
@@ -50,7 +50,7 @@ public class CustomerServiceServiceTests {
     public void setUp() {
 
         this.repoManager = new MemoryRepoManager();
-        this.facadeManager = new FacadeManager(repoManager, mock(PaymentService.class));
+        this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class));
         this.serviceManager = new ServiceManager(facadeManager);
         userRepository = repoManager.getUserRepository();
         itemRepository = repoManager.getItemRepository();
