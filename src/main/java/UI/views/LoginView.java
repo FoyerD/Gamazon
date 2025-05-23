@@ -50,8 +50,8 @@ public class LoginView extends VerticalLayout {
         loginButton.setWidthFull();
         guestButton.setWidthFull();
 
-        loginButton.getStyle().set("background-color", "#3498db").set("color", "white");
-        guestButton.getStyle().set("background-color", "#2ecc71").set("color", "white");
+        loginButton.getStyle().set("background-color", " #3498db").set("color", "white");
+        guestButton.getStyle().set("background-color", " #2ecc71").set("color", "white");
 
         loginButton.addClickListener(e -> login());
         guestButton.addClickListener(e -> loginAsGuest());
@@ -75,6 +75,7 @@ public class LoginView extends VerticalLayout {
         } else {
             UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            UI.getCurrent().getSession().setAttribute("user", response.getValue());
             Notification.show("Welcome, " + response.getValue().getUsername());
             UI.getCurrent().navigate("home");
         }
@@ -87,6 +88,7 @@ public class LoginView extends VerticalLayout {
         } else {
             UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            UI.getCurrent().getSession().setAttribute("user", response.getValue());
             Notification.show("Logged in as Guest");
             UI.getCurrent().navigate("home");
         }

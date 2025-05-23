@@ -6,6 +6,7 @@ import UI.webSocketConfigurations.PendingMessageStore;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.ILoginPresenter;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.UserDTO;
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.AuctionDTO;
 import Application.utils.Response;
@@ -30,7 +31,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Margin.Vertical;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 
@@ -51,6 +51,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final ILoginPresenter loginPresenter;
     private String sessionToken = null;
     private String currentUsername = null;
+    private UserDTO user = null;
 
     private final TextField searchBar = new TextField();
     private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
@@ -89,9 +90,10 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         Button userInfo = new Button("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"),
                                         VaadinIcon.USER.create(),
                                         e -> {
+                                            UI.getCurrent().getSession().setAttribute("user", user);
                                             UI.getCurrent().navigate("user-profile");
                                         });
-        userInfo.getStyle().set("color", "#2d3748").set("font-weight", "bold");
+        userInfo.getStyle().set("color", " #2d3748").set("background-color", " #ebc934").set("font-weight", "bold");
 
         // Configure filter components
         setupFilterComponents();
@@ -105,20 +107,20 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         Button filterBtn = new Button(new Icon(VaadinIcon.FILTER), e -> filterDialog.open());
         filterBtn.setText("Filters");
         filterBtn.getStyle()
-            .set("background-color", "#4299e1")
+            .set("background-color", " #4299e1")
             .set("color", "white");
 
         Button refreshBtn = new Button("Refresh", e -> loadAllProducts());
-        refreshBtn.getStyle().set("background-color", "#2b6cb0").set("color", "white");
+        refreshBtn.getStyle().set("background-color", " #2b6cb0").set("color", "white");
 
         Button goToSearchBtn = new Button("Search Stores", e -> UI.getCurrent().navigate("store-search"));
-        goToSearchBtn.getStyle().set("background-color", "#3182ce").set("color", "white");
+        goToSearchBtn.getStyle().set("background-color", " #3182ce").set("color", "white");
         
         Button cartBtn = new Button("View Cart", e -> UI.getCurrent().navigate("cart"));
-        cartBtn.getStyle().set("background-color", "#38a169").set("color", "white");
+        cartBtn.getStyle().set("background-color", " #38a169").set("color", "white");
 
         Button registerBtn = new Button("Register", e -> UI.getCurrent().navigate("register"));
-        registerBtn.getStyle().set("background-color", "#6b46c1").set("color", "white");
+        registerBtn.getStyle().set("background-color", " #6b46c1").set("color", "white");
 
         Button logoutBtn = new Button("Logout", e -> {
             Response<Void> response = loginPresenter.logout(sessionToken);
@@ -533,5 +535,6 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
         }
+        this.user =(UserDTO)UI.getCurrent().getSession().getAttribute("user");
     }
 }

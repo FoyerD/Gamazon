@@ -322,7 +322,11 @@ public class ShoppingService{
                 Product product = entry.getKey();
                 int quantity = entry.getValue().getFirst();
                 double price = entry.getValue().getSecond();
-                OrderedItemDTO itemDTO = new OrderedItemDTO(product, quantity, receipt.getStoreId(), price);
+                OrderedItemDTO itemDTO = new OrderedItemDTO(product, 
+                                                            quantity, 
+                                                            this.storeFacade.getStoreName(receipt.getStoreId()), 
+                                                            price
+                                                        );
                 items.add(itemDTO);
             }
 

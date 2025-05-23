@@ -25,4 +25,11 @@ public class ReceiptDTO {
         return items;
     }
 
+
+    public double getTotalPrice() {
+        return items.stream()
+                .mapToDouble(OrderedItemDTO::getPrice)
+                .sum();
+    }
+
 }
