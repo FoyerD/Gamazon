@@ -155,6 +155,24 @@ public class StoreFacade {
             if(!store.isOpen()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);
+            store.setPermanentlyClosed(true);
+            Store newStore = this.storeRepository.update(storeId, store);
+            if(!store.equals(newStore)) throw new RuntimeException("Store not updated");
+            return true;
+        }
+    }
+
+    public boolean closeStoreNotPermanent(String storeId){
+        Object lock = this.storeRepository.getLock(storeId);
+        if (lock == null) throw new RuntimeException("Store not found");
+        synchronized (lock) {
+
+            Store store = this.storeRepository.get(storeId);
+            if (store == null) throw new RuntimeException("Store not found");
+            if(!store.isOpen()) throw new RuntimeException("Store is already closed");
+
+            store.setOpen(false);
+            store.setPermanentlyClosed(false);
             Store newStore = this.storeRepository.update(storeId, store);
             if(!store.equals(newStore)) throw new RuntimeException("Store not updated");
             return true;

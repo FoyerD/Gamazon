@@ -13,6 +13,7 @@ public class StoreDTO {
     private Set<String> owners;
     private Set<String> managers;
     private boolean isOpen;
+    private boolean isPermanentlyClosed;
 
     public StoreDTO(String id, String name, String description, String founderId, boolean isOpen, Set<String> owners, Set<String> managers) {  
         this.id = id;
@@ -20,6 +21,7 @@ public class StoreDTO {
         this.description = description;
         this.founderId = founderId;
         this.isOpen = isOpen;
+        this.isPermanentlyClosed = false;
         this.owners = owners != null ? owners : Set.of();
         this.managers = managers != null ? managers : Set.of();
     }
@@ -30,6 +32,7 @@ public class StoreDTO {
         this.description = store.getDescription();
         this.founderId = store.getFounderId();
         this.isOpen = store.isOpen();
+        this.isPermanentlyClosed = store.isPermanentlyClosed();
         this.owners = new HashSet<>(store.getOwners());
         this.managers = new HashSet<>(store.getManagers());
     }
@@ -66,4 +69,11 @@ public class StoreDTO {
         return isOpen;
     }
 
+    public boolean isPermanentlyClosed() {
+        return isPermanentlyClosed;
+    }
+
+    public void setPermanentlyClosed(boolean isPermanentlyClosed) {
+        this.isPermanentlyClosed = isPermanentlyClosed;
+    }
 }

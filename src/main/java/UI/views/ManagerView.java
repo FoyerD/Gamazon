@@ -154,7 +154,21 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         styleButton(homeButton, "var(--lumo-primary-color)");
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
 
-        header.add(title, homeButton);
+        Button tempCloseButton = new Button("Temporarily Close Store", VaadinIcon.LOCK.create());
+        styleButton(tempCloseButton, "#ff9800"); // Orange color for temporary action
+        tempCloseButton.addClickListener(e -> {
+            Response<Boolean> response = managementPresenter.closeStoreNotPermanent(sessionToken, currentStoreId);
+            if (response.errorOccurred()) {
+                Notification.show("Failed to close store: " + response.getErrorMessage(), 
+                    3000, Notification.Position.MIDDLE);
+            } else {
+                Notification.show("Store temporarily closed. Customer baskets are preserved.", 
+                    3000, Notification.Position.MIDDLE);
+                UI.getCurrent().navigate("home");
+            }
+        });
+
+        header.add(title, new HorizontalLayout(tempCloseButton, homeButton));
         add(header);
     }
 

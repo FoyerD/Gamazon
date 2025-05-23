@@ -152,16 +152,24 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         for (Map.Entry<String, ShoppingBasketDTO> basket : cart.getBaskets().entrySet()) {
             // Check if the store is closed
             Response<StoreDTO> storeResponse = storePresenter.getStoreByName(sessionToken, basket.getValue().getStoreName());
-            if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen()) {
-                // Store is closed, remove the basket
+            if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen() && storeResponse.getValue().isPermanentlyClosed()) {
+                // Store is permanently closed, remove the basket
                 purchasePresenter.clearBasket(sessionToken, basket.getKey());
                 Notification.show(
-                    String.format("Basket from store '%s' has been removed because the store is closed", 
+                    String.format("Basket from store '%s' has been removed because the store is permanently closed", 
                     basket.getValue().getStoreName()),
                     5000, 
                     Notification.Position.MIDDLE
                 );
                 continue;
+            } else if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen() && !storeResponse.getValue().isPermanentlyClosed()) {
+                // Store is temporarily closed, show notification but keep basket
+                Notification.show(
+                    String.format("Note: Store '%s' is temporarily closed. Your basket is preserved.", 
+                    basket.getValue().getStoreName()),
+                    5000, 
+                    Notification.Position.MIDDLE
+                );
             }
 
             BasketLayout basketLayout = new BasketLayout(

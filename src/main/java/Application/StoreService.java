@@ -152,6 +152,32 @@ public class StoreService {
         }
     }
 
+    public Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId){
+        String method = "closeStoreNotPermanent";
+        try {
+            if(!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return Response.error("Invalid token");
+            }
+            String userId = this.tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(userId)){
+                throw new Exception("User is banned from closing stores.");
+            }
+            permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
+            boolean result = this.storeFacade.closeStoreNotPermanent(storeId);
+            TradingLogger.logEvent(CLASS_NAME, method, "Store " + storeId + " closed by user " + userId);
+            return new Response<>(result);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error closing store %s: %s", storeId, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
     public Response<StoreDTO> getStoreByName(String sessionToken, String name) {
         String method = "getStoreByName";
         try {
