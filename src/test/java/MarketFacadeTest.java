@@ -3,8 +3,8 @@ import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.Receipt;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
@@ -17,6 +17,8 @@ import Domain.User.Member;
 import Domain.User.User;
 import org.junit.Before;
 import org.junit.Test;
+
+import Application.utils.Response;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -37,8 +39,8 @@ public class MarketFacadeTest {
     private IItemRepository itemRepository;
     private ShoppingCartFacade shoppingCartFacade;
     private StoreFacade storeFacade;
-    private IPaymentService paymentService;
-    private ISupplyService supplyService;
+    private IExternalPaymentService paymentService;
+    private IExternalSupplyService supplyService;
     private INotificationService notificationService;
     private PermissionManager permissionManager;
 
@@ -48,8 +50,8 @@ public class MarketFacadeTest {
         userRepository = mock(IUserRepository.class);
         itemRepository = mock(IItemRepository.class);
         storeFacade = mock(StoreFacade.class);
-        paymentService = mock(IPaymentService.class);
-        supplyService = mock(ISupplyService.class);
+        paymentService = mock(IExternalPaymentService.class);
+        supplyService = mock(IExternalSupplyService.class);
         notificationService = mock(INotificationService.class);
         shoppingCartFacade = mock(ShoppingCartFacade.class);
         permissionManager = mock(PermissionManager.class);
@@ -237,10 +239,13 @@ public class MarketFacadeTest {
         when(member.getName()).thenReturn("managerName");
         when(userRepository.getMember(anyString())).thenReturn(member);
 
+        when(paymentService.handshake()).thenReturn(new Response<>(true));
+        when(supplyService.handshake()).thenReturn(new Response<>(true));
+
         marketFacade.openMarket("manager");
 
-        verify(paymentService).initialize();
-        verify(supplyService).initialize();
+        verify(paymentService).handshake();
+        verify(supplyService).handshake();
 
     }
 

@@ -1,6 +1,6 @@
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.Receipt;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
@@ -68,15 +68,15 @@ public class MarketServiceTest {
     private IPermissionRepository permissionRepository;
     
     // Services that might be mocked for testing
-    private IPaymentService mockPaymentService;
-    private ISupplyService mockSupplyService;
+    private IExternalPaymentService mockPaymentService;
+    private IExternalSupplyService mockSupplyService;
     private INotificationService mockNotificationService;
     
     @Before
     public void setUp() {
         // Create mocks for external services
-        mockPaymentService = mock(IPaymentService.class);
-        mockSupplyService = mock(ISupplyService.class);
+        mockPaymentService = mock(IExternalPaymentService.class);
+        mockSupplyService = mock(IExternalSupplyService.class);
         mockNotificationService = mock(INotificationService.class);
 
         // Initialize repository manager
@@ -139,6 +139,8 @@ public class MarketServiceTest {
 
     @Test
     public void givenMarketClosed_whenOpenMarket_thenMarketIsOpened() {
+        when(mockPaymentService.handshake()).thenReturn(new Response<>(true));
+        when(mockSupplyService.handshake()).thenReturn(new Response<>(true));
         Response<Void> response = marketService.openMarket(tokenId1);
         assertFalse(response.errorOccurred());
     }
@@ -481,7 +483,8 @@ public class MarketServiceTest {
             }
 
         };
-
+        when(mockPaymentService.handshake()).thenReturn(new Response<>(true));
+        when(mockSupplyService.handshake()).thenReturn(new Response<>(true));
         // Replace the mock notification service with our bad one
         Response<Void> updateResponse = marketService.updateNotificationService(tokenId1, badNotificationService);
         assertFalse(updateResponse.errorOccurred(), "Updating notification service should succeed");

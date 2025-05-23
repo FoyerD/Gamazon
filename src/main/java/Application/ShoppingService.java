@@ -15,16 +15,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import Domain.ExternalServices.IPaymentService;
 import Domain.Pair;
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
-import Domain.Shopping.IShoppingCartRepository;
-import Domain.Shopping.ShoppingCartFacade;
-import Domain.Store.IProductRepository;
 import Domain.Store.Item;
-import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
 
@@ -273,29 +266,6 @@ public class ShoppingService{
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error making bid: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
-        }
-    }
-
-
-    class MockPaymentService implements IPaymentService {
-        @Override
-        public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv,
-            double price, long andIncrement, String name, String deliveryAddress) {
-            // Mock payment processing logic
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.processPayment", "Processing mock payment for " + card_owner + " of $" + price);
-            return new Response<>(true); // Assume payment is always successful for testing
-        }
-
-        @Override
-        public void updatePaymentServiceURL(String url) {
-            // Mock implementation for updating payment service URL
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.updatePaymentServiceURL", "Payment service URL updated to: " + url);
-        }
-
-        @Override
-        public void initialize() {
-            // Mock initialization logic
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.initialize", "MockPaymentService initialized");
         }
     }
 }
