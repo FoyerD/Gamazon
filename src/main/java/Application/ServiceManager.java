@@ -61,7 +61,8 @@ public class ServiceManager {
             storeService = new StoreService(facadeManager.getStoreFacade(),
                                             getTokenService(),
                                             facadeManager.getPermissionManager(),
-                                            getINotificationService());
+                                            getINotificationService(),
+                                            facadeManager.getShoppingCartFacade());
         }
         return storeService;
     }

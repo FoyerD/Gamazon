@@ -9,12 +9,16 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.ClientCallable;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@JsModule("./ws-client.js")
 @Route("")
 public class LoginView extends VerticalLayout {
 
@@ -73,8 +77,16 @@ public class LoginView extends VerticalLayout {
         if (response.errorOccurred()) {
             Notification.show("Login failed: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
-            UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
+            String sessionToken = response.getValue().getSessionToken();
+            UI.getCurrent().getSession().setAttribute("sessionToken", sessionToken);
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            
+            // Initialize WebSocket connection by setting the userId in both window and sessionStorage
+            UI.getCurrent().getPage().executeJs(
+                "window.currentUserId = $0; sessionStorage.setItem('currentUserId', $0);",
+                response.getValue().getUsername()
+            );
+            
             Notification.show("Welcome, " + response.getValue().getUsername());
             UI.getCurrent().navigate("home");
         }
@@ -85,10 +97,35 @@ public class LoginView extends VerticalLayout {
         if (response.errorOccurred()) {
             Notification.show("Guest login failed: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
-            UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
+            String sessionToken = response.getValue().getSessionToken();
+            UI.getCurrent().getSession().setAttribute("sessionToken", sessionToken);
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            
+            // Initialize WebSocket connection by setting the userId in both window and sessionStorage
+            UI.getCurrent().getPage().executeJs(
+                "window.currentUserId = $0; sessionStorage.setItem('currentUserId', $0);",
+                response.getValue().getUsername()
+            );
+            
             Notification.show("Logged in as Guest");
             UI.getCurrent().navigate("home");
         }
+    }
+
+    @ClientCallable
+    private void showNotification(String message, String type, Integer duration, String position) {
+        Notification notification = new Notification(message);
+        notification.setDuration(duration > 0 ? duration : 10000);
+        notification.setPosition(Notification.Position.valueOf(position.toUpperCase().replace('-', '_')));
+        
+        if ("error".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        } else if ("warning".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
+        } else if ("success".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        }
+        
+        notification.open();
     }
 }

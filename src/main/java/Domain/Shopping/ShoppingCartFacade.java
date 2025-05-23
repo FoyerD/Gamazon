@@ -607,4 +607,30 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
     public String getStoreName(String storeId) {
         return storeFacade.getStore(storeId).getName();
     }
+
+    /**
+     * Gets all users who have shopping baskets in a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @return A set of user IDs who have baskets in the store
+     */
+    @Override
+    public Set<String> getUsersWithBaskets(String storeId) {
+        Set<String> usersWithBaskets = new HashSet<>();
+        
+        // Get all carts
+        Map<String, IShoppingCart> allCarts = cartRepo.getAll();
+        
+        // For each cart, check if it contains the store
+        for (Map.Entry<String, IShoppingCart> entry : allCarts.entrySet()) {
+            String userId = entry.getKey();
+            IShoppingCart cart = entry.getValue();
+            
+            if (cart.hasStore(storeId)) {
+                usersWithBaskets.add(userId);
+            }
+        }
+        
+        return usersWithBaskets;
+    }
 }
