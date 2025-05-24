@@ -4,18 +4,23 @@ import Domain.management.IMarketFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
+import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.Receipt;
+import Domain.Store.Product;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
+import Application.DTOs.ClientItemDTO;
+import Application.DTOs.ClientOrderDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
@@ -210,20 +215,53 @@ public class MarketService {
         }
     }
 
-    public Response<List<Receipt>> getStorePurchaseHistory(String sessionToken, String storeId) {
+    public Response<List<ClientOrderDTO>> getStorePurchaseHistory(String sessionToken, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getStorePurchaseHistory", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
             List<Receipt> history = marketFacade.getStorePurchaseHistory(storeId, tokenService.extractId(sessionToken));
+            List<ClientOrderDTO> purchaseHistoryDTO = convertReceiptstoClientOrderDTOs(history);
             TradingLogger.logEvent(CLASS_NAME, "getStorePurchaseHistory", "Store purchase history fetched successfully.");
-            return new Response<>(history);
+            return new Response<>(purchaseHistoryDTO);
         } catch (Exception e) {
             TradingLogger.logError(CLASS_NAME, "getStorePurchaseHistory", "Failed to get store purchase history: %s", e.getMessage());
             return new Response<>(new Error(e.getMessage()));
         }
     }
+
+    private List<ClientOrderDTO> convertReceiptstoClientOrderDTOs(List<Receipt> receipts) {
+        List<ClientOrderDTO> purchaseHistoryDTO = new ArrayList<>();
+        for (Receipt receipt : receipts) {
+            String clientName;
+            try {
+                clientName = this.marketFacade.getUsername(receipt.getClientId());
+            } catch (NoSuchElementException e) {
+                clientName = "Unknown";
+            }
+
+            List<ClientItemDTO> items = new ArrayList<>();
+            for (Map.Entry<Product, Pair<Integer, Double>> entry : receipt.getProducts().entrySet()) {
+                Product product = entry.getKey();
+                int quantity = entry.getValue().getFirst();
+                double price = entry.getValue().getSecond();
+                ClientItemDTO itemDTO = new ClientItemDTO(product, 
+                                                            clientName, 
+                                                            quantity,
+                                                            price
+                                                        );
+                items.add(itemDTO);
+            }
+
+            ClientOrderDTO receiptDTO = new ClientOrderDTO(receipt.getReceiptId(),
+                                                    clientName,
+                                                    items);
+            purchaseHistoryDTO.add(receiptDTO);
+        }
+        return purchaseHistoryDTO;
+    }
+
 
     public Response<Void> openMarket(String sessionToken) {
         if (isInvalid(sessionToken)) {

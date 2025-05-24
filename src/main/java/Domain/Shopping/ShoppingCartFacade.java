@@ -365,8 +365,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                             Product product = productEntry.getKey();
                             int qty = productEntry.getValue();
                             Item item = itemFacade.getItem(storeId, product.getProductId());
-                            productPrices.put(product, new Pair<>(qty, item.getPrice()));
                             if (item != null) {
+                                productPrices.put(product, new Pair<>(qty, item.getPrice()));
                                 storeTotal += item.getPrice() * qty;
                             }
                         }

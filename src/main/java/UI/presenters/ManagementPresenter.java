@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import Application.ItemService;
 import Application.MarketService;
 import Application.StoreService;
+import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -92,6 +93,11 @@ public class ManagementPresenter implements IManagementPresenter {
     public Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername,
             String storeId, List<PermissionType> newPermissions) {
         return marketService.changeManagerPermissions(sessionToken, ownerUsername, managerUsername, storeId, newPermissions);
+    }
+
+    @Override
+    public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId) {
+        return marketService.getStorePurchaseHistory(sessionToken, storeId);
     }
     
 }

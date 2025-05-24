@@ -6,6 +6,7 @@ import UI.presenters.IStorePresenter;
 import UI.views.components.AddItemForm;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
 import Domain.Store.Item;
 import Domain.management.PermissionType;
@@ -13,6 +14,7 @@ import Application.UserService;
 import Application.DTOs.UserDTO;
 import Application.MarketService;
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.ClientOrderDTO;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -22,6 +24,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -105,8 +108,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         Tab permissionsTab = new Tab(VaadinIcon.KEY.create(), new Span("Permissions"));
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
+        Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
         
-        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab);
+        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab, historyTab);
         tabs.getStyle().set("margin", "1rem 0");
 
         // Setup grids
@@ -127,6 +131,8 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
                 showItemsView();
             } else if (event.getSelectedTab().equals(auctionsTab)) {
                 showAuctionsView();
+            } else if (event.getSelectedTab().equals(historyTab)) {
+                showHistoryView();
             }
         });
 
@@ -579,6 +585,38 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         );
         
         auctionsGrid.setHeight("300px");
+    }
+
+    private void showHistoryView() {
+        mainContent.removeAll();
+        
+        Response<List<ClientOrderDTO>> historyResponse = managementPresenter.getPurchaseHistory(sessionToken, currentStoreId);
+        if (historyResponse.errorOccurred()) {
+            Notification.show("Failed to fetch purchase history: " + historyResponse.getErrorMessage());
+        } else if (historyResponse.getValue().isEmpty()) {
+            Notification.show("No purchase history found for this store.", 3000, Notification.Position.BOTTOM_END);
+        } else {
+            Grid<ClientOrderDTO> historyGrid = new Grid<>(ClientOrderDTO.class, false);
+
+            historyGrid.addColumn(ClientOrderDTO::getClientName).setHeader("Client").setAutoWidth(true);
+            historyGrid.addColumn(o -> String.valueOf(o.getTotalPrice()) + "$").setHeader("Total Price").setAutoWidth(true);
+            historyGrid.addComponentColumn(receipt -> {
+                Div detailsDiv = new Div();
+
+                // Populate receipt details
+                receipt.getItems().forEach(item -> {
+                    Span itemDetail = new Span(item.getProductName() + " - " + item.getQuantity() + " x $" + item.getPrice());
+                    itemDetail.getStyle().set("display", "block");
+                    detailsDiv.add(itemDetail);
+                });
+
+                return detailsDiv;
+            }).setHeader("Items");
+
+            historyGrid.setItems(historyResponse.getValue());
+            historyGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+            historyGrid.setWidthFull();
+        }
     }
 
     private void loadItems(Grid<ItemDTO> itemsGrid) {
