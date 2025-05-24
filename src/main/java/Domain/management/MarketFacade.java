@@ -141,6 +141,7 @@ public class MarketFacade implements IMarketFacade {
         if (paymentService == null || supplyService == null || notificationService == null || userRepository == null) {
             throw new IllegalStateException("Services not initialized.");
         }
+        
         Response<Boolean> paymentCheck = paymentService.handshake();
         Response<Boolean> supplyCheck = supplyService.handshake();
 
@@ -150,6 +151,7 @@ public class MarketFacade implements IMarketFacade {
             
             throw new IllegalStateException("Handshake failed with external API.");
         }
+
         Member manager = userRepository.getMember(userId);
         permissionManager.addMarketManager(manager);
     }
