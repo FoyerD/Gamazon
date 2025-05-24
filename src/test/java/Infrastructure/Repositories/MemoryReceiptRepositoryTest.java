@@ -8,6 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import Domain.Pair;
 import Domain.Shopping.Receipt;
 import Domain.Store.Category;
 import Domain.Store.Product;
@@ -30,9 +32,9 @@ public class MemoryReceiptRepositoryTest {
     @Test
     public void testSaveReceipt() {
         // Create a test receipt
-        Map<Product, Integer> products = new HashMap<>();
-        products.put(createProduct("product1", "Product 1"), 2);
-        products.put(createProduct("product2", "Product 2"), 1);
+        Map<Product, Pair<Integer, Double>> products = new HashMap<>();
+        products.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
+        products.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
         Receipt receipt = new Receipt(CLIENT_ID, STORE_ID, products, 35.0, PAYMENT_DETAILS);
         
@@ -53,9 +55,9 @@ public class MemoryReceiptRepositoryTest {
     @Test
     public void testSavePurchase() {
         // Create test products
-        Map<Product, Integer> products = new HashMap<>();
-        products.put(createProduct("product1", "Product 1"), 2);
-        products.put(createProduct("product2", "Product 2"), 1);
+        Map<Product, Pair<Integer, Double>> products = new HashMap<>();
+        products.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
+        products.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
         // Save the purchase
         String receiptId = repository.savePurchase(CLIENT_ID, STORE_ID, products, 35.0, PAYMENT_DETAILS);
@@ -74,8 +76,8 @@ public class MemoryReceiptRepositoryTest {
     @Test
     public void testGetReceipt_ExistingReceipt() {
         // Create and save a receipt
-        Map<Product, Integer> products = new HashMap<>();
-        products.put(createProduct("product1", "Product 1"), 2);
+        Map<Product, Pair<Integer, Double>> products = new HashMap<>();
+        products.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         
         Receipt receipt = new Receipt(CLIENT_ID, STORE_ID, products, 20.0, PAYMENT_DETAILS);
         String receiptId = repository.saveReceipt(receipt);
@@ -99,11 +101,11 @@ public class MemoryReceiptRepositoryTest {
     @Test
     public void testGetClientReceipts() {
         // Create and save receipts for multiple clients
-        Map<Product, Integer> products1 = new HashMap<>();
-        products1.put(createProduct("product1", "Product 1"), 2);
+        Map<Product, Pair<Integer, Double>> products1 = new HashMap<>();
+        products1.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         
-        Map<Product, Integer> products2 = new HashMap<>();
-        products2.put(createProduct("product2", "Product 2"), 1);
+        Map<Product, Pair<Integer, Double>> products2 = new HashMap<>();
+        products2.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
         repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS);
         repository.savePurchase(CLIENT_ID, "store456", products2, 15.0, PAYMENT_DETAILS);
@@ -122,11 +124,11 @@ public class MemoryReceiptRepositoryTest {
     @Test
     public void testGetStoreReceipts() {
         // Create and save receipts for multiple stores
-        Map<Product, Integer> products1 = new HashMap<>();
-        products1.put(createProduct("product1", "Product 1"), 2);
+        Map<Product, Pair<Integer, Double>> products1 = new HashMap<>();
+        products1.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         
-        Map<Product, Integer> products2 = new HashMap<>();
-        products2.put(createProduct("product2", "Product 2"), 1);
+        Map<Product, Pair<Integer, Double>> products2 = new HashMap<>();
+        products2.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
         repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS);
         repository.savePurchase("client456", STORE_ID, products2, 15.0, PAYMENT_DETAILS);
@@ -144,12 +146,12 @@ public class MemoryReceiptRepositoryTest {
     
     @Test
     public void testGetClientStoreReceipts() {
-        // Create and save receipts for multiple clients and stores
-        Map<Product, Integer> products1 = new HashMap<>();
-        products1.put(createProduct("product1", "Product 1"), 2);
+        // Create and save receipts for multiple stores
+        Map<Product, Pair<Integer, Double>> products1 = new HashMap<>();
+        products1.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         
-        Map<Product, Integer> products2 = new HashMap<>();
-        products2.put(createProduct("product2", "Product 2"), 1);
+        Map<Product, Pair<Integer, Double>> products2 = new HashMap<>();
+        products2.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
         repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS);
         repository.savePurchase(CLIENT_ID, STORE_ID, products2, 15.0, PAYMENT_DETAILS);
@@ -170,8 +172,8 @@ public class MemoryReceiptRepositoryTest {
     @Test
     public void testClear() {
         // Create and save receipts
-        Map<Product, Integer> products = new HashMap<>();
-        products.put(createProduct("product1", "Product 1"), 2);
+        Map<Product, Pair<Integer, Double>> products = new HashMap<>();
+        products.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         
         repository.savePurchase(CLIENT_ID, STORE_ID, products, 20.0, PAYMENT_DETAILS);
         repository.savePurchase("client456", "store456", products, 20.0, PAYMENT_DETAILS);

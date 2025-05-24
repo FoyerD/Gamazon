@@ -1,5 +1,6 @@
 package Domain.Shopping;
 
+import Domain.Pair;
 import Domain.Store.Product;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ public class Receipt {
     private final String receiptId;
     private final String clientId;
     private final String storeId;
-    private final Map<Product, Integer> products; // Map of Product copies to quantities
+    private final Map<Product, Pair<Integer, Double>> products; // Map of Product copies to quantities
     private final LocalDateTime timestamp;
     private final double totalPrice;
     private final String paymentDetails; // Could contain masked card details or payment method
@@ -29,14 +30,14 @@ public class Receipt {
      * @param totalPrice The total price of the purchase
      * @param paymentDetails Payment method or masked card details
      */
-    public Receipt(String clientId, String storeId, Map<Product, Integer> products, 
+    public Receipt(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products, 
                   double totalPrice, String paymentDetails) {
         this.receiptId = UUID.randomUUID().toString();
         this.clientId = clientId;
         this.storeId = storeId;
         // Create deep copies of all products to make receipt immutable
         this.products = new HashMap<>();
-        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+        for (Map.Entry<Product, Pair<Integer, Double>> entry : products.entrySet()) {
             this.products.put(new Product(entry.getKey()), entry.getValue());
         }
         this.timestamp = LocalDateTime.now();
@@ -76,7 +77,7 @@ public class Receipt {
      * 
      * @return Map of products to quantities
      */
-    public Map<Product, Integer> getProducts() {
+    public Map<Product, Pair<Integer, Double>> getProducts() {
         // Return a copy to maintain immutability
         return new HashMap<>(products);
     }
@@ -123,11 +124,11 @@ public class Receipt {
         map.put("paymentDetails", paymentDetails);
         
         // Convert products to map of productId to quantity
-        Map<String, Integer> productQuantities = new HashMap<>();
-        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
-            productQuantities.put(entry.getKey().getProductId(), entry.getValue());
+        Map<String, Pair<Integer, Double>> productQtyPrice = new HashMap<>();
+        for (Map.Entry<Product,  Pair<Integer, Double>> entry : products.entrySet()) {
+            productQtyPrice.put(entry.getKey().getProductId(), entry.getValue());
         }
-        map.put("products", productQuantities);
+        map.put("products", productQtyPrice);
         
         return map;
     }

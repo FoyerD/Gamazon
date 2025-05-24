@@ -54,8 +54,8 @@ public class LoginView extends VerticalLayout {
         loginButton.setWidthFull();
         guestButton.setWidthFull();
 
-        loginButton.getStyle().set("background-color", "#3498db").set("color", "white");
-        guestButton.getStyle().set("background-color", "#2ecc71").set("color", "white");
+        loginButton.getStyle().set("background-color", " #3498db").set("color", "white");
+        guestButton.getStyle().set("background-color", " #2ecc71").set("color", "white");
 
         loginButton.addClickListener(e -> login());
         guestButton.addClickListener(e -> loginAsGuest());
@@ -80,6 +80,8 @@ public class LoginView extends VerticalLayout {
             String sessionToken = response.getValue().getSessionToken();
             UI.getCurrent().getSession().setAttribute("sessionToken", sessionToken);
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            UI.getCurrent().getSession().setAttribute("user", response.getValue());
+
             
             // Initialize WebSocket connection by setting the userId in both window and sessionStorage
             UI.getCurrent().getPage().executeJs(
@@ -87,6 +89,7 @@ public class LoginView extends VerticalLayout {
                 response.getValue().getUsername()
             );
             
+
             Notification.show("Welcome, " + response.getValue().getUsername());
             UI.getCurrent().navigate("home");
         }
@@ -100,13 +103,14 @@ public class LoginView extends VerticalLayout {
             String sessionToken = response.getValue().getSessionToken();
             UI.getCurrent().getSession().setAttribute("sessionToken", sessionToken);
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            UI.getCurrent().getSession().setAttribute("user", response.getValue());
+
             
             // Initialize WebSocket connection by setting the userId in both window and sessionStorage
             UI.getCurrent().getPage().executeJs(
                 "window.currentUserId = $0; sessionStorage.setItem('currentUserId', $0);",
                 response.getValue().getUsername()
             );
-            
             Notification.show("Logged in as Guest");
             UI.getCurrent().navigate("home");
         }

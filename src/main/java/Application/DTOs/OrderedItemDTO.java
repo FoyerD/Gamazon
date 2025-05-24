@@ -3,32 +3,30 @@ package Application.DTOs;
 import java.util.HashSet;
 import java.util.Set;
 
+
 import Domain.Store.Category;
-import Domain.Store.Item;
+import Domain.Store.Product;
 
-public class OrderDTO {
-    private String storeName;
-    private String name;
-    private String description;
-    private Set<Category> categories;
-    private int quantity;
+public class OrderedItemDTO {
+    private final String storeName;
+    private final String name;
+    private final Set<Category> categories;
+    private final int quantity;
+    private final double price;
 
-    public OrderDTO() {
-    }
-
-    public OrderDTO(String name, String description, Set<Category> categories, String storeName, int quantity) {
+    public OrderedItemDTO(String name, Set<Category> categories, String storeName, int quantity, double price) {
         this.storeName = storeName;
         this.name = name;
-        this.description = description;
         this.categories = categories;
         this.quantity = quantity;
+        this.price = price;
     }
 
-    public OrderDTO(Item item, int quantity, String storeName) {
+    public OrderedItemDTO(Product product, int quantity, String storeName, double price) {
+        this.price = price;
         this.storeName = storeName;
-        this.name = item.getProductName();
-        this.description = item.getDescription();
-        this.categories = new HashSet<>(item.getCategories());
+        this.name = product.getName();
+        this.categories = new HashSet<>(product.getCategories());
         this.quantity = quantity;
     }
 
@@ -48,11 +46,14 @@ public class OrderDTO {
         return quantity;
     }
 
+    public double getPrice() {
+        return price;
+    }
+
     public String toString() {
         return "OrderDTO{" +
                 "storeName='" + storeName + '\'' +
                 ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
                 ", categories=" + categories.stream().map(Category::toString).collect(java.util.stream.Collectors.toList()) +
                 ", quantity=" + quantity +
                 '}';

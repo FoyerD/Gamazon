@@ -225,7 +225,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
 
 
     @Override
-public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,
+    public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,
                 long andIncrement, String clientName, String deliveryAddress) {
     
     
@@ -357,12 +357,15 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
                 
                 // Calculate store-specific total safely with null checks
                 double storeTotal = 0.0;
+                Map<Product, Pair<Integer, Double>> productPrices = new HashMap<>();
                 if (products != null) {
+
                     for (Map.Entry<Product, Integer> productEntry : products.entrySet()) {
                         if (productEntry.getKey() != null && productEntry.getValue() != null) {
                             Product product = productEntry.getKey();
                             int qty = productEntry.getValue();
                             Item item = itemFacade.getItem(storeId, product.getProductId());
+                            productPrices.put(product, new Pair<>(qty, item.getPrice()));
                             if (item != null) {
                                 storeTotal += item.getPrice() * qty;
                             }
@@ -371,7 +374,7 @@ public boolean checkout(String clientId, String card_number, Date expiry_date, S
                 }
                 
                 // Create and save receipt
-                receiptRepo.savePurchase(clientId, storeId, products, storeTotal, paymentDetails);
+                receiptRepo.savePurchase(clientId, storeId, productPrices, storeTotal, paymentDetails);
             }
         }
 
