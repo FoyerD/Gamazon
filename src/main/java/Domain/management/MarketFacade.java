@@ -150,6 +150,7 @@ public class MarketFacade implements IMarketFacade {
             
             throw new IllegalStateException("Handshake failed with external API.");
         }
+        
         Member manager = userRepository.getMember(userId);
         permissionManager.addMarketManager(manager);
     }
