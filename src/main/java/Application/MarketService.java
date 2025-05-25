@@ -115,14 +115,14 @@ public class MarketService {
         }
     }
 
-    public Response<Void> appointStoreManager(String sessionToken, String appointerId, String appointeeId, String storeId) {
+    public Response<Void> appointStoreManager(String sessionToken, String appointeeId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "appointStoreManager", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            String ownerId = tokenService.extractId(sessionToken);
-            if(permissionManager.isBanned(ownerId)){
+            String appointerId = tokenService.extractId(sessionToken);
+            if(permissionManager.isBanned(appointerId)){
                 TradingLogger.logError(CLASS_NAME, "appointStoreManager", "User is banned from appointing store manager.");
                 return new Response<>(new Error("User is banned from appointing store manager."));
             }

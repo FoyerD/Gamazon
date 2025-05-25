@@ -1,13 +1,17 @@
 package UI.views;
 
+import UI.presenters.ILoginPresenter;
 import UI.presenters.IManagementPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IStorePresenter;
+import UI.presenters.LoginPresenter;
 import UI.views.components.AddItemForm;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
+import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import Domain.Store.Item;
+import Domain.User.LoginManager;
 import Domain.management.PermissionType;
 import Application.UserService;
 import Application.DTOs.UserDTO;
@@ -50,6 +54,7 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private final IManagementPresenter managementPresenter;
     private final IProductPresenter productPresenter;
     private final IStorePresenter storePresenter;
+    private final ILoginPresenter loginPresenter;
 
 
     private final UserService userService;
@@ -69,14 +74,14 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private Grid<UserRole> managersPermissionGrid;
 
     @Autowired
-
     public ManagerView(IManagementPresenter managementPresenter, UserService userService, MarketService marketService, 
-                       IStorePresenter storePresenter, IProductPresenter productPresenter) {
+                       IStorePresenter storePresenter, IProductPresenter productPresenter, LoginPresenter loginPresenter) {
         this.storePresenter = storePresenter;
         this.productPresenter = productPresenter;
         this.managementPresenter = managementPresenter;
         this.userService = userService;
         this.marketService = marketService;
+        this.loginPresenter = loginPresenter;
         
         setSizeFull();
         setSpacing(false);
@@ -590,6 +595,77 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         }
     }
 
+
+    private void showAddManagerDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Add New Manager");
+
+        VerticalLayout dialogLayout = new VerticalLayout();
+        dialogLayout.setSpacing(true);
+        dialogLayout.setPadding(true);
+
+        Response<List<UserDTO>> usersResponse = loginPresenter.getAllMembers(sessionToken);
+        Response<StoreDTO> storeResponse = storePresenter.getStoreById(sessionToken, currentStoreId);
+        if (usersResponse.errorOccurred() || storeResponse.errorOccurred()) {
+            Notification.show("Failed to fetch users: " + usersResponse.getErrorMessage());
+        } else {
+            List<UserDTO> members = usersResponse.getValue();
+            StoreDTO currentStore = storeResponse.getValue();
+            List<UserDTO> potentialManagers = members.stream()
+                .filter(user -> !currentStore.getOwners().stream()
+                                    .anyMatch(owner -> owner.equals(user.getId()))
+                                    && !currentStore.getManagers().stream()
+                                    .anyMatch(manager -> manager.equals(user.getId())))
+                .collect(Collectors.toList());
+            
+                
+                
+            ComboBox<UserDTO> userSelect = new ComboBox<>("Select User");
+            userSelect.setItems(potentialManagers);
+            userSelect.setItemLabelGenerator(UserDTO::getUsername);
+            userSelect.setWidth("100%");
+            userSelect.setHelperText("Select a user to appoint as manager");
+            userSelect.setRequired(true);
+            
+
+            MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
+            permissionsSelect.setItems(PermissionType.values());
+            permissionsSelect.setItemLabelGenerator(permission -> 
+                permission.name().replace("_", " ").toLowerCase());
+            permissionsSelect.setWidth("100%");
+            permissionsSelect.setHelperText("Select initial permissions for the manager");
+            dialogLayout.add(userSelect, permissionsSelect);
+
+            Button saveButton = new Button("Save", e -> {
+                UserDTO selectedUser = userSelect.getValue();
+                if (selectedUser != null) {
+
+                    Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
+                    appointManagerWithPermissions(selectedUser, initialPermissions);
+                    Response<Void> response = managementPresenter.appointStoreManager(sessionToken, selectedUser.getId(), currentStoreId);
+                    if (response.errorOccurred()) {
+                        Notification.show("Failed to appoint manager: " + response.getErrorMessage());
+                    } else {
+                        storeManagers.add(new UserRole(selectedUser.getUsername(), "Manager"));
+                        refreshGrids();
+                        Notification.show("Manager appointed successfully");
+                        dialog.close(); // Close first
+                    }
+                } else {
+                    Notification.show("Please Choose a user");
+                }
+            });
+            styleButton(saveButton, "var(--lumo-primary-color)");
+
+            Button cancelButton = new Button("Cancel", e -> dialog.close());
+            styleButton(cancelButton, "#9e9e9e");
+
+            HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+            buttons.setJustifyContentMode(JustifyContentMode.END);
+            dialogLayout.add(buttons);
+        }
+        
+    }
     private void showAddUserDialog(boolean isManager) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle(isManager ? "Add New Manager" : "Add New Owner");
@@ -598,77 +674,95 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         dialogLayout.setSpacing(true);
         dialogLayout.setPadding(true);
 
-        TextField usernameField = new TextField("Username");
-        usernameField.setRequired(true);
-        usernameField.setWidth("100%");
-
-        if (isManager) {
-            MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
-            permissionsSelect.setItems(PermissionType.values());
-            permissionsSelect.setItemLabelGenerator(permission -> 
-                permission.name().replace("_", " ").toLowerCase());
-            permissionsSelect.setWidth("100%");
-            permissionsSelect.setHelperText("Select initial permissions for the manager");
-            dialogLayout.add(usernameField, permissionsSelect);
-
-            Button saveButton = new Button("Save", e -> {
-                String username = usernameField.getValue();
-                if (username != null && !username.isEmpty()) {
-                    // Check if user exists
-                    Response<Boolean> existsResponse = marketService.userExists(username);
-                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
-                        Notification.show("User does not exist in the system");
-                        return;
-                    }
-                    Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
-                    dialog.close(); // Close first
-                    appointManagerWithPermissions(username, initialPermissions);
-                } else {
-                    Notification.show("Please enter a username");
-                }
-            });
-            styleButton(saveButton, "var(--lumo-primary-color)");
-
-            Button cancelButton = new Button("Cancel", e -> dialog.close());
-            styleButton(cancelButton, "#9e9e9e");
-
-            HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
-            buttons.setJustifyContentMode(JustifyContentMode.END);
-            dialogLayout.add(buttons);
+        Response<List<UserDTO>> usersResponse = loginPresenter.getAllMembers(sessionToken);
+        Response<StoreDTO> storeResponse = storePresenter.getStoreById(sessionToken, currentStoreId);
+        if (usersResponse.errorOccurred() || storeResponse.errorOccurred()) {
+            Notification.show("Failed to fetch users: " + usersResponse.getErrorMessage());
         } else {
-            dialogLayout.add(usernameField);
+            List<UserDTO> members = usersResponse.getValue();
+            StoreDTO currentStore = storeResponse.getValue();
+            List<UserDTO> potentialManagers = members.stream()
+                .filter(user -> !currentStore.getOwners().stream()
+                                    .anyMatch(owner -> owner.equals(user.getId()))
+                                    && !currentStore.getManagers().stream()
+                                    .anyMatch(manager -> manager.equals(user.getId())))
+                .collect(Collectors.toList());
+            
+                
+                
 
-            Button saveButton = new Button("Save", e -> {
-                String username = usernameField.getValue();
-                if (username != null && !username.isEmpty()) {
-                    // Check if user exists
-                    Response<Boolean> existsResponse = marketService.userExists(username);
-                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
-                        Notification.show("User does not exist in the system");
-                        return;
-                    }
-                    dialog.close(); // Close first
-                    Response<Void> response = managementPresenter.appointStoreOwner(
-                        sessionToken, currentUsername, username, currentStoreId);
-                    if (response.errorOccurred()) {
-                        Notification.show("Failed to appoint owner: " + response.getErrorMessage());
+            TextField usernameField = new TextField("Username");
+            usernameField.setRequired(true);
+            usernameField.setWidth("100%");
+
+            if (isManager) {
+                MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
+                permissionsSelect.setItems(PermissionType.values());
+                permissionsSelect.setItemLabelGenerator(permission -> 
+                    permission.name().replace("_", " ").toLowerCase());
+                permissionsSelect.setWidth("100%");
+                permissionsSelect.setHelperText("Select initial permissions for the manager");
+                dialogLayout.add(usernameField, permissionsSelect);
+
+                Button saveButton = new Button("Save", e -> {
+                    String username = usernameField.getValue();
+                    if (username != null && !username.isEmpty()) {
+                        // Check if user exists
+                        Response<Boolean> existsResponse = marketService.userExists(username);
+                        if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                            Notification.show("User does not exist in the system");
+                            return;
+                        }
+                        Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
+                        dialog.close(); // Close first
+                        appointManagerWithPermissions(username, initialPermissions);
                     } else {
-                        storeOwners.add(new UserRole(username, "Owner"));
-                        refreshGrids();
-                        Notification.show("Owner appointed successfully");
+                        Notification.show("Please enter a username");
                     }
-                } else {
-                    Notification.show("Please enter a username");
-                }
-            });
-            styleButton(saveButton, "var(--lumo-primary-color)");
+                });
+                styleButton(saveButton, "var(--lumo-primary-color)");
 
-            Button cancelButton = new Button("Cancel", e -> dialog.close());
-            styleButton(cancelButton, "#9e9e9e");
+                Button cancelButton = new Button("Cancel", e -> dialog.close());
+                styleButton(cancelButton, "#9e9e9e");
 
-            HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
-            buttons.setJustifyContentMode(JustifyContentMode.END);
-            dialogLayout.add(buttons);
+                HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+                buttons.setJustifyContentMode(JustifyContentMode.END);
+                dialogLayout.add(buttons);
+            } else {
+                dialogLayout.add(usernameField);
+
+                Button saveButton = new Button("Save", e -> {
+                    String username = usernameField.getValue();
+                    if (username != null && !username.isEmpty()) {
+                        // Check if user exists
+                        Response<Boolean> existsResponse = marketService.userExists(username);
+                        if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                            Notification.show("User does not exist in the system");
+                            return;
+                        }
+                        dialog.close(); // Close first
+                        Response<Void> response = managementPresenter.appointStoreOwner(
+                            sessionToken, currentUsername, username, currentStoreId);
+                        if (response.errorOccurred()) {
+                            Notification.show("Failed to appoint owner: " + response.getErrorMessage());
+                        } else {
+                            storeOwners.add(new UserRole(username, "Owner"));
+                            refreshGrids();
+                            Notification.show("Owner appointed successfully");
+                        }
+                    } else {
+                        Notification.show("Please enter a username");
+                    }
+                });
+                styleButton(saveButton, "var(--lumo-primary-color)");
+
+                Button cancelButton = new Button("Cancel", e -> dialog.close());
+                styleButton(cancelButton, "#9e9e9e");
+
+                HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+                buttons.setJustifyContentMode(JustifyContentMode.END);
+                dialogLayout.add(buttons);
+            }
         }
 
         dialog.add(dialogLayout);

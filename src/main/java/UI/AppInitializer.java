@@ -79,7 +79,7 @@ public class AppInitializer implements CommandLineRunner {
         }
         var store2 = store2Resp.getValue();
 
-        var appointResp = marketService.appointStoreManager(adminToken, tokenService.extractId(admin.getSessionToken()), tokenService.extractId(buyer.getSessionToken()), store1.getId());
+        var appointResp = marketService.appointStoreManager(adminToken, tokenService.extractId(buyer.getSessionToken()), store1.getId());
         if (appointResp.errorOccurred()) {
             System.err.println("❌ Failed to appoint store manager: " + appointResp.getErrorMessage());
             return;

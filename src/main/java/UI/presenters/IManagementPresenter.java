@@ -100,13 +100,12 @@ public interface IManagementPresenter {
     /**
      * Appoints a new manager to a store.
      *
-     * @param sessionToken Session identifier for authentication.
-     * @param appointerUsername Username of the appointer (must have authority).
-     * @param appointeeUsername Username of the new manager.
+     * @param sessionToken Session identifier for authentication (must have autority).
+     * @param appointeeId Username of the new manager.
      * @param storeId Store ID for the appointment.
      * @return Void response indicating success or failure.
      */
-    Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername, String storeId);
+    Response<Void> appointStoreManager(String sessionToken, String appointeeId, String storeId);
 
     /**
      * Removes a store manager.

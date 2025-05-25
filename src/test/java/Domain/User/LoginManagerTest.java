@@ -12,12 +12,16 @@ import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import Domain.management.PermissionManager;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginManagerTest {
 
     @Mock
     private IUserRepository userRepository;
+    
+   
 
     private LoginManager loginManager;
 

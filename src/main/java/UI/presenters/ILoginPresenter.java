@@ -1,5 +1,7 @@
 package UI.presenters;
 
+import java.util.List;
+
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 
@@ -43,4 +45,14 @@ public interface ILoginPresenter {
      * @return Response containing a {@link UserDTO} for the authenticated user, or an error.
      */
     Response<UserDTO> login(String username, String password);
+
+
+
+    /**
+     * Retrieves all members of the system.
+     *
+     * @param sessionToken Token of the session requesting the member list.
+     * @return Response containing a list of {@link UserDTO} representing all members, or an error.
+     */
+    Response<List<UserDTO>> getAllMembers(String sessionToken);
 }

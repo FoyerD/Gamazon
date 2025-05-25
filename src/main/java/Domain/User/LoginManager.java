@@ -1,9 +1,12 @@
 package Domain.User;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+
+
 import org.apache.commons.validator.routines.EmailValidator;
 
 @Component
@@ -169,6 +172,11 @@ public class LoginManager {
     public boolean isLoggedin(String username) {
         Member user = userRepository.getMemberByUsername(username);
         return user.isLoggedIn();
+    }
+
+
+    public List<Member> getAllMembers() {
+        return userRepository.getAllMembers();
     }
 }
 

@@ -71,9 +71,9 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
-    public Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername,
+    public Response<Void> appointStoreManager(String sessionToken, String appointeeId,
             String storeId) {
-            return marketService.appointStoreManager(sessionToken, appointerUsername, appointeeUsername, storeId);
+            return marketService.appointStoreManager(sessionToken, appointeeId, storeId);
     }
 
     @Override

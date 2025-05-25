@@ -1,5 +1,7 @@
 package Application;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,7 @@ public class UserService {
         try {
             User guest = loginManager.createGuest();
             String token = tokenService.generateToken(guest.getId());
-            UserDTO guestDto = new UserDTO(token, guest.getName());
+            UserDTO guestDto = new UserDTO(token, guest.getId(), guest.getName());
             TradingLogger.logEvent(CLASS_NAME, "guestEntry", "New Guest has entered.");
     
             return Response.success(guestDto);
@@ -124,6 +126,31 @@ public class UserService {
         } catch (Exception e) {
             TradingLogger.logError(CLASS_NAME, "login", "Attempted login has failed. Username: " + username + " Password: " + password, e.getMessage());
             return Response.error("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+
+    /***
+     * Retrieves all members of the system.
+     * @param sessionToken The token of the session requesting the member list.
+     * @return {@link Response} of {@link List} of {@link UserDTO} containing all members' information.
+     *         If an error occurs, returns an error message.
+     */
+    public Response<List<UserDTO>> getAllMembers(String sessionToken) {
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, "getAllMembers", "Received invalid session token", sessionToken);
+            return Response.error("Invalid token");
+        }
+
+        String id = tokenService.extractId(sessionToken);
+        try {
+            List<Member> members = loginManager.getAllMembers();
+            return Response.success(members.stream()
+                .map(member -> new UserDTO(tokenService.generateToken(member.getId()), member.getName(), member.getEmail()))
+                .collect(Collectors.toList()));
+        } catch (NoSuchElementException e) {
+            TradingLogger.logError(CLASS_NAME, "getAllMembers", "Couldn't find user with id: " + id, e.getMessage());
+            return Response.error("User not found");
         }
     }
 }
