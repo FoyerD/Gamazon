@@ -14,14 +14,17 @@ import Domain.User.LoginManager;
 import Domain.User.Member;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.springframework.stereotype.Component;
 
 
+@Component
 public class PolicyFacade 
 {
     private final IPolicyRepository policyRepository;
     private IUserRepository userRepository;
     private ItemFacade itemFacade;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public PolicyFacade(IPolicyRepository policyRepository, IUserRepository userRepository, ItemFacade itemFacade) 
     {
         this.policyRepository = policyRepository;
