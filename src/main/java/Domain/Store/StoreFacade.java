@@ -236,7 +236,7 @@ public class StoreFacade {
             throw new RuntimeException("Bid must be greater than current and start");
         }
 
-        if (auction.currentBidderId != null) {
+        if (auction.currentBidderId != null && !auction.currentBidderId.equals(userId)) {
             TradingLogger.logEvent("StoreFacade", "addBid",
                 "DEBUG: Notifying previous bidder: " + auction.currentBidderId);
             String storeName = this.getStoreName(auction.getStoreId());
@@ -246,7 +246,7 @@ public class StoreFacade {
                 "You have been outbid on " + productName + "from " + storeName + " womp womp :(");
         } else {
             TradingLogger.logEvent("StoreFacade", "addBid",
-                "DEBUG: No previous bidder to notify for auction " + auctionId);
+                "DEBUG: No previous bidder to notify for auction " + auctionId + " or it's the same user bidding again.");
         }
 
         auction.setCurrentPrice(bid);
