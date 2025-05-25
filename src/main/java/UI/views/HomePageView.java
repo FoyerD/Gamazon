@@ -107,7 +107,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         H1 title = new H1("Gamazon Home");
 
-        title.getStyle().set("color", "#1a202c");
+        title.getStyle().set("color", "#ffffff");
         
         this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
 
