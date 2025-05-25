@@ -24,7 +24,6 @@ public class WebSocketNotifier {
      * @param userId  the user ID to send the message to (must match the Principal name)
      * @param message the message content
      */
-    // !TODO: Change
     public void notifyUser(String userId, String message) {
         TradingLogger.logEvent("WebSocketNotifier", "notifyUser",
             "DEBUG: Sending to userId = [" + userId + "]");

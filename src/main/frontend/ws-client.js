@@ -30,7 +30,8 @@ const connectWebSocket = (userId) => {
     try { stompClient.deactivate(); } catch (e) {}
   }
 
-  const socket = new SockJS('/ws');
+  const socket = new SockJS(`/ws?userId=${userId}`);
+
   stompClient = new Client({
     webSocketFactory: () => socket,
     connectHeaders: { userId },
@@ -44,13 +45,15 @@ const connectWebSocket = (userId) => {
     },
     reconnectDelay: 5000
   });
-
+  console.log('[WS] Activating STOMP client...');
   stompClient.activate();
   console.log('[WS] Sent CONNECT with userId =', userId);
   window.stompClient = stompClient;
 };
 
 window.connectWebSocket = connectWebSocket;
+connectWebSocket(window.currentUserId);
+
 
 const waitForUserIdAndConnect = () => {
   if (window.currentUserId) {

@@ -239,7 +239,8 @@ public class StoreFacade {
         if (auction.currentBidderId != null) {
             TradingLogger.logEvent("StoreFacade", "addBid",
                 "DEBUG: Notifying previous bidder: " + auction.currentBidderId);
-
+                
+            System.out.println("Notifying previous bidder: " + auction.currentBidderId);
             notificationService.sendNotification(auction.getCurrentBidderId(),
                 "You have been outbid on auction " + auctionId + " womp womp :(");
         } else {
