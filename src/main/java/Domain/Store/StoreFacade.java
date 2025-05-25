@@ -10,10 +10,11 @@ import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import Application.utils.TradingLogger;
+import Domain.ExternalServices.INotificationService;
+import Domain.Pair;
 import Domain.User.IUserRepository;
 import Domain.User.User;
-import Domain.Pair;
-import Domain.ExternalServices.INotificationService;
 
 
 
@@ -219,25 +220,44 @@ public class StoreFacade {
     }
 
     public Auction addBid(String auctionId, String userId, float bid, Supplier<Boolean> chargeCallback) {
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Received bid request. auctionId=" + auctionId + ", userId=" + userId + ", bid=" + bid);
+
         if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
         if (this.auctionRepository.get(auctionId) == null) throw new RuntimeException("Auction not found");
         if (this.getUser.apply(userId) == null) throw new RuntimeException("User not found");
         if (bid < 0) throw new RuntimeException("Bid must be greater than 0");
 
         Auction auction = this.auctionRepository.get(auctionId);
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Fetched auction. currentPrice=" + auction.getCurrentPrice() + ", startPrice=" + auction.getStartPrice());
+
         if (bid <= auction.getCurrentPrice() || bid <= auction.getStartPrice()) {
             throw new RuntimeException("Bid must be greater than current and start");
         }
 
-        if (auction.currentBidderId != null)
-            notificationService.sendNotification(auction.getCurrentBidderId(), "You have been outbid on auction " + auctionId + " womp womp :(");
+        if (auction.currentBidderId != null) {
+            TradingLogger.logEvent("StoreFacade", "addBid",
+                "DEBUG: Notifying previous bidder: " + auction.currentBidderId);
+                
+            System.out.println("Notifying previous bidder: " + auction.currentBidderId);
+            notificationService.sendNotification(auction.getCurrentBidderId(),
+                "You have been outbid on auction " + auctionId + " womp womp :(");
+        } else {
+            TradingLogger.logEvent("StoreFacade", "addBid",
+                "DEBUG: No previous bidder to notify for auction " + auctionId);
+        }
 
         auction.setCurrentPrice(bid);
         auction.setCurrentBidderId(userId);
         auction.setChargeCallback(chargeCallback);
 
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Updated auction with new bid. New currentBidderId=" + userId + ", newPrice=" + bid);
+
         return this.auctionRepository.update(auctionId, auction);
     }
+
 
 
     public Auction closeAuction(String auctionId) {

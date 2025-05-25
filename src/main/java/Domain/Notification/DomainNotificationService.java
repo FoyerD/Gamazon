@@ -2,6 +2,7 @@ package Domain.Notification;
 
 import org.springframework.stereotype.Component;
 
+import Application.utils.TradingLogger;
 import UI.webSocketConfigurations.AbstractNotificationService;
 import UI.webSocketConfigurations.ConnectedUserRegistry;
 import UI.webSocketConfigurations.WebSocketNotifier;
@@ -20,6 +21,9 @@ public class DomainNotificationService extends AbstractNotificationService {
 
     @Override
     protected void storeUndelivered(String userId, String content) {
+        TradingLogger.logEvent("DomainNotificationService", "storeUndelivered",
+            "DEBUG: Storing undelivered notification for userId=" + userId + " with content: " + content);
+
         repo.addNotification(userId, content);
     }
 }
