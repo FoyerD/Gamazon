@@ -280,8 +280,8 @@ public class ShoppingCartFacadeTest {
         assertTrue("Should return true for successful checkout", result);
         verify(mockItemFacade).decreaseAmount(new Pair<>(STORE_ID, PRODUCT_ID), QUANTITY);
         verify(mockPaymentService).processPayment(
-            eq(clientName), eq(cardNumber), eq(expiryDate), eq(cvv), 
-            eq(deliveryAddress), anyDouble()
+            eq(CLIENT_ID), eq(cardNumber), eq(expiryDate), eq(cvv), 
+            eq(clientName), anyDouble()
         );
         verify(mockBasket).clear();
         verify(mockCart).clear();
