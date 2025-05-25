@@ -106,8 +106,19 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
         
+        // Style all tabs to have white text and icons
+        for (Tab tab : new Tab[]{managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab}) {
+            tab.getStyle().set("color", "#ffffff");
+            // Get the icon and span components from the tab
+            tab.getChildren().forEach(component -> {
+                component.getElement().getStyle().set("color", "#ffffff");
+            });
+        }
+        
         Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab);
-        tabs.getStyle().set("margin", "1rem 0");
+        tabs.getStyle()
+            .set("margin", "1rem 0")
+            .set("--lumo-contrast-60pct", "#ffffff"); // This helps with the selected tab indicator color
 
         // Setup grids
         setupManagersGrid();
@@ -224,7 +235,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         styleButton(addButton, "#4caf50");
         addButton.addClickListener(e -> showAddUserDialog(true));
 
-        mainContent.add(new H3("Store Managers"), addButton, managersGrid);
+        H3 title = new H3("Store Managers");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(title, addButton, managersGrid);
         refreshGrids();
     }
 
@@ -235,7 +248,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         styleButton(addButton, "#4caf50");
         addButton.addClickListener(e -> showAddUserDialog(false));
 
-        mainContent.add(new H3("Store Owners"), addButton, ownersGrid);
+        H3 title = new H3("Store Owners");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(title, addButton, ownersGrid);
         refreshGrids();
     }
 
@@ -289,7 +304,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         managersPermissionGrid.setItems(getStoreManagers());
         managersPermissionGrid.setHeight("300px");
 
-        mainContent.add(new H3("Manager Permissions"), managersPermissionGrid);
+        H3 title = new H3("Manager Permissions");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(title, managersPermissionGrid);
     }
 
     private void showItemsView() {
@@ -351,7 +368,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             dialog.open();
         });
 
-        mainContent.add(new H3("Store Managers"), addButton, itemsGrid);
+        H3 title = new H3("Store Items");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(title, addButton, itemsGrid);
     }
 
     private void showAuctionsView() {
@@ -572,11 +591,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         buttonLayout.setSpacing(true);
         
         // Add components to the main content
-        mainContent.add(
-            new H3("Store Auctions"),
-            buttonLayout,
-            auctionsGrid
-        );
+        H3 title = new H3("Store Auctions");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(title, buttonLayout, auctionsGrid);
         
         auctionsGrid.setHeight("300px");
     }
