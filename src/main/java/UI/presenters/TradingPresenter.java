@@ -43,10 +43,12 @@ public class TradingPresenter implements ITradingPresenter {
     @Override
     public boolean closeStore(String sessionToken, String storeId) {
         try {
-            Response<Boolean> response = storeService.closeStore(sessionToken, storeId);
+            //Response<StoreDTO> storeResponse = storeService.getStoreByName(sessionToken, storeId);
+
+            storeService.closeStore(sessionToken, storeId);
+            /*
             if (response.getValue() != null && response.getValue()) {
                 // Get store name for the notification message
-                Response<StoreDTO> storeResponse = storePresenter.getStoreByName(sessionToken, storeId);
                 String storeName = storeResponse.errorOccurred() ? storeId : storeResponse.getValue().getName();
                 
                 // Get all users with baskets in this store and notify them
@@ -56,8 +58,8 @@ public class TradingPresenter implements ITradingPresenter {
                         String.format("Store '%s' has been closed. Your shopping basket in this store has been cleared.", storeName));
                 }
                 return true;
-            }
-            return false;
+            }*/
+            return true;
         } catch (Exception e) {
             return false;
         }
