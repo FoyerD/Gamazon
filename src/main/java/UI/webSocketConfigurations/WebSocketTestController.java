@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class WebSocketTestController {
-
+    // to test run stompClient.publish({destination: "/app/ping", body: "test"}); in dev tools console
     @MessageMapping("/ping")
     @SendToUser("/topic/notifications")
     public String handlePing(Principal principal) {
