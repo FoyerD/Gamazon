@@ -1,53 +1,51 @@
 package UI.views;
 
-import UI.presenters.IProductPresenter;
-import UI.presenters.IUserSessionPresenter;
-import UI.webSocketConfigurations.PendingMessageStore;
-import UI.presenters.IPurchasePresenter;
-import UI.presenters.ILoginPresenter;
-import Application.DTOs.ItemDTO;
-import Application.DTOs.UserDTO;
-import Application.DTOs.CategoryDTO;
-import Application.DTOs.AuctionDTO;
-import Application.utils.Response;
-import Application.MarketService;
-import Domain.Store.ItemFilter;
-import Domain.management.PermissionManager;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.shared.Registration;
-import com.vaadin.flow.component.page.PendingJavaScriptResult;
-import com.vaadin.flow.component.ClientCallable;
 
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.stream.Collectors;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.ArrayList;
+import Application.DTOs.AuctionDTO;
+import Application.DTOs.CategoryDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.UserDTO;
+import Application.MarketService;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
+import Domain.Store.ItemFilter;
+import Domain.management.PermissionManager;
+import UI.presenters.ILoginPresenter;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IPurchasePresenter;
+import UI.presenters.IUserSessionPresenter;
+import UI.webSocketConfigurations.PendingMessageStore;
 
 @JsModule("./ws-client.js")
 @Route("home")
@@ -345,17 +343,36 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
 
+        // !TODO: Change
         if (sessionToken != null) {
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: sessionToken is not null. Attempting to extract userId and inject into JS.");
+
             String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
 
-            // 🔁 Inject userId to JavaScript for WebSocket
+            // Inject userId to JavaScript for WebSocket
+            
             UI.getCurrent().getPage().executeJs("window.currentUserId = $0;", userId);
+            UI.getCurrent().getPage().executeJs("sessionStorage.setItem('currentUserId', $0); window.connectWebSocket && window.connectWebSocket($0);", userId);
 
-            // 💬 Flush pending messages
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: Injected userId to JS: " + userId);
+
+            // Flush pending messages
             List<String> messages = pendingStore.consume(userId);
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: Consumed " + messages.size() + " pending messages for userId=" + userId);
+
             for (String msg : messages) {
                 Notification.show("🔔 " + msg, 4000, Notification.Position.TOP_CENTER);
             }
+
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: Displayed all pending messages for userId=" + userId);
+            }
+        else {
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: sessionToken is null. Skipping userId injection and pending message handling.");
         }
 
         loadAllProducts();
