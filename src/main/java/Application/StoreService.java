@@ -1,13 +1,14 @@
 package Application;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.Set;
-import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
@@ -15,16 +16,14 @@ import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
-
-import Application.TokenService;
 import Domain.ExternalServices.INotificationService;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
-import Domain.management.Permission;
-import Domain.Shopping.IShoppingCartFacade;
 
 @Service
 public class StoreService {
@@ -54,10 +53,12 @@ public class StoreService {
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "StoreService initialized with dependencies");
     }
 
+    @Transactional
     private boolean isInitialized() {
         return this.storeFacade != null && this.tokenService != null && this.permissionManager != null;
     }
 
+    @Transactional
     public Response<StoreDTO> addStore(String sessionToken, String name, String description) {
         String method = "addStore";
         try {
@@ -89,6 +90,7 @@ public class StoreService {
         }
     }
 
+    @Transactional
     public Response<Boolean> openStore(String sessionToken, String storeId){
         String method = "openStore";
         try {
@@ -115,6 +117,7 @@ public class StoreService {
         }
     }
     
+    @Transactional
     public Response<Boolean> closeStore(String sessionToken, String storeId){
         String method = "closeStore";
         try {
@@ -152,6 +155,7 @@ public class StoreService {
         }
     }
 
+    @Transactional
     public Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId){
         String method = "closeStoreNotPermanent";
         try {
@@ -178,6 +182,7 @@ public class StoreService {
         }
     }
 
+    @Transactional
     public Response<StoreDTO> getStoreByName(String sessionToken, String name) {
         String method = "getStoreByName";
         try {
@@ -203,6 +208,7 @@ public class StoreService {
         }
     }
 
+    @Transactional
     public Response<AuctionDTO> addAuction(String sessionToken, String storeId, String productId, String auctionEndDate, double startPrice) {
         String method = "addAuction";
         try {
@@ -229,6 +235,7 @@ public class StoreService {
         }
     }
 
+    @Transactional
     public Response<List<AuctionDTO>> getAllStoreAuctions(String sessionToken, String storeId) {
         String method = "getAllStoreAuctions";
         try {
@@ -250,6 +257,7 @@ public class StoreService {
         }
     }
 
+    @Transactional
     public Response<List<AuctionDTO>> getAllProductAuctions(String sessionToken, String productId) {
         String method = "getAllProductAuctions";
         try {
@@ -271,6 +279,7 @@ public class StoreService {
         }
     }
 
+    @Transactional
     public Response<ItemDTO> acceptBid(String sessionToken, String storeId, String productId, String auctionId) {
         String method = "acceptBid";
         try {
@@ -313,6 +322,7 @@ public class StoreService {
      * @param storeId The ID of the store
      * @return A set of user IDs who have baskets in the store
      */
+    @Transactional
     public Set<String> getUsersWithBaskets(String storeId) {
         String method = "getUsersWithBaskets";
         try {

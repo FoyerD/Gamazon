@@ -1,7 +1,14 @@
 package Application;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
@@ -11,22 +18,10 @@ import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import Domain.Pair;
 import Domain.Shopping.IShoppingCartFacade;
-import Domain.Shopping.IShoppingCartRepository;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
-import Domain.Store.IProductRepository;
 import Domain.Store.Item;
-import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
@@ -53,6 +48,7 @@ public class ShoppingService{
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "ShoppingService initialized with cart facade");
     }
 
+    @Transactional
     public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {
         String method = "addProductToCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -82,6 +78,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional
     public Response<CartDTO> viewCart(String sessionToken) {
         String method = "viewCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -120,7 +117,7 @@ public class ShoppingService{
         }
     }
 
-
+    @Transactional
     public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId, int quantity) {
         String method = "removeProductFromCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -146,6 +143,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional
     public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId) {
         String method = "removeProductFromCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -171,6 +169,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional 
     public Response<Boolean> clearCart(String sessionToken) {
         String method = "clearCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -197,6 +196,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional
     public Response<Boolean> clearBasket(String sessionToken, String storeId) {
         String method = "clearBasket";
         if (!tokenService.validateToken(sessionToken)) {
@@ -226,6 +226,7 @@ public class ShoppingService{
     
 
     // Make Immidiate Purchase Use Case 2.5
+    @Transactional
     public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
          String clientName, String deliveryAddress) {
         String method = "checkout";
@@ -254,7 +255,7 @@ public class ShoppingService{
         }
     }
 
-    
+    @Transactional
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
                                     long andIncrement, String clientName, String deliveryAddress) {
@@ -285,6 +286,7 @@ public class ShoppingService{
 
 
     // View personal purchase history 3.7
+    @Transactional
     public Response<List<ReceiptDTO>> getUserPurchaseHistory(String sessionToken) {
         String method = "getUserPurchaseHistory";
         if (!tokenService.validateToken(sessionToken)) {
