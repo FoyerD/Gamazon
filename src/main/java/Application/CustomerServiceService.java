@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.utils.Error;
 import Application.utils.Response;
@@ -13,7 +14,7 @@ import Domain.Store.Feedback;
 import Domain.Store.FeedbackDTO;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
-import Domain.management.PermissionType;
+
 
 @Service
 public class CustomerServiceService {
@@ -33,22 +34,27 @@ public class CustomerServiceService {
         this.tokenService = null;
         this.permissionManager = null;
     }
+    @Transactional
     public void setStoreFacade(StoreFacade storeFacade) {
         this.storeFacade = storeFacade;
     }
 
+    @Transactional
     public void setTokenService(TokenService tokenService) {
         this.tokenService = tokenService;
     }
 
+    @Transactional
     public void setPermissionManager(PermissionManager permissionManager) {
         this.permissionManager = permissionManager;
     }
 
+    @Transactional
     public boolean isInitialized() {
         return this.storeFacade != null && this.tokenService != null;
     }
 
+    @Transactional
     public Response<Boolean> addFeedback(String sessionToken, String storeId, String productId, String comment) {
         String method = "addFeedback";
         try {
@@ -78,6 +84,7 @@ public class CustomerServiceService {
         }
     }
 
+    @Transactional
     public Response<List<FeedbackDTO>> getAllFeedbacksByStoreId(String sessionToken, String storeId) {
         String method = "getAllFeedbacksByStoreId";
         try {
@@ -100,6 +107,7 @@ public class CustomerServiceService {
         }
     }
 
+    @Transactional
     public Response<List<FeedbackDTO>> getAllFeedbacksByProductId(String sessionToken, String productId) {
         String method = "getAllFeedbacksByProductId";
         try {
@@ -122,6 +130,7 @@ public class CustomerServiceService {
         }
     }
 
+    @Transactional
     public Response<List<FeedbackDTO>> getAllFeedbacksByUserId(String sessionToken, String userId) {
         String method = "getAllFeedbacksByUserId";
         try {

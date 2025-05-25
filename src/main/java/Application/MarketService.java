@@ -1,24 +1,23 @@
 package Application;
 
-import Domain.management.IMarketFacade;
-import Domain.management.PermissionManager;
-import Domain.management.PermissionType;
-import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Shopping.Receipt;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
+import Domain.Shopping.Receipt;
+import Domain.management.IMarketFacade;
+import Domain.management.PermissionManager;
+import Domain.management.PermissionType;
 
 @Service
 public class MarketService {
@@ -40,6 +39,7 @@ public class MarketService {
         return !tokenService.validateToken(sessionToken);
     }
 
+    @Transactional
     public Response<Void> updatePaymentService(String sessionToken, IExternalPaymentService paymentService) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updatePaymentService", "Invalid session token");
@@ -55,6 +55,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> updateNotificationService(String sessionToken, INotificationService notificationService) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updateNotificationService", "Invalid session token");
@@ -70,6 +71,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> updateSupplyService(String sessionToken, IExternalSupplyService supplyService) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updateSupplyService", "Invalid session token");
@@ -85,6 +87,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> updatePaymentServiceURL(String sessionToken, String url) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "updatePaymentServiceURL", "Invalid session token");
@@ -100,6 +103,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<INotificationService> getNotificationService(String sessionToken) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getNotificationService", "Invalid session token");
@@ -115,6 +119,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> appointStoreManager(String sessionToken, String appointerId, String appointeeId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "appointStoreManager", "Invalid session token");
@@ -135,6 +140,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> removeStoreManager(String sessionToken, String removerId, String managerId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "removeStoreManager", "Invalid session token");
@@ -155,6 +161,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> appointStoreOwner(String sessionToken, String appointerId, String appointeeId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "appointStoreOwner", "Invalid session token");
@@ -175,6 +182,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> changeManagerPermissions(String sessionToken, String ownerId, String managerId, String storeId, List<PermissionType> newPermissions) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "changeManagerPermissions", "Invalid session token");
@@ -195,6 +203,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Map<String, List<PermissionType>>> getManagersPermissions(String sessionToken, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getManagersPermissions", "Invalid session token");
@@ -210,6 +219,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<List<Receipt>> getStorePurchaseHistory(String sessionToken, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getStorePurchaseHistory", "Invalid session token");
@@ -225,6 +235,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Void> openMarket(String sessionToken) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "openMarket", "Invalid session token");
@@ -240,6 +251,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Boolean> userExists(String username) {
         try {
             boolean exists = marketFacade.userExists(username);
@@ -251,6 +263,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Boolean> banUser(String sessionToken, String userId, Date endDate) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "banUser", "Invalid session token");
@@ -272,6 +285,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Map<String, Date>> getBannedUsers(String sessionToken) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getBannedUsers", "Invalid session token");
@@ -289,6 +303,7 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public Response<Boolean> unbanUser(String sessionToken, String userId){
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "banUser", "Invalid session token");
