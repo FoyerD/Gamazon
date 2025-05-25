@@ -1,52 +1,52 @@
 package UI.views;
 
-import UI.presenters.IProductPresenter;
-import UI.presenters.IUserSessionPresenter;
-import UI.webSocketConfigurations.PendingMessageStore;
-import UI.presenters.IPurchasePresenter;
-import UI.presenters.ILoginPresenter;
-import Application.DTOs.ItemDTO;
-import Application.DTOs.CategoryDTO;
-import Application.DTOs.AuctionDTO;
-import Application.utils.Response;
-import Application.MarketService;
-import Domain.Store.ItemFilter;
-import Domain.management.PermissionManager;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.shared.Registration;
-import com.vaadin.flow.component.page.PendingJavaScriptResult;
-import com.vaadin.flow.component.ClientCallable;
 
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.stream.Collectors;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.ArrayList;
+import Application.DTOs.AuctionDTO;
+import Application.DTOs.CategoryDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.UserDTO;
+import Application.MarketService;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
+import Domain.Store.ItemFilter;
+import Domain.management.PermissionManager;
+import UI.presenters.ILoginPresenter;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IPurchasePresenter;
+import UI.presenters.IUserSessionPresenter;
+import UI.webSocketConfigurations.PendingMessageStore;
 
 @JsModule("./ws-client.js")
 @Route("home")
@@ -60,7 +60,10 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final PermissionManager permissionManager;
     private String sessionToken = null;
     private String currentUsername = null;
+    private UserDTO user = null;
+
     private boolean isBanned = false;
+
 
     private final TextField searchBar = new TextField();
     private final Grid<ItemDTO> productGrid = new Grid<>(ItemDTO.class);
@@ -80,12 +83,12 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final Button cartBtn = new Button("View Cart");
     private final Button goToSearchBtn = new Button("Search Stores");
 
-    private final PendingMessageStore pendingStore;
+    private final INotificationPresenter notificationPresenter;
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
-                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, PendingMessageStore pendingStore,
+                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
                         MarketService marketService, PermissionManager permissionManager) {
-        this.pendingStore = pendingStore;
+        this.notificationPresenter = notificationPresenter;
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;
         this.purchasePresenter = purchasePresenter;
@@ -103,12 +106,19 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             .set("--lumo-primary-color", "#2196f3");
 
         H1 title = new H1("Gamazon Home");
-        title.getStyle().set("color", "#ffffff");
 
-        Span userInfo = new Span();
-        userInfo.getStyle()
-            .set("color", "#ffffff")
-            .set("font-weight", "bold");
+        title.getStyle().set("color", "#ffffff");
+        
+        this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
+
+        Button userInfo = new Button("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"),
+                                        VaadinIcon.USER.create(),
+                                        e -> {
+                                            UI.getCurrent().getSession().setAttribute("user", user);
+                                            UI.getCurrent().navigate("user-profile");
+                                        });
+        userInfo.getStyle().set("color", " #2d3748").set("background-color", " #ebc934").set("font-weight", "bold");
+
 
         // Configure filter components
         setupFilterComponents();
@@ -122,8 +132,10 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         // Initialize buttons with click handlers
         filterBtn.addClickListener(e -> filterDialog.open());
         filterBtn.getStyle()
-            .set("background-color", "#4299e1")
+            .set("background-color", " #4299e1")
             .set("color", "white");
+
+
 
         refreshBtn.addClickListener(e -> loadAllProducts());
         refreshBtn.getStyle()
@@ -141,7 +153,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             .set("color", "white");
 
         Button registerBtn = new Button("Register", e -> UI.getCurrent().navigate("register"));
-        registerBtn.getStyle().set("background-color", "#6b46c1").set("color", "white");
+        registerBtn.getStyle().set("background-color", " #6b46c1").set("color", "white");
 
         Button logoutBtn = new Button("Logout", e -> {
             Response<Void> response = loginPresenter.logout(sessionToken);
@@ -155,15 +167,21 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         });
         logoutBtn.getStyle().set("background-color", "#e53e3e").set("color", "white");
 
-        HorizontalLayout searchAndFilter = new HorizontalLayout(searchBar, filterBtn);
+        HorizontalLayout searchAndFilter = new HorizontalLayout(searchBar, filterBtn, refreshBtn);
         searchAndFilter.setAlignItems(Alignment.BASELINE);
 
-        HorizontalLayout topBar = new HorizontalLayout(userInfo, title, searchAndFilter, refreshBtn, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
-        topBar.setAlignItems(Alignment.BASELINE);
-        topBar.setWidthFull();
-        topBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        topBar.getStyle().set("padding", "10px");
+        HorizontalLayout welcomeLayout = new HorizontalLayout(title, userInfo);
+        welcomeLayout.setAlignItems(Alignment.BASELINE);
+        welcomeLayout.setWidthFull();
+        welcomeLayout.setJustifyContentMode(JustifyContentMode.START);
+        HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
+        navButtons.setJustifyContentMode(JustifyContentMode.END);
+        navButtons.getStyle().set("padding", "10px");
 
+        HorizontalLayout toptopBar = new HorizontalLayout(welcomeLayout, navButtons);
+        toptopBar.setWidthFull();
+        toptopBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        VerticalLayout topBar = new VerticalLayout(toptopBar, searchAndFilter);
         // Style active filters label
         activeFiltersLabel.getStyle()
             .set("color", "#4a5568")
@@ -326,21 +344,37 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
 
+        // !TODO: Change
         if (sessionToken != null) {
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: sessionToken is not null. Attempting to extract userId and inject into JS.");
+
             String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
 
-            // 🔁 Inject userId to JavaScript for WebSocket
+            // Inject userId to JavaScript for WebSocket
+            
             UI.getCurrent().getPage().executeJs("window.currentUserId = $0;", userId);
+            UI.getCurrent().getPage().executeJs("sessionStorage.setItem('currentUserId', $0); window.connectWebSocket && window.connectWebSocket($0);", userId);
 
-            // 💬 Flush pending messages
-            List<String> messages = pendingStore.consume(userId);
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: Injected userId to JS: " + userId);
+
+            // Flush pending messages
+            List<String> messages = notificationPresenter.getNotifications(userId);
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: Consumed " + messages.size() + " pending messages for userId=" + userId);
+
             for (String msg : messages) {
                 Notification.show("🔔 " + msg, 4000, Notification.Position.TOP_CENTER);
             }
-        }
 
-        this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
-        userInfo.setText("Logged in as: " + (currentUsername != null ? currentUsername : "Unknown"));
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: Displayed all pending messages for userId=" + userId);
+            }
+        else {
+            TradingLogger.logEvent("HomePageView", "constructor",
+                "DEBUG: sessionToken is null. Skipping userId injection and pending message handling.");
+        }
 
         loadAllProducts();
 
@@ -622,5 +656,6 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
                 }
             }
         }
+        this.user =(UserDTO)UI.getCurrent().getSession().getAttribute("user");
     }
 }

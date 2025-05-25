@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
 
+import Domain.Pair;
 import Domain.Shopping.IReceiptRepository;
 import Domain.Shopping.Receipt;
 import Domain.Store.Product;
@@ -63,8 +64,8 @@ public class MemoryReceiptRepository implements IReceiptRepository {
      * {@inheritDoc}
      */
     @Override
-    public String savePurchase(String clientId, String storeId, Map<Product, Integer> products, 
-                             double totalPrice, String paymentDetails) {
+    public String savePurchase(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products, 
+                       double totalPrice, String paymentDetails) {
         Receipt receipt = new Receipt(clientId, storeId, products, totalPrice, paymentDetails);
         return saveReceipt(receipt);
     }

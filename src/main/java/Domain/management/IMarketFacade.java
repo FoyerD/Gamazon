@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.User.IUserRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
@@ -30,7 +30,7 @@ public interface IMarketFacade {
      * 
      * @param paymentService New payment service implementation
      */
-    void updatePaymentService(IPaymentService paymentService);
+    void updatePaymentService(IExternalPaymentService paymentService);
 
     /**
      * 1.2 Update the URL of the payment service endpoint.
@@ -45,7 +45,7 @@ public interface IMarketFacade {
      * 
      * @param supplyService New supply service implementation
      */
-    void updateSupplyService(ISupplyService supplyService);
+    void updateSupplyService(IExternalSupplyService supplyService);
 
     /**
      * Update the notification service used for sending messages to users.
