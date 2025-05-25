@@ -42,6 +42,7 @@ import Application.utils.TradingLogger;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
 import UI.presenters.ILoginPresenter;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IUserSessionPresenter;
@@ -82,12 +83,12 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final Button cartBtn = new Button("View Cart");
     private final Button goToSearchBtn = new Button("Search Stores");
 
-    private final PendingMessageStore pendingStore;
+    private final INotificationPresenter notificationPresenter;
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
-                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, PendingMessageStore pendingStore,
+                        IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
                         MarketService marketService, PermissionManager permissionManager) {
-        this.pendingStore = pendingStore;
+        this.notificationPresenter = notificationPresenter;
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;
         this.purchasePresenter = purchasePresenter;
@@ -359,7 +360,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
                 "DEBUG: Injected userId to JS: " + userId);
 
             // Flush pending messages
-            List<String> messages = pendingStore.consume(userId);
+            List<String> messages = notificationPresenter.getNotifications(userId);
             TradingLogger.logEvent("HomePageView", "constructor",
                 "DEBUG: Consumed " + messages.size() + " pending messages for userId=" + userId);
 
