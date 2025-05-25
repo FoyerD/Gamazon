@@ -140,7 +140,8 @@ public class StoreService {
                     Permission permission = entry.getValue();
                     if (permission.isStoreManager() || permission.isStoreOwner()) {
                         permissionManager.removeAllPermissions(storeId, userId);
-                        notificationService.sendNotification(currId, "Store " + storeId + " has been closed.");
+                        String storeName = storeFacade.getStoreName(storeId);
+                        notificationService.sendNotification(currId, "Store " + storeName + " has been closed.");
                     }
                 }
             }
@@ -176,7 +177,8 @@ public class StoreService {
                     String currId = entry.getKey();
                     Permission permission = entry.getValue();
                     if (permission.isStoreManager() || permission.isStoreOwner()) {
-                        notificationService.sendNotification(currId, "Store " + storeId + " has been closed.");
+                        String storeName = storeFacade.getStoreName(storeId);
+                        notificationService.sendNotification(currId, "Store " + storeName + " has been closed.");
                     }
                 }
             }

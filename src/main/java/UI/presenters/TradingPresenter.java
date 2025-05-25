@@ -86,9 +86,6 @@ public class TradingPresenter implements ITradingPresenter {
             String userId = member.getId();
 
             Response<Boolean> response = marketService.banUser(sessionToken, userId, endDate);
-            if (!response.errorOccurred() && response.getValue()) {
-                webSocketNotifier.notifyUser(userId, "You have been temporarily banned from the system.");
-            }
             return response;
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
@@ -113,9 +110,6 @@ public class TradingPresenter implements ITradingPresenter {
             String userId = member.getId();
 
             Response<Boolean> response = marketService.unbanUser(sessionToken, userId);
-            if (!response.errorOccurred() && response.getValue()) {
-                webSocketNotifier.notifyUser(userId, "Your ban has been lifted. You can now use the system again.");
-            }
             return response;
         } catch (Exception e) {
             return new Response<>(new Error(e.getMessage()));
