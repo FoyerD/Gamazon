@@ -143,7 +143,8 @@ public class StoreService {
                     Permission permission = entry.getValue();
                     if (permission.isStoreManager() || permission.isStoreOwner()) {
                         permissionManager.removeAllPermissions(storeId, userId);
-                        notificationService.sendNotification(currId, "Store " + storeId + " has been closed.");
+                        String storeName = storeFacade.getStoreName(storeId);
+                        notificationService.sendNotification(currId, "Store " + storeName + " has been closed permanently.");
                     }
                 }
             }
@@ -174,6 +175,17 @@ public class StoreService {
             }
             permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
             boolean result = this.storeFacade.closeStoreNotPermanent(storeId);
+            Map<String, Permission> storePermissions = permissionManager.getStorePermissions(storeId);
+            if (storePermissions != null) {
+                for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
+                    String currId = entry.getKey();
+                    Permission permission = entry.getValue();
+                    if (permission.isStoreManager() || permission.isStoreOwner()) {
+                        String storeName = storeFacade.getStoreName(storeId);
+                        notificationService.sendNotification(currId, "Store " + storeName + " has been closed temporarily.");
+                    }
+                }
+            }
             TradingLogger.logEvent(CLASS_NAME, method, "Store " + storeId + " closed by user " + userId);
             return new Response<>(result);
         } catch (Exception ex) {
