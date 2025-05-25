@@ -17,7 +17,7 @@ import Domain.management.PolicyFacade;
 
 import org.aspectj.weaver.ast.And;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,6 +38,7 @@ public class PolicyService
         this.permissionManager = permissionManager;
     }
 
+    @Transactional
     public Response<List<IPolicy>> getAllStorePolicies(String sessionToken, String storeId) {
         String method = "getAllStorePolicies";
         try {
@@ -70,6 +71,7 @@ public class PolicyService
         }
     }
 
+    @Transactional
     public Response<IPolicy> getPolicyById(String sessionToken, String storeId, String policyId) {
         String method = "getPolicyById";
         try {
@@ -95,6 +97,7 @@ public class PolicyService
         }
     }
 
+    @Transactional
     public Response<IPolicy> createPolicy(String sessionToken, String storeId, IPolicyDTO details) {
         String method = "createPolicy";
         try {
@@ -188,6 +191,7 @@ public class PolicyService
         }
     }
 
+    @Transactional
     public Response<IPolicy> updatePolicy(String sessionToken, String storeId, Long policyId, IPolicy updates) {
         String method = "updatePolicy";
         try {
@@ -212,6 +216,7 @@ public class PolicyService
         }
     }
 
+    @Transactional
     public Response<Boolean> deletePolicy(String sessionToken, String storeId, Long policyId) 
     {
         String method = "deletePolicy";
