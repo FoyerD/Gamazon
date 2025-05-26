@@ -1,5 +1,6 @@
 package Domain.Store.Discounts;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -36,14 +37,62 @@ public class AndDiscount extends CompositeDiscount {
 
     @Override
     public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'calculatePrice'");
+        
+        Map<String, PriceBreakDown> output = new HashMap<>();
+        Set<Map<String, PriceBreakDown>> toCompose = new HashSet<>();
+
+        // Collect price breakdowns from all sub-discounts
+        for (Discount discount : this.discounts) {
+            Map<String, PriceBreakDown> priceBreakDowns = discount.calculatePrice(basket);
+            toCompose.add(priceBreakDowns);
+        }
+
+        for (String productId : basket.getOrders().keySet()) {
+            if (!qualifiedByAll(productId) || !conditionApplies(basket)) {
+                PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
+                output.put(productId, priceBreakDown);
+                continue;
+            }
+
+            // Apply the discount logic here, e.g., calculate the new price based on discountPercentage
+            // This is a placeholder for actual price calculation logic
+
+            // Apply the composition:
+            double bestPercentage = 0;
+            for (Map<String, PriceBreakDown> priceBreakDowns : toCompose) {
+                if (priceBreakDowns.containsKey(productId)) {
+                    PriceBreakDown priceBreakDown = priceBreakDowns.get(productId);
+                    if (priceBreakDown.getDiscount() > bestPercentage) {
+                        bestPercentage = priceBreakDown.getDiscount();
+                    }
+                }
+            }
+
+            PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), bestPercentage, null);
+            output.put(productId, priceBreakDown);
+        }
+
+        return output;
     }
 
     @Override
     public boolean isQualified(String productId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isQualified'");
+        for (Discount discount : this.discounts) {
+            if (!discount.isQualified(productId)) {
+                return false;
+            }
+        }
+        return true;
     }
-    
+
+
+    private boolean qualifiedByAll(String productId) {
+        for (Discount discount : this.discounts) {
+            if (!discount.isQualified(productId)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
