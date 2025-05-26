@@ -1,12 +1,10 @@
 package UI.views;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
@@ -19,14 +17,11 @@ import com.vaadin.flow.router.Route;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Application.DTOs.ReceiptDTO;
-import Application.DTOs.StoreDTO;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
-import UI.views.components.StorePreviewDialog;
 
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.NativeButton;
 
 @Route("user-profile")
 public class UserProfileView extends VerticalLayout implements BeforeEnterObserver {
@@ -34,11 +29,9 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
     private String sessionToken = null;
     private UserDTO userDTO = null;
 
-    private final IStorePresenter storePresenter;
     private final IPurchasePresenter purchasePresenter;
 
     public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter) {
-        this.storePresenter = storePresenter;
         this.purchasePresenter = purchasePresenter;
 
         // Set yellow-themed layout styles

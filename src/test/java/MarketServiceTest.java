@@ -22,6 +22,7 @@ import Application.ProductService;
 import Application.ServiceManager;
 import Application.StoreService;
 import Application.TokenService;
+import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
@@ -363,7 +364,7 @@ public class MarketServiceTest {
 
     @Test
     public void givenStoreHasPurchases_whenGettingPurchaseHistory_thenReceiptsReturned() {
-        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(user1.getSessionToken(), store1.getId());
+        Response<List<ClientOrderDTO>> response = marketService.getStorePurchaseHistory(user1.getSessionToken(), store1.getId());
         assertFalse(response.errorOccurred());
     }
 
@@ -442,14 +443,14 @@ public class MarketServiceTest {
 
     @Test
     public void givenEmptyPurchaseHistory_whenGettingStoreHistory_thenEmptyListReturned() {
-        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId1, store1.getId());
+        Response<List<ClientOrderDTO>> response = marketService.getStorePurchaseHistory(tokenId1, store1.getId());
         assertFalse(response.errorOccurred());
         assertTrue(response.getValue().isEmpty());
     }
 
     @Test
     public void givenNoPermission_whenGettingStorePurchaseHistory_thenErrorOccurs() {
-        Response<List<Receipt>> response = marketService.getStorePurchaseHistory(tokenId2, store1.getId());
+        Response<List<ClientOrderDTO>> response = marketService.getStorePurchaseHistory(tokenId2, store1.getId());
         assertTrue(response.errorOccurred());
     }
 

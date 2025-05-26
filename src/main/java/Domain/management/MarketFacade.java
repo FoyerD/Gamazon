@@ -93,6 +93,15 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
+    public String getUsername(String userId) {
+        Member member = userRepository.getMember(userId);
+        if (member == null) {
+            throw new NoSuchElementException("User not found: " + userId);
+        }
+        return member.getName();
+    }
+
+    @Override
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
         permissionManager.appointStoreManager(appointerId, appointeeId, storeId);
     }
