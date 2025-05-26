@@ -27,7 +27,7 @@ public class ItemDTO {
         this.rating = rating;
     }
 
-    // ✅ Factory method
+    // Factory method
     public static ItemDTO fromItem(Item item) {
         return new ItemDTO(
             item.getStoreId(),

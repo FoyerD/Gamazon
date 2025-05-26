@@ -10,7 +10,7 @@ import Domain.Shopping.IShoppingCart;
 
 public class CartDTO {
     private String clientId;
-    private Map<String, ShoppingBasketDTO> baskets;
+    private Map<String, ShoppingBasketDTO> baskets; // maps from a store to a basket
 
     public CartDTO(String clientId, Map<String, ShoppingBasketDTO> baskets) {
         this.clientId = clientId;
