@@ -93,6 +93,15 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
+    public String getUsername(String userId) {
+        Member member = userRepository.getMember(userId);
+        if (member == null) {
+            throw new NoSuchElementException("User not found: " + userId);
+        }
+        return member.getName();
+    }
+
+    @Override
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
         permissionManager.appointStoreManager(appointerId, appointeeId, storeId);
     }
@@ -192,7 +201,12 @@ public class MarketFacade implements IMarketFacade {
         if (member == null) {
             throw new IllegalArgumentException("User not found: " + userId);
         }
-        return permissionManager.banUser(bannerId, userId, endDate);
+        boolean result = permissionManager.banUser(bannerId, userId, endDate);
+        if (result) {
+            String message = String.format("You have been banned until %s", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate));
+            notificationService.sendNotification(userId, message);
+        }
+        return result;
     }
 
     @Override
@@ -201,7 +215,11 @@ public class MarketFacade implements IMarketFacade {
         if (member == null) {
             throw new IllegalArgumentException("User not found: " + userId);
         }
-        return permissionManager.unbanUser(unbannerId, userId);
+        boolean result = permissionManager.unbanUser(unbannerId, userId);
+        if (result) {
+            notificationService.sendNotification(userId, "Your ban has been lifted. You can now use the system again.");
+        }
+        return result;
     }
 
     @Override

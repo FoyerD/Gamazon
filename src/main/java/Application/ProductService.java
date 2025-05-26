@@ -1,20 +1,19 @@
 package Application;
 
-import Application.utils.Response;
-import Application.utils.TradingLogger;
-import Domain.Store.Product;
-import Domain.Store.ProductFacade;
-import Domain.management.PermissionManager;
-
-import java.security.Permission;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.ProductDTO;
 import Application.utils.Error;
+import Application.utils.Response;
+import Application.utils.TradingLogger;
+import Domain.Store.Product;
+import Domain.Store.ProductFacade;
+import Domain.management.PermissionManager;
 
 @Service
 public class ProductService {
@@ -29,6 +28,7 @@ public class ProductService {
         this.permissionManager = permissionManager;
     }
 
+    @Transactional
     public Response<ProductDTO> addProduct(String sessionToken, String name, List<String> categories, List<String> catDesc) {
         String method = "addProduct";
         try {
@@ -48,6 +48,7 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public Response<ProductDTO> getProductByName(String sessionToken, String name) {
         String method = "getProductByName";
         try {
@@ -64,6 +65,7 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public Response<Set<ProductDTO>> getAllProducts(String sessionToken) {
         String method = "getAllProducts";
         try {

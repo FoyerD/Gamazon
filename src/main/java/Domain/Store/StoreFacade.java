@@ -153,7 +153,7 @@ public class StoreFacade {
 
             Store store = this.storeRepository.get(storeId);
             if (store == null) throw new RuntimeException("Store not found");
-            if(!store.isOpen()) throw new RuntimeException("Store is already closed");
+            if(store.isPermanentlyClosed()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);
             store.setPermanentlyClosed(true);
@@ -335,6 +335,7 @@ public class StoreFacade {
                 throw new RuntimeException("Payment failed for accepted bid");
             }
 
+            
         } catch (Exception ex) {
             // Rollback item amount
             item.setAmount(currentAmount);
