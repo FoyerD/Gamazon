@@ -1,9 +1,11 @@
 package UI.presenters;
 
 import java.util.List;
+import java.util.Map;
 
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType; // Questionable but its enum so...
 
@@ -132,14 +134,13 @@ public interface IManagementPresenter {
     /**
      * Changes the permissions of a store manager.
      *
-     * @param sessionToken Session identifier for authentication.
-     * @param ownerUsername Username of the acting store owner.
-     * @param managerUsername Username of the manager whose permissions will be updated.
+     * @param sessionToken Session identifier for authentication. token must be an owner of the store in order to change permissions.
+     * @param managerId id of the manager whose permissions will be updated.
      * @param storeId Store ID.
      * @param newPermissions List of new permissions to assign.
      * @return Void response indicating success or failure.
      */
-    Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions);
+    Response<Void> changeManagerPermissions(String sessionToken, String managerId, String storeId, List<PermissionType> newPermissions);
 
     /**
      * Closes a store (sets it to inactive/unavailable).
@@ -149,4 +150,13 @@ public interface IManagementPresenter {
      * @return Response with true if successful.
      */
     Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId);
+
+    /**
+     * Retrieves all permissions of managers in a store.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store.
+     * @return Response with a map of {@link UserDTO} to their list of {@link PermissionType}.
+     */
+    Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId);
 }

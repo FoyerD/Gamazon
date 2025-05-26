@@ -37,6 +37,16 @@ public class PermissionFactory {
         PermissionType.ACCESS_PURCHASE_RECORDS
     );
 
+    public static final Set<PermissionType> AVAILABLE_MANAGER_PERMISSIONS = Set.of(
+        PermissionType.HANDLE_INVENTORY,
+        PermissionType.EDIT_STORE_POLICIES,
+        PermissionType.VIEW_EMPLOYEE_INFO,
+        PermissionType.ACCESS_PURCHASE_RECORDS,
+        PermissionType.ADMINISTER_STORE,
+        PermissionType.OVERSEE_OFFERS,
+        PermissionType.CONTROL_CONTRACTS
+    );
+
     public static final Set<PermissionType> TRADING_PERMISSIONS = Set.of(
         PermissionType.ASSIGN_OR_REMOVE_OWNERS,
         PermissionType.SUPERVISE_MANAGERS,

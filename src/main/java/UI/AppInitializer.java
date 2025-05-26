@@ -112,7 +112,7 @@ public class AppInitializer implements CommandLineRunner {
             return;
         }
 
-        var permResp = marketService.changeManagerPermissions(adminToken, tokenService.extractId(admin.getSessionToken()), tokenService.extractId(buyer.getSessionToken()), store1.getId(),
+        var permResp = marketService.changeManagerPermissions(adminToken, tokenService.extractId(buyer.getSessionToken()), store1.getId(),
                 List.of(PermissionType.HANDLE_INVENTORY, PermissionType.OVERSEE_OFFERS));
         if (permResp.errorOccurred()) {
             System.err.println("❌ Failed to change manager permissions: " + permResp.getErrorMessage());

@@ -94,6 +94,11 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
+        if (userRepository.getMember(appointeeId) == null) {
+            throw new IllegalArgumentException("Appointee not found.");
+        } else if (isStoreManager(appointeeId, storeId)) {
+            throw new IllegalArgumentException("Appointee is already a store manager.");
+        }
         permissionManager.appointStoreManager(appointerId, appointeeId, storeId);
     }
 
@@ -113,16 +118,20 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
+    public Map<Member, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
         permissionManager.checkPermission(userId, storeId, PermissionType.SUPERVISE_MANAGERS);
-        Map<String, List<PermissionType>> result = new HashMap<>();
+        Map<Member, List<PermissionType>> result = new HashMap<>();
         Map<String, Permission> storePermissions = permissionManager.getAllPermissionsForStore(storeId);
         if (storePermissions != null) {
             for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
                 String username = entry.getKey();
                 Permission p = entry.getValue();
                 if (p.isStoreManager()) {
-                    result.put(username, List.copyOf(p.getPermissions()));
+                    Member member = userRepository.getMember(username);
+                    if (member == null) {
+                        throw new NoSuchElementException("Member not found: " + username);
+                    }
+                    result.put(member, List.copyOf(p.getPermissions()));
                 }
             }
         }
@@ -159,12 +168,12 @@ public class MarketFacade implements IMarketFacade {
     /**
      * Checks if a user is a store manager for the specified store.
      * 
-     * @param username The username to check
+     * @param userId The user ID to check
      * @param storeId The store ID to check
      * @return true if the user is a store manager, false otherwise
      */
-    public boolean isStoreManager(String username, String storeId) {
-        Permission permission = permissionManager.getPermission(storeId, username);
+    public boolean isStoreManager(String userId, String storeId) {
+        Permission permission = permissionManager.getPermission(storeId, userId);
         return permission != null && permission.isStoreManager();
     }
 

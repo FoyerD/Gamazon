@@ -119,7 +119,7 @@ public class UserService {
             Member member = loginManager.login(username, password);
             String token = tokenService.generateToken(member.getId());
             TradingLogger.logEvent(CLASS_NAME, "login", username + " has logged in.");
-            return Response.success(new UserDTO(token, member.getName(), member.getEmail()));
+            return Response.success(new UserDTO(token, member));
         } catch (IllegalArgumentException | NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "login", "Attempted login has failed. Username: " + username + " Password: " + password, e.getMessage());
             return Response.error("Invalid username or password: " + e.getMessage());
@@ -146,7 +146,7 @@ public class UserService {
         try {
             List<Member> members = loginManager.getAllMembers();
             return Response.success(members.stream()
-                .map(member -> new UserDTO(tokenService.generateToken(member.getId()), member.getName(), member.getEmail()))
+                .map(UserDTO::new)
                 .collect(Collectors.toList()));
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "getAllMembers", "Couldn't find user with id: " + id, e.getMessage());

@@ -238,16 +238,18 @@ public class MarketServiceTest {
             // We should have a service method to check if a user is a manager
             // Since we don't have it in the provided code, we'll use marketFacade here
             // In a real implementation, you'd want to use a service method
-            Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
+            Response<Map<UserDTO, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
             assertFalse(response.errorOccurred());
-            assertTrue(response.getValue().containsKey(appointee1Id), 
+            assertTrue(response.getValue().keySet().stream()
+                .anyMatch(user -> user.getId().equals(appointee1Id)), 
                 "Candidate 1 should be a manager if appointment succeeded");
         }
         
         if (threadSuccess[1]) {
-            Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
+            Response<Map<UserDTO, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
             assertFalse(response.errorOccurred());
-            assertTrue(response.getValue().containsKey(appointee2Id), 
+            assertTrue(response.getValue().keySet().stream()
+                .anyMatch(user -> user.getId().equals(appointee2Id)), 
                 "Candidate 2 should be a manager if appointment succeeded");
         }
         
@@ -369,16 +371,17 @@ public class MarketServiceTest {
     @Test
     public void givenStoreHasManagers_whenGettingPermissions_thenPermissionsAreReturned() {
         marketService.appointStoreManager(tokenId1, getUserId(user2), store1.getId());
-        Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, store1.getId());
+        Response<Map<UserDTO, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, store1.getId());
         assertFalse(response.errorOccurred());
-        assertTrue(response.getValue().containsKey(getUserId(user2)));
+        assertTrue(response.getValue().keySet().stream()
+            .anyMatch(user -> user.getId().equals(getUserId(user2))));
     }
 
     @Test
     public void givenManagerExists_whenChangingPermissions_thenPermissionsAreUpdated() {
         marketService.appointStoreManager(tokenId1, getUserId(user2), store1.getId());
         List<PermissionType> newPermissions = List.of(PermissionType.ADMINISTER_STORE);
-        Response<Void> response = marketService.changeManagerPermissions(tokenId1, getUserId(user1), getUserId(user2), store1.getId(), newPermissions);
+        Response<Void> response = marketService.changeManagerPermissions(tokenId1, getUserId(user2), store1.getId(), newPermissions);
         assertFalse(response.errorOccurred());
     }
 
@@ -435,7 +438,7 @@ public class MarketServiceTest {
     @Test
     public void givenInvalidPermissions_whenChangingManagerPermissions_thenErrorOccurs() {
         List<PermissionType> newPermissions = List.of(PermissionType.ADMINISTER_STORE);
-        Response<Void> response = marketService.changeManagerPermissions(tokenId1, "ownerUser", "managerUser", store1.getId(), newPermissions);
+        Response<Void> response = marketService.changeManagerPermissions(tokenId1, "managerUser", store1.getId(), newPermissions);
         assertTrue(response.errorOccurred());
     }
 
@@ -546,10 +549,11 @@ public class MarketServiceTest {
             "Store manager appointment should succeed even if notifications fail");
         
         // Verify the appointment was successful by checking if the user has manager permissions
-        Response<Map<String, List<PermissionType>>> permissionsResponse = 
+        Response<Map<UserDTO, List<PermissionType>>> permissionsResponse = 
             marketService.getManagersPermissions(tokenId1, store1.getId());
         assertFalse(permissionsResponse.errorOccurred(), "Getting manager permissions should succeed");
-        assertTrue(permissionsResponse.getValue().containsKey(appointeeId), 
+        assertTrue(permissionsResponse.getValue().keySet().stream()
+            .anyMatch(user -> user.getId().equals(appointeeId)), 
             "Appointee should be in the list of managers");
         
         // Verify we can still get the notification service

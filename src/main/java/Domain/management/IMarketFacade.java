@@ -8,6 +8,7 @@ import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.User.IUserRepository;
+import Domain.User.Member;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
 
@@ -83,11 +84,11 @@ public interface IMarketFacade {
     /**
      * 4.3 Appoint a new store manager.
      * 
-     * @param appointerUsername Username of the appointing user (owner)
-     * @param appointeeUsername Username of the user being appointed as manager
+     * @param appointerId Username of the appointing user (owner)
+     * @param appointeeId Username of the user being appointed as manager
      * @param storeId ID of the store
      */
-    void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId);
+    void appointStoreManager(String appointerId, String appointeeId, String storeId);
 
     /**
      * 4.4 Remove a store manager from their position.
@@ -126,7 +127,7 @@ public interface IMarketFacade {
      * @param userId ID of the user requesting the information
      * @return Map of manager usernames to their list of permissions
      */
-    Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId);
+    Map<Member, List<PermissionType>> getManagersPermissions(String storeId, String userId);
 
     /**
      * 4.13 Retrieve the purchase history of a store within a given date range.

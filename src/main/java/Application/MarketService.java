@@ -7,15 +7,18 @@ import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.Receipt;
+import Domain.User.Member;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 import org.springframework.stereotype.Service;
 
+import Application.DTOs.UserDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
@@ -175,7 +178,7 @@ public class MarketService {
         }
     }
 
-    public Response<Void> changeManagerPermissions(String sessionToken, String ownerId, String managerId, String storeId, List<PermissionType> newPermissions) {
+    public Response<Void> changeManagerPermissions(String sessionToken, String managerId, String storeId, List<PermissionType> newPermissions) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "changeManagerPermissions", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -186,7 +189,7 @@ public class MarketService {
                 TradingLogger.logError(CLASS_NAME, "changeManagerPermissions", "User is banned from changing manager permissions.");
                 return new Response<>(new Error("User is banned from changing manager permissions."));
             }
-            marketFacade.changeManagerPermissions(ownerId, managerId, storeId, newPermissions);
+            marketFacade.changeManagerPermissions(userId, managerId, storeId, newPermissions);
             TradingLogger.logEvent(CLASS_NAME, "changeManagerPermissions", "Manager permissions changed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -195,15 +198,23 @@ public class MarketService {
         }
     }
 
-    public Response<Map<String, List<PermissionType>>> getManagersPermissions(String sessionToken, String storeId) {
+    public Response<Map<UserDTO, List<PermissionType>>> getManagersPermissions(String sessionToken, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getManagersPermissions", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            Map<String, List<PermissionType>> permissions = marketFacade.getManagersPermissions(storeId, tokenService.extractId(sessionToken));
-            TradingLogger.logEvent(CLASS_NAME, "getManagersPermissions", "Manager permissions fetched successfully.");
-            return new Response<>(permissions);
+            Map<Member, List<PermissionType>> permissions = marketFacade.getManagersPermissions(storeId, tokenService.extractId(sessionToken));
+            Map<UserDTO, List<PermissionType>> userPermissions = new HashMap<>();
+            for (Map.Entry<Member, List<PermissionType>> entry : permissions.entrySet()) {
+                Member member = entry.getKey();
+                List<PermissionType> permissionTypes = entry.getValue();
+                UserDTO user = new UserDTO(member);
+                userPermissions.put(user, permissionTypes);
+            }
+            TradingLogger.logEvent(CLASS_NAME, "getManagersPermissions", userPermissions.entrySet().size() + " manager permissions fetched successfully.");
+
+            return Response.success(userPermissions);
         } catch (Exception e) {
             TradingLogger.logError(CLASS_NAME, "getManagersPermissions", "Failed to fetch manager permissions: %s", e.getMessage());
             return new Response<>(new Error(e.getMessage()));
@@ -309,4 +320,5 @@ public class MarketService {
             return new Response<>(new Error(e.getMessage()));
         }
     }
+
 }
