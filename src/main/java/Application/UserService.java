@@ -91,7 +91,7 @@ public class UserService {
         try {
             Member member = loginManager.register(id, username, password, email);
             TradingLogger.logEvent(CLASS_NAME, "register", "Guest has registed as " + username +".");
-            return Response.success(new UserDTO(sessionToken, member.getName(), email));
+            return Response.success(new UserDTO(sessionToken, member));
         } catch (IllegalStateException e) {
             TradingLogger.logError(CLASS_NAME, "register", "Failed to register " + username + ": " + e.getMessage());
             return Response.error("Failed to register " + username + ": " + e.getMessage());
