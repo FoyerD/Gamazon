@@ -266,7 +266,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
                             expiryDateValue,
                             cvv.getValue(),
                             increment,
-                            user.get(),
+                            name.getValue(),
                             address.getValue()
                         );
                         

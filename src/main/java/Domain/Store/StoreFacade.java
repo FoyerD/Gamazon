@@ -341,8 +341,9 @@ public class StoreFacade {
             itemRepository.update(itemKey, item);
             throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);
         }
-
-        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! in auction " + auctionId + " 🎉 🔔");
+        String productName = item.getProductName();
+        String storeName = this.getStoreName(storeId);
+        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! purchesed " + productName + " from " + storeName + " 🎉 🔔");
         // Final update: optionally mark buyer (if you have a field), or leave updated amount
         itemRepository.update(itemKey, item);
 
