@@ -39,13 +39,7 @@ public class AndDiscount extends CompositeDiscount {
     public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
         
         Map<String, PriceBreakDown> output = new HashMap<>();
-        Set<Map<String, PriceBreakDown>> toCompose = new HashSet<>();
-
-        // Collect price breakdowns from all sub-discounts
-        for (Discount discount : this.discounts) {
-            Map<String, PriceBreakDown> priceBreakDowns = discount.calculatePrice(basket);
-            toCompose.add(priceBreakDowns);
-        }
+        Set<Map<String, PriceBreakDown>> toCompose = this.calculateAllSubDiscounts(basket);
 
         for (String productId : basket.getOrders().keySet()) {
             if (!qualifiedByAll(productId) || !conditionApplies(basket)) {
