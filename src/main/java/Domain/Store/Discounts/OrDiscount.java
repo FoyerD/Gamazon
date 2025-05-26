@@ -5,7 +5,6 @@ import java.util.Set;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
-import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 
 public class OrDiscount extends CompositeDiscount {
 

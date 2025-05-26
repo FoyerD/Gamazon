@@ -1,5 +1,6 @@
 package Domain.Store.Discounts;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import Domain.Shopping.ShoppingBasket;
@@ -28,14 +29,29 @@ public class SimpleDiscount extends Discount {
 
     @Override
     public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'calculatePrice'");
+        
+        Map<String, PriceBreakDown> output = new HashMap<>();
+
+        for (String productId : basket.getOrders().keySet()) {
+            if (!isQualified(productId) || !conditionApplies(basket)) {
+                PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
+                output.put(productId, priceBreakDown);
+                continue;
+            }
+            
+            // Apply the discount logic here, e.g., calculate the new price based on discountPercentage
+            // This is a placeholder for actual price calculation logic
+
+            PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), this.discountPercentage, null);
+            output.put(productId, priceBreakDown);
+        }
+        
+        return output;
     }
 
     @Override
     public boolean isQualified(String productId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isQualified'");
+        return qualifier.isQualified(itemFacade.getProduct(productId));
     }
 
 }
