@@ -1,29 +1,22 @@
 package Application;
 
 import Application.utils.Response;
-import Application.DTOs.PoliciesDTOs.AndPolicyDTO;
-import Application.DTOs.PoliciesDTOs.CategoryAgePolicyDTO;
-import Application.DTOs.PoliciesDTOs.CategoryPolicyDTO;
-import Application.DTOs.PoliciesDTOs.IPolicyDTO;
-import Application.DTOs.PoliciesDTOs.MaxQuantityPolicyDTO;
-import Application.DTOs.PoliciesDTOs.MinQuantityPolicyDTO;
+import Application.DTOs.PolicyDTO;
 import Application.utils.Error;
 import Application.utils.TradingLogger;
-import Domain.Store.Policies.IPolicy;
-import Domain.Store.IPolicyRepository;
+import Domain.Store.Policy;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.PolicyFacade;
-
-import org.aspectj.weaver.ast.And;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
-public class PolicyService 
-{
+public class PolicyService {
     private static final String CLASS_NAME = PolicyService.class.getSimpleName();
 
     private final PolicyFacade policyFacade;
@@ -33,13 +26,13 @@ public class PolicyService
     public PolicyService(PolicyFacade policyFacade,
                          TokenService tokenService,
                          PermissionManager permissionManager) {
-        this.policyFacade = policyFacade;
-        this.tokenService = tokenService;
+        this.policyFacade      = policyFacade;
+        this.tokenService      = tokenService;
         this.permissionManager = permissionManager;
     }
 
     @Transactional
-    public Response<List<IPolicy>> getAllStorePolicies(String sessionToken, String storeId) {
+    public Response<List<PolicyDTO>> getAllStorePolicies(String sessionToken, String storeId) {
         String method = "getAllStorePolicies";
         try {
             if (!tokenService.validateToken(sessionToken)) {
@@ -50,20 +43,22 @@ public class PolicyService
             if (permissionManager.isBanned(userId)) {
                 throw new Exception("User is banned from viewing policies.");
             }
-            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+            permissionManager.checkPermission(
+                    userId, storeId, PermissionType.EDIT_STORE_POLICIES);
 
-            List<IPolicy> policies = policyFacade.getAllStorPolicies(storeId);
-            if (policies.isEmpty()) {
+            List<Policy> policies = policyFacade.getAllStorePolicies(storeId);
+            List<PolicyDTO> dtos = policies.stream()
+                                           .map(PolicyDTO::new)
+                                           .collect(Collectors.toList());
+
+            if (dtos.isEmpty()) {
                 TradingLogger.logEvent(CLASS_NAME, method,
-                                      "No policies found for store " + storeId);
-                return new Response<>(List.of());
-            }
-            else
-            {
+                        "No policies found for store " + storeId);
+            } else {
                 TradingLogger.logEvent(CLASS_NAME, method,
-                                  "Fetched " + policies.size() + " policies for store " + storeId);
+                        "Fetched " + dtos.size() + " policies for store " + storeId);
             }
-            return new Response<>(policies);
+            return new Response<>(dtos);
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
@@ -72,7 +67,9 @@ public class PolicyService
     }
 
     @Transactional
-    public Response<IPolicy> getPolicyById(String sessionToken, String storeId, String policyId) {
+    public Response<PolicyDTO> getPolicyById(String sessionToken,
+                                             String storeId,
+                                             String policyId) {
         String method = "getPolicyById";
         try {
             if (!tokenService.validateToken(sessionToken)) {
@@ -83,13 +80,13 @@ public class PolicyService
             if (permissionManager.isBanned(userId)) {
                 throw new Exception("User is banned from viewing policies.");
             }
-            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+            permissionManager.checkPermission(
+                    userId, storeId, PermissionType.EDIT_STORE_POLICIES);
 
-            IPolicy policy = policyFacade.getPolicy(policyId);
-
+            Policy policy = policyFacade.getPolicy(policyId);
             TradingLogger.logEvent(CLASS_NAME, method,
-                                  "Fetched policy " + policyId + " for store " + storeId);
-            return new Response<>(policy);
+                    "Fetched policy " + policyId + " for store " + storeId);
+            return new Response<>(new PolicyDTO(policy));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
@@ -98,7 +95,9 @@ public class PolicyService
     }
 
     @Transactional
-    public Response<IPolicy> createPolicy(String sessionToken, String storeId, IPolicyDTO details) {
+    public Response<PolicyDTO> createPolicy(String sessionToken,
+                                            String storeId,
+                                            PolicyDTO details) {
         String method = "createPolicy";
         try {
             if (!tokenService.validateToken(sessionToken)) {
@@ -109,82 +108,82 @@ public class PolicyService
             if (permissionManager.isBanned(userId)) {
                 throw new Exception("User is banned from creating policies.");
             }
-            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+            permissionManager.checkPermission(
+                    userId, storeId, PermissionType.EDIT_STORE_POLICIES);
 
-            if (details instanceof AndPolicyDTO)
-            {
-                AndPolicyDTO andPolicyDTO = (AndPolicyDTO) details;
-                List<IPolicy> policies = andPolicyDTO.getPolicies();
-                if (policies == null || policies.isEmpty()) {
-                    throw new Exception("AndPolicy must contain at least one policy");
-                }
-                policyFacade.createAndPolicy(policies, andPolicyDTO.getPolicyId(), storeId);
-                TradingLogger.logEvent(CLASS_NAME, method,
-                                      "Created AndPolicy with ID " + andPolicyDTO.getPolicyId() +
-                                      " for store " + storeId);
-                return new Response<>(policyFacade.getPolicy(andPolicyDTO.getPolicyId()));
-            } 
-            else if (details instanceof CategoryPolicyDTO) 
-            {
-                CategoryPolicyDTO categoryPolicyDTO = (CategoryPolicyDTO) details;
-                String disallowedCategories = categoryPolicyDTO.getCategory();
-                if (disallowedCategories == null || disallowedCategories.isEmpty()) {
-                    throw new Exception("CategoryPolicy must have at least one disallowed category");
-                }
-                policyFacade.createCategoryPolicy(disallowedCategories, categoryPolicyDTO.getPolicyId(), storeId);
-                TradingLogger.logEvent(CLASS_NAME, method,
-                                      "Created CategoryPolicy with ID " + categoryPolicyDTO.getPolicyId() +
-                                      " for store " + storeId);
-                return new Response<>(policyFacade.getPolicy(categoryPolicyDTO.getPolicyId()));
-            } 
-            else if (details instanceof CategoryAgePolicyDTO) 
-            {
-                CategoryAgePolicyDTO agePolicyDTO = (CategoryAgePolicyDTO) details;
-                String category = agePolicyDTO.getCategory();
-                if (category == null || category.isEmpty()) {
-                    throw new Exception("CategoryAgePolicy must have a valid category");
-                }
-                if (agePolicyDTO.getMinAge() <= 0) {
-                    throw new Exception("CategoryAgePolicy must have a valid minimum age");
-                }
-                policyFacade.createCategoryAgePolicy(agePolicyDTO.getPolicyId(), storeId, 
-                                                     agePolicyDTO.getMinAge(), category);
-                TradingLogger.logEvent(CLASS_NAME, method,
-                                      "Created CategoryAgePolicy with ID " + agePolicyDTO.getPolicyId() +
-                                      " for store " + storeId);
-                return new Response<>(policyFacade.getPolicy(agePolicyDTO.getPolicyId()));
+            Policy created;
+            switch (details.getType()) {
+                case AND:
+                    if (details.getSubPolicies() == null || details.getSubPolicies().isEmpty()) {
+                        throw new IllegalArgumentException("AND policy needs children");
+                    }
+                    created = policyFacade.createAndPolicy(
+                            details.getSubPolicies(),
+                            details.getPolicyId(),
+                            storeId);
+                    break;
+                case MIN_QUANTITY_ALL:
+                    created = policyFacade.createMinQuantityAllPolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getMinItemsAll());
+                    break;
+                case MAX_QUANTITY_ALL:
+                    created = policyFacade.createMaxQuantityAllPolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getMaxItemsAll());
+                    break;
+                case MIN_QUANTITY_PRODUCT:
+                    created = policyFacade.createMinQuantityProductPolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getTargetProductId(),
+                            details.getMinItemsProduct());
+                    break;
+                case MAX_QUANTITY_PRODUCT:
+                    created = policyFacade.createMaxQuantityProductPolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getTargetProductId(),
+                            details.getMaxItemsProduct());
+                    break;
+                case MIN_QUANTITY_CATEGORY:
+                    created = policyFacade.createMinQuantityCategoryPolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getTargetCategory(),
+                            details.getMinItemsCategory());
+                    break;
+                case MAX_QUANTITY_CATEGORY:
+                    created = policyFacade.createMaxQuantityCategoryPolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getTargetCategory(),
+                            details.getMaxItemsCategory());
+                    break;
+                case CATEGORY_DISALLOW:
+                    created = policyFacade.createCategoryDisallowPolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getDisallowedCategory());
+                    break;
+                case CATEGORY_AGE:
+                    created = policyFacade.createCategoryAgePolicy(
+                            details.getPolicyId(),
+                            storeId,
+                            details.getAgeCategory(),
+                            details.getMinAge());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported policy type");
             }
-            else if (details instanceof MaxQuantityPolicyDTO) 
-            {
-                MaxQuantityPolicyDTO maxQuantityPolicyDTO = (MaxQuantityPolicyDTO) details;
-                if (maxQuantityPolicyDTO.getMaxQuantity() <= 0) {
-                    throw new Exception("MaxQuantityPolicy must have a valid maximum quantity");
-                }
-                policyFacade.createMaxQuantitPolicy(maxQuantityPolicyDTO.getPolicyId(), storeId, 
-                                                     maxQuantityPolicyDTO.getMaxQuantity(), maxQuantityPolicyDTO.getAmountGot());
-                TradingLogger.logEvent(CLASS_NAME, method,
-                                      "Created MaxQuantityPolicy with ID " + maxQuantityPolicyDTO.getPolicyId() +
-                                      " for store " + storeId);
-                return new Response<>(policyFacade.getPolicy(maxQuantityPolicyDTO.getPolicyId()));
-            }
-            else if (details instanceof MinQuantityPolicyDTO) 
-            {
-                MinQuantityPolicyDTO minAgePolicyDTO = (MinQuantityPolicyDTO) details;
-                if (minAgePolicyDTO.getMinQuantity() <= 0) {
-                    throw new Exception("MinQuantityPolicy must have a valid minimum quantity");
-                }
-                policyFacade.createMinQuantityPolicy(minAgePolicyDTO.getPolicyId(), storeId, 
-                                                     minAgePolicyDTO.getMinQuantity(), minAgePolicyDTO.getAmountGot());
-                TradingLogger.logEvent(CLASS_NAME, method,
-                                      "Created MinQuantityPolicy with ID " + minAgePolicyDTO.getPolicyId() +
-                                      " for store " + storeId);
-                return new Response<>(policyFacade.getPolicy(minAgePolicyDTO.getPolicyId()));
-            }
-            else 
-            {
-                TradingLogger.logError(CLASS_NAME, method, "Unsupported policy type");
-                throw new Exception("Unsupported policy type");
-                }   
+
+            TradingLogger.logEvent(CLASS_NAME, method,
+                    "Created policy " + created.getPolicyId() +
+                    " (" + created.getType() + ") for store " + storeId);
+            return new Response<>(new PolicyDTO(created));
+
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
@@ -192,7 +191,10 @@ public class PolicyService
     }
 
     @Transactional
-    public Response<IPolicy> updatePolicy(String sessionToken, String storeId, Long policyId, IPolicy updates) {
+    public Response<PolicyDTO> updatePolicy(String sessionToken,
+                                            String storeId,
+                                            String policyId,
+                                            PolicyDTO details) {
         String method = "updatePolicy";
         try {
             if (!tokenService.validateToken(sessionToken)) {
@@ -203,12 +205,17 @@ public class PolicyService
             if (permissionManager.isBanned(userId)) {
                 throw new Exception("User is banned from updating policies.");
             }
-            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+            permissionManager.checkPermission(
+                    userId, storeId, PermissionType.EDIT_STORE_POLICIES);
 
-            IPolicy updatedPolicy = policyFacade.updatePolicy(policyId, updates);
+            // Recreate or modify via facade as needed. Example: delete + create
+            policyFacade.removePolicy(policyId);
+            createPolicy(sessionToken, storeId, details);
+
             TradingLogger.logEvent(CLASS_NAME, method,
-                                  "Updated policy " + policyId + " for store " + storeId);
-            return new Response<>(updatedPolicy);
+                    "Updated policy " + policyId + " for store " + storeId);
+            Policy updated = policyFacade.getPolicy(policyId);
+            return new Response<>(new PolicyDTO(updated));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
@@ -217,8 +224,9 @@ public class PolicyService
     }
 
     @Transactional
-    public Response<Boolean> deletePolicy(String sessionToken, String storeId, Long policyId) 
-    {
+    public Response<Boolean> deletePolicy(String sessionToken,
+                                          String storeId,
+                                          String policyId) {
         String method = "deletePolicy";
         try {
             if (!tokenService.validateToken(sessionToken)) {
@@ -229,12 +237,13 @@ public class PolicyService
             if (permissionManager.isBanned(userId)) {
                 throw new Exception("User is banned from deleting policies.");
             }
-            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+            permissionManager.checkPermission(
+                    userId, storeId, PermissionType.EDIT_STORE_POLICIES);
 
-            boolean deleted = policyFacade.deletePolicy(policyId);
+            policyFacade.removePolicy(policyId);
             TradingLogger.logEvent(CLASS_NAME, method,
-                                  "Deleted policy " + policyId + " for store " + storeId);
-            return new Response<>(deleted);
+                    "Deleted policy " + policyId + " for store " + storeId);
+            return new Response<>(true);
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
