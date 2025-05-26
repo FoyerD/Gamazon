@@ -1,54 +1,67 @@
 package Infrastructure.Repositories;
 
-import Domain.Store.Store;
-import Domain.Store.Policies.IPolicy;
-
-import java.security.Policy;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import Domain.Store.Policy;
+import Domain.Store.IPolicyRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+/**
+ * In-memory implementation of IPolicyRepository for Policy objects.
+ */
 @Repository
-public class MemoryPolicyRepository extends Domain.Store.IPolicyRepository {
-    private final Map<String, IPolicy> policies = new ConcurrentHashMap<>();
+public class MemoryPolicyRepository extends IPolicyRepository {
+    // Thread-safe storage of policies by ID
+    private final Map<String, Policy> policies = new ConcurrentHashMap<>();
 
+    /**
+     * Return all policies belonging to the given store.
+     */
     @Override
-    public List<IPolicy> getAllStorePolicies(String storeId) 
-    {
+    public List<Policy> getAllStorePolicies(String storeId) {
         return policies.values().stream()
-                       .filter(p -> storeId.equals(p.getStoreId()))
-                       .collect(Collectors.toList());
+                .filter(p -> storeId.equals(p.getStoreId()))
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Add a new policy under the given ID.
+     * @return true if added, false if ID already existed
+     */
     @Override
-    public boolean add(String id, IPolicy value) 
-    {
-        return policies.putIfAbsent(id, value) == null;
+    public boolean add(String id, Policy policy) {
+        return policies.putIfAbsent(id, policy) == null;
     }
 
+    /**
+     * Remove and return the policy with the given ID, or null if none.
+     */
     @Override
-    public IPolicy remove(String id) 
-    {
+    public Policy remove(String id) {
         return policies.remove(id);
     }
 
+    /**
+     * Lookup a policy by its ID.
+     */
     @Override
-    public IPolicy get(String id) 
-    {
+    public Policy get(String id) {
         return policies.get(id);
     }
 
+    /**
+     * Replace the policy at the given ID if it exists.
+     * @return the new policy if updated, or null if no existing entry
+     */
     @Override
-    public IPolicy update(String id, IPolicy value) 
-    {
-        if (!policies.containsKey(id)) 
-        {
+    public Policy update(String id, Policy policy) {
+        if (!policies.containsKey(id)) {
             return null;
         }
-        policies.put(id, value);
-        return value;
+        policies.put(id, policy);
+        return policy;
     }
 }
