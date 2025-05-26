@@ -90,13 +90,4 @@ public class AndDiscount extends CompositeDiscount {
     }
 
 
-    private boolean qualifiedByAll(String productId) {
-        for (Discount discount : this.discounts) {
-            if (!discount.isQualified(productId)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 }
