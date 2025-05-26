@@ -113,7 +113,7 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
 
         // Style all tabs to have white text and icons
         for (Tab tab : new Tab[]{managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab, historyTab}) {
-            tab.getStyle().set("color", "#ffffff");
+            tab.getStyle().set("color", " #ffffff");
             // Get the icon and span components from the tab
             tab.getChildren().forEach(component -> {
                 component.getElement().getStyle().set("color", "#ffffff");
@@ -633,6 +633,7 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             historyGrid.setItems(historyResponse.getValue());
             historyGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
             historyGrid.setWidthFull();
+            mainContent.add(historyGrid);
         }
     }
 
