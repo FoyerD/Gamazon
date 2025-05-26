@@ -27,7 +27,7 @@ public class CategoryPolicy extends IPolicy
     {
         for (Category category : item.getCategories()) 
         {
-            if (category.getName().equalsIgnoreCase(disallowedCategory)) 
+            if (category.getName().toLowerCase().equalsIgnoreCase(disallowedCategory)) 
             {
                 return false;
             }
