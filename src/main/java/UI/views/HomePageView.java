@@ -585,7 +585,8 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
-        if (sessionToken == null) {
+        user = (UserDTO) UI.getCurrent().getSession().getAttribute("user");
+        if (sessionToken == null || user == null) {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
         } else {

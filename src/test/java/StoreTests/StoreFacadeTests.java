@@ -561,9 +561,12 @@ public class StoreFacadeTests {
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn("user123");
         when(auction.triggerCharge()).thenReturn(true);
+        when(storeRepository.get(storeId)).thenReturn(mock(Store.class));
+        when(storeRepository.getLock(storeId)).thenReturn(new Object());
 
         when(itemRepository.update(itemKey, item)).thenReturn(item);
         when(auctionRepository.remove(auctionId)).thenReturn(auction);
+
 
         Item result = storeFacade.acceptBid(storeId, productId, auctionId);
         assertEquals(item, result);

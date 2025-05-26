@@ -236,16 +236,17 @@ public class StoreFacade {
             throw new RuntimeException("Bid must be greater than current and start");
         }
 
-        if (auction.currentBidderId != null) {
+        if (auction.currentBidderId != null && !auction.currentBidderId.equals(userId)) {
             TradingLogger.logEvent("StoreFacade", "addBid",
                 "DEBUG: Notifying previous bidder: " + auction.currentBidderId);
-                
+            String storeName = this.getStoreName(auction.getStoreId());
+            String productName = this.itemRepository.getItem(auction.getStoreId(), auction.getProductId()).getProductName();
             System.out.println("Notifying previous bidder: " + auction.currentBidderId);
             notificationService.sendNotification(auction.getCurrentBidderId(),
-                "You have been outbid on auction " + auctionId + " womp womp :(");
+                "You have been outbid on " + productName + "from " + storeName + " womp womp :(");
         } else {
             TradingLogger.logEvent("StoreFacade", "addBid",
-                "DEBUG: No previous bidder to notify for auction " + auctionId);
+                "DEBUG: No previous bidder to notify for auction " + auctionId + " or it's the same user bidding again.");
         }
 
         auction.setCurrentPrice(bid);
@@ -334,14 +335,16 @@ public class StoreFacade {
                 throw new RuntimeException("Payment failed for accepted bid");
             }
 
+            
         } catch (Exception ex) {
             // Rollback item amount
             item.setAmount(currentAmount);
             itemRepository.update(itemKey, item);
             throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);
         }
-
-        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! in auction " + auctionId + " 🎉 🔔");
+        String productName = item.getProductName();
+        String storeName = this.getStoreName(storeId);
+        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! purchesed " + productName + " from " + storeName + " 🎉 🔔");
         // Final update: optionally mark buyer (if you have a field), or leave updated amount
         itemRepository.update(itemKey, item);
 
