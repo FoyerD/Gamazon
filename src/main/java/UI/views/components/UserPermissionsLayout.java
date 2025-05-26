@@ -27,7 +27,7 @@ public class UserPermissionsLayout extends VerticalLayout {
 
     public UserPermissionsLayout(Supplier<Map<UserDTO, List<PermissionType>>> userPermissionSupplier, Runnable onAddUser) {
         H3 header = new H3("Store Managers");
-        this.refreshButton = new Button("Refresh");
+        this.refreshButton = new Button("Refresh", VaadinIcon.REFRESH.create());
         this.addUserButton = new Button("Add", VaadinIcon.PLUS.create());
 
         styleButton(refreshButton, "rgb(103, 33, 243)");
