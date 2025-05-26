@@ -9,13 +9,11 @@ import Domain.Store.ItemFacade;
 // this class represents the combination of two discounts both are applied.
 // according to the sixth type of complext discount described in v2 ducument.
 
-public class DoubleDiscount extends Discount{
+public class DoubleDiscount extends CompositeDiscount{
 
-    Set<Discount> discounts; // the set of discounts that are applied
-
-    public DoubleDiscount(ItemFacade itemFacade, Set<Discount> discounts) {
-        super(itemFacade, 0, null);
-        this.discounts = discounts;
+    public DoubleDiscount(ItemFacade itemFacade,  Set<Discount> discounts) {
+        super(itemFacade, discounts);
+        // TODO: inject composite discount condition if needed
     }
 
     @Override

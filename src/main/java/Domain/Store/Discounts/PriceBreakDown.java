@@ -10,13 +10,40 @@ public class PriceBreakDown {
     // Class implementation
 
     private List<String> descriptions;
+    private double originalPrice;
+    private double discount; // INV: between 0 and 1 (percantage)
 
 
+    public PriceBreakDown(double originalPrice, double discount) {
+        this.originalPrice = originalPrice;
+        this.discount = discount;
+        this.descriptions = new LinkedList<>();
+    }
+
+    public PriceBreakDown(double originalPrice, double discount, List<String> descriptions) {
+        this.originalPrice = originalPrice;
+        this.discount = discount;
+        this.descriptions = new LinkedList<>(descriptions);
+    }
+
+    public void addDescription(String description) {
+        descriptions.add(description);
+    }
 
     public List<String> getDescriptions() {
         return new LinkedList<>(descriptions);
     }
 
-    
+    public double getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public double getFinalPrice() {
+        return originalPrice * (1 - discount);
+    }
 
 }

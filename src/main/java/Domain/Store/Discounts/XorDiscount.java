@@ -1,26 +1,31 @@
 package Domain.Store.Discounts;
 
 import java.util.Map;
+import java.util.Set;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
-import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 
-public class XorDiscount extends Discount {
+public class XorDiscount extends CompositeDiscount {
 
-    private Discount discount1;
-    private Discount discount2;
+    public XorDiscount(ItemFacade itemFacade, Discount discount1, Discount discount2) {
+        super(itemFacade, Set.of(discount1, discount2));
+    }
 
-    public XorDiscount(ItemFacade itemFacade, float discountPercentage, DiscountQualifier qualifier, Discount discount1, Discount discount2) {
-        super(itemFacade, discountPercentage, qualifier);
-        this.discount1 = discount1;
-        this.discount2 = discount2;
+    public XorDiscount(ItemFacade itemFacade, Set<Discount> discounts) {
+        super(itemFacade, discounts);
     }
 
     @Override
     public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'calculatePrice'");
+    }
+
+    @Override
+    public boolean isQualified(String productId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isQualified'");
     }
 
 }
