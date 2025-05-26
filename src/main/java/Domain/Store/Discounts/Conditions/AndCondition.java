@@ -1,7 +1,7 @@
 package Domain.Store.Discounts.Conditions;
 
 import java.util.Set;
-
+import java.util.UUID;
 import Domain.Shopping.ShoppingBasket;
 
 public class AndCondition extends CompositeCondition {
@@ -10,9 +10,13 @@ public class AndCondition extends CompositeCondition {
         super(conditions);
     }
 
-
     public AndCondition(Condition condition1, Condition condition2) {
         super(Set.of(condition1, condition2));
+    }
+
+    // Constructor for loading from repository with existing UUID
+    public AndCondition(UUID id, Set<Condition> conditions) {
+        super(id, conditions);
     }
 
     @Override
@@ -24,5 +28,4 @@ public class AndCondition extends CompositeCondition {
         }
         return true;
     }
-
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
@@ -25,8 +26,6 @@ public class AndDiscount extends CompositeDiscount {
         }
 
         AndCondition compositeCondition = new AndCondition(conditions);
-
-
         this.setCondition(compositeCondition);
     }
 
@@ -35,13 +34,27 @@ public class AndDiscount extends CompositeDiscount {
         this.setCondition(new AndCondition(Set.of(discount1.getCondition(), discount2.getCondition())));
     }
 
+    // Constructor for loading from repository with existing UUID
+    public AndDiscount(UUID id, ItemFacade itemFacade, Set<Discount> discounts) {
+        super(id, itemFacade, discounts, null);
+
+        Set<Condition> conditions = new HashSet<>();
+        for (Discount discount : discounts) {
+            if (discount.getCondition() != null) {
+                conditions.add(discount.getCondition());
+            }
+        }
+
+        AndCondition compositeCondition = new AndCondition(conditions);
+        this.setCondition(compositeCondition);
+    }
+
     @Override
     public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
         
         Map<String, PriceBreakDown> output = new HashMap<>();
         Set<Map<String, PriceBreakDown>> toCompose = this.calculateAllSubDiscounts(basket);
 
-        
         // condition only applies if all discounts apply
         if (!conditionApplies(basket)) {
             for (String productId : basket.getOrders().keySet()) {
@@ -57,9 +70,6 @@ public class AndDiscount extends CompositeDiscount {
                 output.put(productId, priceBreakDown);
                 continue;
             }
-
-            // Apply the discount logic here, e.g., calculate the new price based on discountPercentage
-            // This is a placeholder for actual price calculation logic
 
             // Apply the composition:
             double bestPercentage = 0;
@@ -79,15 +89,14 @@ public class AndDiscount extends CompositeDiscount {
         return output;
     }
 
+    // checks if any of the discounts is qualified
     @Override
     public boolean isQualified(String productId) {
         for (Discount discount : this.discounts) {
-            if (!discount.isQualified(productId)) {
-                return true;
+            if (discount.isQualified(productId)) {
+                return true; // If ANY discount is qualified, return true
             }
         }
-        return false;
+        return false; // If none qualify, return false
     }
-
-
 }

@@ -3,25 +3,31 @@ package Domain.Store.Discounts;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
 import Domain.Store.Discounts.Conditions.TrueCondition;
 
-// this class represents the combination of two discounts both are applied.
-// according to the sixth type of complext discount described in v2 ducument.
-
 public class DoubleDiscount extends CompositeDiscount {
 
-    public DoubleDiscount(ItemFacade itemFacade,  Set<Discount> discounts) {
+    public DoubleDiscount(ItemFacade itemFacade, Set<Discount> discounts) {
         super(itemFacade, discounts);
 
         if (discounts == null || itemFacade == null) {
             throw new IllegalArgumentException("Discounts and ItemFacade cannot be null");
         }
 
-        // No need for a composite condition here, as we are only interested in applying both discounts
-        this.setCondition(new TrueCondition()); // No condition needed for double discount
+        this.setCondition(new TrueCondition());
+    }
+
+    // Constructor for loading from repository with existing UUID
+    public DoubleDiscount(UUID id, ItemFacade itemFacade, Set<Discount> discounts) {
+        super(id, itemFacade, discounts, new TrueCondition());
+
+        if (discounts == null || itemFacade == null) {
+            throw new IllegalArgumentException("Discounts and ItemFacade cannot be null");
+        }
     }
 
     @Override
@@ -29,7 +35,6 @@ public class DoubleDiscount extends CompositeDiscount {
         
         Set<Map<String, PriceBreakDown>> toCompose = this.calculateAllSubDiscounts(basket);
         Map<String, PriceBreakDown> output = new HashMap<>();
-
 
         for (String productId : basket.getOrders().keySet()) {
             if (!isQualified(productId) || !conditionApplies(basket)) {
@@ -47,24 +52,22 @@ public class DoubleDiscount extends CompositeDiscount {
                 }
             }
 
-            // Assuming the best percentage is applied to the original price
             double originalPrice = itemFacade.getItem(basket.getStoreId(), productId).getPrice();
-            output.put(productId, new PriceBreakDown(originalPrice, percentageAccumulator, null));
+            // Fixed: store the actual discount percentage, not the remaining price ratio
+            double finalDiscountPercentage = 1 - percentageAccumulator;
+            output.put(productId, new PriceBreakDown(originalPrice, finalDiscountPercentage, null));
         }
 
         return output;
     }
 
-    // checks if qualified by any of the two discounts
     @Override
     public boolean isQualified(String productId) {
         for (Discount discount : discounts) {
             if (discount.isQualified(productId)) {
-                return true; // If any discount qualifies, return true
+                return true;
             }
         }
-        return false; // If none qualify, return false
+        return false;
     }
-
-
 }

@@ -1,12 +1,28 @@
 package Domain.Store.Discounts.Conditions;
 
+import java.util.UUID;
 import Domain.Shopping.ShoppingBasket;
 
 public class TrueCondition implements Condition {
 
+    private final UUID id;
+
+    public TrueCondition() {
+        this.id = UUID.randomUUID();
+    }
+
+    // Constructor for loading from repository with existing UUID
+    public TrueCondition(UUID id) {
+        this.id = id;
+    }
+
+    @Override
+    public UUID getId() {
+        return id;
+    }
+
     /**
      * Checks if the condition is satisfied.
-     *
      * @return true, as this condition is always satisfied
      */
     @Override
@@ -15,8 +31,20 @@ public class TrueCondition implements Condition {
     }
 
     @Override
-    public String toString() {
-        return "True";
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        TrueCondition condition = (TrueCondition) obj;
+        return id.equals(condition.id);
     }
-    
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "TrueCondition{id=" + id + "}";
+    }
 }

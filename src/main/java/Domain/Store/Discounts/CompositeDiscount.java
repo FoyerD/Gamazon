@@ -3,6 +3,7 @@ package Domain.Store.Discounts;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
@@ -22,6 +23,12 @@ public abstract class CompositeDiscount extends Discount {
         this.discounts = discounts;
     }
 
+    // Constructor for loading from repository with existing UUID
+    public CompositeDiscount(UUID id, ItemFacade itemFacade, Set<Discount> discounts, Condition condition) {
+        super(id, itemFacade, condition);
+        this.discounts = discounts;
+    }
+
     protected Set<Map<String, PriceBreakDown>> calculateAllSubDiscounts(ShoppingBasket basket) {
         Set<Map<String, PriceBreakDown>> allSubDiscounts = new HashSet<>();
         for (Discount discount : discounts) {
@@ -30,4 +37,8 @@ public abstract class CompositeDiscount extends Discount {
         return allSubDiscounts;
     }
 
+    // Getter for repository serialization
+    public Set<Discount> getDiscounts() {
+        return new HashSet<>(discounts);
+    }
 }

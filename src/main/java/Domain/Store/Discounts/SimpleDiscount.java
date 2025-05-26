@@ -2,6 +2,7 @@ package Domain.Store.Discounts;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
@@ -25,6 +26,13 @@ public class SimpleDiscount extends Discount {
         this.qualifier = qualifier;
         this.discountPercentage = discountPercentage;
         this.setCondition(new TrueCondition());
+    }
+
+    // Constructor for loading from repository with existing UUID
+    public SimpleDiscount(UUID id, ItemFacade itemFacade, float discountPercentage, DiscountQualifier qualifier, Condition condition) {
+        super(id, itemFacade, condition);
+        this.qualifier = qualifier;
+        this.discountPercentage = discountPercentage;
     }
 
     @Override
@@ -54,4 +62,12 @@ public class SimpleDiscount extends Discount {
         return qualifier.isQualified(itemFacade.getProduct(productId));
     }
 
+    // Getters for repository serialization
+    public DiscountQualifier getQualifier() {
+        return qualifier;
+    }
+
+    public double getDiscountPercentage() {
+        return discountPercentage;
+    }
 }

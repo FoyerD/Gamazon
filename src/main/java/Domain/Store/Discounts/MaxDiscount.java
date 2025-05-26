@@ -3,13 +3,11 @@ package Domain.Store.Discounts;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
 import Domain.Store.Discounts.Conditions.TrueCondition;
-
-// This class represents a discount which is bounded by the maximum of multiple discounts.
-// According to the fifth type of complext discount described in v2 ducument.
 
 public class MaxDiscount extends CompositeDiscount {
 
@@ -20,10 +18,7 @@ public class MaxDiscount extends CompositeDiscount {
             throw new IllegalArgumentException("Discounts cannot be null or empty");
         }
         
-        // No need for a composite condition here, as we are only interested in the maximum discount
-        // across all provided discounts
-        this.setCondition(new TrueCondition()); // No condition needed for max discount
-
+        this.setCondition(new TrueCondition());
     }
 
     public MaxDiscount(ItemFacade itemFacade, Discount discount1, Discount discount2) {
@@ -32,11 +27,18 @@ public class MaxDiscount extends CompositeDiscount {
             throw new IllegalArgumentException("Discounts cannot be null");
         }
 
-        // No need for a composite condition here, as we are only interested in the maximum discount
-        this.setCondition(new TrueCondition()); // No condition needed for max discount
+        this.setCondition(new TrueCondition());
     }
 
-    
+    // Constructor for loading from repository with existing UUID
+    public MaxDiscount(UUID id, ItemFacade itemFacade, Set<Discount> discounts) {
+        super(id, itemFacade, discounts, new TrueCondition());
+
+        if (discounts == null || discounts.isEmpty()) {
+            throw new IllegalArgumentException("Discounts cannot be null or empty");
+        }
+    }
+
     @Override
     public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
         
@@ -50,10 +52,6 @@ public class MaxDiscount extends CompositeDiscount {
                 continue;
             }
 
-            // Apply the discount logic here, e.g., calculate the new price based on discountPercentage
-            // This is a placeholder for actual price calculation logic
-
-            // Apply the composition:
             double bestPercentage = 0;
             for (Map<String, PriceBreakDown> priceBreakDowns : toCompose) {
                 if (priceBreakDowns.containsKey(productId)) {
@@ -71,15 +69,13 @@ public class MaxDiscount extends CompositeDiscount {
         return output;
     }
 
-    // checks if qualified by any of the discounts
     @Override
     public boolean isQualified(String productId) {
         for (Discount discount : discounts) {
             if (discount.isQualified(productId)) {
-                return true; // If any discount qualifies, return true
+                return true;
             }
         }
-        return false; // If none qualify, return false
+        return false;
     }
-
 }
