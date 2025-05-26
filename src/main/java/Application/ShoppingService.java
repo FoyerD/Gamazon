@@ -17,14 +17,8 @@ import org.springframework.stereotype.Service;
 
 import Domain.ExternalServices.IPaymentService;
 import Domain.Pair;
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCartFacade;
-import Domain.Shopping.IShoppingCartRepository;
-import Domain.Shopping.ShoppingCartFacade;
-import Domain.Store.IProductRepository;
 import Domain.Store.Item;
-import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
 
@@ -90,6 +84,8 @@ public class ShoppingService{
             }
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
             Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
+
+            // Creation of BasketDTO's
             for (Pair<Item, Integer> item : itemsMap) {
                 ItemDTO itemDTO = ItemDTO.fromItem(item.getFirst());
                 itemDTO.setAmount(item.getSecond());
@@ -104,6 +100,7 @@ public class ShoppingService{
                     baskets.put(item.getFirst().getStoreId(), basket);
                 }
             }
+
             CartDTO cart = new CartDTO(clientId, baskets);
             TradingLogger.logEvent(CLASS_NAME, method, "Cart viewed for user " + clientId + " with " + itemsMap.size() + " items");
             return new Response<>(cart);
@@ -274,6 +271,18 @@ public class ShoppingService{
             TradingLogger.logError(CLASS_NAME, method, "Error making bid: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
+    }
+
+
+
+    // helper methods
+    private ShoppingBasketDTO addPriceBreakdownToBasket(ShoppingBasketDTO basket) {
+        throw new UnsupportedOperationException("Method not implemented yet. This method should add price breakdown to the basket.");
+    }
+
+    private CartDTO addPriceBreakdownToCart(CartDTO cart) {
+        // use the helper method above
+        throw new UnsupportedOperationException("Method not implemented yet. This method should add price breakdown to the cart.");
     }
 
 

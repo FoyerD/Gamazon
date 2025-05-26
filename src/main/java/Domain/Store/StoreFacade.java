@@ -14,6 +14,7 @@ import Domain.User.IUserRepository;
 import Domain.User.User;
 import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
+import Domain.Store.Discounts.Discount;
 
 
 
@@ -25,6 +26,7 @@ public class StoreFacade {
     private IAuctionRepository auctionRepository;
     private Function<String, User> getUser;
     private INotificationService notificationService;
+
 
     @Autowired
     public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, INotificationService notificationService) {
@@ -332,5 +334,8 @@ public class StoreFacade {
     }
 
 
+    public boolean addDiscount(String storeId, Discount discount) {
+        throw new UnsupportedOperationException("Method not implemented yet");
+    }
 
 }

@@ -15,6 +15,7 @@ public class ItemDTO {
     private final Set<CategoryDTO> categories;
     private final String productName;
     private final double rating;
+    private final PriceBreakDownDTO priceBreakDown; // Only needed for discounts when viewing the cart
 
     public ItemDTO(String storeId, String productId, double price, int amount, String description, Set<CategoryDTO> categories, String productName, double rating) {
         this.storeId = storeId;
@@ -25,6 +26,19 @@ public class ItemDTO {
         this.categories = categories;
         this.productName = productName;
         this.rating = rating;
+        this.priceBreakDown = null; // Only needed for discounts when viewing the cart
+    }
+
+    public ItemDTO(String storeId, String productId, double price, int amount, String description, Set<CategoryDTO> categories, String productName, double rating, PriceBreakDownDTO priceBreakDown) {
+        this.storeId = storeId;
+        this.productId = productId;
+        this.price = price;
+        this.amount = amount;
+        this.description = description;
+        this.categories = categories;
+        this.productName = productName;
+        this.rating = rating;
+        this.priceBreakDown = priceBreakDown; // Only needed for discounts when viewing the cart
     }
 
     // Factory method
@@ -40,6 +54,22 @@ public class ItemDTO {
                 .collect(Collectors.toSet()),
             item.getProductName(),
             item.getRating()
+        );
+    }
+
+    public static ItemDTO fromItem(Item item, PriceBreakDownDTO priceBreakDown) {
+        return new ItemDTO(
+            item.getStoreId(),
+            item.getProductId(),
+            item.getPrice(),
+            item.getAmount(),
+            item.getDescription(),
+            item.getCategories().stream()
+                .map(CategoryDTO::fromCategory)
+                .collect(Collectors.toSet()),
+            item.getProductName(),
+            item.getRating(),
+            priceBreakDown
         );
     }
 
@@ -77,5 +107,9 @@ public class ItemDTO {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public PriceBreakDownDTO getPriceBreakDown() {
+        return priceBreakDown;
     }
 }

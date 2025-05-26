@@ -1,5 +1,11 @@
 package Domain.Store.Discounts.Conditions;
 
 public class OrCondition extends CompositeCondition{
+
+    @Override
+    public boolean isSatisfied() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isSatisfied'");
+    }
     
 }

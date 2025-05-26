@@ -21,6 +21,7 @@ import Domain.ExternalServices.INotificationService;
 import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.Discount;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.Permission;
@@ -327,4 +328,10 @@ public class StoreService {
             return new HashSet<>(); // Return empty set in case of error
         }
     }
+
+
+    public Response<Boolean> addDiscount(Discount discount) {
+        throw new UnsupportedOperationException("Method not implemented yet.");
+    }
+
 }
