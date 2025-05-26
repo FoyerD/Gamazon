@@ -1,5 +1,7 @@
 package Domain.Store.Discounts.Conditions;
 
+import Domain.Shopping.ShoppingBasket;
+
 public interface Condition {
     
     /**
@@ -7,5 +9,5 @@ public interface Condition {
      *
      * @return true if the condition is satisfied, false otherwise
      */
-    boolean isSatisfied();
+    boolean isSatisfied(ShoppingBasket basket);
 }

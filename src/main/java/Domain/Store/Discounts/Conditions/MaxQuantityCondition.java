@@ -1,12 +1,23 @@
 package Domain.Store.Discounts.Conditions;
 
+import Domain.Shopping.ShoppingBasket;
+import Domain.Store.ItemFacade;
+
 public class MaxQuantityCondition extends SimpleCondition {
 
-    @Override
-    public boolean isSatisfied() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isSatisfied'");
+    private String productId;
+    private int maxQuantity;
+
+    public MaxQuantityCondition(ItemFacade itemFacade, String productId, int maxQuantity) {
+        super(itemFacade);
+        this.productId = productId;
+        this.maxQuantity = maxQuantity;
     }
 
-    
+    @Override
+    public boolean isSatisfied(ShoppingBasket shoppingBasket) {
+        int quantity = shoppingBasket.getQuantity(productId);
+        return quantity <= maxQuantity;
+    }
+
 }

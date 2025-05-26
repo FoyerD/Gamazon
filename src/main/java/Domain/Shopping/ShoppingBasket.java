@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class ShoppingBasket {
     
-    private Map<String, Integer> orders;
+    private Map<String, Integer> orders; // maps product IDs to their quantities
     private String storeId;
     private String clientId;
 
@@ -110,6 +110,14 @@ public class ShoppingBasket {
             total += quantity;
         }  
         return total;
+    }
+
+    public int getQuantity(String productId) {
+        if (orders.containsKey(productId)) {
+            return orders.get(productId);
+        } else {
+            return 0; // Return 0 if the product is not in the basket
+        }
     }
 
     /**
