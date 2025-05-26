@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
+import Application.utils.TradingLogger;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Store.Item;
@@ -212,8 +213,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             }
 
             paymentService.processPayment(
-                clientName, cardNumber, expiryDate, cvv, 
-                deliveryAddress, price
+                clientId, cardNumber, expiryDate, cvv, 
+                clientName, price
             );
 
             return true;
@@ -323,13 +324,17 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         if (purchaseSuccess) {
             // Call payment service and check for error response
             paymentResponse = paymentService.processPayment(
-                clientName, card_number, expiry_date, cvv, 
-                deliveryAddress, totalPrice
+                clientId, card_number, expiry_date, cvv, 
+                clientName, totalPrice
             );
+
             
             if (paymentResponse == null) {
                 throw new RuntimeException("Payment failed: service returned null response");
             }
+            
+            if(paymentResponse.getValue() == null)
+                throw new RuntimeException("Payment failed: value is null");
 
             // If payment service returned an error, throw an exception to trigger rollback
             if (paymentResponse.errorOccurred()) {
