@@ -258,6 +258,12 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         // Added null check for cart.getCart()
         if (storeIds != null) {
             for (String storeId : storeIds) {
+                if(storeFacade.getStore(storeId) == null) {
+                    throw new RuntimeException("Store not found: " + storeId);
+                }
+                if(!storeFacade.getStore(storeId).isOpen()) {
+                    throw new RuntimeException("Store is closed: " + storeId);
+                }
                 ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
                 if (basket != null && !basket.isEmpty()) {
                     // Track products and prices for this store
