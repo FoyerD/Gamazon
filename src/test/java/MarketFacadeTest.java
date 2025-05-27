@@ -84,6 +84,7 @@ public class MarketFacadeTest {
             return null;
         }).when(permissionManager).appointStoreManager(anyString(), anyString(), anyString());
         
+        when(userRepository.getMember("newManager")).thenReturn(mock(Member.class));
         // Act
         marketFacade.appointStoreManager("admin", "newManager", "store1");
         
