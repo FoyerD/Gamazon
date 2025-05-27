@@ -1,7 +1,6 @@
 package Domain.Store.Discounts;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -275,7 +274,7 @@ public class DiscountFacade {
     /**
      * Finds a discount by ID.
      */
-    public Optional<Discount> findDiscountById(UUID id) {
+    public Discount findDiscountById(UUID id) {
         validateId(id);
         return discountRepository.findById(id);
     }
@@ -317,7 +316,7 @@ public class DiscountFacade {
     /**
      * Finds a condition by ID.
      */
-    public Optional<Condition> findConditionById(UUID id) {
+    public Condition findConditionById(UUID id) {
         validateId(id);
         return conditionRepository.findById(id);
     }
@@ -359,6 +358,14 @@ public class DiscountFacade {
         discountRepository.clear();
         conditionRepository.clear();
     }
+
+    public Set<Discount> getStoreDiscounts(String storeId) {
+        if (storeId == null || storeId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Store ID cannot be null or empty");
+        }
+        return discountRepository.getStoreDiscounts(storeId);
+    }
+    
     
     // ===========================================
     // VALIDATION METHODS

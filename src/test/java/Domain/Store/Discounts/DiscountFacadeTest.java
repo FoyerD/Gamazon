@@ -659,8 +659,9 @@ public class DiscountFacadeTest {
         
         when(mockDiscountRepository.findById(discountId)).thenReturn(expectedDiscount);
         
-        Optional<Discount> result = discountFacade.findDiscountById(discountId);
+        Discount result = discountFacade.findDiscountById(discountId);
         
+        assertNotNull(result);
         assertEquals("Should return the discount from repository", expectedDiscount, result);
         verify(mockDiscountRepository).findById(discountId);
     }

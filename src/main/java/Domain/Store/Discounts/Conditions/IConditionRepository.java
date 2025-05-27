@@ -1,7 +1,6 @@
 package Domain.Store.Discounts.Conditions;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -27,7 +26,7 @@ public interface IConditionRepository {
      * @return an Optional containing the condition if found, empty otherwise
      * @throws IllegalArgumentException if id is null
      */
-    Optional<Condition> findById(UUID id);
+    Condition findById(UUID id);
     
     /**
      * Deletes a condition by its unique identifier.

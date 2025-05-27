@@ -22,6 +22,7 @@ import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.Permission;
@@ -36,22 +37,26 @@ public class StoreService {
     private INotificationService notificationService;
     private IShoppingCartFacade shoppingCartFacade;
 
+    private DiscountFacade discountFacade;
+
     public StoreService() {
         this.storeFacade = null;
         this.tokenService = null;
         this.permissionManager = null;
         this.notificationService = null;
         this.shoppingCartFacade = null;
+        this.discountFacade = null;
     }
 
     @Autowired
     public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, 
-                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade) {
+                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, DiscountFacade discountFacade) {
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
         this.permissionManager = permissionManager;
         this.shoppingCartFacade = shoppingCartFacade;
+        this.discountFacade = discountFacade;
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "StoreService initialized with dependencies");
     }
 
