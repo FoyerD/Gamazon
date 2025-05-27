@@ -18,6 +18,7 @@ import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.IProductRepository;
 
 /**
@@ -46,7 +47,9 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @param productRepository The repository for products
      */
     @Autowired
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo,
+     IPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade,
+      IReceiptRepository receiptRepo, IProductRepository productRepository, DiscountFacade discountFacade) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
@@ -54,7 +57,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         this.storeFacade = storeFacade;
         this.receiptRepo = receiptRepo;
         this.checkoutManager = new CheckoutManager(basketRepo, paymentService, itemFacade, productRepository,
-         new ReceiptBuilder(receiptRepo, itemFacade));
+         new ReceiptBuilder(receiptRepo, itemFacade), discountFacade);
     }
 
     /**

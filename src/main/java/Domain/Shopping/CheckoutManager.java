@@ -15,6 +15,9 @@ import Domain.ExternalServices.IPaymentService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
+import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.DiscountFacade;
+import Domain.Store.Discounts.PriceBreakDown;
 import Domain.Store.IProductRepository;
 
 /**
@@ -28,18 +31,21 @@ public class CheckoutManager {
     private final ItemFacade itemFacade;
     private final IProductRepository productRepo;
     private final ReceiptBuilder receiptBuilder;
+    private final PriceCalculator priceCalculator;
 
     @Autowired
     public CheckoutManager(IShoppingBasketRepository basketRepo, 
                           IPaymentService paymentService,
                           ItemFacade itemFacade, 
                           IProductRepository productRepo,
-                          ReceiptBuilder receiptBuilder) {
+                          ReceiptBuilder receiptBuilder,
+                          DiscountFacade discountFacade) {
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
         this.itemFacade = itemFacade;
         this.productRepo = productRepo;
         this.receiptBuilder = receiptBuilder;
+        this.priceCalculator = new PriceCalculator(itemFacade, discountFacade);
     }
 
     /**
@@ -63,6 +69,7 @@ public class CheckoutManager {
         Set<ShoppingBasket> basketsRollbackData = new HashSet<>();
         Set<String> cartRollbackData = new HashSet<>();
         Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
+        Map<String, Map<Product, Double>> storeProductPricesMap = new HashMap<>(); // Store discounted prices
         
         try {
             boolean purchaseSuccess = false;
@@ -79,6 +86,7 @@ public class CheckoutManager {
                             purchaseSuccess = true;
                             totalPrice += storeResult.getTotalPrice();
                             storeProductsMap.put(storeId, storeResult.getProducts());
+                            storeProductPricesMap.put(storeId, storeResult.getProductPrices());
                         }
                         
                         // Clear the basket
@@ -107,9 +115,9 @@ public class CheckoutManager {
             }
             cart.clear();
             
-            // Create receipts
+            // Create receipts with discounted prices
             if (purchaseSuccess) {
-                receiptBuilder.createReceipts(clientId, storeProductsMap, cardNumber);
+                receiptBuilder.createReceiptsWithDiscounts(clientId, storeProductsMap, storeProductPricesMap, cardNumber);
             }
 
             return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData);
@@ -126,9 +134,19 @@ public class CheckoutManager {
                                                   Map<Pair<String, String>, Integer> itemsRollbackData,
                                                   Set<ShoppingBasket> basketsRollbackData) {
         Map<Product, Integer> storeProducts = new HashMap<>();
+        Map<Product, Double> productPrices = new HashMap<>(); // Store final prices for receipt
         double totalPrice = 0;
         
         basketsRollbackData.add(basket);
+        
+        // Calculate discounted prices for all products in the basket
+        Map<String, PriceBreakDown> priceBreakdowns = null;
+        try {
+            priceBreakdowns = priceCalculator.calculatePrice(basket);
+        } catch (Exception e) {
+            System.err.println("Error calculating discounted prices, falling back to original prices: " + e.getMessage());
+            priceBreakdowns = new HashMap<>();
+        }
         
         Map<String, Integer> orders = basket.getOrders();
         if (orders != null) {
@@ -144,16 +162,37 @@ public class CheckoutManager {
                             // Decrease item quantity
                             itemFacade.decreaseAmount(new Pair<>(storeId, productId), quantity);
                             
-                            // Get product and calculate price
+                            // Get product and calculate discounted price
                             Product product = productRepo.get(productId);
                             if (product != null) {
                                 Product productCopy = new Product(product);
                                 Item item = itemFacade.getItem(storeId, productCopy.getProductId());
                                 if (item != null) {
-                                    double productPrice = item.getPrice() * quantity;
-                                    totalPrice += productPrice;
+                                    double unitPrice;
+                                    
+                                    // Use discounted price if available, otherwise fall back to original price
+                                    PriceBreakDown priceBreakdown = priceBreakdowns.get(productId);
+                                    if (priceBreakdown != null) {
+                                        unitPrice = priceBreakdown.getFinalPrice();
+                                        
+                                        // Log discount application for debugging
+                                        if (priceBreakdown.getDiscount() > 0) {
+                                            System.out.println("Applied discount to product " + productId + 
+                                                             ": Original price " + priceBreakdown.getOriginalPrice() + 
+                                                             ", Discount " + (priceBreakdown.getDiscount() * 100) + "%" +
+                                                             ", Final price " + unitPrice);
+                                        }
+                                    } else {
+                                        unitPrice = item.getPrice();
+                                        System.out.println("No discounts found for product " + productId + 
+                                                         ", using original price: " + unitPrice);
+                                    }
+                                    
+                                    double productTotalPrice = unitPrice * quantity;
+                                    totalPrice += productTotalPrice;
                                     
                                     storeProducts.put(productCopy, quantity);
+                                    productPrices.put(productCopy, unitPrice); // Store the final unit price
                                     itemsRollbackData.put(new Pair<>(storeId, productCopy.getProductId()), quantity);
                                 }
                             }
@@ -165,7 +204,7 @@ public class CheckoutManager {
             }
         }
         
-        return new CheckoutStoreResult(!storeProducts.isEmpty(), totalPrice, storeProducts);
+        return new CheckoutStoreResult(!storeProducts.isEmpty(), totalPrice, storeProducts, productPrices);
     }
 
     /**
@@ -229,16 +268,26 @@ public class CheckoutManager {
         private final boolean success;
         private final double totalPrice;
         private final Map<Product, Integer> products;
+        private final Map<Product, Double> productPrices; // Final unit prices after discounts
 
         public CheckoutStoreResult(boolean success, double totalPrice, Map<Product, Integer> products) {
             this.success = success;
             this.totalPrice = totalPrice;
             this.products = products;
+            this.productPrices = new HashMap<>();
+        }
+
+        public CheckoutStoreResult(boolean success, double totalPrice, Map<Product, Integer> products, Map<Product, Double> productPrices) {
+            this.success = success;
+            this.totalPrice = totalPrice;
+            this.products = products;
+            this.productPrices = productPrices != null ? productPrices : new HashMap<>();
         }
 
         public boolean isSuccess() { return success; }
         public double getTotalPrice() { return totalPrice; }
         public Map<Product, Integer> getProducts() { return products; }
+        public Map<Product, Double> getProductPrices() { return productPrices; }
     }
 
     /**

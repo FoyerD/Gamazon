@@ -89,7 +89,8 @@ public class FacadeManager {
                                                 getItemFacade(),
                                                 getStoreFacade(),
                                                 repoManager.getReceiptRepository(),
-                                                repoManager.getProductRepository());
+                                                repoManager.getProductRepository(),
+                                                getDiscountFacade());
         }
         return CartFacade;
     }

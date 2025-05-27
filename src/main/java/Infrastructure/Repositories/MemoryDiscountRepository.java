@@ -1,10 +1,14 @@
 package Infrastructure.Repositories;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.springframework.stereotype.Repository;
 
@@ -15,28 +19,39 @@ import Domain.Store.Discounts.IDiscountRepository;
 public class MemoryDiscountRepository implements IDiscountRepository {
     
     private final Map<UUID, Discount> discounts;
+    private final Map<String, Map<UUID, Discount>> discountsByStore;
 
     public MemoryDiscountRepository() {
         this.discounts = new ConcurrentHashMap<>();
+        this.discountsByStore = new ConcurrentHashMap<>();
     }
 
     @Override
-    public void save(Discount discount) {
+    public void save(String storeID, Discount discount) {
         if (discount == null) {
             throw new IllegalArgumentException("Discount cannot be null");
         }
         if (discount.getId() == null) {
             throw new IllegalArgumentException("Discount ID cannot be null");
         }
+        if (storeID == null || storeID.trim().isEmpty()) {
+            throw new IllegalArgumentException("Store ID cannot be null or empty");
+        }
+        
+        // Store in main discounts map
         discounts.put(discount.getId(), discount);
+        
+        // Store in store-specific map
+        discountsByStore.computeIfAbsent(storeID, k -> new ConcurrentHashMap<>())
+                       .put(discount.getId(), discount);
     }
 
     @Override
-    public Optional<Discount> findById(UUID id) {
+    public Discount findById(UUID id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
-        return Optional.ofNullable(discounts.get(id));
+        return discounts.get(id);
     }
 
     @Override
@@ -44,7 +59,13 @@ public class MemoryDiscountRepository implements IDiscountRepository {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
-        discounts.remove(id);
+        
+        Discount discount = discounts.remove(id);
+        if (discount != null) {
+            // Remove from all store maps
+            discountsByStore.values().forEach(storeDiscounts -> 
+                storeDiscounts.remove(id));
+        }
     }
 
     @Override
@@ -63,10 +84,149 @@ public class MemoryDiscountRepository implements IDiscountRepository {
     @Override
     public void clear() {
         discounts.clear();
+        discountsByStore.clear();
     }
 
     @Override
     public int size() {
         return discounts.size();
+    }
+
+    @Override
+    public List<Discount> findByStoreId(String storeId) {
+        if (storeId == null || storeId.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        if (storeDiscounts == null) {
+            return new ArrayList<>();
+        }
+        
+        return new ArrayList<>(storeDiscounts.values());
+    }
+
+    @Override
+    public Set<Discount> getStoreDiscounts(String storeId) {
+        if (storeId == null || storeId.trim().isEmpty()) {
+            return new HashSet<>();
+        }
+        
+        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        if (storeDiscounts == null) {
+            return new HashSet<>();
+        }
+        
+        return new HashSet<>(storeDiscounts.values());
+    }
+
+    /**
+     * Deletes all discounts for a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @return The number of discounts deleted
+     */
+    public int deleteByStoreId(String storeId) {
+        if (storeId == null || storeId.trim().isEmpty()) {
+            return 0;
+        }
+        
+        Map<UUID, Discount> storeDiscounts = discountsByStore.remove(storeId);
+        if (storeDiscounts == null) {
+            return 0;
+        }
+        
+        // Remove from main discounts map
+        storeDiscounts.keySet().forEach(discounts::remove);
+        
+        return storeDiscounts.size();
+    }
+
+    /**
+     * Gets the number of discounts for a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @return The number of discounts for the store
+     */
+    public int getStoreDiscountCount(String storeId) {
+        if (storeId == null || storeId.trim().isEmpty()) {
+            return 0;
+        }
+        
+        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        return storeDiscounts != null ? storeDiscounts.size() : 0;
+    }
+
+    /**
+     * Checks if a store has any discounts.
+     * 
+     * @param storeId The ID of the store
+     * @return true if the store has discounts, false otherwise
+     */
+    public boolean hasDiscountsForStore(String storeId) {
+        if (storeId == null || storeId.trim().isEmpty()) {
+            return false;
+        }
+        
+        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        return storeDiscounts != null && !storeDiscounts.isEmpty();
+    }
+
+    /**
+     * Gets all store IDs that have discounts.
+     * 
+     * @return Map of store IDs to the number of discounts they have
+     */
+    public Map<String, Integer> getStoreDiscountCounts() {
+        return discountsByStore.entrySet().stream()
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> entry.getValue().size()
+                ));
+    }
+
+    /**
+     * Updates a discount for a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @param discount The discount to update
+     * @return The previous discount if it existed, null otherwise
+     */
+    public Discount updateDiscount(String storeId, Discount discount) {
+        if (discount == null) {
+            throw new IllegalArgumentException("Discount cannot be null");
+        }
+        if (discount.getId() == null) {
+            throw new IllegalArgumentException("Discount ID cannot be null");
+        }
+        if (storeId == null || storeId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Store ID cannot be null or empty");
+        }
+
+        Discount previousDiscount = discounts.put(discount.getId(), discount);
+        discountsByStore.computeIfAbsent(storeId, k -> new ConcurrentHashMap<>())
+                       .put(discount.getId(), discount);
+        
+        return previousDiscount;
+    }
+
+    /**
+     * Finds a discount by ID within a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @param discountId The ID of the discount
+     * @return The discount if found within the store, null otherwise
+     */
+    public Discount findByStoreAndDiscountId(String storeId, UUID discountId) {
+        if (storeId == null || storeId.trim().isEmpty() || discountId == null) {
+            return null;
+        }
+        
+        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        if (storeDiscounts == null) {
+            return null;
+        }
+        
+        return storeDiscounts.get(discountId);
     }
 }

@@ -19,7 +19,7 @@ public interface IDiscountRepository {
      * @param discount the discount to save
      * @throws IllegalArgumentException if discount is null or has a null ID
      */
-    void save(Discount discount);
+    void save(String StoreID, Discount discount);
     
     /**
      * Finds a discount by its unique identifier.
