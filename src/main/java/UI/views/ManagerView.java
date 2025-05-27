@@ -16,7 +16,6 @@ import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 
 import Domain.management.PermissionType;
-import Application.UserService;
 import Application.DTOs.UserDTO;
 import Application.MarketService;
 import Application.DTOs.AuctionDTO;
@@ -141,9 +140,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             if (event.getSelectedTab().equals(managersTab)) {
                 showManagersView();
             } else if (event.getSelectedTab().equals(ownersTab)) {
-                // showOwnersView();
+                showOwnersView();
             } else if (event.getSelectedTab().equals(permissionsTab)) {
-                // showPermissionsView();
+                showPermissionsView();
             } else if (event.getSelectedTab().equals(itemsTab)) {
                 showItemsView();
             } else if (event.getSelectedTab().equals(auctionsTab)) {
@@ -258,62 +257,65 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         styleButton(addButton, "#4caf50");
         addButton.addClickListener(e -> showAddUserDialog(false));
 
-        mainContent.add(new H3("Store Owners"), addButton, ownersGrid);
+        //mainContent.add(new H3("Store Owners"), addButton, ownersGrid);
+        mainContent.add(new H3("Store Owners"), new Span("Under construction"));
         // refreshGrids();
     }
 
     private void showPermissionsView() {
         mainContent.removeAll();
         
-        managersPermissionGrid = new Grid<>();
-        managersPermissionGrid.addColumn(UserRole::getUsername).setHeader("Manager");
+        mainContent.add(new H3("Store Permissions"), new Span("Under construction"));
+
+        // managersPermissionGrid = new Grid<>();
+        // managersPermissionGrid.addColumn(UserRole::getUsername).setHeader("Manager");
         
-        // Add a column to show current permissions with remove buttons for each
-        managersPermissionGrid.addComponentColumn(manager -> {
-            HorizontalLayout permissionsLayout = new HorizontalLayout();
-            permissionsLayout.setSpacing(true);
-            permissionsLayout.getStyle().set("flex-wrap", "wrap");
+        // // Add a column to show current permissions with remove buttons for each
+        // managersPermissionGrid.addComponentColumn(manager -> {
+        //     HorizontalLayout permissionsLayout = new HorizontalLayout();
+        //     permissionsLayout.setSpacing(true);
+        //     permissionsLayout.getStyle().set("flex-wrap", "wrap");
             
-            Set<PermissionType> permissions = managerPermissionsMap.getOrDefault(manager.getUsername(), new HashSet<>());
-            permissions.forEach(permission -> {
-                Span permissionChip = new Span(permission.name().replace("_", " ").toLowerCase());
-                permissionChip.getStyle()
-                    .set("background-color", "var(--lumo-primary-color-10)")
-                    .set("border-radius", "16px")
-                    .set("padding", "4px 8px")
-                    .set("margin", "2px");
+        //     Set<PermissionType> permissions = managerPermissionsMap.getOrDefault(manager.getUsername(), new HashSet<>());
+        //     permissions.forEach(permission -> {
+        //         Span permissionChip = new Span(permission.name().replace("_", " ").toLowerCase());
+        //         permissionChip.getStyle()
+        //             .set("background-color", "var(--lumo-primary-color-10)")
+        //             .set("border-radius", "16px")
+        //             .set("padding", "4px 8px")
+        //             .set("margin", "2px");
 
-                Button removeButton = new Button(VaadinIcon.CLOSE_SMALL.create());
-                removeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-                removeButton.addClickListener(e -> {
-                    Set<PermissionType> currentPermissions = new HashSet<>(permissions);
-                    currentPermissions.remove(permission);
-                    updatePermissions(manager.getUsername(), new ArrayList<>(currentPermissions));
-                    managerPermissionsMap.put(manager.getUsername(), currentPermissions);
-                    refreshPermissionsGrid();
-                });
+        //         Button removeButton = new Button(VaadinIcon.CLOSE_SMALL.create());
+        //         removeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        //         removeButton.addClickListener(e -> {
+        //             Set<PermissionType> currentPermissions = new HashSet<>(permissions);
+        //             currentPermissions.remove(permission);
+        //             updatePermissions(manager.getUsername(), new ArrayList<>(currentPermissions));
+        //             managerPermissionsMap.put(manager.getUsername(), currentPermissions);
+        //             refreshPermissionsGrid();
+        //         });
 
-                HorizontalLayout chip = new HorizontalLayout(permissionChip, removeButton);
-                chip.setSpacing(false);
-                chip.setAlignItems(Alignment.CENTER);
-                permissionsLayout.add(chip);
-            });
-            return permissionsLayout;
-        }).setHeader("Current Permissions");
+        //         HorizontalLayout chip = new HorizontalLayout(permissionChip, removeButton);
+        //         chip.setSpacing(false);
+        //         chip.setAlignItems(Alignment.CENTER);
+        //         permissionsLayout.add(chip);
+        //     });
+        //     return permissionsLayout;
+        // }).setHeader("Current Permissions");
 
-        // Add actions column with add permissions button
-        managersPermissionGrid.addComponentColumn(manager -> {
-            Button addButton = new Button("Add Permissions", VaadinIcon.PLUS.create());
-            styleButton(addButton, "#4caf50");
-            addButton.addClickListener(e -> showAddPermissionsDialog(manager.getUsername()));
-            return addButton;
-        }).setHeader("Actions");
+        // // Add actions column with add permissions button
+        // managersPermissionGrid.addComponentColumn(manager -> {
+        //     Button addButton = new Button("Add Permissions", VaadinIcon.PLUS.create());
+        //     styleButton(addButton, "#4caf50");
+        //     addButton.addClickListener(e -> showAddPermissionsDialog(manager.getUsername()));
+        //     return addButton;
+        // }).setHeader("Actions");
 
-        //TODO: remove this
-        //managersPermissionGrid.setItems(getStoreManagers());
-        managersPermissionGrid.setHeight("300px");
+        // //TODO: remove this
+        // //managersPermissionGrid.setItems(getStoreManagers());
+        // managersPermissionGrid.setHeight("300px");
 
-        mainContent.add(new H3("Manager Permissions"), managersPermissionGrid);
+        // mainContent.add(new H3("Manager Permissions"), managersPermissionGrid);
     }
 
     private void showItemsView() {
