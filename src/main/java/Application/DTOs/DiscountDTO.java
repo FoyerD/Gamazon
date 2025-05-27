@@ -33,7 +33,7 @@ public class DiscountDTO {
     private ConditionDTO condition;
     
     // Fields for simple discounts
-    private Double discountPercentage;
+    private Float discountPercentage;
     private QualifierType qualifierType;
     private String qualifierValue; // Product ID, Category name, or null for store
     
@@ -163,11 +163,11 @@ public class DiscountDTO {
         this.condition = condition;
     }
     
-    public Double getDiscountPercentage() {
+    public Float getDiscountPercentage() {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(Double discountPercentage) {
+    public void setDiscountPercentage(Float discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
     

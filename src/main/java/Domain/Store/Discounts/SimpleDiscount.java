@@ -13,7 +13,7 @@ import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 public class SimpleDiscount extends Discount {
 
     private DiscountQualifier qualifier;
-    private double discountPercentage; // INV: between 0 and 1 (percentage)
+    private float discountPercentage; // INV: between 0 and 1 (percentage)
 
     public SimpleDiscount(ItemFacade itemFacade, float discountPercentage, DiscountQualifier qualifier, Condition condition) {
         super(itemFacade, condition);
@@ -67,7 +67,7 @@ public class SimpleDiscount extends Discount {
         return qualifier;
     }
 
-    public double getDiscountPercentage() {
+    public float getDiscountPercentage() {
         return discountPercentage;
     }
 }
