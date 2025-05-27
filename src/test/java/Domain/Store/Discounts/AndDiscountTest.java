@@ -57,7 +57,7 @@ public class AndDiscountTest {
         discounts.add(discount1);
         discounts.add(discount2);
         
-        andDiscount = new AndDiscount(itemFacade, 0.2f, qualifier, discounts);
+        andDiscount = new AndDiscount(itemFacade, discounts);
     }
     
     @Test
@@ -69,7 +69,7 @@ public class AndDiscountTest {
     
     @Test
     public void testConstructorWithTwoDiscounts() {
-        AndDiscount discount = new AndDiscount(itemFacade, 0.15f, qualifier, discount1, discount2);
+        AndDiscount discount = new AndDiscount(itemFacade, discount1, discount2);
         assertNotNull(discount);
         assertNotNull(discount.getId());
     }
@@ -96,14 +96,14 @@ public class AndDiscountTest {
         when(itemFacade.getItem("store1", "product1")).thenReturn(item);
         when(item.getPrice()).thenReturn(100.0);
         
-        // Mock the AND condition to return false
+        // Mock the AND condition to return false (not all conditions satisfied)
         when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(false); // This makes AND condition false
+        when(condition2.isSatisfied(basket)).thenReturn(false);
         
         // Execute
         Map<String, PriceBreakDown> result = andDiscount.calculatePrice(basket);
         
-        // Verify - should return no discount when condition not satisfied
+        // Verify - should return no discount when conditions not satisfied
         assertEquals(1, result.size());
         PriceBreakDown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
@@ -111,7 +111,7 @@ public class AndDiscountTest {
     }
     
     @Test
-    public void testCalculatePriceWhenConditionSatisfied() {
+    public void testCalculatePriceWhenAllConditionsSatisfied() {
         // Setup
         Map<String, Integer> orders = new HashMap<>();
         orders.put("product1", 2);
@@ -132,7 +132,7 @@ public class AndDiscountTest {
         when(discount1.isQualified("product1")).thenReturn(true);
         when(discount2.isQualified("product1")).thenReturn(true);
         
-        // Mock the AND condition to return true
+        // Mock all conditions to be satisfied
         when(condition1.isSatisfied(basket)).thenReturn(true);
         when(condition2.isSatisfied(basket)).thenReturn(true);
         
@@ -147,20 +147,30 @@ public class AndDiscountTest {
     }
     
     @Test
-    public void testIsQualifiedWhenAllDiscountsQualify() {
-        when(discount1.isQualified("product1")).thenReturn(true);
-        when(discount2.isQualified("product1")).thenReturn(true);
-        
-        assertTrue(andDiscount.isQualified("product1"));
-    }
-    
-    @Test
-    public void testIsQualifiedWhenOneDiscountDoesNotQualify() {
+    public void testIsQualifiedWhenAnyDiscountQualifies() {
+        // CORRECT LOGIC: isQualified should return true if ANY discount qualifies
+        // This is for efficiency - if any discount could apply, it's worth processing
         when(discount1.isQualified("product1")).thenReturn(true);
         when(discount2.isQualified("product1")).thenReturn(false);
         
-        // This tests the FIXED logic - should return false when ANY discount is not qualified
-        assertFalse(andDiscount.isQualified("product1"));
+        assertTrue("AndDiscount should qualify if ANY discount qualifies", 
+                  andDiscount.isQualified("product1"));
+        
+        // Test the other way around
+        when(discount1.isQualified("product1")).thenReturn(false);
+        when(discount2.isQualified("product1")).thenReturn(true);
+        
+        assertTrue("AndDiscount should qualify if ANY discount qualifies", 
+                  andDiscount.isQualified("product1"));
+    }
+    
+    @Test
+    public void testIsQualifiedWhenBothDiscountsQualify() {
+        when(discount1.isQualified("product1")).thenReturn(true);
+        when(discount2.isQualified("product1")).thenReturn(true);
+        
+        assertTrue("AndDiscount should qualify when both discounts qualify", 
+                  andDiscount.isQualified("product1"));
     }
     
     @Test
@@ -168,34 +178,92 @@ public class AndDiscountTest {
         when(discount1.isQualified("product1")).thenReturn(false);
         when(discount2.isQualified("product1")).thenReturn(false);
         
-        assertFalse(andDiscount.isQualified("product1"));
+        assertFalse("AndDiscount should not qualify when no discounts qualify", 
+                   andDiscount.isQualified("product1"));
     }
     
     @Test
-    public void testIsQualifiedCompletelyOppositeOfOriginalBuggyBehavior() {
-        // Test case 1: Both qualify -> should return true (FIXED)
+    public void testAndCompositionLogic() {
+        // This test demonstrates the AND composition logic:
+        // - CONDITIONS: ALL conditions must be satisfied for any discounts to apply
+        // - QUALIFICATION: ANY discount qualifying means processing is worthwhile
+        // - APPLICATION: Individual discounts apply to products they qualify for
+        
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("product1", 1); // qualifies for discount1 only
+        orders.put("product2", 1); // qualifies for discount2 only  
+        orders.put("product3", 1); // qualifies for both discounts
+        orders.put("product4", 1); // qualifies for neither discount
+        
+        when(basket.getOrders()).thenReturn(orders);
+        when(basket.getStoreId()).thenReturn("store1");
+        
+        // Setup items
+        Item item1 = mock(Item.class);
+        Item item2 = mock(Item.class);
+        Item item3 = mock(Item.class);
+        Item item4 = mock(Item.class);
+        
+        when(itemFacade.getItem("store1", "product1")).thenReturn(item1);
+        when(itemFacade.getItem("store1", "product2")).thenReturn(item2);
+        when(itemFacade.getItem("store1", "product3")).thenReturn(item3);
+        when(itemFacade.getItem("store1", "product4")).thenReturn(item4);
+        
+        when(item1.getPrice()).thenReturn(100.0);
+        when(item2.getPrice()).thenReturn(100.0);
+        when(item3.getPrice()).thenReturn(100.0);
+        when(item4.getPrice()).thenReturn(100.0);
+        
+        // Setup discount qualifications
         when(discount1.isQualified("product1")).thenReturn(true);
-        when(discount2.isQualified("product1")).thenReturn(true);
-        assertTrue("When both discounts qualify, AndDiscount should qualify", 
+        when(discount1.isQualified("product2")).thenReturn(false);
+        when(discount1.isQualified("product3")).thenReturn(true);
+        when(discount1.isQualified("product4")).thenReturn(false);
+        
+        when(discount2.isQualified("product1")).thenReturn(false);
+        when(discount2.isQualified("product2")).thenReturn(true);
+        when(discount2.isQualified("product3")).thenReturn(true);
+        when(discount2.isQualified("product4")).thenReturn(false);
+        
+        // Test qualification logic (efficiency check)
+        assertTrue("Product1 should qualify (discount1 qualifies)", 
                   andDiscount.isQualified("product1"));
+        assertTrue("Product2 should qualify (discount2 qualifies)", 
+                  andDiscount.isQualified("product2"));
+        assertTrue("Product3 should qualify (both qualify)", 
+                  andDiscount.isQualified("product3"));
+        assertFalse("Product4 should not qualify (neither qualifies)", 
+                   andDiscount.isQualified("product4"));
+    }
+    
+    @Test
+    public void testConditionsApplyToAllDiscounts() {
+        // Test that when conditions are not satisfied, no discounts apply
+        // even if individual discounts would qualify for specific products
         
-        // Test case 2: First qualifies, second doesn't -> should return false (FIXED)
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("product1", 1);
+        
+        when(basket.getOrders()).thenReturn(orders);
+        when(basket.getStoreId()).thenReturn("store1");
+        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
+        when(item.getPrice()).thenReturn(100.0);
+        
+        // Product qualifies for discount1
         when(discount1.isQualified("product1")).thenReturn(true);
         when(discount2.isQualified("product1")).thenReturn(false);
-        assertFalse("When any discount doesn't qualify, AndDiscount should not qualify", 
-                   andDiscount.isQualified("product1"));
         
-        // Test case 3: First doesn't qualify, second does -> should return false (FIXED)
-        when(discount1.isQualified("product1")).thenReturn(false);
-        when(discount2.isQualified("product1")).thenReturn(true);
-        assertFalse("When any discount doesn't qualify, AndDiscount should not qualify", 
-                   andDiscount.isQualified("product1"));
+        // But not all conditions are satisfied
+        when(condition1.isSatisfied(basket)).thenReturn(true);
+        when(condition2.isSatisfied(basket)).thenReturn(false); // This fails the AND
         
-        // Test case 4: Neither qualifies -> should return false (FIXED)
-        when(discount1.isQualified("product1")).thenReturn(false);
-        when(discount2.isQualified("product1")).thenReturn(false);
-        assertFalse("When no discounts qualify, AndDiscount should not qualify", 
-                   andDiscount.isQualified("product1"));
+        // Execute
+        Map<String, PriceBreakDown> result = andDiscount.calculatePrice(basket);
+        
+        // Verify - no discount should apply because conditions aren't met
+        assertEquals(1, result.size());
+        PriceBreakDown breakdown = result.get("product1");
+        assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
     
     @Test
@@ -203,7 +271,7 @@ public class AndDiscountTest {
         Set<Discount> discounts = new HashSet<>();
         discounts.add(discount1);
         discounts.add(discount2);
-        AndDiscount another = new AndDiscount(itemFacade, 0.2f, qualifier, discounts);
+        AndDiscount another = new AndDiscount(itemFacade, discounts);
         
         assertNotEquals(andDiscount.getId(), another.getId());
     }

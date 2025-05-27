@@ -22,9 +22,14 @@ public class MaxDiscount extends CompositeDiscount {
     }
 
     public MaxDiscount(ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        super(itemFacade, Set.of(discount1, discount2));
+        super(itemFacade, validateAndCreateSet(itemFacade, discount1, discount2));
+
         if (discount1 == null || discount2 == null) {
             throw new IllegalArgumentException("Discounts cannot be null");
+        }
+
+        if (itemFacade == null) {
+            throw new IllegalArgumentException("ItemFacade cannot be null");
         }
 
         this.setCondition(new TrueCondition());

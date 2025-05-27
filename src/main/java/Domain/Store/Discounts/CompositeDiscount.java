@@ -41,4 +41,24 @@ public abstract class CompositeDiscount extends Discount {
     public Set<Discount> getDiscounts() {
         return new HashSet<>(discounts);
     }
+
+        // Helper method that validates parameters and creates the set
+    protected static Set<Discount> validateAndCreateSet(ItemFacade itemFacade, Discount discount1, Discount discount2) {
+        if (itemFacade == null) {
+            throw new IllegalArgumentException("ItemFacade cannot be null");
+        }
+        if (discount1 == null) {
+            throw new IllegalArgumentException("discount1 cannot be null");
+        }
+        if (discount2 == null) {
+            throw new IllegalArgumentException("discount2 cannot be null");
+        }
+        
+        Set<Discount> discounts = new HashSet<>();
+        discounts.add(discount1);
+        discounts.add(discount2);
+        return discounts;
+    }
+
+
 }

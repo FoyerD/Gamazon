@@ -29,6 +29,7 @@ public class OrConditionTest {
     
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         orCondition = new OrCondition(Set.of(condition1, condition2));
     }
     

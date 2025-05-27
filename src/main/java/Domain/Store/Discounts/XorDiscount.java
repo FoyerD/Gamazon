@@ -11,12 +11,12 @@ import Domain.Store.ItemFacade;
 public class XorDiscount extends CompositeDiscount {
 
     public XorDiscount(ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        super(itemFacade, Set.of(discount1, discount2));
+        super(itemFacade, validateAndCreateSet(itemFacade, discount1, discount2));
     }
 
     // Constructor for loading from repository with existing UUID
     public XorDiscount(UUID id, ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        super(id, itemFacade, Set.of(discount1, discount2), null);
+        super(id, itemFacade, validateAndCreateSet(itemFacade, discount1, discount2), null);
     }
 
     @Override

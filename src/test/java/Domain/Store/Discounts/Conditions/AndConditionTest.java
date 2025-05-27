@@ -29,6 +29,7 @@ public class AndConditionTest {
     
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         andCondition = new AndCondition(Set.of(condition1, condition2));
     }
     

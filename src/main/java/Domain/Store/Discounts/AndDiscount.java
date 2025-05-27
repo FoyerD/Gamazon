@@ -10,11 +10,10 @@ import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
 import Domain.Store.Discounts.Conditions.AndCondition;
 import Domain.Store.Discounts.Conditions.Condition;
-import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 
 public class AndDiscount extends CompositeDiscount {
 
-    public AndDiscount(ItemFacade itemFacade, float discountPercentage, DiscountQualifier qualifier, Set<Discount> discounts) {
+    public AndDiscount(ItemFacade itemFacade, Set<Discount> discounts) {
         super(itemFacade, discounts);
 
         Set<Condition> conditions = new HashSet<>();
@@ -29,8 +28,8 @@ public class AndDiscount extends CompositeDiscount {
         this.setCondition(compositeCondition);
     }
 
-    public AndDiscount(ItemFacade itemFacade, float discountPercentage, DiscountQualifier qualifier, Discount discount1, Discount discount2) {
-        super(itemFacade, Set.of(discount1, discount2));
+    public AndDiscount(ItemFacade itemFacade, Discount discount1, Discount discount2) {
+        super(itemFacade, validateAndCreateSet(itemFacade, discount1, discount2));
         this.setCondition(new AndCondition(Set.of(discount1.getCondition(), discount2.getCondition())));
     }
 
@@ -51,6 +50,10 @@ public class AndDiscount extends CompositeDiscount {
 
     @Override
     public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
+
+        if (basket == null || basket.getStoreId() == null || basket.getOrders() == null) {
+            throw new IllegalArgumentException("Basket, Store ID, and Orders cannot be null");
+        }
         
         Map<String, PriceBreakDown> output = new HashMap<>();
         Set<Map<String, PriceBreakDown>> toCompose = this.calculateAllSubDiscounts(basket);

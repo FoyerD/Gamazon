@@ -23,7 +23,11 @@ public class PriceBreakDown {
     public PriceBreakDown(double originalPrice, double discount, List<String> descriptions) {
         this.originalPrice = originalPrice;
         this.discount = discount;
-        this.descriptions = new LinkedList<>(descriptions);
+        if (descriptions == null) {
+            this.descriptions = new LinkedList<>();
+        } else {
+            this.descriptions = new LinkedList<>(descriptions);
+        }
     }
 
     public void addDescription(String description) {

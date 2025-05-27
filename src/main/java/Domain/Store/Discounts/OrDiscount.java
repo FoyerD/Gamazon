@@ -12,7 +12,7 @@ import Domain.Store.Discounts.Conditions.OrCondition;
 public class OrDiscount extends CompositeDiscount {
 
     public OrDiscount(ItemFacade itemFacade, Discount discount, Set<Condition> conditions) {
-        super(itemFacade, Set.of(discount));
+        super(itemFacade, validateAndCreateSet(itemFacade, discount, discount));
 
         if (itemFacade == null || discount == null || conditions == null) {
             throw new IllegalArgumentException("ItemFacade, Discount, and Conditions cannot be null");
@@ -23,7 +23,7 @@ public class OrDiscount extends CompositeDiscount {
 
     // Constructor for loading from repository with existing UUID
     public OrDiscount(UUID id, ItemFacade itemFacade, Discount discount, Set<Condition> conditions) {
-        super(id, itemFacade, Set.of(discount), new OrCondition(conditions));
+        super(id, itemFacade, validateAndCreateSet(itemFacade, discount, discount), new OrCondition(conditions));
 
         if (itemFacade == null || discount == null || conditions == null) {
             throw new IllegalArgumentException("ItemFacade, Discount, and Conditions cannot be null");
