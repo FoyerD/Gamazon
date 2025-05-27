@@ -670,7 +670,7 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         AddUserRoleDialog dialog = new AddUserRoleDialog(
             "Add New Manager",
             () -> {
-                // TODO: fix UserDTO data
+
                 Response<List<UserDTO>> usersResponse = loginPresenter.getAllMembers(sessionToken);
                 Response<StoreDTO> storeResponse = storePresenter.getStoreById(sessionToken, currentStoreId);
                 if (usersResponse.errorOccurred() || storeResponse.errorOccurred()) {

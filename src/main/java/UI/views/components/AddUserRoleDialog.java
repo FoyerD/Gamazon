@@ -48,7 +48,7 @@ public class AddUserRoleDialog extends Dialog {
     }
 
     private void setupDialog() {
-        candidateSelect.setItemLabelGenerator(user -> user.getUsername() + " (" + user.getEmail() + ") - " + user.getId());
+        candidateSelect.setItemLabelGenerator(user -> user.getUsername());
         candidateSelect.setWidth("100%");
         candidateSelect.setHelperText("Select a user to appoint as manager");
         candidateSelect.setRequired(true);
