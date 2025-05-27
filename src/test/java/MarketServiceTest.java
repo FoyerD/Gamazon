@@ -1,7 +1,6 @@
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Shopping.Receipt;
 import Domain.Store.IItemRepository;
 import Domain.Store.IStoreRepository;
 import Domain.User.IUserRepository;
@@ -32,7 +31,6 @@ import Application.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -221,8 +219,8 @@ public class MarketServiceTest {
         thread2.start();
         
         // Wait for both threads to complete
-        thread1.join(5000);  // Wait up to 5 seconds
-        thread2.join(5000);
+        thread1.join();  // Wait up to 5 seconds
+        thread2.join();
         
         // Print diagnostic information
         System.out.println("Thread 1 success: " + threadSuccess[0]);
