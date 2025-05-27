@@ -23,6 +23,16 @@ public interface IStorePresenter {
      */
     Response<StoreDTO> getStoreByName(String sessionToken, String name);
 
+
+    /**
+     * Retrieves store details by its unique identifier.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId Unique identifier of the store to retrieve.
+     * @return Response containing {@link StoreDTO} or an error message.
+     */
+    public Response<StoreDTO> getStoreById(String sessionToken, String storeId);
+
     /**
      * Retrieves all auctions associated with a given store.
      *

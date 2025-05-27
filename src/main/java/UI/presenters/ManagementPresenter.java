@@ -1,6 +1,7 @@
 package UI.presenters;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import Application.StoreService;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType;
 import Domain.Pair;
@@ -72,9 +74,9 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
-    public Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername,
+    public Response<Void> appointStoreManager(String sessionToken, String appointeeId,
             String storeId) {
-            return marketService.appointStoreManager(sessionToken, appointerUsername, appointeeUsername, storeId);
+            return marketService.appointStoreManager(sessionToken, appointeeId, storeId);
     }
 
     @Override
@@ -90,9 +92,14 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
-    public Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername,
+    public Response<Void> changeManagerPermissions(String sessionToken, String managerId,
             String storeId, List<PermissionType> newPermissions) {
-        return marketService.changeManagerPermissions(sessionToken, ownerUsername, managerUsername, storeId, newPermissions);
+        return marketService.changeManagerPermissions(sessionToken, managerId, storeId, newPermissions);
+    }
+
+    @Override
+    public Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId) {
+        return marketService.getManagersPermissions(sessionToken, storeId);
     }
 
     @Override

@@ -16,6 +16,7 @@ import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
+
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Store.Item;
@@ -347,6 +348,31 @@ public class StoreService {
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error getting users with baskets for store %s: %s", storeId, ex.getMessage());
             return new HashSet<>(); // Return empty set in case of error
+        }
+    }
+
+    public Response<StoreDTO> getStoreById(String sessionToken, String storeId) {
+        String method = "getStoreById";
+        try {
+            if(!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return Response.error("Invalid token");
+            }
+            Store store = this.storeFacade.getStore(storeId);
+            if(store == null) {
+                TradingLogger.logError(CLASS_NAME, method, "Store not found with id %s", storeId);
+                return new Response<>(new Error("Store not found."));
+            }
+            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved store with id: " + storeId);
+            return new Response<>(new StoreDTO(store));
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error retrieving store by name %s: %s", storeId, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
         }
     }
 }

@@ -1,5 +1,8 @@
 package Domain.User;
 
+import java.util.List;
+
+import Application.DTOs.UserDTO;
 import Domain.ILockbasedRepository;
 
 public abstract class IUserRepository extends ILockbasedRepository<User, String> {
@@ -68,4 +71,10 @@ public abstract class IUserRepository extends ILockbasedRepository<User, String>
      * @return true if the user is a member, false otherwise.
      */
     abstract public boolean userIsMember(String id);
+
+    /**
+     * Retrieves all members in the repository.
+     * @return A list of all {@link Member} users.
+     */
+    abstract public List<Member> getAllMembers();
 }

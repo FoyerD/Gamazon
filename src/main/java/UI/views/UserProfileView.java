@@ -175,8 +175,7 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
             Notification.show("Error fetching purchase history: " + receipts.getErrorMessage(), 3000, Notification.Position.BOTTOM_END);
         } else if (receipts.getValue().isEmpty()) {
             Notification.show("No purchase history found.", 3000, Notification.Position.BOTTOM_END);
-        }
-        else {
+        } else {
 
 
             receiptGrid.addColumn(ReceiptDTO::getStoreName).setHeader("Store").setAutoWidth(true);

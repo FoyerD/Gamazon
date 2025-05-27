@@ -1,4 +1,5 @@
 package Infrastructure.Repositories;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -85,6 +86,13 @@ public class MemoryUserRepository extends IUserRepository {
     @Override
     public boolean userIsMember(String id) {
         return users.containsKey(id); // Returns true if user is a member
+    }
+    @Override
+    public List<Member> getAllMembers() {
+        return users.values().stream()
+                .filter(user -> user instanceof Member)
+                .map(user -> (Member) user)
+                .toList(); // Returns a list of all members
     }
     
 }

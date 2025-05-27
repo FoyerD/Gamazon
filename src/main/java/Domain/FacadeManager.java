@@ -1,8 +1,5 @@
 package Domain;
 
-
-
-
 import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;

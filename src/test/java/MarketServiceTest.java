@@ -147,7 +147,7 @@ public class MarketServiceTest {
     public void givenValidUsers_whenAppointingStoreManager_thenStoreManagerIsAppointed() {
         String appointerId = getUserId(user1);
         String appointeeId = getUserId(user2);
-        Response<Void> response = marketService.appointStoreManager(tokenId1, appointerId, appointeeId, store1.getId());
+        Response<Void> response = marketService.appointStoreManager(tokenId1, appointeeId, store1.getId());
         assertFalse(response.errorOccurred());
     }
 
@@ -155,7 +155,7 @@ public class MarketServiceTest {
     public void givenStoreManagerExists_whenRemovingStoreManager_thenManagerIsRemoved() {
         String appointerId = getUserId(user1);
         String appointeeId = getUserId(user2);
-        marketService.appointStoreManager(tokenId1, appointerId, appointeeId, store1.getId());
+        marketService.appointStoreManager(tokenId1, appointeeId, store1.getId());
         Response<Void> response = marketService.removeStoreManager(user1.getSessionToken(), appointerId, appointeeId, store1.getId());
         assertFalse(response.errorOccurred());
     }
@@ -184,7 +184,6 @@ public class MarketServiceTest {
         UserDTO user4 = user4Response.getValue();
 
         // Get token and user IDs through TokenService
-        String appointerId = getUserId(user1);
         String appointee1Id = getUserId(user3);
         String appointee2Id = getUserId(user4);
         
@@ -198,7 +197,7 @@ public class MarketServiceTest {
         // Create two threads, each attempting to appoint a different manager
         Thread thread1 = new Thread(() -> {
             Response<Void> response = marketService.appointStoreManager(
-                tokenId1, appointerId, appointee1Id, storeId);
+                tokenId1, appointee1Id, storeId);
             threadSuccess[0] = !response.errorOccurred();
             if (response.errorOccurred()) {
                 threadErrors[0] = response.getErrorMessage();
@@ -207,7 +206,7 @@ public class MarketServiceTest {
         
         Thread thread2 = new Thread(() -> {
             Response<Void> response = marketService.appointStoreManager(
-                tokenId1, appointerId, appointee2Id, storeId);
+                tokenId1, appointee2Id, storeId);
             threadSuccess[1] = !response.errorOccurred();
             if (response.errorOccurred()) {
                 threadErrors[1] = response.getErrorMessage();
@@ -238,16 +237,18 @@ public class MarketServiceTest {
             // We should have a service method to check if a user is a manager
             // Since we don't have it in the provided code, we'll use marketFacade here
             // In a real implementation, you'd want to use a service method
-            Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
+            Response<Map<UserDTO, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
             assertFalse(response.errorOccurred());
-            assertTrue(response.getValue().containsKey(appointee1Id), 
+            assertTrue(response.getValue().keySet().stream()
+                .anyMatch(user -> user.getId().equals(appointee1Id)), 
                 "Candidate 1 should be a manager if appointment succeeded");
         }
         
         if (threadSuccess[1]) {
-            Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
+            Response<Map<UserDTO, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, storeId);
             assertFalse(response.errorOccurred());
-            assertTrue(response.getValue().containsKey(appointee2Id), 
+            assertTrue(response.getValue().keySet().stream()
+                .anyMatch(user -> user.getId().equals(appointee2Id)), 
                 "Candidate 2 should be a manager if appointment succeeded");
         }
         
@@ -368,17 +369,18 @@ public class MarketServiceTest {
 
     @Test
     public void givenStoreHasManagers_whenGettingPermissions_thenPermissionsAreReturned() {
-        marketService.appointStoreManager(tokenId1, getUserId(user1), getUserId(user2), store1.getId());
-        Response<Map<String, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, store1.getId());
+        marketService.appointStoreManager(tokenId1, getUserId(user2), store1.getId());
+        Response<Map<UserDTO, List<PermissionType>>> response = marketService.getManagersPermissions(tokenId1, store1.getId());
         assertFalse(response.errorOccurred());
-        assertTrue(response.getValue().containsKey(getUserId(user2)));
+        assertTrue(response.getValue().keySet().stream()
+            .anyMatch(user -> user.getId().equals(getUserId(user2))));
     }
 
     @Test
     public void givenManagerExists_whenChangingPermissions_thenPermissionsAreUpdated() {
-        marketService.appointStoreManager(tokenId1, getUserId(user1), getUserId(user2), store1.getId());
+        marketService.appointStoreManager(tokenId1, getUserId(user2), store1.getId());
         List<PermissionType> newPermissions = List.of(PermissionType.ADMINISTER_STORE);
-        Response<Void> response = marketService.changeManagerPermissions(tokenId1, getUserId(user1), getUserId(user2), store1.getId(), newPermissions);
+        Response<Void> response = marketService.changeManagerPermissions(tokenId1, getUserId(user2), store1.getId(), newPermissions);
         assertFalse(response.errorOccurred());
     }
 
@@ -411,8 +413,9 @@ public class MarketServiceTest {
 
     @Test
     public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {
+        // TODO: Figure out what is 'wrong appointee'
         String appointeeUsername = "newManager";
-        Response<Void> response = marketService.appointStoreManager(tokenId1, "ownerUser", appointeeUsername, store1.getId());
+        Response<Void> response = marketService.appointStoreManager(tokenId1, appointeeUsername, store1.getId());
         assertTrue(response.errorOccurred());
     }
 
@@ -434,7 +437,7 @@ public class MarketServiceTest {
     @Test
     public void givenInvalidPermissions_whenChangingManagerPermissions_thenErrorOccurs() {
         List<PermissionType> newPermissions = List.of(PermissionType.ADMINISTER_STORE);
-        Response<Void> response = marketService.changeManagerPermissions(tokenId1, "ownerUser", "managerUser", store1.getId(), newPermissions);
+        Response<Void> response = marketService.changeManagerPermissions(tokenId1, "managerUser", store1.getId(), newPermissions);
         assertTrue(response.errorOccurred());
     }
 
@@ -537,7 +540,7 @@ public class MarketServiceTest {
         
         // Try to appoint a store manager, which should trigger notifications
         Response<Void> appointResponse = marketService.appointStoreManager(
-            tokenId1, appointerId, appointeeId, store1.getId());
+            tokenId1, appointeeId, store1.getId());
         
         // Test the system's behavior with notification failures
         // The system uses a lenient approach where notification failures don't block the main operation
@@ -545,10 +548,11 @@ public class MarketServiceTest {
             "Store manager appointment should succeed even if notifications fail");
         
         // Verify the appointment was successful by checking if the user has manager permissions
-        Response<Map<String, List<PermissionType>>> permissionsResponse = 
+        Response<Map<UserDTO, List<PermissionType>>> permissionsResponse = 
             marketService.getManagersPermissions(tokenId1, store1.getId());
         assertFalse(permissionsResponse.errorOccurred(), "Getting manager permissions should succeed");
-        assertTrue(permissionsResponse.getValue().containsKey(appointeeId), 
+        assertTrue(permissionsResponse.getValue().keySet().stream()
+            .anyMatch(user -> user.getId().equals(appointeeId)), 
             "Appointee should be in the list of managers");
         
         // Verify we can still get the notification service

@@ -30,6 +30,12 @@ public class StorePresenter implements IStorePresenter {
         return storeService.getStoreByName(sessionToken, name);
     }
 
+
+    @Override 
+    public Response<StoreDTO> getStoreById(String sessionToken, String storeId) {
+        return storeService.getStoreById(sessionToken, storeId);
+    }
+
     @Override
     public Response<List<AuctionDTO>> getAllStoreAuctions(String sessionToken, String storeId) {
         return storeService.getAllStoreAuctions(sessionToken, storeId);
