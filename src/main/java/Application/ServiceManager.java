@@ -20,6 +20,7 @@ public class ServiceManager {
     private ShoppingService shoppingService;
     private FacadeManager facadeManager;
     private INotificationService notificationService;
+    private PolicyService policyService;
 
     public ServiceManager(FacadeManager facadeManager) {
         this.facadeManager = facadeManager;
@@ -109,5 +110,14 @@ public class ServiceManager {
                                                 facadeManager.getLoginManager());
         }
         return shoppingService;
+    }
+
+    public PolicyService getPolicyService() {
+        if (policyService == null) {
+            policyService = new PolicyService(facadeManager.getPolicyFacade(),
+                                            getTokenService(),
+                                            facadeManager.getPermissionManager());
+        }
+        return policyService;
     }
 }

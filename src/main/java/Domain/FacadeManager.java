@@ -15,6 +15,7 @@ import Domain.User.LoginManager;
 import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionManager;
+import Domain.management.PolicyFacade;
 
 public class FacadeManager {
     private IRepoManager repoManager;
@@ -27,6 +28,8 @@ public class FacadeManager {
     private LoginManager loginManager;
     private PermissionManager permissionManager;
     private INotificationService notificationService;
+    private PolicyFacade policyFacade;
+
     public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService) {
         this.repoManager = repoManager;
         this.paymentService = paymentService;
@@ -86,7 +89,9 @@ public class FacadeManager {
                                                 getItemFacade(),
                                                 getStoreFacade(),
                                                 repoManager.getReceiptRepository(),
-                                                repoManager.getProductRepository());
+                                                repoManager.getProductRepository(),
+                                                getPolicyFacade(),
+                                                repoManager.getUserRepository());
         }
         return CartFacade;
     }
@@ -109,5 +114,15 @@ public class FacadeManager {
             permissionManager = new PermissionManager(repoManager.getPermissionRepository());
         }
         return permissionManager;
+    }
+
+    public PolicyFacade getPolicyFacade() {
+        if (policyFacade == null) {
+            policyFacade = new PolicyFacade(repoManager.getPolicyRepository(),
+                                            repoManager.getUserRepository(),
+                                            getItemFacade(),
+                                            getProductFacade());
+        }
+        return policyFacade;
     }
 }

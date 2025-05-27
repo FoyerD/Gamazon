@@ -6,6 +6,7 @@ import Domain.Shopping.IShoppingCartRepository;
 import Domain.Store.IAuctionRepository;
 import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
+import Domain.Store.IPolicyRepository;
 import Domain.Store.IProductRepository;
 import Domain.Store.IStoreRepository;
 import Domain.User.IUserRepository;
@@ -22,4 +23,6 @@ public interface IRepoManager {
     public IFeedbackRepository getFeedbackRepository();
     public IProductRepository getProductRepository();
     public IUserRepository getUserRepository();
+    public IPolicyRepository getPolicyRepository();
 }
+
