@@ -12,6 +12,10 @@ public class ProductQualifier implements DiscountQualifier {
 
     @Override
     public boolean isQualified(Product product) {
+        if (product == null || product.getProductId() == null) {
+            throw new IllegalArgumentException("Product or product ID cannot be null");
+        }
+
         return product.getProductId().equals(this.productId);
     }
 
