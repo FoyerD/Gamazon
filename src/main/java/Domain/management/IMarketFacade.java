@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
@@ -69,6 +71,15 @@ public interface IMarketFacade {
      * @return true if the user exists, false otherwise
      */
     boolean userExists(String username);
+
+    /**
+     * Get the username associated with a given user ID.
+     * If the user does not exist, an exception is thrown.
+     * 
+     * @param userId The ID of the user
+     * @return The username of the user
+     */
+    public String getUsername(String userId) throws NoSuchElementException;
 
     /**
      * Initialize facades with required repositories and services.

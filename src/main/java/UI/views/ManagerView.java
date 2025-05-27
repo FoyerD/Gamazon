@@ -19,16 +19,17 @@ import Domain.management.PermissionType;
 import Application.DTOs.UserDTO;
 import Application.MarketService;
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.ClientOrderDTO;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -111,10 +112,22 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         Tab permissionsTab = new Tab(VaadinIcon.KEY.create(), new Span("Permissions"));
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
+        Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
         
-        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab);
-        tabs.getStyle().set("margin", "1rem 0");
 
+        // Style all tabs to have white text and icons
+        for (Tab tab : new Tab[]{managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab, historyTab}) {
+            tab.getStyle().set("color", " #ffffff");
+            // Get the icon and span components from the tab
+            tab.getChildren().forEach(component -> {
+                component.getElement().getStyle().set("color", "#ffffff");
+            });
+        }
+        
+        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab, historyTab);
+        tabs.getStyle()
+            .set("margin", "1rem 0")
+            .set("--lumo-contrast-60pct", "#ffffff"); 
         // Setup grids
         managersLayout = new UserPermissionsLayout(
             "Managers", 
@@ -147,6 +160,8 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
                 showItemsView();
             } else if (event.getSelectedTab().equals(auctionsTab)) {
                 showAuctionsView();
+            } else if (event.getSelectedTab().equals(historyTab)) {
+                showHistoryView();
             }
         });
 
@@ -247,7 +262,6 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         // addButton.addClickListener(e -> showAddUserDialog(true));
 
         mainContent.add(managersLayout);
-        // refreshGrids();
     }
 
     private void showOwnersView() {
@@ -257,15 +271,19 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         styleButton(addButton, "#4caf50");
         addButton.addClickListener(e -> showAddUserDialog(false));
 
-        //mainContent.add(new H3("Store Owners"), addButton, ownersGrid);
-        mainContent.add(new H3("Store Owners"), new Span("Under construction"));
-        // refreshGrids();
+        H3 title = new H3("Store Owners");
+        title.getStyle().set("color", " #ffffff");
+        mainContent.add(title, new Span("Under construction"));
+
+
+
     }
 
     private void showPermissionsView() {
         mainContent.removeAll();
-        
-        mainContent.add(new H3("Store Permissions"), new Span("Under construction"));
+        H3 title = new H3("Store Permissions");
+        title.getStyle().set("color", " #ffffff");
+        mainContent.add(title, new Span("Under construction"));
 
         // managersPermissionGrid = new Grid<>();
         // managersPermissionGrid.addColumn(UserRole::getUsername).setHeader("Manager");
@@ -314,8 +332,6 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         // //TODO: remove this
         // //managersPermissionGrid.setItems(getStoreManagers());
         // managersPermissionGrid.setHeight("300px");
-
-        // mainContent.add(new H3("Manager Permissions"), managersPermissionGrid);
     }
 
     private void showItemsView() {
@@ -377,6 +393,8 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             dialog.open();
         });
 
+        H3 title = new H3("Store Items");
+        title.getStyle().set("color", "#ffffff");
         mainContent.add(new H3("Store Items"), addButton, itemsGrid);
     }
 
@@ -598,13 +616,44 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         buttonLayout.setSpacing(true);
         
         // Add components to the main content
-        mainContent.add(
-            new H3("Store Auctions"),
-            buttonLayout,
-            auctionsGrid
-        );
+        H3 title = new H3("Store Auctions");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(title, buttonLayout, auctionsGrid);
         
         auctionsGrid.setHeight("300px");
+    }
+
+    private void showHistoryView() {
+        mainContent.removeAll();
+        
+        Response<List<ClientOrderDTO>> historyResponse = managementPresenter.getPurchaseHistory(sessionToken, currentStoreId);
+        if (historyResponse.errorOccurred()) {
+            Notification.show("Failed to fetch purchase history: " + historyResponse.getErrorMessage());
+        } else if (historyResponse.getValue().isEmpty()) {
+            Notification.show("No purchase history found for this store.", 3000, Notification.Position.BOTTOM_END);
+        } else {
+            Grid<ClientOrderDTO> historyGrid = new Grid<>(ClientOrderDTO.class, false);
+
+            historyGrid.addColumn(ClientOrderDTO::getClientName).setHeader("Client").setAutoWidth(true);
+            historyGrid.addColumn(o -> String.valueOf(o.getTotalPrice()) + "$").setHeader("Total Price").setAutoWidth(true);
+            historyGrid.addComponentColumn(receipt -> {
+                Div detailsDiv = new Div();
+
+                // Populate receipt details
+                receipt.getItems().forEach(item -> {
+                    Span itemDetail = new Span(item.getProductName() + " - " + item.getQuantity() + " x $" + item.getPrice());
+                    itemDetail.getStyle().set("display", "block");
+                    detailsDiv.add(itemDetail);
+                });
+
+                return detailsDiv;
+            }).setHeader("Items");
+
+            historyGrid.setItems(historyResponse.getValue());
+            historyGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+            historyGrid.setWidthFull();
+            mainContent.add(historyGrid);
+        }
     }
 
     private void loadItems(Grid<ItemDTO> itemsGrid) {

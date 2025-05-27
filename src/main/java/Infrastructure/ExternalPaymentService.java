@@ -1,6 +1,7 @@
 package Infrastructure;
 
 import Application.utils.Response;
+import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import Application.utils.Error;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Map.Entry;
 
 @Service
 public class ExternalPaymentService implements IExternalPaymentService {
@@ -50,18 +52,18 @@ public class ExternalPaymentService implements IExternalPaymentService {
 
     @Override
     public Response<Integer> processPayment(String userId, String cardNumber, Date expiryDate, String cvv, String holder, double amount) {
-        try {
+        try {            
             Map<String, String> data = Map.of(
-                "action_type", "pay",
+                "action_type", "pay" ,
                 "amount", String.valueOf((int) amount),
-                "currency", "USD",
+                "currency", "USD" ,
                 "card_number", cardNumber,
                 "month", String.valueOf(expiryDate.getMonth() + 1),
                 "year", String.valueOf(expiryDate.getYear() + 1900),
                 "holder", holder,
-                "ccv", cvv,
+                "cvv", cvv ,
                 "id", userId
-            );
+                );
             String result = post(data);
             int transactionId = Integer.parseInt(result);
             if (transactionId == -1) {

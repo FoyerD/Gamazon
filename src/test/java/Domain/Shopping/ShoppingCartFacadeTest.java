@@ -251,6 +251,11 @@ public class ShoppingCartFacadeTest {
         stores.add(STORE_ID);
         when(mockCart.getCart()).thenReturn(stores);
         
+        //Mock Store
+        Store mockStore = mock(Store.class);
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mockStore);
+        when(mockStore.isOpen()).thenReturn(true);
+        
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockBasket.isEmpty()).thenReturn(false);
         
@@ -280,8 +285,8 @@ public class ShoppingCartFacadeTest {
         assertTrue("Should return true for successful checkout", result);
         verify(mockItemFacade).decreaseAmount(new Pair<>(STORE_ID, PRODUCT_ID), QUANTITY);
         verify(mockPaymentService).processPayment(
-            eq(clientName), eq(cardNumber), eq(expiryDate), eq(cvv), 
-            eq(deliveryAddress), anyDouble()
+            eq(CLIENT_ID), eq(cardNumber), eq(expiryDate), eq(cvv), 
+            eq(clientName), anyDouble()
         );
         verify(mockBasket).clear();
         verify(mockCart).clear();
@@ -304,6 +309,7 @@ public class ShoppingCartFacadeTest {
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
         Set<String> emptyStores = new HashSet<>();
         when(mockCart.getCart()).thenReturn(emptyStores);
+
         
         // Act
         boolean result = facade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, 
@@ -334,6 +340,11 @@ public class ShoppingCartFacadeTest {
         stores.add(STORE_ID);
         when(mockCart.getCart()).thenReturn(stores);
         
+        //Mock Store
+        Store mockStore = mock(Store.class);
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mockStore);
+        when(mockStore.isOpen()).thenReturn(true);
+
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockBasket.isEmpty()).thenReturn(true);
         

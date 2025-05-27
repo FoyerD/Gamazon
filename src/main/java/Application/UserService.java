@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
@@ -32,6 +33,7 @@ public class UserService {
      * @return {@link Response} of {@link UserDTO} containing the token and guest user name.
      *         If an error occurs, returns an error message.
      */
+    @Transactional
     public Response<UserDTO> guestEntry() {
         try {
             User guest = loginManager.createGuest();
@@ -54,6 +56,7 @@ public class UserService {
      * @param sessionToken The token of the user to exit.
      * @return {@link Response} of {@link Void} indicating success or failure.
      */
+    @Transactional
     public Response<Void> exit(String sessionToken) {
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "exit", "received invalid session token.", sessionToken);
@@ -80,6 +83,7 @@ public class UserService {
      * @return {@link Response} of {@link UserDTO} containing the token and user name.
      *         If an error occurs, returns an error message.
      */
+    @Transactional
     public Response<UserDTO> register(String sessionToken, String username, String password, String email) {
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "register", "Received invalid session token", sessionToken);
@@ -114,6 +118,7 @@ public class UserService {
      * @return {@link Response} of {@link UserDTO} containing the token and user name.
      *         If an error occurs, returns an error message.
      */
+    @Transactional
     public Response<UserDTO> login(String username, String password) {
         try {
             Member member = loginManager.login(username, password);

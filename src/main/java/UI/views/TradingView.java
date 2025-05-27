@@ -14,6 +14,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import UI.presenters.ITradingPresenter;
@@ -46,6 +47,7 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
         this.tradingPresenter = tradingPresenter;
         
         H2 title = new H2("Store Trading Operations");
+        title.addClassName("view-only");
         
         // Store management section
         storeNameField = new TextField("Store Name");
@@ -60,6 +62,7 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
 
         // User ban section
         H2 banTitle = new H2("User Management");
+        banTitle.addClassName("view-only");
         
         usernameToBanField = new TextField("Username to Ban");
         usernameToBanField.setPlaceholder("Enter username");
@@ -87,11 +90,13 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
 
         // View banned users section
         viewBannedUsersButton = new Button("View Banned Users", e -> showBannedUsers());
+        viewBannedUsersButton.addClassName("view-only");
         viewBannedUsersButton.getStyle()
             .set("background-color", "#2196f3")
             .set("color", "white");
 
         Button homeButton = new Button("Return to Homepage", e -> UI.getCurrent().navigate("home"));
+        homeButton.addClassName("view-only");
         homeButton.getStyle()
             .set("background-color", "#4caf50")
             .set("color", "white");
@@ -109,7 +114,11 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
         HorizontalLayout bannedUsersSection = new HorizontalLayout(viewBannedUsersButton);
         bannedUsersSection.setAlignItems(Alignment.BASELINE);
 
-        add(title, storeSection, banTitle, banSection, unbanSection, bannedUsersSection, homeButton);
+        // Create a user menu container
+        Div userMenu = new Div(title, storeSection, banTitle, banSection, unbanSection, bannedUsersSection, homeButton);
+        userMenu.addClassName("user-menu");
+        
+        add(userMenu);
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
         
@@ -192,11 +201,24 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
         if (response.errorOccurred()) {
             Notification.show("Failed to ban user: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
+            // First disable all interactive elements immediately
+            UI.getCurrent().getPage().executeJs(
+                "if (document.querySelector('.user-menu')) {" +
+                "  document.querySelectorAll('button:not(.view-only), input:not(.view-only), select:not(.view-only), a:not(.view-only)').forEach(el => {" +
+                "    el.disabled = true;" +
+                "    el.style.pointerEvents = 'none';" +
+                "    el.style.opacity = '0.5';" +
+                "  });" +
+                "}"
+            );
+            
+            // Then show notification and clear fields
             Notification.show("User '" + username + "' banned successfully until " + endDateTime, 3000, Notification.Position.MIDDLE);
             usernameToBanField.clear();
             banEndDatePicker.clear();
             banEndTimePicker.clear();
-            // Force page refresh for the banned user
+            
+            // Finally reload the page
             UI.getCurrent().getPage().executeJs("setTimeout(() => window.location.reload(), 1000);");
         }
     }
@@ -212,9 +234,22 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
         if (response.errorOccurred()) {
             Notification.show("Failed to unban user: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
+            // First enable all interactive elements immediately
+            UI.getCurrent().getPage().executeJs(
+                "if (document.querySelector('.user-menu')) {" +
+                "  document.querySelectorAll('button, input, select, a').forEach(el => {" +
+                "    el.disabled = false;" +
+                "    el.style.pointerEvents = '';" +
+                "    el.style.opacity = '';" +
+                "  });" +
+                "}"
+            );
+            
+            // Then show notification and clear field
             Notification.show("User '" + username + "' unbanned successfully", 3000, Notification.Position.MIDDLE);
             usernameToUnbanField.clear();
-            // Force page refresh for the unbanned user
+            
+            // Finally reload the page
             UI.getCurrent().getPage().executeJs("setTimeout(() => window.location.reload(), 1000);");
         }
     }

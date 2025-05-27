@@ -3,7 +3,9 @@ package UI.presenters;
 import java.util.List;
 import java.util.Map;
 
+import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
@@ -159,4 +161,15 @@ public interface IManagementPresenter {
      * @return Response with a map of {@link UserDTO} to their list of {@link PermissionType}.
      */
     Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId);
+
+
+    /**
+     * Gets the purchase history of a store.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store whose purchase history is requested.
+     * @return Response with a list of {@link ClientOrderDTO} representing the purchase history, or error.
+     */
+    public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId);
+
 }

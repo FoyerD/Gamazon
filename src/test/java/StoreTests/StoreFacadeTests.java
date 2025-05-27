@@ -1,12 +1,13 @@
 package StoreTests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.fail;
 
 import Domain.User.Member;
 
@@ -169,29 +170,18 @@ public class StoreFacadeTests {
     }
 
     @Test
-    public void givenInitializedFacadeAndOpenStore_whenCloseStore_thenReturnTrue(){
-        Store store = mock(Store.class);
-        String storeId = "storeId";
-        when(storeRepository.get(storeId)).thenReturn(store);
-        when(store.getId()).thenReturn(storeId);
-        when(store.isOpen()).thenReturn(true);
-        when(storeRepository.getLock(storeId)).thenReturn(new Object());
-        when(storeRepository.update(eq(storeId), any(Store.class))).thenReturn(store);
-        assertTrue(storeFacade.closeStore(storeId));
-    }
-
-    @Test
     public void givenInitializedFacadeAndClosedStore_whenCloseStore_thenReturnError(){
         Store store = mock(Store.class);
         String storeId = "storeId";
         when(storeRepository.get(storeId)).thenReturn(store);
         when(store.getId()).thenReturn(storeId);
-        when(store.isOpen()).thenReturn(false);
+        when(store.isPermanentlyClosed()).thenReturn(true);
         when(storeRepository.getLock(storeId)).thenReturn(new Object());
         try {
-            assertTrue(storeFacade.closeStore(storeId) == false);
-        } catch (Exception e) {
-            assertEquals(e.getMessage(), "Store is already closed");
+            storeFacade.closeStore(storeId);
+            fail("Expected RuntimeException was not thrown");
+        } catch (RuntimeException e) {
+            assertEquals("Store is already closed", e.getMessage());
         }
     }
 
@@ -571,9 +561,12 @@ public class StoreFacadeTests {
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn("user123");
         when(auction.triggerCharge()).thenReturn(true);
+        when(storeRepository.get(storeId)).thenReturn(mock(Store.class));
+        when(storeRepository.getLock(storeId)).thenReturn(new Object());
 
         when(itemRepository.update(itemKey, item)).thenReturn(item);
         when(auctionRepository.remove(auctionId)).thenReturn(auction);
+
 
         Item result = storeFacade.acceptBid(storeId, productId, auctionId);
         assertEquals(item, result);
