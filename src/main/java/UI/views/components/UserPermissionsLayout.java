@@ -2,6 +2,7 @@ package UI.views.components;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.vaadin.flow.component.button.Button;
@@ -22,11 +23,16 @@ public class UserPermissionsLayout extends VerticalLayout {
     private final Button refreshButton;
     private final Button addUserButton;
     private final Grid<UserPermission> userGrid;
+    private final Span usersCountSpan;
     protected final Supplier<Map<UserDTO, List<PermissionType>>> userPermissionSupplier;
+    private final String roleType;
 
 
-    public UserPermissionsLayout(Supplier<Map<UserDTO, List<PermissionType>>> userPermissionSupplier, Runnable onAddUser) {
-        H3 header = new H3("Store Managers");
+    public UserPermissionsLayout(String roleType, Supplier<Map<UserDTO, List<PermissionType>>> userPermissionSupplier,
+                                Runnable onAddUser,
+                                Consumer<UserPermission> onPermissionChange) {
+        this.roleType = roleType;
+        H3 header = new H3("Store " + roleType);
         this.refreshButton = new Button("Refresh", VaadinIcon.REFRESH.create());
         this.addUserButton = new Button("Add", VaadinIcon.PLUS.create());
 
@@ -34,6 +40,8 @@ public class UserPermissionsLayout extends VerticalLayout {
         styleButton(addUserButton, " #4caf50");
 
         this.userGrid = new Grid<>(UserPermission.class);
+        usersCountSpan = new Span();
+        usersCountSpan.getStyle().set("font-weight", "bold").set("margin-left", "1em");
         this.userPermissionSupplier = userPermissionSupplier;
 
         // Configure the grid
@@ -46,7 +54,7 @@ public class UserPermissionsLayout extends VerticalLayout {
             } else {
                 Div detailsDiv = new Div();
                 up.permissions.forEach(p -> {
-                    Span permissioSpan = new Span(p.toString());
+                    Span permissioSpan = new Span("• " + p.toString());
                     permissioSpan.getStyle().set("display", "block");
                     detailsDiv.add(permissioSpan);
                 });
@@ -54,13 +62,20 @@ public class UserPermissionsLayout extends VerticalLayout {
             }
             return permissionLayout;
         }).setHeader("Permissions");
+
+        userGrid.addComponentColumn(up -> {
+            Button changeRoleButton = new Button("Change Permissions", VaadinIcon.PENCIL.create());
+            changeRoleButton.addClickListener(event -> onPermissionChange.accept(up));
+            styleButton(changeRoleButton, "var(--lumo-primary-color)");
+            return changeRoleButton;
+        }).setHeader("Actions");
         userGrid.setSizeFull();
         userGrid.setHeight("400px");
 
         // Add components to the layout
         HorizontalLayout buttonLayout = new HorizontalLayout(refreshButton, addUserButton);
         buttonLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        add(header, buttonLayout, userGrid);
+        add(header, buttonLayout, userGrid, usersCountSpan);
         expand(userGrid);
 
         refreshButton.addClickListener(event -> refreshUsers());
@@ -75,14 +90,16 @@ public class UserPermissionsLayout extends VerticalLayout {
     public void refreshUsers() {
         Map<UserDTO, List<PermissionType>> users = userPermissionSupplier.get();
         if (users != null) {
-            this.add(users.entrySet().size() + " users loaded.");
             userGrid.setItems(users.entrySet().stream()
                 .map(entry -> new UserPermission(entry.getKey(), entry.getValue()))
                 .toList());
+                usersCountSpan.setText("Loaded " + users.size() + " " + roleType);
         } else {
             Notification.show("Failed to load users. Please try again later.");
             userGrid.setItems(List.of()); // Clear grid if no users
+            usersCountSpan.setText("Loaded " + 0 + " " + roleType);
         }
+        
     }
 
     private void styleButton(Button button, String color) {

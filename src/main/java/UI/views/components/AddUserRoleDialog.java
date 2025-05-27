@@ -2,10 +2,8 @@ package UI.views.components;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 
 import com.vaadin.flow.component.button.Button;
@@ -18,9 +16,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
-import Application.utils.Response;
 import Domain.management.PermissionFactory;
 import Domain.management.PermissionType;
 import UI.views.dataobjects.UserPermission;
