@@ -375,7 +375,7 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             dialog.open();
         });
 
-        mainContent.add(new H3("Store Managers"), addButton, itemsGrid);
+        mainContent.add(new H3("Store Items"), addButton, itemsGrid);
     }
 
     private void showAuctionsView() {

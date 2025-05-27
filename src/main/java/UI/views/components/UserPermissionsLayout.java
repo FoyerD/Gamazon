@@ -80,11 +80,6 @@ public class UserPermissionsLayout extends VerticalLayout {
 
         refreshButton.addClickListener(event -> refreshUsers());
         addUserButton.addClickListener(event -> onAddUser.run());
-        // Set layout properties
-        setSizeFull();
-        setHeightFull();
-        setPadding(true);
-        setSpacing(true);
     }
 
     public void refreshUsers() {
