@@ -8,6 +8,8 @@ import Domain.Store.IFeedbackRepository;
 import Domain.Store.IItemRepository;
 import Domain.Store.IProductRepository;
 import Domain.Store.IStoreRepository;
+import Domain.Store.Discounts.IDiscountRepository;
+import Domain.Store.Discounts.Conditions.IConditionRepository;
 import Domain.User.IUserRepository;
 import Domain.management.IPermissionRepository;
 
@@ -22,4 +24,6 @@ public interface IRepoManager {
     public IFeedbackRepository getFeedbackRepository();
     public IProductRepository getProductRepository();
     public IUserRepository getUserRepository();
+    public IDiscountRepository getDiscountRepository();
+    public IConditionRepository getConditionRepository();
 }

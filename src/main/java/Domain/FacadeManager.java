@@ -11,6 +11,7 @@ import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
 import Domain.Store.ProductFacade;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.User.LoginManager;
 import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
@@ -27,6 +28,8 @@ public class FacadeManager {
     private LoginManager loginManager;
     private PermissionManager permissionManager;
     private INotificationService notificationService;
+    private DiscountFacade discountFacade;
+
     public FacadeManager(IRepoManager repoManager, IPaymentService paymentService) {
         this.repoManager = repoManager;
         this.paymentService = paymentService;
@@ -109,5 +112,13 @@ public class FacadeManager {
             permissionManager = new PermissionManager(repoManager.getPermissionRepository());
         }
         return permissionManager;
+    }
+
+    public DiscountFacade getDiscountFacade() {
+        if (discountFacade == null) {
+            discountFacade = new DiscountFacade(repoManager.getDiscountRepository(),
+                                                repoManager.getConditionRepository());
+        }
+        return discountFacade;
     }
 }
