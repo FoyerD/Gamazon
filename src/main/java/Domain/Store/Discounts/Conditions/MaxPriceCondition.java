@@ -7,29 +7,35 @@ import Domain.Store.ItemFacade;
 public class MaxPriceCondition extends SimpleCondition{
 
     private double maxPrice;
-    private String productId;
-    private String storeId;
 
-    public MaxPriceCondition(ItemFacade itemFacade, String storeId, String productId, double maxPrice) {
+    public MaxPriceCondition(ItemFacade itemFacade, double maxPrice) {
         super(itemFacade);
-        this.storeId = storeId;
-        this.productId = productId;
         this.maxPrice = maxPrice;
     }
 
     // Constructor for loading from repository with existing UUID
-    public MaxPriceCondition(UUID id, ItemFacade itemFacade, String storeId, String productId, double maxPrice) {
+    public MaxPriceCondition(UUID id, ItemFacade itemFacade, double maxPrice) {
         super(id, itemFacade);
-        this.storeId = storeId;
-        this.productId = productId;
         this.maxPrice = maxPrice;
     }
 
     @Override
     public boolean isSatisfied(ShoppingBasket shoppingBasket) {
-        double unitPrice = itemFacade.getItem(storeId, productId).getPrice();
-        double price = unitPrice * shoppingBasket.getQuantity(productId);
-        return price <= maxPrice;
+
+        if (shoppingBasket == null || shoppingBasket.getStoreId() == null) {
+            throw new IllegalArgumentException("ShoppingBasket and StoreId cannot be null");
+        }
+
+        double totalBasketPrice = 0.0;
+        
+        // Calculate total price of entire basket
+        for (String productId : shoppingBasket.getOrders().keySet()) {
+            double unitPrice = itemFacade.getItem(shoppingBasket.getStoreId(), productId).getPrice();
+            int quantity = shoppingBasket.getQuantity(productId);
+            totalBasketPrice += unitPrice * quantity;
+        }
+        
+        return totalBasketPrice <= maxPrice;
     }
 
     // Getters for repository serialization
@@ -37,11 +43,4 @@ public class MaxPriceCondition extends SimpleCondition{
         return maxPrice;
     }
 
-    public String getProductId() {
-        return productId;
-    }
-
-    public String getStoreId() {
-        return storeId;
-    }
 }

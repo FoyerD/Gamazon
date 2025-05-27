@@ -7,6 +7,8 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
@@ -28,11 +30,19 @@ public class MinPriceConditionTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        condition = new MinPriceCondition(itemFacade, "store1", "product1", 100.0);
+        condition = new MinPriceCondition(itemFacade, 100.0);
+        
+        // Mock the basket's storeId
+        when(basket.getStoreId()).thenReturn("store1");
     }
     
     @Test
     public void testIsSatisfiedWhenPriceMeetsMinimum() {
+        // Create a map with one product
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("product1", 2);
+        
+        when(basket.getOrders()).thenReturn(orders);
         when(itemFacade.getItem("store1", "product1")).thenReturn(item);
         when(item.getPrice()).thenReturn(50.0);
         when(basket.getQuantity("product1")).thenReturn(2);
@@ -43,6 +53,11 @@ public class MinPriceConditionTest {
     
     @Test
     public void testIsSatisfiedWhenPriceAboveMinimum() {
+        // Create a map with one product
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("product1", 2);
+        
+        when(basket.getOrders()).thenReturn(orders);
         when(itemFacade.getItem("store1", "product1")).thenReturn(item);
         when(item.getPrice()).thenReturn(60.0);
         when(basket.getQuantity("product1")).thenReturn(2);
@@ -53,6 +68,11 @@ public class MinPriceConditionTest {
     
     @Test
     public void testIsSatisfiedWhenPriceBelowMinimum() {
+        // Create a map with one product
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("product1", 2);
+        
+        when(basket.getOrders()).thenReturn(orders);
         when(itemFacade.getItem("store1", "product1")).thenReturn(item);
         when(item.getPrice()).thenReturn(30.0);
         when(basket.getQuantity("product1")).thenReturn(2);
@@ -65,35 +85,32 @@ public class MinPriceConditionTest {
     public void testConstructorWithExistingUUID() {
         UUID existingId = UUID.randomUUID();
         MinPriceCondition conditionWithId = new MinPriceCondition(
-            existingId, itemFacade, "store1", "product1", 50.0);
+            existingId, itemFacade, 50.0);
         
         assertEquals(existingId, conditionWithId.getId());
-        assertEquals("store1", conditionWithId.getStoreId());
-        assertEquals("product1", conditionWithId.getProductId());
         assertEquals(50.0, conditionWithId.getMinPrice(), 0.001);
     }
     
     @Test
     public void testGetters() {
-        assertEquals("store1", condition.getStoreId());
-        assertEquals("product1", condition.getProductId());
         assertEquals(100.0, condition.getMinPrice(), 0.001);
         assertNotNull(condition.getId());
     }
     
     @Test
     public void testZeroQuantity() {
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
-        when(item.getPrice()).thenReturn(50.0);
-        when(basket.getQuantity("product1")).thenReturn(0);
+        // Create an empty map (no products)
+        Map<String, Integer> orders = new HashMap<>();
         
-        // Total price: 50 * 0 = 0, which is below minimum
+        when(basket.getOrders()).thenReturn(orders);
+        
+        // Total price: 0, which is below minimum
         assertFalse(condition.isSatisfied(basket));
     }
     
     @Test
     public void testHasUniqueId() {
-        MinPriceCondition another = new MinPriceCondition(itemFacade, "store1", "product1", 100.0);
+        MinPriceCondition another = new MinPriceCondition(itemFacade, 100.0);
         assertNotEquals(condition.getId(), another.getId());
     }
 }

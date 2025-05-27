@@ -7,29 +7,30 @@ import Domain.Store.ItemFacade;
 public class MinPriceCondition extends SimpleCondition {
 
     private double minPrice;
-    private String productId;
-    private String storeId;
 
-    public MinPriceCondition(ItemFacade itemFacade, String storeId, String productId, double minPrice) {
+    public MinPriceCondition(ItemFacade itemFacade, double minPrice) {
         super(itemFacade);
-        this.productId = productId;
         this.minPrice = minPrice;
-        this.storeId = storeId;
     }
 
     // Constructor for loading from repository with existing UUID
-    public MinPriceCondition(UUID id, ItemFacade itemFacade, String storeId, String productId, double minPrice) {
+    public MinPriceCondition(UUID id, ItemFacade itemFacade, double minPrice) {
         super(id, itemFacade);
-        this.productId = productId;
         this.minPrice = minPrice;
-        this.storeId = storeId;
     }
 
     @Override
     public boolean isSatisfied(ShoppingBasket shoppingBasket) {
-        double unitPrice = itemFacade.getItem(storeId, productId).getPrice();
-        double price = unitPrice * shoppingBasket.getQuantity(productId);
-        return price >= minPrice;
+        double totalBasketPrice = 0.0;
+        
+        // Calculate total price of entire basket
+        for (String productId : shoppingBasket.getOrders().keySet()) {
+            double unitPrice = itemFacade.getItem(shoppingBasket.getStoreId(), productId).getPrice();
+            int quantity = shoppingBasket.getQuantity(productId);
+            totalBasketPrice += unitPrice * quantity;
+        }
+        
+        return totalBasketPrice >= minPrice;
     }
 
     // Getters for repository serialization
@@ -37,11 +38,4 @@ public class MinPriceCondition extends SimpleCondition {
         return minPrice;
     }
 
-    public String getProductId() {
-        return productId;
-    }
-
-    public String getStoreId() {
-        return storeId;
-    }
 }
