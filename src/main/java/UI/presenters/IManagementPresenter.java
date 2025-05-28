@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
@@ -159,7 +160,7 @@ public interface IManagementPresenter {
      * @param storeId ID of the store.
      * @return Response with a map of {@link UserDTO} to their list of {@link PermissionType}.
      */
-    Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId);
+    Response<EmployeeInfo> getEmployeeInfo(String sessionToken, String storeId);
 
     /**
      * Gets the purchase history of a store.

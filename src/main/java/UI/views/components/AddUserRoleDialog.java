@@ -89,10 +89,8 @@ public class AddUserRoleDialog extends Dialog {
         dialogLayout.add(candidateSelect, additionalInfo, buttons);
 
         Tab addManagerTab = new Tab(VaadinIcon.USERS.create(), new Span("Add Manager"));
-        addManagerTab.getStyle().set("color", " #ffffff");
 
         Tab addOwnerTab = new Tab(VaadinIcon.USER_STAR.create(), new Span("Add Owner"));
-        addOwnerTab.getStyle().set("color", " #ffffff");
         Tabs tabs = new Tabs(addManagerTab, addOwnerTab);
 
 
@@ -100,15 +98,15 @@ public class AddUserRoleDialog extends Dialog {
             additionalInfo.removeAll();
             List<UserDTO> users = new ArrayList<>();
             if (tabs.getSelectedTab().equals(addManagerTab)) {
-                users = managementCandidatesSupplier.get();
+                users = this.managementCandidatesSupplier.get();
                 additionalInfo.add(permissionsSelect);
 
                 saveButton.addClickListener(e -> saveManager());
             } else if (tabs.getSelectedTab().equals(addOwnerTab)) {
-                users = ownershipCandidatesSupplier.get();
+                users = this.ownershipCandidatesSupplier.get();
                 saveButton.addClickListener(e -> saveOwner());
             }
-            
+            // TODO: addCLickListener might be problematic
             if (users != null) {
                 if (users.isEmpty()) {
                     Notification.show("No more candidates left");

@@ -9,6 +9,7 @@ import Application.ItemService;
 import Application.MarketService;
 import Application.StoreService;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
@@ -101,8 +102,8 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
-    public Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId) {
-        return marketService.getManagersPermissions(sessionToken, storeId);
+    public Response<EmployeeInfo> getEmployeeInfo(String sessionToken, String storeId) {
+        return marketService.getEmployeeInfo(sessionToken, storeId);
     }
 
 

@@ -31,7 +31,7 @@ public class EmployeesLayout extends VerticalLayout {
                             Runnable onAddUser,
                             Consumer<UserPermission> onPermissionChange,
                             Consumer<UserDTO> ownerRemover) {
-        H3 header = new H3("Store EMployees");
+        H3 header = new H3("Store Employees");
         this.refreshButton = new Button("Refresh", VaadinIcon.REFRESH.create());
         this.addUserButton = new Button("Add", VaadinIcon.PLUS.create());
 

@@ -124,13 +124,13 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         // Setup grids
         employeesLayout = new EmployeesLayout(
             () -> {
-                Response<Map<UserDTO, List<PermissionType>>> response = managementPresenter.getStoreManagersPermissions(sessionToken, currentStoreId);
+                Response<EmployeeInfo> response = managementPresenter.getEmployeeInfo(sessionToken, currentStoreId);
                 if (response.errorOccurred()) {
                     Notification.show("Failed to fetch managers' permissions: " + response.getErrorMessage(), 
                         3000, Notification.Position.MIDDLE);
                     return null;
                 }
-                return new EmployeeInfo(null, null); // TODO: fix presenter method return value
+                return response.getValue();
             }, 
             () -> showAddUserDialog(),
             up -> showChangeManagerPermissionsDialog(up),
