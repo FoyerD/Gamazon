@@ -1,11 +1,6 @@
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
-import Domain.User.IUserRepository;
-import Domain.management.IMarketFacade;
-import Domain.management.IPermissionRepository;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.FacadeManager;
@@ -41,8 +36,6 @@ public class MarketServiceTest {
     private ServiceManager serviceManager;
     private FacadeManager facadeManager;
     private MemoryRepoManager repositoryManager;
-    private IMarketFacade marketFacade;  // Added concrete MarketFacade
-
     private MarketService marketService;
     private UserService userService;
     private StoreService storeService;
@@ -60,12 +53,6 @@ public class MarketServiceTest {
     private ProductDTO product1;
     private StoreDTO store1;
     
-    // Repository access through repoManager
-    private IUserRepository userRepository;
-    private IItemRepository itemRepository;
-    private IStoreRepository storeRepository;
-    private IPermissionRepository permissionRepository;
-    
     // Services that might be mocked for testing
     private IExternalPaymentService mockPaymentService;
     private IExternalSupplyService mockSupplyService;
@@ -78,24 +65,11 @@ public class MarketServiceTest {
         mockSupplyService = mock(IExternalSupplyService.class);
         mockNotificationService = mock(INotificationService.class);
 
-        // Initialize repository manager
+        // Initialize dependency injectors
         repositoryManager = new MemoryRepoManager();
-        
-        // Get repositories through the manager
-        userRepository = repositoryManager.getUserRepository();
-        itemRepository = repositoryManager.getItemRepository();
-        storeRepository = repositoryManager.getStoreRepository();
-        permissionRepository = repositoryManager.getPermissionRepository();
-        
-        // Create facade manager with repositories
         facadeManager = new FacadeManager(repositoryManager, mockPaymentService);
-        
-        // Get direct access to marketFacade
-        marketFacade = facadeManager.getMarketFacade();
-        
-        // Create service manager
         serviceManager = new ServiceManager(facadeManager);
-
+        
         // Get the services
         marketService = serviceManager.getMarketService();
         userService = serviceManager.getUserService();
@@ -145,7 +119,6 @@ public class MarketServiceTest {
     }
 
     public void givenValidUsers_whenAppointingStoreManager_thenStoreManagerIsAppointed() {
-        String appointerId = getUserId(user1);
         String appointeeId = getUserId(user2);
         Response<Void> response = marketService.appointStoreManager(tokenId1, appointeeId, store1.getId());
         assertFalse(response.errorOccurred());
@@ -412,10 +385,7 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {
-        // TODO: Figure out what is 'wrong appointee'
-        String appointeeUsername = "newManager";
-        Response<Void> response = marketService.appointStoreManager(tokenId1, appointeeUsername, store1.getId());
+    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {        Response<Void> response = marketService.appointStoreManager(tokenId1, "dontexists", store1.getId());
         assertTrue(response.errorOccurred());
     }
 
@@ -535,7 +505,6 @@ public class MarketServiceTest {
         UserDTO user3 = user3Response.getValue();
         
         // Get user IDs from tokens through TokenService
-        String appointerId = getUserId(user1);
         String appointeeId = getUserId(user3);
         
         // Try to appoint a store manager, which should trigger notifications

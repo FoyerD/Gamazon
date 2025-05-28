@@ -110,4 +110,8 @@ public class ServiceManager {
         }
         return shoppingService;
     }
+
+    public void injectINotificationService(INotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 }
