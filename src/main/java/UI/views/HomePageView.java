@@ -46,7 +46,6 @@ import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IUserSessionPresenter;
-import UI.webSocketConfigurations.PendingMessageStore;
 
 @JsModule("./ws-client.js")
 @Route("home")
