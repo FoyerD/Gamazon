@@ -5,7 +5,6 @@ import java.util.Map;
 
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.ItemDTO;
-import Application.DTOs.ReceiptDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
@@ -112,26 +111,25 @@ public interface IManagementPresenter {
     Response<Void> appointStoreManager(String sessionToken, String appointeeId, String storeId);
 
     /**
-     * Removes a store manager.
+     * Removes a store owner.
      *
      * @param sessionToken Session identifier for authentication.
-     * @param removerUsername Username of the remover (must have authority).
-     * @param managerUsername Username of the manager to remove.
+     * @param removerId Username of the remover (must have authority).
+     * @param ownerId Username of the manager to remove.
      * @param storeId Store ID.
      * @return Void response indicating success or failure.
      */
-    Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername, String storeId);
+    Response<Void> removeStoreOwner(String sessionToken, String ownerId, String storeId);
 
     /**
      * Appoints a new store owner.
      *
-     * @param sessionToken Session identifier for authentication.
-     * @param appointerUsername Username of the appointer (must be an owner).
-     * @param appointeeUsername Username of the new owner.
+     * @param sessionToken Session identifier for authentication (must be an owner).
+     * @param appointeeId ID of the new owner.
      * @param storeId Store ID.
      * @return Void response indicating success or failure.
      */
-    Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername, String storeId);
+    Response<Void> appointStoreOwner(String sessionToken, String appointeeId, String storeId);
 
     /**
      * Changes the permissions of a store manager.
@@ -143,6 +141,7 @@ public interface IManagementPresenter {
      * @return Void response indicating success or failure.
      */
     Response<Void> changeManagerPermissions(String sessionToken, String managerId, String storeId, List<PermissionType> newPermissions);
+
 
     /**
      * Closes a store (sets it to inactive/unavailable).
@@ -161,7 +160,6 @@ public interface IManagementPresenter {
      * @return Response with a map of {@link UserDTO} to their list of {@link PermissionType}.
      */
     Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId);
-
 
     /**
      * Gets the purchase history of a store.

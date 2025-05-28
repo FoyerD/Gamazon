@@ -1,5 +1,6 @@
 package UI.views.components;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -11,10 +12,13 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 
 import Application.DTOs.UserDTO;
 import Domain.management.PermissionFactory;
@@ -23,29 +27,126 @@ import UI.views.dataobjects.UserPermission;
 
 public class AddUserRoleDialog extends Dialog {
     private final ComboBox<UserDTO> candidateSelect;
-    private final Supplier<List<UserDTO>> candidatesSupplier;
+    private final MultiSelectComboBox<PermissionType> permissionsSelect;
+    private final Supplier<List<UserDTO>> managementCandidatesSupplier;
+    private final Supplier<List<UserDTO>> ownershipCandidatesSupplier;
     /**
      * Function to handle the addition of a user with their permissions.
      * Returns true if the user permissions was successfully added, false otherwise.
      */
-    private final Function<UserPermission, Boolean> onAddUser;
+    private final Function<UserPermission, Boolean> onAddManager;
+    private final Function<UserDTO, Boolean> onAddOwner;
     private final VerticalLayout dialogLayout = new VerticalLayout();
 
     
-    public AddUserRoleDialog(String title, 
-                            Supplier<List<UserDTO>> candidatesSupplier, 
-                            Function<UserPermission, Boolean> onAddUser) {
-        this.candidatesSupplier = candidatesSupplier;
-        this.onAddUser = onAddUser;
-        this.setHeaderTitle(title);
+    public AddUserRoleDialog(Supplier<List<UserDTO>> managementCandidatesSupplier, 
+                            Supplier<List<UserDTO>> ownershipCandidatesSupplier,
+                            Function<UserPermission, Boolean> onAddManager,
+                            Function<UserDTO, Boolean> onAddOwner) {
+
+        this.managementCandidatesSupplier = managementCandidatesSupplier;
+        this.ownershipCandidatesSupplier = ownershipCandidatesSupplier;
+        this.onAddManager = onAddManager;
+        this.onAddOwner = onAddOwner;
 
         dialogLayout.setSpacing(true);
         dialogLayout.setPadding(true);
 
         candidateSelect = new ComboBox<>("Select User");
-                
-        setupDialog();
+        candidateSelect.setItemLabelGenerator(UserDTO::getUsername);
+        permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
+        permissionsSelect.setItemLabelGenerator(PermissionType::toString);
+        permissionsSelect.setWidth("100%");
+        permissionsSelect.setHelperText("Select initial permissions for the manager");
+        permissionsSelect.setItems(PermissionFactory.AVAILABLE_MANAGER_PERMISSIONS);
+
+        VerticalLayout additionalInfo = new VerticalLayout();
+        
+
+        Button saveButton = new Button("Save", e -> {
+            UserDTO selectedUser = candidateSelect.getValue();
+            if (selectedUser == null) {
+
+                Notification.show("Please Choose a user");
+            } else {
+                Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
+                if (initialPermissions.isEmpty()) {
+                    Notification.show("Please select at least one permission");
+                } else if (onAddManager.apply(new UserPermission(selectedUser, List.copyOf(initialPermissions)))) {
+                    this.close();
+                }
+            }
+        });
+
+        styleButton(saveButton, "var(--lumo-primary-color)");
+
+        Button cancelButton = new Button("Cancel", e -> this.close());
+        styleButton(cancelButton, " #9e9e9e");
+
+        HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+        buttons.setJustifyContentMode(JustifyContentMode.END);
+
+        dialogLayout.add(candidateSelect, additionalInfo, buttons);
+
+        Tab addManagerTab = new Tab(VaadinIcon.USERS.create(), new Span("Add Manager"));
+        addManagerTab.getStyle().set("color", " #ffffff");
+
+        Tab addOwnerTab = new Tab(VaadinIcon.USER_STAR.create(), new Span("Add Owner"));
+        addOwnerTab.getStyle().set("color", " #ffffff");
+        Tabs tabs = new Tabs(addManagerTab, addOwnerTab);
+
+
+        tabs.addSelectedChangeListener(event -> {
+            additionalInfo.removeAll();
+            List<UserDTO> users = new ArrayList<>();
+            if (tabs.getSelectedTab().equals(addManagerTab)) {
+                users = managementCandidatesSupplier.get();
+                additionalInfo.add(permissionsSelect);
+
+                saveButton.addClickListener(e -> saveManager());
+            } else if (tabs.getSelectedTab().equals(addOwnerTab)) {
+                users = ownershipCandidatesSupplier.get();
+                saveButton.addClickListener(e -> saveOwner());
+            }
+            
+            if (users != null) {
+                if (users.isEmpty()) {
+                    Notification.show("No more candidates left");
+                }
+                candidateSelect.setItems(users);
+            }
+
+        });
+        this.add(tabs, dialogLayout);
+        
+        
+        // setupDialog();
     }
+
+    private void saveManager() {
+        UserDTO selectedUser = candidateSelect.getValue();
+        if (selectedUser == null) {
+            Notification.show("Please Choose a user");
+        } else {
+            Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
+            if (initialPermissions.isEmpty()) {
+                Notification.show("Please select at least one permission");
+            } else if (onAddManager.apply(new UserPermission(selectedUser, List.copyOf(initialPermissions)))) {
+                this.close();
+            }
+        }
+    }
+
+    private void saveOwner() {
+        UserDTO selectedUser = candidateSelect.getValue();
+        if (selectedUser == null) {
+            Notification.show("Please Choose a user");
+        } else if (onAddOwner.apply(selectedUser)) {
+            this.close();
+        }
+        
+    }
+    
 
     private void setupDialog() {
         candidateSelect.setItemLabelGenerator(user -> user.getUsername());
@@ -71,7 +172,7 @@ public class AddUserRoleDialog extends Dialog {
                 Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
                 if (initialPermissions.isEmpty()) {
                     Notification.show("Please select at least one permission");
-                } else if (onAddUser.apply(new UserPermission(selectedUser, List.copyOf(initialPermissions)))) {
+                } else if (onAddManager.apply(new UserPermission(selectedUser, List.copyOf(initialPermissions)))) {
                     this.close();
                 }
             }
@@ -88,20 +189,27 @@ public class AddUserRoleDialog extends Dialog {
         this.add(dialogLayout);
     }
 
+    private void showAddOwner() {
 
-    public void refreshCandidates() {
-        List<UserDTO> candidates = candidatesSupplier.get();
-        if (candidates == null) {
-            Notification.show("Failed to refresh user list.");
-        } else if (candidates.isEmpty()) {
-            dialogLayout.removeAll();
-            Span noCandidatesMessage = new Span("No users available to appoint as manager.");
-            noCandidatesMessage.getStyle().set("color", "var(--lumo-secondary-text-color)");
-            dialogLayout.add(noCandidatesMessage);
-        } else {
-            candidateSelect.setItems(candidates);
-        }
     }
+
+    private void showAddManager() {
+
+    }
+
+    // public void refreshCandidates() {
+    //     List<UserDTO> candidates = candidatesSupplier.get();
+    //     if (candidates == null) {
+    //         Notification.show("Failed to refresh user list.");
+    //     } else if (candidates.isEmpty()) {
+    //         dialogLayout.removeAll();
+    //         Span noCandidatesMessage = new Span("No users available to appoint as manager.");
+    //         noCandidatesMessage.getStyle().set("color", "var(--lumo-secondary-text-color)");
+    //         dialogLayout.add(noCandidatesMessage);
+    //     } else {
+    //         candidateSelect.setItems(candidates);
+    //     }
+    // }
     
 
     private void styleButton(Button button, String color) {

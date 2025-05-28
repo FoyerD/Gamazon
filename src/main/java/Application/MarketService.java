@@ -177,7 +177,7 @@ public class MarketService {
     }
 
     @Transactional
-    public Response<Void> appointStoreOwner(String sessionToken, String appointerId, String appointeeId, String storeId) {
+    public Response<Void> appointStoreOwner(String sessionToken, String appointeeId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "appointStoreOwner", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -188,7 +188,7 @@ public class MarketService {
                 TradingLogger.logError(CLASS_NAME, "appointStoreOwner", "User is banned from appointing store owner.");
                 return new Response<>(new Error("User is banned from appointing store owner."));
             }
-            marketFacade.appointStoreOwner(appointerId, appointeeId, storeId);
+            marketFacade.appointStoreOwner(ownerId, appointeeId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "appointStoreOwner", "Store owner appointed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -241,6 +241,7 @@ public class MarketService {
             return new Response<>(new Error(e.getMessage()));
         }
     }
+
 
     @Transactional
     public Response<List<ClientOrderDTO>> getStorePurchaseHistory(String sessionToken, String storeId) {

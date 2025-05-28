@@ -259,7 +259,7 @@ public class MarketServiceTest {
     
     @Test
     public void givenValidUsers_whenAppointingStoreOwner_thenStoreOwnerIsAppointed() {
-        Response<Void> response = marketService.appointStoreOwner(tokenId1, getUserId(user1), getUserId(user2), store1.getId());
+        Response<Void> response = marketService.appointStoreOwner(tokenId1, getUserId(user2), store1.getId());
         assertFalse(response.errorOccurred());
     }
 
@@ -301,7 +301,7 @@ public class MarketServiceTest {
         // Create two threads, each attempting to appoint a different owner
         Thread thread1 = new Thread(() -> {
             Response<Void> response = marketService.appointStoreOwner(
-                tokenId1, appointerId, appointee1Id, storeId);
+                tokenId1, appointee1Id, storeId);
             threadSuccess[0] = !response.errorOccurred();
             if (response.errorOccurred()) {
                 threadErrors[0] = response.getErrorMessage();
@@ -310,7 +310,7 @@ public class MarketServiceTest {
         
         Thread thread2 = new Thread(() -> {
             Response<Void> response = marketService.appointStoreOwner(
-                tokenId1, appointerId, appointee2Id, storeId);
+                tokenId1, appointee2Id, storeId);
             threadSuccess[1] = !response.errorOccurred();
             if (response.errorOccurred()) {
                 threadErrors[1] = response.getErrorMessage();
@@ -322,8 +322,8 @@ public class MarketServiceTest {
         thread2.start();
         
         // Wait for both threads to complete
-        thread1.join(5000);  // Wait up to 5 seconds
-        thread2.join(5000);
+        thread1.join();
+        thread2.join();
         
         // Print diagnostic information
         System.out.println("Thread 1 success: " + threadSuccess[0]);
@@ -429,7 +429,7 @@ public class MarketServiceTest {
     @Test
     public void givenWrongApointee_whenAppointingStoreOwner_thenErrorOccurs() {
         String appointeeUsername = "newOwner";
-        Response<Void> response = marketService.appointStoreOwner(tokenId1, "ownerUser", appointeeUsername, store1.getId());
+        Response<Void> response = marketService.appointStoreOwner(tokenId1, appointeeUsername, store1.getId());
         assertTrue(response.errorOccurred());
     }
 

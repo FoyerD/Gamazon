@@ -118,6 +118,11 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public void appointStoreOwner(String appointerId, String appointeeId, String storeId) {
+        if (userRepository.getMember(appointeeId) == null) {
+            throw new IllegalArgumentException("Appointee not found.");
+        } else if (isStoreOwner(appointeeId, storeId)) {
+            throw new IllegalArgumentException("Appointee is already a store owner.");
+        }
         permissionManager.appointStoreOwner(appointerId, appointeeId, storeId);
     }
 
@@ -189,12 +194,12 @@ public class MarketFacade implements IMarketFacade {
     /**
      * Checks if a user is a store owner for the specified store.
      * 
-     * @param username The username to check
+     * @param userId The user ID to check
      * @param storeId The store ID to check
      * @return true if the user is a store owner, false otherwise
      */
-    public boolean isStoreOwner(String username, String storeId) {
-        Permission permission = permissionManager.getPermission(storeId, username);
+    public boolean isStoreOwner(String userId, String storeId) {
+        Permission permission = permissionManager.getPermission(storeId, userId);
         return permission != null && permission.isStoreOwner();
     }
     

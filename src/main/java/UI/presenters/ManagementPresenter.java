@@ -73,22 +73,25 @@ public class ManagementPresenter implements IManagementPresenter {
         return itemService.decreaseAmount(sessionToken, new Pair<>(storeId, productId), amount);
     }
 
+
     @Override
     public Response<Void> appointStoreManager(String sessionToken, String appointeeId,
             String storeId) {
             return marketService.appointStoreManager(sessionToken, appointeeId, storeId);
     }
 
+
     @Override
-    public Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername,
+    public Response<Void> removeStoreOwner(String sessionToken,  String managerId,
             String storeId) {
-        return marketService.removeStoreManager(sessionToken, removerUsername, managerUsername, storeId);
+        throw new UnsupportedOperationException("Removing store owner is not supported yet.");
+        // return marketService.removeStoreManager(sessionToken, managerId, storeId);
     }
 
     @Override
-    public Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername,
+    public Response<Void> appointStoreOwner(String sessionToken, String appointeeId,
             String storeId) {
-        return marketService.appointStoreOwner(sessionToken, appointerUsername, appointeeUsername, storeId);
+        return marketService.appointStoreOwner(sessionToken, appointeeId, storeId);
     }
 
     @Override
@@ -101,6 +104,7 @@ public class ManagementPresenter implements IManagementPresenter {
     public Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId) {
         return marketService.getManagersPermissions(sessionToken, storeId);
     }
+
 
     @Override
     public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId) {
