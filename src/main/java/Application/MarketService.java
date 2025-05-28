@@ -157,18 +157,18 @@ public class MarketService {
     }
 
     @Transactional
-    public Response<Void> removeStoreManager(String sessionToken, String removerId, String managerId, String storeId) {
+    public Response<Void> removeStoreOwner(String sessionToken, String ownerId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "removeStoreManager", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            String ownerId = tokenService.extractId(sessionToken);
+            String removerId = tokenService.extractId(sessionToken);
             if(permissionManager.isBanned(ownerId)){
                 TradingLogger.logError(CLASS_NAME, "removeStoreManager", "User is banned from removing store manager.");
                 return new Response<>(new Error("User is banned from removing store manager."));
             }
-            marketFacade.removeStoreManager(removerId, managerId, storeId);
+            marketFacade.removeStoreOwner(removerId, ownerId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "removeStoreManager", "Store manager removed successfully.");
             return new Response<>(null);
         } catch (Exception e) {

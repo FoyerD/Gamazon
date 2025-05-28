@@ -112,8 +112,8 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void removeStoreManager(String removerId, String managerId, String storeId) {
-        permissionManager.removeStoreManager(removerId, managerId, storeId);
+    public void removeStoreOwner(String removerId, String ownerId, String storeId) {
+        permissionManager.removeStoreOwner(removerId, ownerId, storeId);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class MarketFacade implements IMarketFacade {
 
         List<Member> members = new ArrayList<>();
         for (String id : ownersIds) {
-            Member member = userRepository.getMember(userId);
+            Member member = userRepository.getMember(id);
             if (member == null) {
                 throw new NoSuchElementException("Member not found: " + userId);
             }

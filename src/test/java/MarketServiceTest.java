@@ -31,7 +31,6 @@ import Application.UserService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -153,11 +152,11 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void givenStoreManagerExists_whenRemovingStoreManager_thenManagerIsRemoved() {
+    public void givenStoreOwnerExists_whenRemovingStoreOwner_thenOwnerIsRemoved() {
         String appointerId = getUserId(user1);
         String appointeeId = getUserId(user2);
-        marketService.appointStoreManager(tokenId1, appointeeId, store1.getId());
-        Response<Void> response = marketService.removeStoreManager(user1.getSessionToken(), appointerId, appointeeId, store1.getId());
+        marketService.appointStoreOwner(tokenId1, appointeeId, store1.getId());
+        Response<Void> response = marketService.removeStoreOwner(user1.getSessionToken(), appointeeId, store1.getId());
         assertFalse(response.errorOccurred());
     }
 
@@ -425,7 +424,7 @@ public class MarketServiceTest {
     @Test
     public void givenWrongAppointer_whenRemovingStoreManager_thenErrorOccurs() {
         String managerUsername = "existingManager";
-        Response<Void> response = marketService.removeStoreManager(tokenId1, "ownerUser", managerUsername, store1.getId());
+        Response<Void> response = marketService.removeStoreOwner(tokenId1, managerUsername, store1.getId());
         assertTrue(response.errorOccurred());
     }
 

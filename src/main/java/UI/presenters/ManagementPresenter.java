@@ -85,8 +85,7 @@ public class ManagementPresenter implements IManagementPresenter {
     @Override
     public Response<Void> removeStoreOwner(String sessionToken,  String managerId,
             String storeId) {
-        throw new UnsupportedOperationException("Removing store owner is not supported yet.");
-        // return marketService.removeStoreManager(sessionToken, managerId, storeId);
+        return marketService.removeStoreOwner(sessionToken, managerId, storeId);
     }
 
     @Override

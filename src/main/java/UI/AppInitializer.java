@@ -3,7 +3,10 @@ package UI;
 import Application.*;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.UserDTO;
+import Application.utils.Response;
 import Domain.management.PermissionType;
+
+import org.hibernate.query.sqm.tree.expression.ValueBindJpaCriteriaParameter;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -131,6 +134,23 @@ public class AppInitializer implements CommandLineRunner {
             return;
         }
 
+
+        Response<UserDTO> user3Resp = userService.guestEntry();
+        if (user3Resp.errorOccurred()) {
+            System.err.println("❌ Failed to enter as guest: " + user3Resp.getErrorMessage());
+        }
+
+        UserDTO user3 = user3Resp.getValue();
+
+        Response<UserDTO> newOneResp = userService.register(user3.getSessionToken(), "new_one", "New1234!@", "c@c.il");
+        if (newOneResp.errorOccurred()) {
+            System.err.println("❌ Failed to register as new_one: " + newOneResp.getErrorMessage());
+        }
+
+        Response<Void> newOneExitResp = userService.exit(newOneResp.getValue().getSessionToken());
+        if (newOneExitResp.errorOccurred()) {
+            System.err.println("❌ Failed to log out new_one: " + newOneExitResp.getErrorMessage());
+        }
         System.out.println("✅ App Initialization Complete");
     }
 }

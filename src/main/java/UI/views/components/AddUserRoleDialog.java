@@ -95,26 +95,15 @@ public class AddUserRoleDialog extends Dialog {
 
 
         tabs.addSelectedChangeListener(event -> {
-            additionalInfo.removeAll();
-            List<UserDTO> users = new ArrayList<>();
+            dialogLayout.removeAll();
             if (tabs.getSelectedTab().equals(addManagerTab)) {
-                users = this.managementCandidatesSupplier.get();
-                additionalInfo.add(permissionsSelect);
-
-                saveButton.addClickListener(e -> saveManager());
+                showAddManager();
             } else if (tabs.getSelectedTab().equals(addOwnerTab)) {
-                users = this.ownershipCandidatesSupplier.get();
-                saveButton.addClickListener(e -> saveOwner());
+                showAddOwner();
             }
-            // TODO: addCLickListener might be problematic
-            if (users != null) {
-                if (users.isEmpty()) {
-                    Notification.show("No more candidates left");
-                }
-                candidateSelect.setItems(users);
-            }
-
         });
+
+        showAddManager(); // add manager by defualt
         this.add(tabs, dialogLayout);
         
         
@@ -146,36 +135,60 @@ public class AddUserRoleDialog extends Dialog {
     }
     
 
-    private void setupDialog() {
-        candidateSelect.setItemLabelGenerator(user -> user.getUsername());
-        candidateSelect.setWidth("100%");
-        candidateSelect.setHelperText("Select a user to appoint as manager");
-        candidateSelect.setRequired(true);
+    // private void setupDialog() {
+    //     candidateSelect.setItemLabelGenerator(user -> user.getUsername());
+    //     candidateSelect.setWidth("100%");
+    //     candidateSelect.setHelperText("Select a user to appoint as manager");
+    //     candidateSelect.setRequired(true);
         
 
-        MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
-        permissionsSelect.setItems(PermissionFactory.MANAGER_PERMISSIONS);
-        permissionsSelect.setItemLabelGenerator(PermissionType::toString);
-        permissionsSelect.setWidth("100%");
-        permissionsSelect.setHelperText("Select initial permissions for the manager");
+    //     MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
+    //     permissionsSelect.setItems(PermissionFactory.MANAGER_PERMISSIONS);
+    //     permissionsSelect.setItemLabelGenerator(PermissionType::toString);
+    //     permissionsSelect.setWidth("100%");
+    //     permissionsSelect.setHelperText("Select initial permissions for the manager");
 
-        dialogLayout.add(candidateSelect, permissionsSelect);
+    //     dialogLayout.add(candidateSelect, permissionsSelect);
 
-        Button saveButton = new Button("Save", e -> {
-            UserDTO selectedUser = candidateSelect.getValue();
-            if (selectedUser == null) {
+    //     Button saveButton = new Button("Save", e -> {
+    //         UserDTO selectedUser = candidateSelect.getValue();
+    //         if (selectedUser == null) {
 
-                Notification.show("Please Choose a user");
-            } else {
-                Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
-                if (initialPermissions.isEmpty()) {
-                    Notification.show("Please select at least one permission");
-                } else if (onAddManager.apply(new UserPermission(selectedUser, List.copyOf(initialPermissions)))) {
-                    this.close();
-                }
+    //             Notification.show("Please Choose a user");
+    //         } else {
+    //             Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
+    //             if (initialPermissions.isEmpty()) {
+    //                 Notification.show("Please select at least one permission");
+    //             } else if (onAddManager.apply(new UserPermission(selectedUser, List.copyOf(initialPermissions)))) {
+    //                 this.close();
+    //             }
+    //         }
+    //     });
+
+    //     styleButton(saveButton, "var(--lumo-primary-color)");
+
+    //     Button cancelButton = new Button("Cancel", e -> this.close());
+    //     styleButton(cancelButton, " #9e9e9e");
+
+    //     HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+    //     buttons.setJustifyContentMode(JustifyContentMode.END);
+    //     dialogLayout.add(buttons);
+    //     this.add(dialogLayout);
+    // }
+
+    private void showAddOwner() {
+
+        List<UserDTO> users = ownershipCandidatesSupplier.get();
+        if (users != null) {
+            if (users.isEmpty()) {
+                Notification.show("No more candidates left");
+                candidateSelect.setItems(List.of());
             }
-        });
+            candidateSelect.setItems(users);
+        }
 
+        
+        Button saveButton = new Button("Save", e -> saveOwner());
         styleButton(saveButton, "var(--lumo-primary-color)");
 
         Button cancelButton = new Button("Cancel", e -> this.close());
@@ -183,16 +196,31 @@ public class AddUserRoleDialog extends Dialog {
 
         HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
         buttons.setJustifyContentMode(JustifyContentMode.END);
-        dialogLayout.add(buttons);
-        this.add(dialogLayout);
-    }
 
-    private void showAddOwner() {
-
+        dialogLayout.add(candidateSelect, buttons);
     }
 
     private void showAddManager() {
+        List<UserDTO> users = managementCandidatesSupplier.get();
+        if (users != null) {
+            if (users.isEmpty()) {
+                Notification.show("No more candidates left");
+                candidateSelect.setItems(List.of());
+            }
+            candidateSelect.setItems(users);
+        }
 
+        
+        Button saveButton = new Button("Save", e -> saveManager());
+        styleButton(saveButton, "var(--lumo-primary-color)");
+
+        Button cancelButton = new Button("Cancel", e -> this.close());
+        styleButton(cancelButton, " #9e9e9e");
+
+        HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+        buttons.setJustifyContentMode(JustifyContentMode.END);
+
+        dialogLayout.add(candidateSelect, permissionsSelect, buttons);
     }
 
     // public void refreshCandidates() {

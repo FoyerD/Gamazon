@@ -31,15 +31,14 @@ public class PermissionManager {
         getOrCreatePermission(appointerId, appointeeId, storeId, RoleType.STORE_MANAGER);
     }
 
-    public void removeStoreManager(String removerUsername, String managerUsername, String storeId) {
-        checkPermission(removerUsername, storeId, PermissionType.SUPERVISE_MANAGERS);
-        Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !(permission.isStoreManager())) {
-            throw new IllegalStateException(managerUsername + " is not a manager.");
+    public void removeStoreOwner(String removerId, String ownerId, String storeId) {
+        checkPermission(removerId, storeId, PermissionType.SUPERVISE_MANAGERS);
+        Permission permission = permissionRepository.get(storeId, ownerId);
+        if (permission == null || !(permission.isStoreOwner())) {
+            throw new IllegalStateException(ownerId + " is not an owner.");
         }
-        permission.setPermissions(Set.of());
-        permission.setRole(null);
-        permissionRepository.update(storeId, managerUsername, permission);
+        
+        permissionRepository.remove(storeId, ownerId);
     }
 
     public Map<String, Map<String, Permission>> getAllStorePermissions(){
