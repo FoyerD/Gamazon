@@ -1,9 +1,10 @@
-package Domain.User;
+package Domain.Repos;
 
 import java.util.List;
 
-import Application.DTOs.UserDTO;
-import Domain.ILockbasedRepository;
+import Domain.User.Guest;
+import Domain.User.Member;
+import Domain.User.User;
 
 public abstract class IUserRepository extends ILockbasedRepository<User, String> {
 

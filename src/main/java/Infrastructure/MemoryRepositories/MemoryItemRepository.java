@@ -1,14 +1,15 @@
-package Infrastructure.Repositories;
+package Infrastructure.MemoryRepositories;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Pair;
-import Domain.Store.IItemRepository;
+import Domain.Repos.IItemRepository;
 import Domain.Store.Item;
 
 /**
@@ -17,6 +18,7 @@ import Domain.Store.Item;
  */
 @Primary
 @Repository
+@Profile("dev")
 public class MemoryItemRepository extends IItemRepository {
 
     private final Map<Pair<String, String>, Item> items;

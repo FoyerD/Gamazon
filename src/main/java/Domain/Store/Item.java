@@ -1,25 +1,48 @@
 package Domain.Store;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
+
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 
 /**
  * Represents an item available in a store.
  * Encapsulates inventory, pricing, description, and rating logic.
  */
+
+ @Entity
+ @Table(name = "items")
+ @IdClass(ItemId.class)
 public class Item {
 
+    @Id
     private String storeId;
+    @Id
     private String productId;
+
     private double price;
     private int amount;
     private String description;
+    private String productName;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Category> categories;
 
-    private int[] rates;
-    private Supplier<Set<Category>> categoryFetcher;
-    private Supplier<String> nameFetcher;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Integer> rates;
+
+    protected Item() {
+    // Required by JPA
+    this.rates = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0));
+    }
 
     /**
      * Constructs a new item with the specified details.
@@ -30,13 +53,15 @@ public class Item {
      * @param amount      the quantity available
      * @param description a description of the item
      */
-    public Item(String storeId, String productId, double price, int amount, String description) {
+    public Item(String storeId, String productId, double price, int amount, String description, String productName, Set<Category> categories) {
         this.storeId = storeId;
         this.productId = productId;
         this.price = price;
         this.amount = amount;
         this.description = description;
-        this.rates = new int[5];
+        this.productName = productName;
+        this.categories = categories;
+        this.rates = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0));
     }
 
     /** @return the store ID associated with this item */
@@ -65,30 +90,11 @@ public class Item {
     }
 
     /**
-     * Sets a supplier for fetching the item's categories dynamically.
-     * @param fetcher a function returning a set of categories
-     */
-    public void setCategoryFetcher(Supplier<Set<Category>> fetcher) {
-        this.categoryFetcher = fetcher;
-    }
-
-    /**
-     * Sets a supplier for fetching the item's product name dynamically.
-     * @param fetcher a function returning the product name
-     */
-    public void setNameFetcher(Supplier<String> fetcher) {
-        this.nameFetcher = fetcher;
-    }
-
-    /**
      * @return the set of categories associated with the item
      * @throws IllegalStateException if the fetcher was not set
      */
     public Set<Category> getCategories() {
-        if (categoryFetcher == null) {
-            throw new IllegalStateException("Category fetcher not set");
-        }
-        return categoryFetcher.get();
+        return categories;
     }
 
     /**
@@ -96,10 +102,7 @@ public class Item {
      * @throws IllegalStateException if the fetcher was not set
      */
     public String getProductName() {
-        if (nameFetcher == null) {
-            throw new IllegalStateException("Name fetcher not set");
-        }
-        return nameFetcher.get();
+        return productName;
     }
 
     /**
@@ -130,23 +133,30 @@ public class Item {
      * @throws IllegalArgumentException if the rating is out of bounds
      */
     public void addRating(int newRating) {
-        if (newRating == 0) return;
-        if (newRating < 0 || newRating > 5)
+        if (newRating < 1 || newRating > 5)
             throw new IllegalArgumentException("newRating must be between 1 and 5");
-        rates[newRating - 1]++;
+
+        rates.set(newRating - 1, rates.get(newRating - 1) + 1);
     }
+
+
 
     /**
      * @return the average user rating for this item (0.0 if unrated)
      */
     public double getRating() {
-        double totalCount = Arrays.stream(rates).sum();
+        if (rates == null || rates.isEmpty()) return 0.0;
+
+        int totalCount = rates.stream().mapToInt(Integer::intValue).sum();
         if (totalCount == 0) return 0.0;
-        double weightedSum = IntStream.range(0, rates.length)
-                                      .mapToDouble(i -> (i + 1) * rates[i])
-                                      .sum();
+
+        double weightedSum = IntStream.range(0, rates.size())
+                                    .mapToDouble(i -> (i + 1) * rates.get(i))
+                                    .sum();
+
         return weightedSum / totalCount;
     }
+
 
     /**
      * Decreases the available quantity of the item.

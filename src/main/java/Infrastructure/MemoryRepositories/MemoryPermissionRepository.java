@@ -1,4 +1,4 @@
-package Infrastructure.Repositories;
+package Infrastructure.MemoryRepositories;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
 
-import Domain.management.IPermissionRepository;
+import Domain.Repos.IPermissionRepository;
 import Domain.management.Permission;
 
 @Repository

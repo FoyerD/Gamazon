@@ -1,4 +1,4 @@
-package Domain;
+package Domain.Repos;
 
 public interface IRepository<V, K> {
     // Generic methods for repository

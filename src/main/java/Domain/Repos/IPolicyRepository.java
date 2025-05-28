@@ -1,10 +1,9 @@
 
-package Domain.Store;
+package Domain.Repos;
 
 
 import java.util.List;
 
-import Domain.ILockbasedRepository;
 import Domain.Store.Policy;
 
 public abstract class IPolicyRepository extends ILockbasedRepository<Policy, String> 

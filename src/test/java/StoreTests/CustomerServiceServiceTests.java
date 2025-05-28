@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Categories;
 
 import Application.CustomerServiceService;
 import Application.ServiceManager;
@@ -17,10 +18,10 @@ import Application.TokenService;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
 import Domain.Pair;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.FeedbackDTO;
-import Domain.Store.IItemRepository;
 import Domain.Store.Item;
-import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
 import Infrastructure.MemoryRepoManager;
@@ -67,7 +68,7 @@ public class CustomerServiceServiceTests {
         storeId = this.storeService.addStore(tokenId, "TheAwsomStore", "creepy ahhh store").getValue().getId();
         productId = "productwhatwhat";
         itemId = new Pair<>(storeId, productId);
-        Item item = new Item(storeId, productId, 10.0, 100, "an items");
+        Item item = new Item(storeId, productId, 10.0, 100, "an items", null, null);
         this.itemRepository.add(itemId, item);
         if (this.itemRepository.get(new Pair<>(storeId, productId)) == null){
             throw new RuntimeException("Item not found in repository");

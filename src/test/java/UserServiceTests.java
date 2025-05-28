@@ -8,7 +8,7 @@ import Application.UserService;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.User.LoginManager;
-import Infrastructure.Repositories.MemoryUserRepository;
+import Infrastructure.MemoryRepositories.MemoryUserRepository;
 
 public class UserServiceTests {
     private UserService userService;

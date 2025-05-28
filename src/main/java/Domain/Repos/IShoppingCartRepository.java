@@ -1,7 +1,8 @@
-package Domain.Shopping;
+package Domain.Repos;
 
-import Domain.ILockbasedRepository;
 import java.util.Map;
+
+import Domain.Shopping.IShoppingCart;
 
 /**
  * Abstract repository class for managing shopping carts.

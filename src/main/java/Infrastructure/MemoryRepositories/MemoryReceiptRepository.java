@@ -1,4 +1,4 @@
-package Infrastructure.Repositories;
+package Infrastructure.MemoryRepositories;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 
 import Domain.Pair;
-import Domain.Shopping.IReceiptRepository;
+import Domain.Repos.IReceiptRepository;
 import Domain.Shopping.Receipt;
 import Domain.Store.Product;
 

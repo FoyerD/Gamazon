@@ -13,7 +13,11 @@ import org.springframework.stereotype.Component;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
-import Domain.User.IUserRepository;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
 import Domain.User.User;
 
 

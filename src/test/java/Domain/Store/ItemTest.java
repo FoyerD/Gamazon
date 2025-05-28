@@ -1,9 +1,8 @@
 package Domain.Store;
 
-import java.util.Set;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +12,7 @@ public class ItemTest {
 
     @Before
     public void setUp() {
-        item = new Item("store1", "prodA", 100.0, 5, "A fine product");
+        item = new Item("store1", "prodA", 100.0, 5, "A fine product", "Product name", new HashSet<>());
     }
 
     @Test
@@ -92,28 +91,4 @@ public class ItemTest {
         item.addRating(6);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void whenGetCategoriesWithoutFetcher_thenThrows() {
-        item.getCategories();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void whenGetProductNameWithoutFetcher_thenThrows() {
-        item.getProductName();
-    }
-
-    @Test
-    public void givenCategoryFetcherSet_whenGetCategories_thenReturnsSet() {
-        Category c = new Category("Books", "Reading");
-        item.setCategoryFetcher(() -> Set.of(c));
-        Set<Category> cats = item.getCategories();
-        assertEquals(1, cats.size());
-        assertTrue(cats.contains(c));
-    }
-
-    @Test
-    public void givenNameFetcherSet_whenGetProductName_thenReturnsName() {
-        item.setNameFetcher(() -> "MyProduct");
-        assertEquals("MyProduct", item.getProductName());
-    }
 }

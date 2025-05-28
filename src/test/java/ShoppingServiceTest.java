@@ -1,26 +1,22 @@
-import static org.junit.Assert.*;
-
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import Application.DTOs.AuctionDTO;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
-import Application.DTOs.ProductDTO;
 import Application.DTOs.ShoppingBasketDTO;
-import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.ServiceManager;
 import Application.ShoppingService;
@@ -28,32 +24,29 @@ import Application.TokenService;
 import Application.UserService;
 import Application.utils.Error;
 import Application.utils.Response;
-import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.IShoppingBasketRepository;
-import Domain.Shopping.IShoppingCartRepository;
+import Domain.ExternalServices.INotificationService;
+import Domain.FacadeManager;
+import Domain.Pair;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IPermissionRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
-import Domain.Store.StoreFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
-import Domain.User.IUserRepository;
+import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
-import Domain.User.Member;
-import Domain.User.User;
-import Domain.management.IPermissionRepository;
 import Domain.management.PermissionManager;
 import Infrastructure.MemoryRepoManager;
-import Infrastructure.ExternalPaymentService;
-import Domain.FacadeManager;
-import Domain.Pair;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.IItemRepository;
-import Domain.Store.IProductRepository;
-import Domain.Store.IStoreRepository;
 
 public class ShoppingServiceTest {
 
@@ -293,7 +286,7 @@ public class ShoppingServiceTest {
         // Update the item to have limited stock (just 1 unit)
         try {
             // Try to update the stock directly using the itemFacade from the setup
-            Item item = new Item(limitedStoreId, limitedProductId, 10.0, 1, "Limited Stock Item");
+            Item item = new Item(limitedStoreId, limitedProductId, 10.0, 1, "Limited Stock Item", null, null);
             itemFacade.update(new Pair<>(limitedStoreId, limitedProductId), item);
             System.out.println("Successfully updated item to have stock of 1");
         } catch (Exception e) {

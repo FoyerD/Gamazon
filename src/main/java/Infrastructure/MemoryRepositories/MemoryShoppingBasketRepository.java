@@ -1,4 +1,4 @@
-package Infrastructure.Repositories;
+package Infrastructure.MemoryRepositories;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 
 import Domain.Pair;
-import Domain.Shopping.IShoppingBasketRepository;
+import Domain.Repos.IShoppingBasketRepository;
 import Domain.Shopping.ShoppingBasket;
 
 @Repository

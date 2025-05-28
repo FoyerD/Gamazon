@@ -1,12 +1,12 @@
-package Infrastructure.Repositories;
+package Infrastructure.MemoryRepositories;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
 
+import Domain.Repos.IUserRepository;
 import Domain.User.Guest;
-import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
 

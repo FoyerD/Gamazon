@@ -1,9 +1,9 @@
-package Domain.Store;
+package Domain.Repos;
 
 import java.util.List;
 
-import Domain.ILockbasedRepository;
 import Domain.Pair;
+import Domain.Store.Item;
 
 /**
  * Abstract repository interface for managing items.

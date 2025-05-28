@@ -1,13 +1,14 @@
-package Infrastructure.Repositories;
-
-import Domain.Store.Policy;
-import Domain.Store.IPolicyRepository;
-import org.springframework.stereotype.Repository;
+package Infrastructure.MemoryRepositories;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
+import Domain.Repos.IPolicyRepository;
+import Domain.Store.Policy;
 
 /**
  * In-memory implementation of IPolicyRepository for Policy objects.

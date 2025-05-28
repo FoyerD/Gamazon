@@ -16,16 +16,16 @@ import org.junit.Test;
 
 import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Auction;
 import Domain.Store.Feedback;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
-import Domain.User.IUserRepository;
 
 public class StoreFacadeTests {
     private StoreFacade storeFacade;

@@ -1,11 +1,11 @@
 import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IPermissionRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
-import Domain.User.IUserRepository;
 import Domain.management.IMarketFacade;
-import Domain.management.IPermissionRepository;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.FacadeManager;

@@ -1,6 +1,8 @@
-package Domain.management;
+package Domain.Repos;
 
 import java.util.Map;
+
+import Domain.management.Permission;
 
 public abstract class IPermissionRepository {
 

@@ -1,8 +1,8 @@
-package Domain.Store;
+package Domain.Repos;
 
 import java.util.List;
 
-import Domain.ILockbasedRepository;
+import Domain.Store.Feedback;
 
 
 public abstract class IFeedbackRepository extends ILockbasedRepository<Feedback, String> {

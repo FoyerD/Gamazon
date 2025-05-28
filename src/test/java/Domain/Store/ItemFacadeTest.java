@@ -18,6 +18,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import Domain.Pair;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IStoreRepository;
 
 public class ItemFacadeTest {
 

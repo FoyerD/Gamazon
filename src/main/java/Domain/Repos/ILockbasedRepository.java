@@ -1,4 +1,4 @@
-package Domain;
+package Domain.Repos;
 
 import java.util.Map;
 

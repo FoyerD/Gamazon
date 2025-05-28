@@ -1,7 +1,7 @@
-package Domain.Shopping;
+package Domain.Repos;
 
-import Domain.ILockbasedRepository;
 import Domain.Pair;
+import Domain.Shopping.ShoppingBasket;
 
 /**
  * Abstract repository class for managing shopping baskets.

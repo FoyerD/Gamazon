@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import Domain.Pair;
 import Domain.Shopping.ShoppingBasket;
+import Infrastructure.MemoryRepositories.MemoryShoppingBasketRepository;
 
 /**
  * Test class for MemoryShoppingBasketRepository

@@ -1,4 +1,4 @@
-package Infrastructure.Repositories;
+package Infrastructure.MemoryRepositories;
 
 import java.util.List;
 import java.util.Map;
@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
-import Domain.Store.Feedback; 
-import Domain.Store.IFeedbackRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Store.Feedback;
 @Repository
 public class MemoryFeedbackRepository extends IFeedbackRepository{
     private Map<String, Feedback> feedbacks;

@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
-import Domain.User.IUserRepository;
-import Domain.User.Member;
+import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IUserRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
+import Domain.User.Member;
 
 /**
  * Interface for the Market Facade that manages all market-related operations.

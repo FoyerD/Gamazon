@@ -1,13 +1,14 @@
-package Infrastructure.Repositories;
+package Infrastructure.MemoryRepositories;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import Domain.Store.IProductRepository;
+import Domain.Repos.IProductRepository;
 import Domain.Store.Product;
 
 /**
@@ -15,6 +16,7 @@ import Domain.Store.Product;
  * Provides thread-safe CRUD operations on products.
  */
 @Repository
+@Profile("dev")
 public class MemoryProductRepository extends IProductRepository {
     private final ConcurrentMap<String, Product> products;
 
