@@ -17,8 +17,8 @@ public class TrueCondition implements Condition {
     }
 
     @Override
-    public UUID getId() {
-        return id;
+    public String getId() {
+        return id.toString();
     }
 
     /**

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.ConditionDTO;
+import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
@@ -22,11 +24,14 @@ import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.DiscountBuilder;
 import Domain.Store.Discounts.DiscountFacade;
+import Domain.Store.Discounts.Conditions.ConditionBuilder;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.Permission;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Store.Discounts.Conditions.Condition;
 
 @Service
 public class StoreService {
@@ -36,6 +41,8 @@ public class StoreService {
     private PermissionManager permissionManager;
     private INotificationService notificationService;
     private IShoppingCartFacade shoppingCartFacade;
+    // private final DiscountBuilder discountBuilder;
+    // private final ConditionBuilder conditionBuilder;
 
     private DiscountFacade discountFacade;
 
@@ -46,6 +53,8 @@ public class StoreService {
         this.notificationService = null;
         this.shoppingCartFacade = null;
         this.discountFacade = null;
+        // this.discountBuilder = null;
+        // this.conditionBuilder = null;
     }
 
     @Autowired
@@ -319,14 +328,19 @@ public class StoreService {
      * @param storeId The ID of the store
      * @return A set of user IDs who have baskets in the store
      */
-    public Set<String> getUsersWithBaskets(String storeId) {
+    public Set<String> getUsersWithBaskets(String sessionToken, String storeId) {
         String method = "getUsersWithBaskets";
         try {
             if(!this.isInitialized()) {
                 TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
                 throw new RuntimeException("StoreService is not initialized.");
             }
-            
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                throw new RuntimeException("Invalid token.");
+            }
+
             return shoppingCartFacade.getUsersWithBaskets(storeId);
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error getting users with baskets for store %s: %s", storeId, ex.getMessage());
@@ -335,66 +349,100 @@ public class StoreService {
     }
 
 
-    // ===========================================
-    // DISCOUNT MANAGEMENT METHODS
-    // ===========================================
+    public Response<Set<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeID) {
+        String method = "getStoreDiscounts";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
 
-    /**
-     * Adds a discount to a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @param discount The discount to add
-     * @return Response indicating success or failure
-     */
-    public Response<Boolean> addDiscount(String sessionToken, String storeId, Discount discount) {
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            Set<Discount> discounts = this.discountFacade.getStoreDiscounts(storeID);
+            
+            Set<DiscountDTO> output = new HashSet<>();
+
+            for (Discount discount : discounts) {
+                DiscountDTO dto = DiscountDTO.fromDiscount(discount);
+                output.add(dto);
+            }
+
+            return new Response<>(output);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error getting discounts for store %s: %s", storeID, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+    
+
+    public Response<DiscountDTO> addDiscount(String sessionToken, String storeId, DiscountDTO discountDTO) {
         String method = "addDiscount";
         try {
             if (!this.isInitialized()) {
                 TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
                 return new Response<>(new Error("StoreService is not initialized."));
             }
-            
+
             if (!tokenService.validateToken(sessionToken)) {
                 TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
+                return new Response<>(new Error("Invalid token"));
             }
-            
+
             String userId = this.tokenService.extractId(sessionToken);
             if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from managing discounts.");
+                throw new Exception("User is banned from adding discounts.");
             }
-            
-            // Check if user has permission to manage discounts in this store
-            permissionManager.checkPermission(userId, storeId, PermissionType.MODIFY_PRODUCTS);
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Add discount using facade
-            discountFacade.addDiscount(storeId, discount);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Discount added to store " + storeId + " by user " + userId);
-            return new Response<>(true);
-            
+            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+
+            Discount discount = discountFacade.addDiscount(storeId, discountDTO);
+            TradingLogger.logEvent(CLASS_NAME, method, "Discount added to store " + storeId + ": " + discount.getId());
+            return new Response<>(DiscountDTO.fromDiscount(discount));
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error adding discount to store %s: %s", storeId, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
-    /**
-     * Removes a discount from a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @param discountId The ID of the discount to remove
-     * @return Response indicating success or failure
-     */
+    public Response<Set<ConditionDTO>> getStoreConditions(String sessionToken, String storeID) {
+        String method = "getConditionsOfStore";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            Set<Condition> conditions = this.discountFacade.getStoreConditions(storeID);
+            
+            if (conditions == null) {
+                TradingLogger.logEvent(CLASS_NAME, method, "No conditions found for store " + storeID);
+                return new Response<>(new Error("Problem occurred"));
+            }
+
+            Set<ConditionDTO> output = new HashSet<>();
+
+            for (Condition condition : conditions) {
+                ConditionDTO dto = ConditionDTO.fromCondition(condition);
+                output.add(dto);
+            }
+
+            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + conditions.size() + " conditions for store " + storeID);
+            return new Response<>(output);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error getting conditions for store %s: %s", storeID, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+
     public Response<Boolean> removeDiscount(String sessionToken, String storeId, String discountId) {
         String method = "removeDiscount";
         try {
@@ -402,245 +450,28 @@ public class StoreService {
                 TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
                 return new Response<>(new Error("StoreService is not initialized."));
             }
-            
+
             if (!tokenService.validateToken(sessionToken)) {
                 TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
+                return new Response<>(new Error("Invalid token"));
             }
-            
+
             String userId = this.tokenService.extractId(sessionToken);
             if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from managing discounts.");
+                throw new Exception("User is banned from removing discounts.");
             }
-            
-            // Check if user has permission to manage discounts in this store
-            permissionManager.checkPermission(userId, storeId, PermissionType.MODIFY_PRODUCTS);
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Parse and validate discount ID
-            java.util.UUID discountUUID;
-            try {
-                discountUUID = java.util.UUID.fromString(discountId);
-            } catch (IllegalArgumentException e) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid discount ID format: %s", discountId);
-                return new Response<>(new Error("Invalid discount ID format."));
-            }
-            
-            // Remove discount using facade
-            discountFacade.removeDiscount(storeId, discountUUID);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Discount " + discountId + " removed from store " + storeId + " by user " + userId);
-            return new Response<>(true);
-            
+            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+
+            boolean result = discountFacade.removeDiscount(storeId, discountId);
+            TradingLogger.logEvent(CLASS_NAME, method, "Discount " + discountId + " removed from store " + storeId);
+            return new Response<>(result);
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error removing discount %s from store %s: %s", discountId, storeId, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
-    /**
-     * Updates a discount in a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @param discount The updated discount
-     * @return Response indicating success or failure
-     */
-    public Response<Boolean> updateDiscount(String sessionToken, String storeId, Discount discount) {
-        String method = "updateDiscount";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
-            
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from managing discounts.");
-            }
-            
-            // Check if user has permission to manage discounts in this store
-            permissionManager.checkPermission(userId, storeId, PermissionType.MODIFY_PRODUCTS);
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Update discount using facade
-            discountFacade.updateDiscount(storeId, discount);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Discount " + discount.getId() + " updated in store " + storeId + " by user " + userId);
-            return new Response<>(true);
-            
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error updating discount in store %s: %s", storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
 
-    /**
-     * Gets all discounts for a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @return Response containing the set of discounts or error
-     */
-    public Response<Set<Discount>> getStoreDiscounts(String sessionToken, String storeId) {
-        String method = "getStoreDiscounts";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
-            
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            
-            // Note: Getting discounts might not require special permissions as it could be for viewing purposes
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from accessing store information.");
-            }
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Get discounts using facade
-            Set<Discount> discounts = discountFacade.getStoreDiscounts(storeId);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + discounts.size() + " discounts for store " + storeId);
-            return new Response<>(discounts);
-            
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error retrieving discounts for store %s: %s", storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
-
-    /**
-     * Gets the count of discounts for a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @return Response containing the discount count or error
-     */
-    public Response<Integer> getStoreDiscountCount(String sessionToken, String storeId) {
-        String method = "getStoreDiscountCount";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
-            
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from accessing store information.");
-            }
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Get discount count using facade
-            int count = discountFacade.getStoreDiscountCount(storeId);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved discount count (" + count + ") for store " + storeId);
-            return new Response<>(count);
-            
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error retrieving discount count for store %s: %s", storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
-
-    // ===========================================
-    // CONDITION MANAGEMENT METHODS
-    // ===========================================
-
-    /**
-     * Adds a condition to a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @param condition The condition to add
-     * @return Response indicating success or failure
-     */
-    public Response<Boolean> addCondition(String sessionToken, String storeId, Domain.Store.Discounts.Conditions.Condition condition) {
-        String method = "addCondition";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
-            
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from managing conditions.");
-            }
-            
-            // Check if user has permission to manage conditions in this store
-            permissionManager.checkPermission(userId, storeId, PermissionType.MODIFY_PRODUCTS);
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Add condition using facade
-            discountFacade.addCondition(storeId, condition);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Condition added to store " + storeId + " by user " + userId);
-            return new Response<>(true);
-            
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error adding condition to store %s: %s", storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
-
-    /**
-     * Removes a condition from a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @param conditionId The ID of the condition to remove
-     * @return Response indicating success or failure
-     */
     public Response<Boolean> removeCondition(String sessionToken, String storeId, String conditionId) {
         String method = "removeCondition";
         try {
@@ -648,183 +479,28 @@ public class StoreService {
                 TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
                 return new Response<>(new Error("StoreService is not initialized."));
             }
-            
+
             if (!tokenService.validateToken(sessionToken)) {
                 TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
+                return new Response<>(new Error("Invalid token"));
             }
-            
+
             String userId = this.tokenService.extractId(sessionToken);
             if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from managing conditions.");
+                throw new Exception("User is banned from removing conditions.");
             }
-            
-            // Check if user has permission to manage conditions in this store
-            permissionManager.checkPermission(userId, storeId, PermissionType.MODIFY_PRODUCTS);
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Parse and validate condition ID
-            java.util.UUID conditionUUID;
-            try {
-                conditionUUID = java.util.UUID.fromString(conditionId);
-            } catch (IllegalArgumentException e) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid condition ID format: %s", conditionId);
-                return new Response<>(new Error("Invalid condition ID format."));
-            }
-            
-            // Remove condition using facade
-            discountFacade.removeCondition(storeId, conditionUUID);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Condition " + conditionId + " removed from store " + storeId + " by user " + userId);
-            return new Response<>(true);
-            
+            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+
+            boolean result = discountFacade.removeCondition(storeId, conditionId);
+            TradingLogger.logEvent(CLASS_NAME, method, "Condition " + conditionId + " removed from store " + storeId);
+            return new Response<>(result);
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error removing condition %s from store %s: %s", conditionId, storeId, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }
 
-    /**
-     * Gets all conditions for a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @return Response containing the map of conditions or error
-     */
-    public Response<Map<java.util.UUID, Domain.Store.Discounts.Conditions.Condition>> getStoreConditions(String sessionToken, String storeId) {
-        String method = "getStoreConditions";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
-            
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from accessing store information.");
-            }
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Get conditions using facade
-            Map<java.util.UUID, Domain.Store.Discounts.Conditions.Condition> conditions = discountFacade.getStoreConditions(storeId);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + conditions.size() + " conditions for store " + storeId);
-            return new Response<>(conditions);
-            
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error retrieving conditions for store %s: %s", storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
 
-    /**
-     * Gets the count of conditions for a specific store.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @return Response containing the condition count or error
-     */
-    public Response<Integer> getStoreConditionCount(String sessionToken, String storeId) {
-        String method = "getStoreConditionCount";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
-            
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from accessing store information.");
-            }
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Get condition count using facade
-            int count = discountFacade.getStoreConditionCount(storeId);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved condition count (" + count + ") for store " + storeId);
-            return new Response<>(count);
-            
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error retrieving condition count for store %s: %s", storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
-
-    /**
-     * Clears all discounts and conditions for a specific store.
-     * This is a destructive operation that requires owner-level permissions.
-     * 
-     * @param sessionToken The user's session token
-     * @param storeId The ID of the store
-     * @return Response indicating success or failure
-     */
-    public Response<Boolean> clearStoreDiscountsAndConditions(String sessionToken, String storeId) {
-        String method = "clearStoreDiscountsAndConditions";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
-            
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from managing store data.");
-            }
-            
-            // This is a destructive operation - require owner permissions
-            permissionManager.checkPermission(userId, storeId, PermissionType.OPEN_DEACTIVATE_STORE);
-            
-            // Verify store exists
-            Store store = storeFacade.getStore(storeId);
-            if (store == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Store not found: %s", storeId);
-                return new Response<>(new Error("Store not found."));
-            }
-            
-            // Clear all discounts and conditions using facade
-            discountFacade.clearStoreDiscountsAndConditions(storeId);
-            
-            TradingLogger.logEvent(CLASS_NAME, method, "All discounts and conditions cleared for store " + storeId + " by user " + userId);
-            return new Response<>(true);
-            
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error clearing discounts and conditions for store %s: %s", storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
 
 
 }

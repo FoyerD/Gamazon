@@ -1,9 +1,7 @@
 package Domain.Store.Discounts;
 
-import java.util.List;
-import java.util.Map;
+
 import java.util.Set;
-import java.util.UUID;
 
 
 /**
@@ -28,7 +26,7 @@ public interface IDiscountRepository {
      * @return the discount if found, null otherwise
      * @throws IllegalArgumentException if id is null
      */
-    Discount findById(UUID id);
+    Discount get(String id);
     
     /**
      * Deletes a discount by its unique identifier.
@@ -36,23 +34,8 @@ public interface IDiscountRepository {
      * @param id the UUID of the discount to delete
      * @throws IllegalArgumentException if id is null
      */
-    void deleteById(UUID id);
+    void delete(String id);
     
-    /**
-     * Retrieves all discounts in the repository.
-     * 
-     * @return a map of UUID to Discount containing all discounts
-     */
-    Map<UUID, Discount> findAll();
-    
-    /**
-     * Retrieves all discounts for a specific store.
-     * 
-     * @param storeId the ID of the store to find discounts for
-     * @return a list of discounts for the specified store, empty list if none found or store doesn't exist
-     * @throws IllegalArgumentException if storeId is null or empty
-     */
-    List<Discount> findByStoreId(String storeId);
     
     /**
      * Checks if a discount exists with the given ID.
@@ -61,7 +44,7 @@ public interface IDiscountRepository {
      * @return true if a discount exists with the given ID, false otherwise
      * @throws IllegalArgumentException if id is null
      */
-    boolean existsById(UUID id);
+    boolean exists(String id);
     
     /**
      * Removes all discounts from the repository.
@@ -69,12 +52,6 @@ public interface IDiscountRepository {
      */
     void clear();
     
-    /**
-     * Gets the total number of discounts in the repository.
-     * 
-     * @return the count of discounts
-     */
-    int size();
     
     /**
      * Gets all the discounts for a specific store.

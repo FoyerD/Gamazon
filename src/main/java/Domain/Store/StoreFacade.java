@@ -3,6 +3,7 @@ package Domain.Store;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -16,6 +17,7 @@ import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
+import Domain.Store.Discounts.Conditions.Condition;
 
 
 
@@ -335,9 +337,5 @@ public class StoreFacade {
         return item;
     }
 
-
-    public boolean addDiscount(String storeId, Discount discount) {
-        throw new UnsupportedOperationException("Method not implemented yet");
-    }
 
 }

@@ -2,7 +2,7 @@ package Infrastructure.Repositories;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -14,8 +14,8 @@ import Domain.Store.Discounts.Conditions.IConditionRepository;
 @Repository
 public class MemoryConditionRepository implements IConditionRepository {
     
-    private final Map<UUID, Condition> conditions;
-    private final Map<String, Map<UUID, Condition>> conditionsByStore;
+    private final Map<String, Condition> conditions;
+    private final Map<String, Map<String, Condition>> conditionsByStore;
 
     public MemoryConditionRepository() {
         this.conditions = new ConcurrentHashMap<>();
@@ -43,7 +43,7 @@ public class MemoryConditionRepository implements IConditionRepository {
     }
 
     @Override
-    public Condition findById(UUID id) {
+    public Condition get(String id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
@@ -51,7 +51,7 @@ public class MemoryConditionRepository implements IConditionRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void delete(String id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
@@ -65,12 +65,7 @@ public class MemoryConditionRepository implements IConditionRepository {
     }
 
     @Override
-    public Map<UUID, Condition> findAll() {
-        return new HashMap<>(conditions);
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
+    public boolean exists(String id) {
         if (id == null) {
             return false;
         }
@@ -94,12 +89,12 @@ public class MemoryConditionRepository implements IConditionRepository {
      * @param storeID The ID of the store
      * @return Map of condition IDs to conditions for the specified store
      */
-    public Map<UUID, Condition> findByStoreId(String storeID) {
+    public Map<String, Condition> findByStoreId(String storeID) {
         if (storeID == null || storeID.trim().isEmpty()) {
             return new HashMap<>();
         }
-        
-        Map<UUID, Condition> storeConditions = conditionsByStore.get(storeID);
+
+        Map<String, Condition> storeConditions = conditionsByStore.get(storeID);
         return storeConditions != null ? new HashMap<>(storeConditions) : new HashMap<>();
     }
 
@@ -114,7 +109,7 @@ public class MemoryConditionRepository implements IConditionRepository {
             return 0;
         }
         
-        Map<UUID, Condition> storeConditions = conditionsByStore.remove(storeID);
+        Map<String, Condition> storeConditions = conditionsByStore.remove(storeID);
         if (storeConditions == null) {
             return 0;
         }
@@ -136,7 +131,7 @@ public class MemoryConditionRepository implements IConditionRepository {
             return 0;
         }
         
-        Map<UUID, Condition> storeConditions = conditionsByStore.get(storeID);
+        Map<String, Condition> storeConditions = conditionsByStore.get(storeID);
         return storeConditions != null ? storeConditions.size() : 0;
     }
 
@@ -151,7 +146,7 @@ public class MemoryConditionRepository implements IConditionRepository {
             return false;
         }
         
-        Map<UUID, Condition> storeConditions = conditionsByStore.get(storeID);
+        Map<String, Condition> storeConditions = conditionsByStore.get(storeID);
         return storeConditions != null && !storeConditions.isEmpty();
     }
 
@@ -166,5 +161,11 @@ public class MemoryConditionRepository implements IConditionRepository {
                     Map.Entry::getKey,
                     entry -> entry.getValue().size()
                 ));
+    }
+
+    @Override
+    public Set<Condition> getStoreConditions(String storeId) {
+        Map<String, Condition> storeConditions = conditionsByStore.get(storeId);
+        return storeConditions != null ? Set.copyOf(storeConditions.values()) : Set.of();
     }
 }

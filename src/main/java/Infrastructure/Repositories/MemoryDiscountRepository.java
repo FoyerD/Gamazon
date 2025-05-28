@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
@@ -18,8 +17,8 @@ import Domain.Store.Discounts.IDiscountRepository;
 @Repository
 public class MemoryDiscountRepository implements IDiscountRepository {
     
-    private final Map<UUID, Discount> discounts;
-    private final Map<String, Map<UUID, Discount>> discountsByStore;
+    private final Map<String, Discount> discounts;
+    private final Map<String, Map<String, Discount>> discountsByStore;
 
     public MemoryDiscountRepository() {
         this.discounts = new ConcurrentHashMap<>();
@@ -47,7 +46,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
     }
 
     @Override
-    public Discount findById(UUID id) {
+    public Discount get(String id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
@@ -55,7 +54,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void delete(String id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
@@ -69,12 +68,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
     }
 
     @Override
-    public Map<UUID, Discount> findAll() {
-        return new HashMap<>(discounts);
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
+    public boolean exists(String id) {
         if (id == null) {
             return false;
         }
@@ -87,38 +81,16 @@ public class MemoryDiscountRepository implements IDiscountRepository {
         discountsByStore.clear();
     }
 
-    @Override
-    public int size() {
-        return discounts.size();
-    }
-
-    @Override
-    public List<Discount> findByStoreId(String storeId) {
-        if (storeId == null || storeId.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-        
-        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
-        if (storeDiscounts == null) {
-            return new ArrayList<>();
-        }
-        
-        return new ArrayList<>(storeDiscounts.values());
-    }
 
     @Override
     public Set<Discount> getStoreDiscounts(String storeId) {
-        if (storeId == null || storeId.trim().isEmpty()) {
-            return new HashSet<>();
-        }
         
-        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
-        if (storeDiscounts == null) {
-            return new HashSet<>();
-        }
+        Map<String, Discount> storeDiscounts = discountsByStore.get(storeId);
+        
         
         return new HashSet<>(storeDiscounts.values());
     }
+
 
     /**
      * Deletes all discounts for a specific store.
@@ -131,7 +103,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
             return 0;
         }
         
-        Map<UUID, Discount> storeDiscounts = discountsByStore.remove(storeId);
+        Map<String, Discount> storeDiscounts = discountsByStore.remove(storeId);
         if (storeDiscounts == null) {
             return 0;
         }
@@ -153,7 +125,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
             return 0;
         }
         
-        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        Map<String, Discount> storeDiscounts = discountsByStore.get(storeId);
         return storeDiscounts != null ? storeDiscounts.size() : 0;
     }
 
@@ -168,7 +140,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
             return false;
         }
         
-        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        Map<String, Discount> storeDiscounts = discountsByStore.get(storeId);
         return storeDiscounts != null && !storeDiscounts.isEmpty();
     }
 
@@ -217,12 +189,12 @@ public class MemoryDiscountRepository implements IDiscountRepository {
      * @param discountId The ID of the discount
      * @return The discount if found within the store, null otherwise
      */
-    public Discount findByStoreAndDiscountId(String storeId, UUID discountId) {
+    public Discount findByStoreAndDiscountId(String storeId, String discountId) {
         if (storeId == null || storeId.trim().isEmpty() || discountId == null) {
             return null;
         }
         
-        Map<UUID, Discount> storeDiscounts = discountsByStore.get(storeId);
+        Map<String, Discount> storeDiscounts = discountsByStore.get(storeId);
         if (storeDiscounts == null) {
             return null;
         }

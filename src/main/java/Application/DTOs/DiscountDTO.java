@@ -1,8 +1,6 @@
 package Application.DTOs;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import Domain.Store.Discounts.*;
@@ -28,7 +26,7 @@ public class DiscountDTO {
         STORE
     }
     
-    private UUID id;
+    private String id;
     private DiscountType type;
     private ConditionDTO condition;
     
@@ -44,7 +42,7 @@ public class DiscountDTO {
     public DiscountDTO() {}
     
     // Constructor for basic initialization
-    public DiscountDTO(UUID id, DiscountType type, ConditionDTO condition) {
+    public DiscountDTO(String id, DiscountType type, ConditionDTO condition) {
         this.id = id;
         this.type = type;
         this.condition = condition;
@@ -139,11 +137,11 @@ public class DiscountDTO {
     }
     
     // Getters and setters
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-    
-    public void setId(UUID id) {
+
+    public void setId(String id) {
         this.id = id;
     }
     
@@ -253,4 +251,5 @@ public class DiscountDTO {
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
+
 }

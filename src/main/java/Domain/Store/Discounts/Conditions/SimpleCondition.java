@@ -20,8 +20,8 @@ public abstract class SimpleCondition implements Condition {
     }
 
     @Override
-    public UUID getId() {
-        return id;
+    public String getId() {
+        return id.toString();
     }
 
     @Override

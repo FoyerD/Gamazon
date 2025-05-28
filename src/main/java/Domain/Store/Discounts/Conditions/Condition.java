@@ -9,7 +9,7 @@ public interface Condition {
      * Gets the unique identifier for this condition
      * @return UUID of this condition
      */
-    UUID getId();
+    String getId();
     
     /**
      * Checks if the condition is satisfied.

@@ -118,7 +118,8 @@ public class FacadeManager {
     public DiscountFacade getDiscountFacade() {
         if (discountFacade == null) {
             discountFacade = new DiscountFacade(repoManager.getDiscountRepository(),
-                                                repoManager.getConditionRepository());
+                                                repoManager.getConditionRepository(),
+                                                getItemFacade());
         }
         return discountFacade;
     }

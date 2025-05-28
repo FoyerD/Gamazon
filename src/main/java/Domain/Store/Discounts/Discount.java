@@ -33,8 +33,8 @@ public abstract class Discount {
         this.condition = condition;
     }
 
-    public UUID getId() {
-        return id;
+    public String getId() {
+        return id.toString();
     }
 
     // Outputs a map from product to the price breakdown

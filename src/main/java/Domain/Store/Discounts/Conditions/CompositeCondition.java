@@ -21,8 +21,8 @@ public abstract class CompositeCondition implements Condition {
     }
 
     @Override
-    public UUID getId() {
-        return id;
+    public String getId() {
+        return id.toString();
     }
 
     // Getter for repository serialization

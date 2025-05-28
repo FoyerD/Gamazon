@@ -1,7 +1,6 @@
 package Application.DTOs;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import Domain.Store.Discounts.Conditions.*;
@@ -18,7 +17,7 @@ public class ConditionDTO {
         TRUE
     }
     
-    private UUID id;
+    private String id;
     private ConditionType type;
     
     // Fields for simple conditions
@@ -35,7 +34,7 @@ public class ConditionDTO {
     public ConditionDTO() {}
     
     // Constructor for simple conditions
-    public ConditionDTO(UUID id, ConditionType type) {
+    public ConditionDTO(String id, ConditionType type) {
         this.id = id;
         this.type = type;
     }
@@ -96,11 +95,11 @@ public class ConditionDTO {
     }
     
     // Getters and setters
-    public UUID getId() {
+    public String getId() {
         return id;
     }
     
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
     

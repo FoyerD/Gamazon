@@ -1,7 +1,7 @@
 package Domain.Store.Discounts.Conditions;
 
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
 
 
 /**
@@ -26,7 +26,7 @@ public interface IConditionRepository {
      * @return an Optional containing the condition if found, empty otherwise
      * @throws IllegalArgumentException if id is null
      */
-    Condition findById(UUID id);
+    Condition get(String id);
     
     /**
      * Deletes a condition by its unique identifier.
@@ -34,22 +34,19 @@ public interface IConditionRepository {
      * @param id the UUID of the condition to delete
      * @throws IllegalArgumentException if id is null
      */
-    void deleteById(UUID id);
+    void delete(String id);
     
-    /**
-     * Retrieves all conditions in the repository.
-     * 
-     * @return a map of UUID to Condition containing all conditions
-     */
-    Map<UUID, Condition> findAll();
+    
+    Set<Condition> getStoreConditions(String storeId);
+ 
     
     /**
      * Checks if a condition exists with the given ID.
      * 
-     * @param id the UUID to check
+     * @param id the String to check
      * @return true if a condition exists with the given ID, false otherwise
      */
-    boolean existsById(UUID id);
+    boolean exists(String id);
     
     /**
      * Removes all conditions from the repository.
