@@ -10,14 +10,14 @@ import Domain.Store.Product;
 /**
  * Interface for repository that manages purchase receipts.
  */
-public interface IReceiptRepository {
+public abstract class IReceiptRepository extends ILockbasedRepository<Receipt, String> {
     /**
      * Save a purchase receipt.
      * 
      * @param receipt The Receipt object to save
      * @return The ID of the saved receipt
      */
-    String saveReceipt(Receipt receipt);
+    public abstract String saveReceipt(Receipt receipt);
     
     /**
      * Save a purchase record (convenience method)
@@ -29,7 +29,7 @@ public interface IReceiptRepository {
      * @param paymentDetails Payment method information (masked)
      * @return The generated receipt ID
      */
-    String savePurchase(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products, 
+    public abstract String savePurchase(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products, 
                        double totalPrice, String paymentDetails);
     
     /**
@@ -38,7 +38,7 @@ public interface IReceiptRepository {
      * @param receiptId The receipt ID
      * @return The receipt object, or null if not found
      */
-    Receipt getReceipt(String receiptId);
+    public abstract Receipt getReceipt(String receiptId);
     
     /**
      * Get all receipts for a specific client
@@ -46,7 +46,7 @@ public interface IReceiptRepository {
      * @param clientId The client ID
      * @return List of receipts for the client
      */
-    List<Receipt> getClientReceipts(String clientId);
+    public abstract List<Receipt> getClientReceipts(String clientId);
     
     /**
      * Get all receipts for a specific store
@@ -54,7 +54,7 @@ public interface IReceiptRepository {
      * @param storeId The store ID
      * @return List of receipts for the store
      */
-    List<Receipt> getStoreReceipts(String storeId);
+    public abstract List<Receipt> getStoreReceipts(String storeId);
     
     /**
      * Get all receipts for a client at a specific store
@@ -63,10 +63,10 @@ public interface IReceiptRepository {
      * @param storeId The store ID
      * @return List of receipts for the client at the specified store
      */
-    List<Receipt> getClientStoreReceipts(String clientId, String storeId);
+    public abstract List<Receipt> getClientStoreReceipts(String clientId, String storeId);
     
     /**
      * Clear all stored receipts
      */
-    void clear();
+    public abstract void clear();
 }

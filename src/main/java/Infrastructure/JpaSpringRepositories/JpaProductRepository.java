@@ -52,5 +52,10 @@ public class JpaProductRepository extends IProductRepository {
     public Product update(String id, Product value) {
         return jpaProductRepository.save(value);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaProductRepository.deleteAll();
+    }
     
 }

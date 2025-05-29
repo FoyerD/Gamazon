@@ -21,4 +21,8 @@ public abstract class ILockbasedRepository<V, K> implements IRepository<V, K> {
     protected boolean isIdValid(K id) {
         return id != null && !id.toString().trim().isEmpty();
     }
+
+    protected void deleteAllLocks() {
+        locks.clear();
+    }
 }

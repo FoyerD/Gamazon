@@ -95,4 +95,10 @@ public class MemoryUserRepository extends IUserRepository {
                 .toList(); // Returns a list of all members
     }
     
+    @Override
+    public void deleteAll() {
+        users.clear(); // Clears all users from the repository
+        this.deleteAllLocks(); // Deletes all locks associated with users
+    }
+    
 }

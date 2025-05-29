@@ -93,4 +93,10 @@ public class MemoryShoppingCartRepository extends IShoppingCartRepository {
     public Map<String, IShoppingCart> getAll() {
         return new ConcurrentHashMap<>(carts); // Return a copy to prevent external modification
     }
+
+    @Override
+    public void deleteAll() {
+        carts.clear();
+        this.deleteAllLocks(); 
+    }
 }

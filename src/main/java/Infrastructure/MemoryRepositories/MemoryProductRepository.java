@@ -87,4 +87,10 @@ public class MemoryProductRepository extends IProductRepository {
     public Set<Product> getAll() {
         return new HashSet<>(products.values());
     }
+
+    @Override
+    public void deleteAll() {
+        products.clear();
+        this.deleteAllLocks();
+    }
 }

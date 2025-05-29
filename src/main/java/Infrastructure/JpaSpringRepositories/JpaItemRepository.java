@@ -72,4 +72,9 @@ public class JpaItemRepository extends IItemRepository {
         }
         return jpaItemRepository.save(item);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaItemRepository.deleteAll();
+    }
 }

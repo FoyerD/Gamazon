@@ -54,4 +54,10 @@ public class MemoryNotificationRepository extends INotificationRepository {
         notifications.put(userId, new ArrayList<>(value));
         return value;
     }
+
+    @Override
+    public void deleteAll() {
+        notifications.clear();
+        deleteAllLocks();
+    }
 }

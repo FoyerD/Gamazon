@@ -84,5 +84,11 @@ public class MemoryFeedbackRepository extends IFeedbackRepository{
                 .filter(feedback -> feedback.getCustomerId().equals(userId))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteAll() {
+        this.feedbacks.clear();
+        this.deleteAllLocks();
+    }
     
 }

@@ -1,10 +1,10 @@
 package Domain.Repos;
 
+import Domain.Pair;
 import java.util.Map;
-
 import Domain.management.Permission;
 
-public abstract class IPermissionRepository {
+public abstract class IPermissionRepository extends ILockbasedRepository<Permission, Pair<String, String>> {
 
     public IPermissionRepository() {}
 
@@ -19,4 +19,5 @@ public abstract class IPermissionRepository {
     public abstract Map<String, Permission> getAllPermissionsForStore(String storeId);
 
     public abstract Map<String, Map<String, Permission>> getAllPermissions();
+
 }

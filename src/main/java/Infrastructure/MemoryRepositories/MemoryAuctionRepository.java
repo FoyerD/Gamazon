@@ -61,4 +61,10 @@ public class MemoryAuctionRepository extends IAuctionRepository {
         if (!isIdValid(id)) throw new IllegalArgumentException("ID cannot be null");
         return (Auction)this.auctions.get(id);
     }
+    
+    @Override
+    public void deleteAll() {
+        this.auctions.clear();
+        this.deleteAllLocks();
+    }
 }

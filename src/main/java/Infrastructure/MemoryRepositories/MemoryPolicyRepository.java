@@ -65,4 +65,10 @@ public class MemoryPolicyRepository extends IPolicyRepository {
         policies.put(id, policy);
         return policy;
     }
+
+    @Override
+    public void deleteAll() {
+        policies.clear();
+        this.deleteAllLocks();
+    }
 }

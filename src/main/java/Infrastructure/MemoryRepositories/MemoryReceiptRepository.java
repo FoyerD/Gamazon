@@ -18,7 +18,7 @@ import Domain.Store.Product;
  * Repository for storing and retrieving purchase receipts.
  */
 @Repository
-public class MemoryReceiptRepository implements IReceiptRepository {
+public class MemoryReceiptRepository extends IReceiptRepository {
     // Main storage for all receipts: receiptId -> Receipt
     private final Map<String, Receipt> receipts;
     
@@ -140,5 +140,86 @@ public class MemoryReceiptRepository implements IReceiptRepository {
         receipts.clear();
         clientReceipts.clear();
         storeReceipts.clear();
+    }
+
+    @Override
+    public boolean add(String id, Receipt value) {
+        if (id == null || value == null) {
+            throw new IllegalArgumentException("ID and value cannot be null");
+        }
+        if (!id.equals(value.getReceiptId())) {
+            throw new IllegalArgumentException("ID does not match the receipt ID");
+        }
+        if (receipts.containsKey(id)) {
+            throw new IllegalArgumentException("Receipt with this ID already exists");
+        }
+
+        receipts.put(id, value);
+        return true;
+    }
+
+    @Override
+    public Receipt remove(String id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        
+        Receipt removedReceipt = receipts.remove(id);
+        if (removedReceipt != null) {
+            String clientId = removedReceipt.getClientId();
+            String storeId = removedReceipt.getStoreId();
+            
+            // Remove from client index
+            Map<String, String> clientReceiptIds = clientReceipts.get(clientId);
+            if (clientReceiptIds != null) {
+                clientReceiptIds.remove(id);
+                if (clientReceiptIds.isEmpty()) {
+                    clientReceipts.remove(clientId);
+                }
+            }
+            
+            // Remove from store index
+            Map<String, String> storeReceiptIds = storeReceipts.get(storeId);
+            if (storeReceiptIds != null) {
+                storeReceiptIds.remove(id);
+                if (storeReceiptIds.isEmpty()) {
+                    storeReceipts.remove(storeId);
+                }
+            }
+        }
+        
+        return removedReceipt;
+    }
+
+    @Override
+    public Receipt get(String id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        return receipts.get(id);
+    }
+
+    @Override
+    public Receipt update(String id, Receipt value) {
+        if (id == null || value == null) {
+            throw new IllegalArgumentException("ID and value cannot be null");
+        }
+        if (!id.equals(value.getReceiptId())) {
+            throw new IllegalArgumentException("ID does not match the receipt ID");
+        }
+        if (!receipts.containsKey(id)) {
+            throw new IllegalArgumentException("Receipt with this ID does not exist");
+        }
+
+        receipts.put(id, value);
+        return value;
+    }
+
+    @Override
+    public void deleteAll() {
+        receipts.clear();
+        clientReceipts.clear();
+        storeReceipts.clear();
+        this.deleteAllLocks();
     }
 }

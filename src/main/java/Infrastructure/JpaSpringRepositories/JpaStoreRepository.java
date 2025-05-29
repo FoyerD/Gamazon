@@ -45,4 +45,9 @@ public class JpaStoreRepository extends IStoreRepository {
     public Store getStoreByName(String name) {
         return jpaStoreRepository.getStoreByName(name);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaStoreRepository.deleteAll();
+    }
 }

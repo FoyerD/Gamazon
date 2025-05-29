@@ -87,4 +87,9 @@ public class MemoryShoppingBasketRepository extends IShoppingBasketRepository {
         return value;
     }
     
+    @Override
+    public void deleteAll() {
+        baskets.clear();
+        this.deleteAllLocks();
+    }
 }

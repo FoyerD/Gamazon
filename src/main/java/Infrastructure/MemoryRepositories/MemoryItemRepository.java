@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +15,6 @@ import Domain.Store.Item;
  * In-memory implementation of {@link IItemRepository}.
  * Stores items in a thread-safe map keyed by (storeId, productId) pairs.
  */
-@Primary
 @Repository
 @Profile("dev")
 public class MemoryItemRepository extends IItemRepository {
@@ -196,5 +194,11 @@ public class MemoryItemRepository extends IItemRepository {
             addLock(id); // safe no-op if already exists
         }
         return getLock(id);
+    }
+
+    @Override
+    public void deleteAll() {
+        items.clear();
+        deleteAllLocks();
     }
 }

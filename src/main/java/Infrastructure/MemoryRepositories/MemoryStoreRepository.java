@@ -58,4 +58,10 @@ public class MemoryStoreRepository extends IStoreRepository{
         }
         return null;
     }
+
+    @Override
+    public void deleteAll() {
+        this.stores.clear();
+        this.deleteAllLocks();
+    }
 }

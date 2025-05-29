@@ -1,16 +1,23 @@
 package UI;
 
-import Application.*;
-import Application.DTOs.ProductDTO;
-import Application.DTOs.UserDTO;
-import Domain.management.PermissionType;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+import Application.DTOs.ProductDTO;
+import Application.DTOs.UserDTO;
+import Application.ItemService;
+import Application.MarketService;
+import Application.ProductService;
+import Application.StoreService;
+import Application.TokenService;
+import Application.UserService;
+import Domain.management.PermissionType;
+
 @Component
-//@Profile({"dev", "test"})
+@Order(1)
 public class AppInitializer implements CommandLineRunner {
 
     private final UserService userService;
@@ -80,6 +87,7 @@ public class AppInitializer implements CommandLineRunner {
         var store2 = store2Resp.getValue();
 
         var appointResp = marketService.appointStoreManager(adminToken, tokenService.extractId(buyer.getSessionToken()), store1.getId());
+        System.out.println("Appointing buyer as store manager for store1: " + store1.getManagers().toString());
         if (appointResp.errorOccurred()) {
             System.err.println("❌ Failed to appoint store manager: " + appointResp.getErrorMessage());
             return;

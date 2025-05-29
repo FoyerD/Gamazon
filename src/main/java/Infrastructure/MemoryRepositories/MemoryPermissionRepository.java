@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
 
+import Domain.Pair;
 import Domain.Repos.IPermissionRepository;
 import Domain.management.Permission;
 
@@ -48,5 +49,43 @@ public class MemoryPermissionRepository extends IPermissionRepository {
 
     public Map<String, Map<String, Permission>> getAllPermissions() {
         return permissions;
+    }
+
+    @Override
+    public void deleteAll() {
+        permissions.clear();
+        this.deleteAllLocks();
+    }
+
+    @Override
+    public boolean add(Pair<String, String> id, Permission value) {
+        if (id == null || id.getFirst() == null || id.getSecond() == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        return add(id.getFirst(), id.getSecond(), value);
+    }
+
+    @Override
+    public Permission remove(Pair<String, String> id) {
+        if (id == null || id.getFirst() == null || id.getSecond() == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        return remove(id.getFirst(), id.getSecond());
+    }
+
+    @Override
+    public Permission get(Pair<String, String> id) {
+        if (id == null || id.getFirst() == null || id.getSecond() == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        return get(id.getFirst(), id.getSecond());
+    }
+
+    @Override
+    public Permission update(Pair<String, String> id, Permission value) {
+        if (id == null || id.getFirst() == null || id.getSecond() == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+        return update(id.getFirst(), id.getSecond(), value);
     }
 }

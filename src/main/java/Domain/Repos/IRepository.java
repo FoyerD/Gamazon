@@ -8,4 +8,6 @@ public interface IRepository<V, K> {
     V remove(K id);
     V get(K id);
     V update(K id, V value);
+    void deleteAll();
+
 }
