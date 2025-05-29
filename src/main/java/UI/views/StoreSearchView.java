@@ -147,8 +147,8 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
 
         StoreLayout storelayout = new StoreLayout(store,
         itemLayout,
-        s -> UI.getCurrent().navigate("owner"),
-        s -> {            
+        null,  // Remove owner action
+        s -> {            // Keep manager action
             UI.getCurrent().getSession().setAttribute("currentStoreId", s.getId());
             UI.getCurrent().navigate("manager");
         });
