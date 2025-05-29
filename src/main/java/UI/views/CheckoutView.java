@@ -4,7 +4,6 @@ import UI.presenters.IPurchasePresenter;
 import Application.utils.Response;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
@@ -18,12 +17,10 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Calendar;
+
 
 @Route("checkout")
 public class CheckoutView extends VerticalLayout implements BeforeEnterObserver {

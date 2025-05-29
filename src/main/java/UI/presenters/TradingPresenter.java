@@ -9,12 +9,9 @@ import Application.UserService;
 import Application.utils.Response;
 import Application.utils.Error;
 import Application.DTOs.StoreDTO;
-import Application.DTOs.UserDTO;
 import UI.webSocketConfigurations.WebSocketNotifier;
 import Domain.User.Member;
-import Domain.User.IUserRepository;
 import Domain.User.User;
-import java.util.Set;
 import java.util.Date;
 import java.util.Map;
 

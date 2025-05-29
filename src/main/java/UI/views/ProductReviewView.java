@@ -5,11 +5,10 @@ import UI.presenters.IStorePresenter;
 import Application.DTOs.ItemDTO;
 import Application.utils.Response;
 import Domain.Store.FeedbackDTO;
-import Domain.Store.ItemFilter;
+
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;

@@ -93,10 +93,10 @@ public class MarketFacadeTest {
         String managerId = "managerUser";
         
         // Execute
-        marketFacade.removeStoreManager(removerId, managerId, storeId);
+        marketFacade.removeStoreOwner(removerId, managerId, storeId);
         
         // Verify that permissionManager.removeStoreManager was called with the correct parameters
-        verify(permissionManager).removeStoreManager(removerId, managerId, storeId);
+        verify(permissionManager).removeStoreOwner(removerId, managerId, storeId);
     }
 
     @Test
@@ -109,6 +109,7 @@ public class MarketFacadeTest {
         
         // Set up the permissionManager mock to use our map
         when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
+        when(userRepository.getMember("newOwner")).thenReturn(mock(Member.class));
         
         // Set up the appointStoreOwner method behavior to modify our map
         doAnswer(invocation -> {
