@@ -3,6 +3,7 @@ package UI;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ import Domain.management.PermissionType;
 
 @Component
 @Order(1)
-public class AppInitializer implements CommandLineRunner {
+public class AppInitializer implements CommandLineRunner, Ordered {
 
     private final UserService userService;
     private final StoreService storeService;
@@ -40,6 +41,11 @@ public class AppInitializer implements CommandLineRunner {
         this.itemService = itemService;
         this.marketService = marketService;
         this.tokenService = tokenService;
+    }
+
+    @Override
+    public int getOrder() {
+        return 1; 
     }
 
     @Override
