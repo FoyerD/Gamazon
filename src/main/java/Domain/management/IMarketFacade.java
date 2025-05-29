@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.User.IUserRepository;
+import Domain.User.Member;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
 
@@ -30,7 +33,7 @@ public interface IMarketFacade {
      * 
      * @param paymentService New payment service implementation
      */
-    void updatePaymentService(IPaymentService paymentService);
+    void updatePaymentService(IExternalPaymentService paymentService);
 
     /**
      * 1.2 Update the URL of the payment service endpoint.
@@ -45,7 +48,7 @@ public interface IMarketFacade {
      * 
      * @param supplyService New supply service implementation
      */
-    void updateSupplyService(ISupplyService supplyService);
+    void updateSupplyService(IExternalSupplyService supplyService);
 
     /**
      * Update the notification service used for sending messages to users.
@@ -70,6 +73,15 @@ public interface IMarketFacade {
     boolean userExists(String username);
 
     /**
+     * Get the username associated with a given user ID.
+     * If the user does not exist, an exception is thrown.
+     * 
+     * @param userId The ID of the user
+     * @return The username of the user
+     */
+    public String getUsername(String userId) throws NoSuchElementException;
+
+    /**
      * Initialize facades with required repositories and services.
      * 
      * @param userRepository Repository for user data
@@ -83,11 +95,11 @@ public interface IMarketFacade {
     /**
      * 4.3 Appoint a new store manager.
      * 
-     * @param appointerUsername Username of the appointing user (owner)
-     * @param appointeeUsername Username of the user being appointed as manager
+     * @param appointerId Username of the appointing user (owner)
+     * @param appointeeId Username of the user being appointed as manager
      * @param storeId ID of the store
      */
-    void appointStoreManager(String appointerUsername, String appointeeUsername, String storeId);
+    void appointStoreManager(String appointerId, String appointeeId, String storeId);
 
     /**
      * 4.4 Remove a store manager from their position.
@@ -126,7 +138,7 @@ public interface IMarketFacade {
      * @param userId ID of the user requesting the information
      * @return Map of manager usernames to their list of permissions
      */
-    Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId);
+    Map<Member, List<PermissionType>> getManagersPermissions(String storeId, String userId);
 
     /**
      * 4.13 Retrieve the purchase history of a store within a given date range.
@@ -140,4 +152,11 @@ public interface IMarketFacade {
     boolean banUser(String bannerId, String userId, Date endDate);
     boolean unbanUser(String bannerId, String userId);
     void checkPermission(String userId, String storeId, PermissionType permissionType);
+
+    /**
+     * Get all currently banned users and their ban expiration dates.
+     * 
+     * @return A map of usernames to their ban expiration dates
+     */
+    Map<String, Date> getBannedUsers();
 }

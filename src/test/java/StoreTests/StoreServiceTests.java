@@ -1,7 +1,6 @@
 package StoreTests;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -18,19 +17,8 @@ import Application.ItemService;
 import Application.ProductService;
 import Application.ServiceManager;
 import Application.StoreService;
-import Application.TokenService;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
-import Domain.Store.StoreFacade;
-import Domain.User.IUserRepository;
-import Domain.management.IPermissionRepository;
-import Domain.management.PermissionManager;
 import Infrastructure.MemoryRepoManager;
 import Domain.FacadeManager;
-import Domain.Pair;
-import Domain.Store.Item;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
@@ -42,21 +30,10 @@ import Application.utils.Response;
 public class StoreServiceTests {
     // Existing fields
     private StoreService storeService;
-    private StoreFacade storeFacade;
-    private IStoreRepository storeRepository;
-    private IAuctionRepository auctionRepository;
-    private IItemRepository itemRepository;
-    private IFeedbackRepository feedbackRepository;
-    private IUserRepository userRepository;
-    private TokenService tokenService;
-    private PermissionManager permissionManager;
-    private IPermissionRepository permissionRepository;
     
     // Add ServiceManager as a field
     private ServiceManager serviceManager;
-    
-    // User data
-    private UUID userId;
+
     private String tokenId = null;
 
     @Before
@@ -72,17 +49,6 @@ public class StoreServiceTests {
         
         // Get needed services directly from the service manager
         this.storeService = serviceManager.getStoreService();
-        this.tokenService = serviceManager.getTokenService();
-        
-        // For backward compatibility, also get facades and repositories
-        this.storeFacade = facadeManager.getStoreFacade();
-        this.storeRepository = repositoryManager.getStoreRepository();
-        this.auctionRepository = repositoryManager.getAuctionRepository();
-        this.itemRepository = repositoryManager.getItemRepository();
-        this.feedbackRepository = repositoryManager.getFeedbackRepository();
-        this.userRepository = repositoryManager.getUserRepository();
-        this.permissionRepository = repositoryManager.getPermissionRepository();
-        this.permissionManager = new PermissionManager(permissionRepository);
         
         // Create a guest user
         Response<UserDTO> guestResponse = serviceManager.getUserService().guestEntry();
@@ -99,9 +65,6 @@ public class StoreServiceTests {
         
         // Get the token for the registered user
         this.tokenId = userResponse.getValue().getSessionToken();
-        
-        // Get the user ID from the token
-        this.userId = UUID.fromString(tokenService.extractId(tokenId));
     }
 
     @Test

@@ -1,26 +1,12 @@
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
-const waitForUserId = () => {
-  return new Promise((resolve) => {
-    const check = () => {
-      const userId = window.currentUserId || sessionStorage.getItem('currentUserId');
-      if (userId) {
-        resolve(userId);
-      } else {
-        setTimeout(check, 50);
-      }
-    };
-    check();
-  });
-};
+let stompClient = null;
 
 const showNotification = (message) => {
-  // Create a Vaadin notification directly
   const notification = document.createElement('vaadin-notification');
   notification.position = 'top-stretch';
   notification.duration = 10000;
-  
   const content = document.createElement('div');
   content.style.padding = '1em';
   content.style.background = '#ff9800';
@@ -28,72 +14,59 @@ const showNotification = (message) => {
   content.style.textAlign = 'center';
   content.style.fontSize = 'var(--lumo-font-size-m)';
   content.textContent = message;
-  
   notification.renderer = (root) => {
-    if (root.firstElementChild) {
-      root.removeChild(root.firstElementChild);
-    }
+    root.innerHTML = '';
     root.appendChild(content);
   };
-  
   document.body.appendChild(notification);
   notification.open();
-  
-  // Remove the notification element after it's closed
-  setTimeout(() => {
-    document.body.removeChild(notification);
-  }, 10000);
+  setTimeout(() => document.body.removeChild(notification), 10000);
 };
 
-let stompClient = null;
-
 const connectWebSocket = (userId) => {
+  if (!userId) return;
+
   if (stompClient) {
-    try {
-      stompClient.deactivate();
-    } catch (e) {
-      console.error('[WS] Error deactivating previous connection:', e);
-    }
+    try { stompClient.deactivate(); } catch (e) {}
   }
 
-  const socket = new SockJS('/ws');
+  const socket = new SockJS(`/ws?userId=${userId}`);
+
   stompClient = new Client({
     webSocketFactory: () => socket,
-    connectHeaders: {
-      userId: userId
-    },
+    connectHeaders: { userId },
+    debug: (msg) => console.log('[STOMP DEBUG]', msg),
     onConnect: () => {
-      console.log(`[WS] Connected as ${userId}`);
-      stompClient.subscribe(`/user/${userId}/topic/notifications`, (message) => {
-        console.log('[WS] Received notification:', message.body);
+      const destination = '/user/topic/notifications';
+      stompClient.subscribe(destination, (message) => {
+        console.log('[WS] 🔔 Notification received:', message.body);
         showNotification(message.body);
       });
     },
-    onStompError: (frame) => {
-      console.error('[WS] STOMP error:', frame);
-    },
-    onWebSocketClose: () => {
-      console.log('[WS] Connection closed, attempting to reconnect...');
-      setTimeout(() => connectWebSocket(userId), 5000);
-    },
     reconnectDelay: 5000
   });
-
+  console.log('[WS] Activating STOMP client...');
   stompClient.activate();
+  console.log('[WS] Sent CONNECT with userId =', userId);
+  window.stompClient = stompClient;
 };
 
-// Listen for userId changes
-window.addEventListener('storage', (event) => {
-  if (event.key === 'currentUserId') {
-    const userId = event.newValue;
-    if (userId) {
-      connectWebSocket(userId);
-    }
-  }
-});
+window.connectWebSocket = connectWebSocket;
+connectWebSocket(window.currentUserId);
 
-waitForUserId().then((userId) => {
-  // Store userId in sessionStorage for cross-window access
-  sessionStorage.setItem('currentUserId', userId);
-  connectWebSocket(userId);
+
+const waitForUserIdAndConnect = () => {
+  if (window.currentUserId) {
+    sessionStorage.setItem('currentUserId', window.currentUserId);
+    connectWebSocket(window.currentUserId);
+  } else {
+    setTimeout(waitForUserIdAndConnect, 100);
+  }
+};
+
+waitForUserIdAndConnect();
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'currentUserId' && e.newValue)
+    connectWebSocket(e.newValue);
 });

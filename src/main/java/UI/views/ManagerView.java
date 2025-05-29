@@ -1,27 +1,35 @@
 package UI.views;
 
+import UI.presenters.ILoginPresenter;
 import UI.presenters.IManagementPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IStorePresenter;
+import UI.presenters.LoginPresenter;
 import UI.views.components.AddItemForm;
+import UI.views.components.AddUserRoleDialog;
+import UI.views.components.ChangeUserRoleDialog;
+import UI.views.components.UserPermissionsLayout;
+import UI.views.dataobjects.UserPermission;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
+import Application.DTOs.StoreDTO;
 import Application.utils.Response;
-import Domain.Store.Item;
+
 import Domain.management.PermissionType;
-import Application.UserService;
 import Application.DTOs.UserDTO;
 import Application.MarketService;
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.ClientOrderDTO;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -50,16 +58,16 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private final IManagementPresenter managementPresenter;
     private final IProductPresenter productPresenter;
     private final IStorePresenter storePresenter;
+    private final ILoginPresenter loginPresenter;
 
 
-    private final UserService userService;
     private final MarketService marketService;
 
     private String sessionToken;
     private String currentUsername;
     private String currentStoreId;
 
-    private final Grid<UserRole> managersGrid = new Grid<>();
+    private final UserPermissionsLayout managersLayout;
     private final Grid<UserRole> ownersGrid = new Grid<>();
     private final VerticalLayout mainContent = new VerticalLayout();
     private final ComboBox<PermissionType> permissionSelect = new ComboBox<>("Permission");
@@ -69,14 +77,13 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private Grid<UserRole> managersPermissionGrid;
 
     @Autowired
-
-    public ManagerView(IManagementPresenter managementPresenter, UserService userService, MarketService marketService, 
-                       IStorePresenter storePresenter, IProductPresenter productPresenter) {
+    public ManagerView(IManagementPresenter managementPresenter, MarketService marketService, 
+                       IStorePresenter storePresenter, IProductPresenter productPresenter, LoginPresenter loginPresenter) {
         this.storePresenter = storePresenter;
         this.productPresenter = productPresenter;
         this.managementPresenter = managementPresenter;
-        this.userService = userService;
         this.marketService = marketService;
+        this.loginPresenter = loginPresenter;
         
         setSizeFull();
         setSpacing(false);
@@ -105,12 +112,38 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         Tab permissionsTab = new Tab(VaadinIcon.KEY.create(), new Span("Permissions"));
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
+        Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
         
-        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab);
-        tabs.getStyle().set("margin", "1rem 0");
 
+        // Style all tabs to have white text and icons
+        for (Tab tab : new Tab[]{managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab, historyTab}) {
+            tab.getStyle().set("color", " #ffffff");
+            // Get the icon and span components from the tab
+            tab.getChildren().forEach(component -> {
+                component.getElement().getStyle().set("color", "#ffffff");
+            });
+        }
+        
+        Tabs tabs = new Tabs(managersTab, ownersTab, permissionsTab, itemsTab, auctionsTab, historyTab);
+        tabs.getStyle()
+            .set("margin", "1rem 0")
+            .set("--lumo-contrast-60pct", "#ffffff"); 
         // Setup grids
-        setupManagersGrid();
+        managersLayout = new UserPermissionsLayout(
+            "Managers", 
+            () -> {
+                Response<Map<UserDTO, List<PermissionType>>> response = managementPresenter.getStoreManagersPermissions(sessionToken, currentStoreId);
+                if (response.errorOccurred()) {
+                    Notification.show("Failed to fetch managers' permissions: " + response.getErrorMessage(), 
+                        3000, Notification.Position.MIDDLE);
+                    return null;
+                }
+                return response.getValue();
+            }, 
+            () -> showAddManagerDialog(),
+            up -> showChangeManagerPermissionsDialog(up)
+        );
+
         setupOwnersGrid();
         setupPermissionsSection();
 
@@ -127,10 +160,14 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
                 showItemsView();
             } else if (event.getSelectedTab().equals(auctionsTab)) {
                 showAuctionsView();
+            } else if (event.getSelectedTab().equals(historyTab)) {
+                showHistoryView();
             }
         });
 
-        add(tabs, mainContent);
+        mainContent.setSizeFull();
+
+        addAndExpand(tabs, mainContent);
         showManagersView(); // Show managers view by default
     }
 
@@ -172,29 +209,29 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         add(header);
     }
 
-    private void setupManagersGrid() {
-        managersGrid.addColumn(UserRole::getUsername).setHeader("Username");
-        managersGrid.addColumn(UserRole::getRole).setHeader("Role");
-        managersGrid.addComponentColumn(user -> {
-            HorizontalLayout actions = new HorizontalLayout();
+    // private void setupManagersGrid() {
+    //     managersGrid.addColumn(UserRole::getUsername).setHeader("Username");
+    //     managersGrid.addColumn(UserRole::getRole).setHeader("Role");
+    //     managersGrid.addComponentColumn(user -> {
+    //         HorizontalLayout actions = new HorizontalLayout();
             
-            Button permissionsButton = new Button("Permissions", VaadinIcon.KEY.create());
-            styleButton(permissionsButton, "#2196f3");
-            permissionsButton.addClickListener(e -> showPermissionsDialog(user.getUsername()));
+    //         Button permissionsButton = new Button("Permissions", VaadinIcon.KEY.create());
+    //         styleButton(permissionsButton, " #2196f3");
+    //         permissionsButton.addClickListener(e -> showPermissionsDialog(user.getUsername()));
             
-            Button removeButton = new Button("Remove", VaadinIcon.TRASH.create());
-            styleButton(removeButton, "#f44336");
-            removeButton.addClickListener(e -> {
-                removeManager(user.getUsername());
-                refreshGrids(); // Refresh immediately after removal
-            });
+    //         Button removeButton = new Button("Remove", VaadinIcon.TRASH.create());
+    //         styleButton(removeButton, " #f44336");
+    //         removeButton.addClickListener(e -> {
+    //             removeManager(user.getUsername());
+    //             refreshGrids(); // Refresh immediately after removal
+    //         });
             
-            actions.add(permissionsButton, removeButton);
-            return actions;
-        }).setHeader("Actions");
+    //         actions.add(permissionsButton, removeButton);
+    //         return actions;
+    //     }).setHeader("Actions");
 
-        managersGrid.setHeight("300px");
-    }
+    //     managersGrid.setHeight("300px");
+    // }
 
     private void setupOwnersGrid() {
         ownersGrid.addColumn(UserRole::getUsername).setHeader("Username");
@@ -204,7 +241,7 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             styleButton(removeButton, "#f44336");
             removeButton.addClickListener(e -> {
                 removeOwner(user.getUsername());
-                refreshGrids(); // Refresh immediately after removal
+                // refreshGrids(); // Refresh immediately after removal
             });
             return removeButton;
         }).setHeader("Actions");
@@ -220,12 +257,11 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
     private void showManagersView() {
         mainContent.removeAll();
         
-        Button addButton = new Button("Add Manager", VaadinIcon.PLUS.create());
-        styleButton(addButton, "#4caf50");
-        addButton.addClickListener(e -> showAddUserDialog(true));
+        // Button addButton = new Button("Add Manager", VaadinIcon.PLUS.create());
+        // styleButton(addButton, "#4caf50");
+        // addButton.addClickListener(e -> showAddUserDialog(true));
 
-        mainContent.add(new H3("Store Managers"), addButton, managersGrid);
-        refreshGrids();
+        mainContent.add(managersLayout);
     }
 
     private void showOwnersView() {
@@ -235,61 +271,67 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         styleButton(addButton, "#4caf50");
         addButton.addClickListener(e -> showAddUserDialog(false));
 
-        mainContent.add(new H3("Store Owners"), addButton, ownersGrid);
-        refreshGrids();
+        H3 title = new H3("Store Owners");
+        title.getStyle().set("color", " #ffffff");
+        mainContent.add(title, new Span("Under construction"));
+
+
+
     }
 
     private void showPermissionsView() {
         mainContent.removeAll();
+        H3 title = new H3("Store Permissions");
+        title.getStyle().set("color", " #ffffff");
+        mainContent.add(title, new Span("Under construction"));
+
+        // managersPermissionGrid = new Grid<>();
+        // managersPermissionGrid.addColumn(UserRole::getUsername).setHeader("Manager");
         
-        managersPermissionGrid = new Grid<>();
-        managersPermissionGrid.addColumn(UserRole::getUsername).setHeader("Manager");
-        
-        // Add a column to show current permissions with remove buttons for each
-        managersPermissionGrid.addComponentColumn(manager -> {
-            HorizontalLayout permissionsLayout = new HorizontalLayout();
-            permissionsLayout.setSpacing(true);
-            permissionsLayout.getStyle().set("flex-wrap", "wrap");
+        // // Add a column to show current permissions with remove buttons for each
+        // managersPermissionGrid.addComponentColumn(manager -> {
+        //     HorizontalLayout permissionsLayout = new HorizontalLayout();
+        //     permissionsLayout.setSpacing(true);
+        //     permissionsLayout.getStyle().set("flex-wrap", "wrap");
             
-            Set<PermissionType> permissions = managerPermissionsMap.getOrDefault(manager.getUsername(), new HashSet<>());
-            permissions.forEach(permission -> {
-                Span permissionChip = new Span(permission.name().replace("_", " ").toLowerCase());
-                permissionChip.getStyle()
-                    .set("background-color", "var(--lumo-primary-color-10)")
-                    .set("border-radius", "16px")
-                    .set("padding", "4px 8px")
-                    .set("margin", "2px");
+        //     Set<PermissionType> permissions = managerPermissionsMap.getOrDefault(manager.getUsername(), new HashSet<>());
+        //     permissions.forEach(permission -> {
+        //         Span permissionChip = new Span(permission.name().replace("_", " ").toLowerCase());
+        //         permissionChip.getStyle()
+        //             .set("background-color", "var(--lumo-primary-color-10)")
+        //             .set("border-radius", "16px")
+        //             .set("padding", "4px 8px")
+        //             .set("margin", "2px");
 
-                Button removeButton = new Button(VaadinIcon.CLOSE_SMALL.create());
-                removeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-                removeButton.addClickListener(e -> {
-                    Set<PermissionType> currentPermissions = new HashSet<>(permissions);
-                    currentPermissions.remove(permission);
-                    updatePermissions(manager.getUsername(), new ArrayList<>(currentPermissions));
-                    managerPermissionsMap.put(manager.getUsername(), currentPermissions);
-                    refreshPermissionsGrid();
-                });
+        //         Button removeButton = new Button(VaadinIcon.CLOSE_SMALL.create());
+        //         removeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        //         removeButton.addClickListener(e -> {
+        //             Set<PermissionType> currentPermissions = new HashSet<>(permissions);
+        //             currentPermissions.remove(permission);
+        //             updatePermissions(manager.getUsername(), new ArrayList<>(currentPermissions));
+        //             managerPermissionsMap.put(manager.getUsername(), currentPermissions);
+        //             refreshPermissionsGrid();
+        //         });
 
-                HorizontalLayout chip = new HorizontalLayout(permissionChip, removeButton);
-                chip.setSpacing(false);
-                chip.setAlignItems(Alignment.CENTER);
-                permissionsLayout.add(chip);
-            });
-            return permissionsLayout;
-        }).setHeader("Current Permissions");
+        //         HorizontalLayout chip = new HorizontalLayout(permissionChip, removeButton);
+        //         chip.setSpacing(false);
+        //         chip.setAlignItems(Alignment.CENTER);
+        //         permissionsLayout.add(chip);
+        //     });
+        //     return permissionsLayout;
+        // }).setHeader("Current Permissions");
 
-        // Add actions column with add permissions button
-        managersPermissionGrid.addComponentColumn(manager -> {
-            Button addButton = new Button("Add Permissions", VaadinIcon.PLUS.create());
-            styleButton(addButton, "#4caf50");
-            addButton.addClickListener(e -> showAddPermissionsDialog(manager.getUsername()));
-            return addButton;
-        }).setHeader("Actions");
+        // // Add actions column with add permissions button
+        // managersPermissionGrid.addComponentColumn(manager -> {
+        //     Button addButton = new Button("Add Permissions", VaadinIcon.PLUS.create());
+        //     styleButton(addButton, "#4caf50");
+        //     addButton.addClickListener(e -> showAddPermissionsDialog(manager.getUsername()));
+        //     return addButton;
+        // }).setHeader("Actions");
 
-        managersPermissionGrid.setItems(getStoreManagers());
-        managersPermissionGrid.setHeight("300px");
-
-        mainContent.add(new H3("Manager Permissions"), managersPermissionGrid);
+        // //TODO: remove this
+        // //managersPermissionGrid.setItems(getStoreManagers());
+        // managersPermissionGrid.setHeight("300px");
     }
 
     private void showItemsView() {
@@ -351,7 +393,9 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             dialog.open();
         });
 
-        mainContent.add(new H3("Store Managers"), addButton, itemsGrid);
+        H3 title = new H3("Store Items");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(new H3("Store Items"), addButton, itemsGrid);
     }
 
     private void showAuctionsView() {
@@ -572,13 +616,44 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         buttonLayout.setSpacing(true);
         
         // Add components to the main content
-        mainContent.add(
-            new H3("Store Auctions"),
-            buttonLayout,
-            auctionsGrid
-        );
+        H3 title = new H3("Store Auctions");
+        title.getStyle().set("color", "#ffffff");
+        mainContent.add(title, buttonLayout, auctionsGrid);
         
         auctionsGrid.setHeight("300px");
+    }
+
+    private void showHistoryView() {
+        mainContent.removeAll();
+        
+        Response<List<ClientOrderDTO>> historyResponse = managementPresenter.getPurchaseHistory(sessionToken, currentStoreId);
+        if (historyResponse.errorOccurred()) {
+            Notification.show("Failed to fetch purchase history: " + historyResponse.getErrorMessage());
+        } else if (historyResponse.getValue().isEmpty()) {
+            Notification.show("No purchase history found for this store.", 3000, Notification.Position.BOTTOM_END);
+        } else {
+            Grid<ClientOrderDTO> historyGrid = new Grid<>(ClientOrderDTO.class, false);
+
+            historyGrid.addColumn(ClientOrderDTO::getClientName).setHeader("Client").setAutoWidth(true);
+            historyGrid.addColumn(o -> String.valueOf(o.getTotalPrice()) + "$").setHeader("Total Price").setAutoWidth(true);
+            historyGrid.addComponentColumn(receipt -> {
+                Div detailsDiv = new Div();
+
+                // Populate receipt details
+                receipt.getItems().forEach(item -> {
+                    Span itemDetail = new Span(item.getProductName() + " - " + item.getQuantity() + " x $" + item.getPrice());
+                    itemDetail.getStyle().set("display", "block");
+                    detailsDiv.add(itemDetail);
+                });
+
+                return detailsDiv;
+            }).setHeader("Items");
+
+            historyGrid.setItems(historyResponse.getValue());
+            historyGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+            historyGrid.setWidthFull();
+            mainContent.add(historyGrid);
+        }
     }
 
     private void loadItems(Grid<ItemDTO> itemsGrid) {
@@ -590,6 +665,70 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         }
     }
 
+
+    private void showAddManagerDialog() {
+        AddUserRoleDialog dialog = new AddUserRoleDialog(
+            "Add New Manager",
+            () -> {
+
+                Response<List<UserDTO>> usersResponse = loginPresenter.getAllMembers(sessionToken);
+                Response<StoreDTO> storeResponse = storePresenter.getStoreById(sessionToken, currentStoreId);
+                if (usersResponse.errorOccurred() || storeResponse.errorOccurred()) {
+                    Notification.show("Failed to fetch users: " + usersResponse.getErrorMessage());
+                    return null;
+                }
+                List<UserDTO> members = usersResponse.getValue();
+                StoreDTO currentStore = storeResponse.getValue();
+                return  members.stream()
+                    .filter(user -> !currentStore.getOwners().stream()
+                                        .anyMatch(owner -> owner.equals(user.getId()))
+                                        && !currentStore.getManagers().stream()
+                                        .anyMatch(manager -> manager.equals(user.getId())))
+                    .collect(Collectors.toList());
+            },
+            userPermissions -> {
+                Response<Void> response = managementPresenter.appointStoreManager(sessionToken, userPermissions.user.getId(), currentStoreId);
+                if (response.errorOccurred()) {
+                    Notification.show("Failed to appoint manager: " + response.getErrorMessage());
+                    return false;
+                } 
+                Response<Void> permissionsResponse = managementPresenter.changeManagerPermissions(
+                    sessionToken, userPermissions.user.getId(), currentStoreId, userPermissions.permissions);
+                if (permissionsResponse.errorOccurred()) {
+                    Notification.show("Failed to set permissions: " + permissionsResponse.getErrorMessage());
+                    return false;
+                }
+                Notification.show("Manager appointed successfully");
+                managersLayout.refreshUsers();
+                return true;     
+            }
+        );
+
+
+        dialog.refreshCandidates();
+        dialog.open();
+    }
+
+    private void showChangeManagerPermissionsDialog(UserPermission user) {
+        ChangeUserRoleDialog dialog = new ChangeUserRoleDialog(user,
+        up -> {
+            Response<Void> res = managementPresenter.changeManagerPermissions(sessionToken, 
+                                                                            up.user.getId(), 
+                                                                            currentStoreId, 
+                                                                            up.permissions);
+            if (res.errorOccurred()) {
+                Notification.show("Failed to change permissions: " + res.getErrorMessage());
+                return false;
+            }
+            Notification.show("Permissions updated successfully");
+            managersLayout.refreshUsers();
+            return true;
+        });
+
+        dialog.open();
+
+    }
+
     private void showAddUserDialog(boolean isManager) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle(isManager ? "Add New Manager" : "Add New Owner");
@@ -598,77 +737,96 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         dialogLayout.setSpacing(true);
         dialogLayout.setPadding(true);
 
-        TextField usernameField = new TextField("Username");
-        usernameField.setRequired(true);
-        usernameField.setWidth("100%");
-
-        if (isManager) {
-            MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
-            permissionsSelect.setItems(PermissionType.values());
-            permissionsSelect.setItemLabelGenerator(permission -> 
-                permission.name().replace("_", " ").toLowerCase());
-            permissionsSelect.setWidth("100%");
-            permissionsSelect.setHelperText("Select initial permissions for the manager");
-            dialogLayout.add(usernameField, permissionsSelect);
-
-            Button saveButton = new Button("Save", e -> {
-                String username = usernameField.getValue();
-                if (username != null && !username.isEmpty()) {
-                    // Check if user exists
-                    Response<Boolean> existsResponse = marketService.userExists(username);
-                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
-                        Notification.show("User does not exist in the system");
-                        return;
-                    }
-                    Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
-                    dialog.close(); // Close first
-                    appointManagerWithPermissions(username, initialPermissions);
-                } else {
-                    Notification.show("Please enter a username");
-                }
-            });
-            styleButton(saveButton, "var(--lumo-primary-color)");
-
-            Button cancelButton = new Button("Cancel", e -> dialog.close());
-            styleButton(cancelButton, "#9e9e9e");
-
-            HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
-            buttons.setJustifyContentMode(JustifyContentMode.END);
-            dialogLayout.add(buttons);
+        Response<List<UserDTO>> usersResponse = loginPresenter.getAllMembers(sessionToken);
+        Response<StoreDTO> storeResponse = storePresenter.getStoreById(sessionToken, currentStoreId);
+        if (usersResponse.errorOccurred() || storeResponse.errorOccurred()) {
+            Notification.show("Failed to fetch users: " + usersResponse.getErrorMessage());
         } else {
-            dialogLayout.add(usernameField);
+            List<UserDTO> members = usersResponse.getValue();
+            StoreDTO currentStore = storeResponse.getValue();
+            List<UserDTO> potentialManagers = members.stream()
+                .filter(user -> !currentStore.getOwners().stream()
+                                    .anyMatch(owner -> owner.equals(user.getId()))
+                                    && !currentStore.getManagers().stream()
+                                    .anyMatch(manager -> manager.equals(user.getId())))
+                .collect(Collectors.toList());
+            
+                
+                
 
-            Button saveButton = new Button("Save", e -> {
-                String username = usernameField.getValue();
-                if (username != null && !username.isEmpty()) {
-                    // Check if user exists
-                    Response<Boolean> existsResponse = marketService.userExists(username);
-                    if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
-                        Notification.show("User does not exist in the system");
-                        return;
-                    }
-                    dialog.close(); // Close first
-                    Response<Void> response = managementPresenter.appointStoreOwner(
-                        sessionToken, currentUsername, username, currentStoreId);
-                    if (response.errorOccurred()) {
-                        Notification.show("Failed to appoint owner: " + response.getErrorMessage());
+            TextField usernameField = new TextField("Username");
+            usernameField.setRequired(true);
+            usernameField.setWidth("100%");
+
+            if (isManager) {
+                MultiSelectComboBox<PermissionType> permissionsSelect = new MultiSelectComboBox<>("Initial Permissions");
+                permissionsSelect.setItems(PermissionType.values());
+                permissionsSelect.setItemLabelGenerator(permission -> 
+                    permission.name().replace("_", " ").toLowerCase());
+                permissionsSelect.setWidth("100%");
+                permissionsSelect.setHelperText("Select initial permissions for the manager");
+                dialogLayout.add(usernameField, permissionsSelect);
+
+                Button saveButton = new Button("Save", e -> {
+                    String username = usernameField.getValue();
+                    if (username != null && !username.isEmpty()) {
+                        // Check if user exists
+                        Response<Boolean> existsResponse = marketService.userExists(username);
+                        if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                            Notification.show("User does not exist in the system");
+                            return;
+                        }
+                        Set<PermissionType> initialPermissions = permissionsSelect.getSelectedItems();
+                        dialog.close(); // Close first
+                        appointManagerWithPermissions(username, initialPermissions);
                     } else {
-                        storeOwners.add(new UserRole(username, "Owner"));
-                        refreshGrids();
-                        Notification.show("Owner appointed successfully");
+                        Notification.show("Please enter a username");
                     }
-                } else {
-                    Notification.show("Please enter a username");
-                }
-            });
-            styleButton(saveButton, "var(--lumo-primary-color)");
+                });
+                styleButton(saveButton, "var(--lumo-primary-color)");
 
-            Button cancelButton = new Button("Cancel", e -> dialog.close());
-            styleButton(cancelButton, "#9e9e9e");
+                Button cancelButton = new Button("Cancel", e -> dialog.close());
+                styleButton(cancelButton, "#9e9e9e");
 
-            HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
-            buttons.setJustifyContentMode(JustifyContentMode.END);
-            dialogLayout.add(buttons);
+                HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+                buttons.setJustifyContentMode(JustifyContentMode.END);
+                dialogLayout.add(buttons);
+            } else {
+                dialogLayout.add(usernameField);
+
+                Button saveButton = new Button("Save", e -> {
+                    String username = usernameField.getValue();
+                    if (username != null && !username.isEmpty()) {
+                        // Check if user exists
+                        Response<Boolean> existsResponse = marketService.userExists(username);
+                        if (existsResponse.errorOccurred() || !existsResponse.getValue()) {
+                            Notification.show("User does not exist in the system");
+                            return;
+                        }
+                        dialog.close(); // Close first
+                        Response<Void> response = managementPresenter.appointStoreOwner(
+                            sessionToken, currentUsername, username, currentStoreId);
+                        if (response.errorOccurred()) {
+                            Notification.show("Failed to appoint owner: " + response.getErrorMessage());
+                        } else {
+                            //TODO: remove this
+                            //storeOwners.add(new UserRole(username, "Owner"));
+                            // refreshGrids();
+                            Notification.show("Owner appointed successfully");
+                        }
+                    } else {
+                        Notification.show("Please enter a username");
+                    }
+                });
+                styleButton(saveButton, "var(--lumo-primary-color)");
+
+                Button cancelButton = new Button("Cancel", e -> dialog.close());
+                styleButton(cancelButton, "#9e9e9e");
+
+                HorizontalLayout buttons = new HorizontalLayout(saveButton, cancelButton);
+                buttons.setJustifyContentMode(JustifyContentMode.END);
+                dialogLayout.add(buttons);
+            }
         }
 
         dialog.add(dialogLayout);
@@ -699,7 +857,7 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
             updatePermissions(username, newPermissions);
             managerPermissionsMap.put(username, new HashSet<>(newPermissions));
             dialog.close();
-            refreshGrids(); // Refresh to update permissions display
+            // refreshGrids(); // Refresh to update permissions display
         });
         styleButton(saveButton, "var(--lumo-primary-color)");
 
@@ -774,32 +932,22 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         }
     }
 
-    private void refreshGrids() {
-        // Create lists to store our data
-        List<UserRole> managers = new ArrayList<>();
-        List<UserRole> owners = new ArrayList<>();
-        List<ItemDTO> items = new ArrayList<>();
+    private void Managers() {
 
-        // Add the current store's managers and owners
-        if (currentStoreId != null) {
-            managers.addAll(getStoreManagers());
-            owners.addAll(getStoreOwners());
-            items.addAll(storePresenter.getItemsByStoreId(sessionToken, currentStoreId).getValue());
-        }
-
-        // Update the grids
-        managersGrid.setItems(managers);
-        ownersGrid.setItems(owners);
+        // // Update the grids
+        // managersGrid.setItems(managers);
+        // ownersGrid.setItems(owners);
         
-        // Also refresh the permissions grid if we're in that view
-        refreshPermissionsGrid();
     }
 
-    private void updatePermissions(String username, List<PermissionType> permissions) {
+    // void refreshGrids() {
+    //     throw new UnsupportedOperationException("Method not implemented yet");
+    // }
+
+    private void updatePermissions(String userId, List<PermissionType> permissions) {
         Response<Void> response = managementPresenter.changeManagerPermissions(
             sessionToken,
-            currentUsername,
-            username,
+            userId,
             currentStoreId,
             permissions
         );
@@ -807,42 +955,12 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         if (response.errorOccurred()) {
             Notification.show("Failed to update permissions: " + response.getErrorMessage());
         } else {
-            managerPermissionsMap.put(username, new HashSet<>(permissions));
+            managerPermissionsMap.put(userId, new HashSet<>(permissions));
             Notification.show("Permissions updated successfully");
             refreshPermissionsGrid();
         }
     }
 
-    // Helper method to maintain managers list (in a real app this would come from the presenter)
-    private Set<UserRole> storeManagers = new HashSet<>();
-    private Set<UserRole> storeOwners = new HashSet<>();
-
-    private List<UserRole> getStoreManagers() {
-        return new ArrayList<>(storeManagers);
-    }
-
-    private List<UserRole> getStoreOwners() {
-        return new ArrayList<>(storeOwners);
-    }
-
-    private void appointManager(String username) {
-        Response<Void> response = managementPresenter.appointStoreManager(
-            sessionToken, currentUsername, username, currentStoreId);
-        if (response.errorOccurred()) {
-            Notification.show("Failed to appoint manager: " + response.getErrorMessage());
-        } else {
-            storeManagers.add(new UserRole(username, "Manager"));
-            // Initialize with basic permissions
-            Set<PermissionType> basicPermissions = new HashSet<>(Arrays.asList(
-                PermissionType.VIEW_EMPLOYEE_INFO,
-                PermissionType.ACCESS_PURCHASE_RECORDS
-            ));
-            managerPermissionsMap.put(username, basicPermissions);
-            updatePermissions(username, new ArrayList<>(basicPermissions));
-            Notification.show("Manager appointed successfully");
-            refreshGrids();
-        }
-    }
 
     private void appointOwner(String username) {
         Response<Void> response = managementPresenter.appointStoreOwner(
@@ -850,9 +968,10 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         if (response.errorOccurred()) {
             Notification.show("Failed to appoint owner: " + response.getErrorMessage());
         } else {
-            storeOwners.add(new UserRole(username, "Owner"));
+            // TODO: remove this
+            //storeOwners.add(new UserRole(username, "Owner"));
             Notification.show("Owner appointed successfully");
-            refreshGrids();
+            // refreshGrids();
         }
     }
 
@@ -862,31 +981,35 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         if (response.errorOccurred()) {
             Notification.show("Failed to remove manager: " + response.getErrorMessage());
         } else {
-            storeManagers.removeIf(user -> user.getUsername().equals(username));
+            // TODO: remove this
+            //storeManagers.removeIf(user -> user.getUsername().equals(username));
             managerPermissionsMap.remove(username); // Remove permissions when manager is removed
             Notification.show("Manager removed successfully");
-            refreshGrids();
+            // refreshGrids();
         }
     }
 
     private void removeOwner(String username) {
         // In a real implementation, this would call the appropriate method
         Notification.show("Owner removal not implemented");
-        storeOwners.removeIf(user -> user.getUsername().equals(username));
-        refreshGrids();
+        // TODO: remove this
+        
+        //storeOwners.removeIf(user -> user.getUsername().equals(username));
+        // refreshGrids();
     }
 
     private void appointManagerWithPermissions(String username, Set<PermissionType> initialPermissions) {
         Response<Void> response = managementPresenter.appointStoreManager(
-            sessionToken, currentUsername, username, currentStoreId);
+            sessionToken, username, currentStoreId);
         if (response.errorOccurred()) {
             Notification.show("Failed to appoint manager: " + response.getErrorMessage());
         } else {
-            storeManagers.add(new UserRole(username, "Manager"));
+            // TODO: remove this
+            //storeManagers.add(new UserRole(username, "Manager"));
             managerPermissionsMap.put(username, initialPermissions);
             updatePermissions(username, new ArrayList<>(initialPermissions));
             Notification.show("Manager appointed successfully");
-            refreshGrids();
+            // refreshGrids();
         }
     }
 
@@ -895,12 +1018,17 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
         currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
         currentStoreId = (String) UI.getCurrent().getSession().getAttribute("currentStoreId");
-        
-        if (sessionToken == null || currentStoreId == null) {
+        if (sessionToken == null) {
+            Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
+            event.forwardTo("");
+        }
+        if (currentStoreId == null) {
             Notification.show("Please select a store first", 3000, Notification.Position.MIDDLE);
             event.forwardTo("store-search");
         }
-
+        
+        // load store managers and owners
+        managersLayout.refreshUsers();
         // Clear permissions map when entering a new store
         managerPermissionsMap.clear();
     }
@@ -941,41 +1069,41 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
         public String getRole() { return role; }
     }
 
-    private static class MultiSelectComboBox<T> extends com.vaadin.flow.component.combobox.ComboBox<T> {
-        private final Set<T> selected = new HashSet<>();
+    // private static class MultiSelectComboBox<T> extends com.vaadin.flow.component.combobox.ComboBox<T> {
+    //     private final Set<T> selected = new HashSet<>();
 
-        public MultiSelectComboBox() {
-            super();
-            addValueChangeListener(e -> {
-                if (e.getValue() != null) {
-                    selected.add(e.getValue());
-                    clear();
-                    updateDisplay();
-                }
-            });
-        }
+    //     public MultiSelectComboBox() {
+    //         super();
+    //         addValueChangeListener(e -> {
+    //             if (e.getValue() != null) {
+    //                 selected.add(e.getValue());
+    //                 clear();
+    //                 updateDisplay();
+    //             }
+    //         });
+    //     }
 
-        public MultiSelectComboBox(String label) {
-            this();
-            setLabel(label);
-        }
+    //     public MultiSelectComboBox(String label) {
+    //         this();
+    //         setLabel(label);
+    //     }
 
-        public void setValue(Set<T> values) {
-            selected.clear();
-            if (values != null) {
-                selected.addAll(values);
-            }
-            updateDisplay();
-        }
+    //     public void setValue(Set<T> values) {
+    //         selected.clear();
+    //         if (values != null) {
+    //             selected.addAll(values);
+    //         }
+    //         updateDisplay();
+    //     }
 
-        public Set<T> getSelectedItems() {
-            return Collections.unmodifiableSet(selected);
-        }
+    //     public Set<T> getSelectedItems() {
+    //         return Collections.unmodifiableSet(selected);
+    //     }
 
-        private void updateDisplay() {
-            String display = selected.isEmpty() ? "" : 
-                selected.size() + " selected";
-            setPlaceholder(display);
-        }
-    }
+    //     private void updateDisplay() {
+    //         String display = selected.isEmpty() ? "" : 
+    //             selected.size() + " selected";
+    //         setPlaceholder(display);
+    //     }
+    // }
 } 

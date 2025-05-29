@@ -1,5 +1,6 @@
 package Domain.Shopping;
 
+import Domain.Pair;
 import Domain.Store.Product;
 import java.util.List;
 import java.util.Map;

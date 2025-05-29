@@ -1,10 +1,12 @@
-
 package Domain.User;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+
+
 import org.apache.commons.validator.routines.EmailValidator;
 
 @Component
@@ -27,6 +29,20 @@ public class LoginManager {
             throw new NoSuchElementException("User not found");
         }
         return user;
+    }
+
+    /***
+     * Retrieves a user by their username.
+     * @param username The username of the user to retrieve.
+     * @return The user associated with the given username.
+     * @throws NoSuchElementException if no user is found with the given username.
+     ***/
+    public User getUserByUsername(String username) {
+        Member member = userRepository.getMemberByUsername(username);
+        if (member == null) {
+            throw new NoSuchElementException("User not found");
+        }
+        return member;
     }
 
     /***
@@ -156,6 +172,11 @@ public class LoginManager {
     public boolean isLoggedin(String username) {
         Member user = userRepository.getMemberByUsername(username);
         return user.isLoggedIn();
+    }
+
+
+    public List<Member> getAllMembers() {
+        return userRepository.getAllMembers();
     }
 }
 

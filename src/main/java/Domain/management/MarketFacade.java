@@ -3,9 +3,11 @@ package Domain.management;
 import java.io.IOException;
 import java.util.*;
 import org.springframework.stereotype.Component;
+
+import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
 import Domain.User.IUserRepository;
@@ -16,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Component
 public class MarketFacade implements IMarketFacade {
 
-    private IPaymentService paymentService;
-    private ISupplyService supplyService;
+    private IExternalPaymentService paymentService;
+    private IExternalSupplyService supplyService;
     private INotificationService notificationService;
     private IUserRepository userRepository;
     private PermissionManager permissionManager;
@@ -31,8 +33,8 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Autowired
-    public MarketFacade(IPaymentService paymentService,
-                        ISupplyService supplyService,
+    public MarketFacade(IExternalPaymentService paymentService,
+                        IExternalSupplyService supplyService,
                         INotificationService notificationService,
                         IUserRepository userRepository,
                         IShoppingCartFacade shoppingCartFacade,
@@ -61,7 +63,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void updatePaymentService(IPaymentService paymentService) {
+    public void updatePaymentService(IExternalPaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
@@ -71,7 +73,7 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void updateSupplyService(ISupplyService supplyService) {
+    public void updateSupplyService(IExternalSupplyService supplyService) {
         this.supplyService = supplyService;
     }
 
@@ -91,7 +93,21 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
+    public String getUsername(String userId) {
+        Member member = userRepository.getMember(userId);
+        if (member == null) {
+            throw new NoSuchElementException("User not found: " + userId);
+        }
+        return member.getName();
+    }
+
+    @Override
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
+        if (userRepository.getMember(appointeeId) == null) {
+            throw new IllegalArgumentException("Appointee not found.");
+        } else if (isStoreManager(appointeeId, storeId)) {
+            throw new IllegalArgumentException("Appointee is already a store manager.");
+        }
         permissionManager.appointStoreManager(appointerId, appointeeId, storeId);
     }
 
@@ -111,16 +127,20 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
+    public Map<Member, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
         permissionManager.checkPermission(userId, storeId, PermissionType.SUPERVISE_MANAGERS);
-        Map<String, List<PermissionType>> result = new HashMap<>();
+        Map<Member, List<PermissionType>> result = new HashMap<>();
         Map<String, Permission> storePermissions = permissionManager.getAllPermissionsForStore(storeId);
         if (storePermissions != null) {
             for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
                 String username = entry.getKey();
                 Permission p = entry.getValue();
                 if (p.isStoreManager()) {
-                    result.put(username, List.copyOf(p.getPermissions()));
+                    Member member = userRepository.getMember(username);
+                    if (member == null) {
+                        throw new NoSuchElementException("Member not found: " + username);
+                    }
+                    result.put(member, List.copyOf(p.getPermissions()));
                 }
             }
         }
@@ -139,8 +159,17 @@ public class MarketFacade implements IMarketFacade {
         if (paymentService == null || supplyService == null || notificationService == null || userRepository == null) {
             throw new IllegalStateException("Services not initialized.");
         }
-        paymentService.initialize();
-        supplyService.initialize();
+        
+        Response<Boolean> paymentCheck = paymentService.handshake();
+        Response<Boolean> supplyCheck = supplyService.handshake();
+
+        if (paymentCheck.errorOccurred() || supplyCheck.errorOccurred() ||
+            !Boolean.TRUE.equals(paymentCheck.getValue()) ||
+            !Boolean.TRUE.equals(supplyCheck.getValue())) {
+            
+            throw new IllegalStateException("Handshake failed with external API.");
+        }
+
         Member manager = userRepository.getMember(userId);
         permissionManager.addMarketManager(manager);
     }
@@ -148,12 +177,12 @@ public class MarketFacade implements IMarketFacade {
     /**
      * Checks if a user is a store manager for the specified store.
      * 
-     * @param username The username to check
+     * @param userId The user ID to check
      * @param storeId The store ID to check
      * @return true if the user is a store manager, false otherwise
      */
-    public boolean isStoreManager(String username, String storeId) {
-        Permission permission = permissionManager.getPermission(storeId, username);
+    public boolean isStoreManager(String userId, String storeId) {
+        Permission permission = permissionManager.getPermission(storeId, userId);
         return permission != null && permission.isStoreManager();
     }
 
@@ -181,7 +210,12 @@ public class MarketFacade implements IMarketFacade {
         if (member == null) {
             throw new IllegalArgumentException("User not found: " + userId);
         }
-        return permissionManager.banUser(bannerId, userId, endDate);
+        boolean result = permissionManager.banUser(bannerId, userId, endDate);
+        if (result) {
+            String message = String.format("You have been banned until %s", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate));
+            notificationService.sendNotification(userId, message);
+        }
+        return result;
     }
 
     @Override
@@ -190,7 +224,31 @@ public class MarketFacade implements IMarketFacade {
         if (member == null) {
             throw new IllegalArgumentException("User not found: " + userId);
         }
-        return permissionManager.unbanUser(unbannerId, userId);
+        boolean result = permissionManager.unbanUser(unbannerId, userId);
+        if (result) {
+            notificationService.sendNotification(userId, "Your ban has been lifted. You can now use the system again.");
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Date> getBannedUsers() {
+        Map<String, Date> bannedUsers = new HashMap<>();
+        Map<String, Permission> systemPermissions = permissionManager.getAllPermissionsForStore("1");
+        
+        for (Map.Entry<String, Permission> entry : systemPermissions.entrySet()) {
+            String userId = entry.getKey();
+            Permission permission = entry.getValue();
+            
+            if (permission.hasPermission(PermissionType.BANNED)) {
+                Member member = userRepository.getMember(userId);
+                if (member != null) {
+                    bannedUsers.put(member.getName(), permission.getExpirationDate());
+                }
+            }
+        }
+        
+        return bannedUsers;
     }
 
 }

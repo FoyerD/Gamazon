@@ -106,8 +106,13 @@ public class ServiceManager {
             shoppingService = new ShoppingService(facadeManager.getShoppingCartFacade(),
                                                 getTokenService(),
                                                 facadeManager.getStoreFacade(),
-                                                facadeManager.getPermissionManager());
+                                                facadeManager.getPermissionManager(),
+                                                facadeManager.getLoginManager());
         }
         return shoppingService;
+    }
+
+    public void injectINotificationService(INotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 }

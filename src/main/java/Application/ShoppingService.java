@@ -1,25 +1,32 @@
 package Application;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OrderedItemDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import Domain.ExternalServices.IPaymentService;
 import Domain.Pair;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Store.Item;
+import Domain.Shopping.Receipt;
+import Domain.Store.Product;
 import Domain.Store.StoreFacade;
+import Domain.User.LoginManager;
+import Domain.User.User;
 import Domain.management.PermissionManager;
 
 @Service
@@ -27,19 +34,22 @@ public class ShoppingService{
     private static final String CLASS_NAME = ShoppingService.class.getSimpleName();
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
+    private final LoginManager loginManager;
     private StoreFacade storeFacade;
     private PermissionManager permissionManager;
 
     @Autowired
-    public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade, PermissionManager permissionManager) {
+    public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade, PermissionManager permissionManager, LoginManager loginManager) {
         this.cartFacade = cartFacade;
         this.tokenService = tokenService;
         this.storeFacade = storeFacade;
         this.permissionManager = permissionManager;
+        this.loginManager = loginManager;
         
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "ShoppingService initialized with cart facade");
     }
 
+    @Transactional
     public Response<Boolean> addProductToCart(String storeId, String sessionToken, String productId, int quantity) {
         String method = "addProductToCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -69,6 +79,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional
     public Response<CartDTO> viewCart(String sessionToken) {
         String method = "viewCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -110,7 +121,7 @@ public class ShoppingService{
         }
     }
 
-
+    @Transactional
     public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId, int quantity) {
         String method = "removeProductFromCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -136,6 +147,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional
     public Response<Boolean> removeProductFromCart(String storeId, String sessionToken, String productId) {
         String method = "removeProductFromCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -161,6 +173,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional 
     public Response<Boolean> clearCart(String sessionToken) {
         String method = "clearCart";
         if (!tokenService.validateToken(sessionToken)) {
@@ -187,6 +200,7 @@ public class ShoppingService{
         }
     }
 
+    @Transactional
     public Response<Boolean> clearBasket(String sessionToken, String storeId) {
         String method = "clearBasket";
         if (!tokenService.validateToken(sessionToken)) {
@@ -216,6 +230,7 @@ public class ShoppingService{
     
 
     // Make Immidiate Purchase Use Case 2.5
+    @Transactional
     public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
          String clientName, String deliveryAddress) {
         String method = "checkout";
@@ -244,7 +259,7 @@ public class ShoppingService{
         }
     }
 
-    
+    @Transactional
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
                                     long andIncrement, String clientName, String deliveryAddress) {
@@ -285,26 +300,62 @@ public class ShoppingService{
         throw new UnsupportedOperationException("Method not implemented yet. This method should add price breakdown to the cart.");
     }
 
-
-    class MockPaymentService implements IPaymentService {
-        @Override
-        public Response<Boolean> processPayment(String card_owner, String card_number, Date expiry_date, String cvv,
-            double price, long andIncrement, String name, String deliveryAddress) {
-            // Mock payment processing logic
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.processPayment", "Processing mock payment for " + card_owner + " of $" + price);
-            return new Response<>(true); // Assume payment is always successful for testing
+    // View personal purchase history 3.7
+    @Transactional
+    public Response<List<ReceiptDTO>> getUserPurchaseHistory(String sessionToken) {
+        String method = "getUserPurchaseHistory";
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+            return Response.error("Invalid token");
         }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
+        try {
+            
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
+ 
 
-        @Override
-        public void updatePaymentServiceURL(String url) {
-            // Mock implementation for updating payment service URL
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.updatePaymentServiceURL", "Payment service URL updated to: " + url);
+            List<Receipt> purchaseHistory = cartFacade.getClientPurchaseHistory(clientId);
+            List<ReceiptDTO> receiptDTOs = converReceiptstoDTOs(purchaseHistory);
+            TradingLogger.logEvent(CLASS_NAME, method, "Purchase history retrieved for user " + clientId);
+            return new Response<>(receiptDTOs);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error retrieving purchase history: %s", ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
         }
+    }
 
-        @Override
-        public void initialize() {
-            // Mock initialization logic
-            TradingLogger.logEvent(CLASS_NAME, "MockPaymentService.initialize", "MockPaymentService initialized");
+    
+    private List<ReceiptDTO> converReceiptstoDTOs(List<Receipt> receipts) {
+        List<ReceiptDTO> purchaseHistoryDTO = new ArrayList<>();
+        for (Receipt receipt : receipts) {
+            List<OrderedItemDTO> items = new ArrayList<>();
+            for (Map.Entry<Product, Pair<Integer, Double>> entry : receipt.getProducts().entrySet()) {
+                Product product = entry.getKey();
+                int quantity = entry.getValue().getFirst();
+                double price = entry.getValue().getSecond();
+                OrderedItemDTO itemDTO = new OrderedItemDTO(product, 
+                                                            quantity, 
+                                                            this.storeFacade.getStoreName(receipt.getStoreId()), 
+                                                            price
+                                                        );
+                items.add(itemDTO);
+            }
+
+            String clientName = "Unknown"; // Default name if user not found
+            User user = loginManager.getUser(receipt.getClientId());
+            if (user != null) {
+                clientName = user.getName();
+            }
+            ReceiptDTO receiptDTO = new ReceiptDTO(receipt.getReceiptId(),
+                                                    clientName,
+                                                    this.storeFacade.getStoreName(receipt.getStoreId()),
+                                                    items);
+            purchaseHistoryDTO.add(receiptDTO);
         }
+        return purchaseHistoryDTO;
     }
 }

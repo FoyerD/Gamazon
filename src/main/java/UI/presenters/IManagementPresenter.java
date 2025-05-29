@@ -1,9 +1,13 @@
 package UI.presenters;
 
 import java.util.List;
+import java.util.Map;
 
+import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType; // Questionable but its enum so...
 
@@ -100,13 +104,12 @@ public interface IManagementPresenter {
     /**
      * Appoints a new manager to a store.
      *
-     * @param sessionToken Session identifier for authentication.
-     * @param appointerUsername Username of the appointer (must have authority).
-     * @param appointeeUsername Username of the new manager.
+     * @param sessionToken Session identifier for authentication (must have autority).
+     * @param appointeeId Username of the new manager.
      * @param storeId Store ID for the appointment.
      * @return Void response indicating success or failure.
      */
-    Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername, String storeId);
+    Response<Void> appointStoreManager(String sessionToken, String appointeeId, String storeId);
 
     /**
      * Removes a store manager.
@@ -133,14 +136,13 @@ public interface IManagementPresenter {
     /**
      * Changes the permissions of a store manager.
      *
-     * @param sessionToken Session identifier for authentication.
-     * @param ownerUsername Username of the acting store owner.
-     * @param managerUsername Username of the manager whose permissions will be updated.
+     * @param sessionToken Session identifier for authentication. token must be an owner of the store in order to change permissions.
+     * @param managerId id of the manager whose permissions will be updated.
      * @param storeId Store ID.
      * @param newPermissions List of new permissions to assign.
      * @return Void response indicating success or failure.
      */
-    Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions);
+    Response<Void> changeManagerPermissions(String sessionToken, String managerId, String storeId, List<PermissionType> newPermissions);
 
     /**
      * Closes a store (sets it to inactive/unavailable).
@@ -150,4 +152,24 @@ public interface IManagementPresenter {
      * @return Response with true if successful.
      */
     Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId);
+
+    /**
+     * Retrieves all permissions of managers in a store.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store.
+     * @return Response with a map of {@link UserDTO} to their list of {@link PermissionType}.
+     */
+    Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId);
+
+
+    /**
+     * Gets the purchase history of a store.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store whose purchase history is requested.
+     * @return Response with a list of {@link ClientOrderDTO} representing the purchase history, or error.
+     */
+    public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId);
+
 }

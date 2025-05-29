@@ -25,7 +25,7 @@ import org.mockito.Mock;
 
 import Application.utils.Response;
 import Domain.Pair;
-import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Store.Auction;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
@@ -48,7 +48,7 @@ public class ShoppingCartFacadeTest {
     private IShoppingBasketRepository mockBasketRepo;
     
     @Mock
-    private IPaymentService mockPaymentService;
+    private IExternalPaymentService mockPaymentService;
     
     @Mock
     private ItemFacade mockItemFacade;
@@ -81,7 +81,7 @@ public class ShoppingCartFacadeTest {
         // Initialize mocks manually since initMocks isn't working
         mockCartRepo = mock(IShoppingCartRepository.class);
         mockBasketRepo = mock(IShoppingBasketRepository.class);
-        mockPaymentService = mock(IPaymentService.class);
+        mockPaymentService = mock(IExternalPaymentService.class);
         mockItemFacade = mock(ItemFacade.class);
         mockStoreFacade = mock(StoreFacade.class);
         mockReceiptRepo = mock(IReceiptRepository.class);
@@ -251,6 +251,11 @@ public class ShoppingCartFacadeTest {
         stores.add(STORE_ID);
         when(mockCart.getCart()).thenReturn(stores);
         
+        //Mock Store
+        Store mockStore = mock(Store.class);
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mockStore);
+        when(mockStore.isOpen()).thenReturn(true);
+        
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockBasket.isEmpty()).thenReturn(false);
         
@@ -269,8 +274,8 @@ public class ShoppingCartFacadeTest {
         // Configure the payment service to return a successful response
         when(mockPaymentService.processPayment(
             anyString(), anyString(), any(Date.class), anyString(), 
-            anyDouble(), anyLong(), anyString(), anyString()
-        )).thenReturn(Response.success(true));
+            anyString(), anyDouble()
+        )).thenReturn(Response.success(10000));
         
         // Act
         boolean result = facade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, 
@@ -280,8 +285,8 @@ public class ShoppingCartFacadeTest {
         assertTrue("Should return true for successful checkout", result);
         verify(mockItemFacade).decreaseAmount(new Pair<>(STORE_ID, PRODUCT_ID), QUANTITY);
         verify(mockPaymentService).processPayment(
-            eq(clientName), eq(cardNumber), eq(expiryDate), eq(cvv), 
-            anyDouble(), eq(transactionId), eq(clientName), eq(deliveryAddress)
+            eq(CLIENT_ID), eq(cardNumber), eq(expiryDate), eq(cvv), 
+            eq(clientName), anyDouble()
         );
         verify(mockBasket).clear();
         verify(mockCart).clear();
@@ -304,6 +309,7 @@ public class ShoppingCartFacadeTest {
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
         Set<String> emptyStores = new HashSet<>();
         when(mockCart.getCart()).thenReturn(emptyStores);
+
         
         // Act
         boolean result = facade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, 
@@ -313,7 +319,7 @@ public class ShoppingCartFacadeTest {
         assertTrue("Should return true even for empty cart", result);
         verify(mockPaymentService, never()).processPayment(
             anyString(), anyString(), any(Date.class), anyString(), 
-            anyDouble(), anyLong(), anyString(), anyString()
+            anyString(), anyDouble()
         );
         verify(mockCart).clear();
     }
@@ -334,6 +340,11 @@ public class ShoppingCartFacadeTest {
         stores.add(STORE_ID);
         when(mockCart.getCart()).thenReturn(stores);
         
+        //Mock Store
+        Store mockStore = mock(Store.class);
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mockStore);
+        when(mockStore.isOpen()).thenReturn(true);
+
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockBasket.isEmpty()).thenReturn(true);
         
@@ -345,7 +356,7 @@ public class ShoppingCartFacadeTest {
         assertTrue("Should return true even for empty basket", result);
         verify(mockPaymentService, never()).processPayment(
             anyString(), anyString(), any(Date.class), anyString(), 
-            anyDouble(), anyLong(), anyString(), anyString()
+            anyString(), anyDouble()
         );
         verify(mockCart).clear();
     }
@@ -374,7 +385,7 @@ public class ShoppingCartFacadeTest {
         assertTrue("Should return true even for null cart (new one is created)", result);
         verify(mockPaymentService, never()).processPayment(
             anyString(), anyString(), any(Date.class), anyString(), 
-            anyDouble(), anyLong(), anyString(), anyString()
+            anyString(), anyDouble()
         );
     }
     
@@ -411,7 +422,7 @@ public class ShoppingCartFacadeTest {
         // Mock payment failure
         when(mockPaymentService.processPayment(
             anyString(), anyString(), any(Date.class), anyString(), 
-            anyDouble(), anyLong(), anyString(), anyString()
+            anyString(), anyDouble()
         )).thenThrow(new RuntimeException("Payment failed"));
         
         // Act - should throw exception

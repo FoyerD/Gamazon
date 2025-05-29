@@ -11,67 +11,61 @@ import org.junit.Before;
 import org.junit.Test;
 
 import Application.CustomerServiceService;
+import Application.ItemService;
+import Application.ProductService;
 import Application.ServiceManager;
 import Application.StoreService;
 import Application.TokenService;
+import Application.UserService;
+import Application.DTOs.UserDTO;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
 import Domain.Pair;
 import Domain.Store.FeedbackDTO;
-import Domain.Store.IItemRepository;
-import Domain.Store.Item;
-import Domain.User.IUserRepository;
-import Domain.User.Member;
-import Domain.User.User;
 import Infrastructure.MemoryRepoManager;
-import Infrastructure.PaymentService;
+import Infrastructure.ExternalPaymentService;
 import Application.utils.Response;
 
 
 public class CustomerServiceServiceTests {
     private CustomerServiceService customerServiceService;
     private StoreService storeService;
-    private IItemRepository itemRepository;
-    private IUserRepository userRepository;
-    private TokenService tokenService;
+    private ItemService itemService;
+    private ProductService productService;
+    private UserService userService;
     private ServiceManager serviceManager;
     private FacadeManager facadeManager;
     private IRepoManager repoManager;
 
-    UUID userId = UUID.randomUUID();
     String storeId;
     Pair<String, String> itemId;
     String productId;
-
-
+    String userId;
     String tokenId = null;
 
     @Before
     public void setUp() {
 
         this.repoManager = new MemoryRepoManager();
-        this.facadeManager = new FacadeManager(repoManager, mock(PaymentService.class));
+        this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class));
         this.serviceManager = new ServiceManager(facadeManager);
-        userRepository = repoManager.getUserRepository();
-        itemRepository = repoManager.getItemRepository();
         
         
         customerServiceService = serviceManager.getCustomerService();
-        this.tokenService = serviceManager.getTokenService();
         storeService = serviceManager.getStoreService();
+        itemService = serviceManager.getItemService();
+        productService = serviceManager.getProductService();
+        userService = serviceManager.getUserService();
 
-        tokenId = this.tokenService.generateToken(userId.toString());
-        User user = new Member(userId, "Member1", "passpass", "email@email.com");
-        this.userRepository.add(userId.toString(), user);
-
+        UserDTO guest = userService.guestEntry().getValue();
+        tokenId = guest.getSessionToken();
+        userId = userService.register(tokenId, "testUser", "Password123!", "a@a.com").getValue().getId();
+        
+        
         storeId = this.storeService.addStore(tokenId, "TheAwsomStore", "creepy ahhh store").getValue().getId();
-        productId = "productwhatwhat";
+        productId = productService.addProduct(tokenId, "Cool Product", List.of("Prod Cat"), List.of("Cat desc")).getValue().getId();
         itemId = new Pair<>(storeId, productId);
-        Item item = new Item(storeId, productId, 10.0, 100, "an items");
-        this.itemRepository.add(itemId, item);
-        if (this.itemRepository.get(new Pair<>(storeId, productId)) == null){
-            throw new RuntimeException("Item not found in repository");
-        }
+        itemService.add(tokenId, storeId, productId, 10.0, 5, "Cool Item");
         
     }
 

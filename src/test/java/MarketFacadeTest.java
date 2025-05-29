@@ -3,42 +3,32 @@ import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
-import Domain.ExternalServices.ISupplyService;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingCartFacade;
-import Domain.Store.Feedback;
-import Domain.Store.IItemRepository;
-import Domain.Store.Item;
-import Domain.Store.StoreFacade;
 import Domain.User.IUserRepository;
 import Domain.User.Member;
 import Domain.User.User;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
+import Application.utils.Response;
+
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class MarketFacadeTest {
 
     private MarketFacade marketFacade;
     private IUserRepository userRepository;
-    private IItemRepository itemRepository;
     private ShoppingCartFacade shoppingCartFacade;
-    private StoreFacade storeFacade;
-    private IPaymentService paymentService;
-    private ISupplyService supplyService;
+    private IExternalPaymentService paymentService;
+    private IExternalSupplyService supplyService;
     private INotificationService notificationService;
     private PermissionManager permissionManager;
 
@@ -46,10 +36,8 @@ public class MarketFacadeTest {
     public void setUp() {
         // Create the mock objects
         userRepository = mock(IUserRepository.class);
-        itemRepository = mock(IItemRepository.class);
-        storeFacade = mock(StoreFacade.class);
-        paymentService = mock(IPaymentService.class);
-        supplyService = mock(ISupplyService.class);
+        paymentService = mock(IExternalPaymentService.class);
+        supplyService = mock(IExternalSupplyService.class);
         notificationService = mock(INotificationService.class);
         shoppingCartFacade = mock(ShoppingCartFacade.class);
         permissionManager = mock(PermissionManager.class);
@@ -81,7 +69,6 @@ public class MarketFacadeTest {
         
         // Set up the mock behavior for appointStoreManager
         doAnswer(invocation -> {
-            String appointerId = invocation.getArgument(0);
             String appointeeId = invocation.getArgument(1);
             String storeId = invocation.getArgument(2);
             
@@ -90,6 +77,7 @@ public class MarketFacadeTest {
             return null;
         }).when(permissionManager).appointStoreManager(anyString(), anyString(), anyString());
         
+        when(userRepository.getMember("newManager")).thenReturn(mock(Member.class));
         // Act
         marketFacade.appointStoreManager("admin", "newManager", "store1");
         
@@ -124,7 +112,6 @@ public class MarketFacadeTest {
         
         // Set up the appointStoreOwner method behavior to modify our map
         doAnswer(invocation -> {
-            String appointerId = invocation.getArgument(0);
             String appointeeId = invocation.getArgument(1);
             String storeId = invocation.getArgument(2);
             
@@ -175,10 +162,13 @@ public class MarketFacadeTest {
     @Test
     public void givenAdminWithSupervisePermission_whenGetManagersPermissions_thenReturnManagerPermissions() {
         // Create test data
-        User user = mock(User.class);
+        Member user = mock(Member.class);
         when(user.getName()).thenReturn("admin");
         when(userRepository.get(anyString())).thenReturn(user);
 
+        Member manager = mock(Member.class);
+        when(manager.getName()).thenReturn("managerUser");
+        when(userRepository.getMember(anyString())).thenReturn(manager);
         // Create permissions for testing
         Permission adminPermission = createPermissionWith(PermissionType.SUPERVISE_MANAGERS);
         Permission managerPermission = createPermissionWith(PermissionType.HANDLE_INVENTORY);
@@ -198,12 +188,12 @@ public class MarketFacadeTest {
         when(managerPermission.getPermissions()).thenReturn(managerPermissions);
         
         // Execute the method
-        Map<String, List<PermissionType>> result = marketFacade.getManagersPermissions("store1", "userId");
+        Map<Member, List<PermissionType>> result = marketFacade.getManagersPermissions("store1", "userId");
         
         // Verify the result
-        assertTrue(result.containsKey("managerUser"), "Result should contain managerUser");
-        assertEquals(1, result.get("managerUser").size(), "Manager should have 1 permission");
-        assertEquals(PermissionType.HANDLE_INVENTORY, result.get("managerUser").get(0), 
+        assertTrue(result.containsKey(manager), "Result should contain managerUser");
+        assertEquals(1, result.get(manager).size(), "Manager should have 1 permission");
+        assertEquals(PermissionType.HANDLE_INVENTORY, result.get(manager).get(0), 
                     "Manager should have HANDLE_INVENTORY permission");
     }
 
@@ -237,10 +227,13 @@ public class MarketFacadeTest {
         when(member.getName()).thenReturn("managerName");
         when(userRepository.getMember(anyString())).thenReturn(member);
 
+        when(paymentService.handshake()).thenReturn(new Response<>(true));
+        when(supplyService.handshake()).thenReturn(new Response<>(true));
+
         marketFacade.openMarket("manager");
 
-        verify(paymentService).initialize();
-        verify(supplyService).initialize();
+        verify(paymentService).handshake();
+        verify(supplyService).handshake();
 
     }
 

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
 import Domain.Pair;
-import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
@@ -27,7 +27,7 @@ import Domain.Store.IProductRepository;
 @Component
 public class CheckoutManager {
     private final IShoppingBasketRepository basketRepo;
-    private final IPaymentService paymentService;
+    private final IExternalPaymentService paymentService;
     private final ItemFacade itemFacade;
     private final IProductRepository productRepo;
     private final ReceiptBuilder receiptBuilder;
@@ -35,7 +35,7 @@ public class CheckoutManager {
 
     @Autowired
     public CheckoutManager(IShoppingBasketRepository basketRepo, 
-                          IPaymentService paymentService,
+                          IExternalPaymentService paymentService,
                           ItemFacade itemFacade, 
                           IProductRepository productRepo,
                           ReceiptBuilder receiptBuilder,
@@ -98,9 +98,9 @@ public class CheckoutManager {
 
             // Process payment if there are items to checkout
             if (purchaseSuccess) {
-                Response<Boolean> paymentResponse = paymentService.processPayment(
-                    clientName, cardNumber, expiryDate, cvv, 
-                    totalPrice, andIncrement, clientName, deliveryAddress
+                Response<Integer> paymentResponse = paymentService.processPayment(
+                    clientId, cardNumber, expiryDate, cvv, 
+                    clientName, totalPrice
                 );
                 
                 if (paymentResponse == null || paymentResponse.errorOccurred()) {

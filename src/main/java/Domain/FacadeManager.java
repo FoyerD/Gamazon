@@ -1,11 +1,8 @@
 package Domain;
 
-
-
-
 import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
@@ -24,18 +21,22 @@ public class FacadeManager {
     private StoreFacade storeFacade;
     private ItemFacade itemFacade;
     private ProductFacade productFacade;
-    private IPaymentService paymentService;
+    private IExternalPaymentService paymentService;
     private LoginManager loginManager;
     private PermissionManager permissionManager;
     private INotificationService notificationService;
+<<<<<<< HEAD
     private DiscountFacade discountFacade;
 
     public FacadeManager(IRepoManager repoManager, IPaymentService paymentService) {
+=======
+    public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService) {
+>>>>>>> 348-refactor-tests
         this.repoManager = repoManager;
         this.paymentService = paymentService;
     }
 
-    public IPaymentService getPaymentService() {
+    public IExternalPaymentService getPaymentService() {
         return paymentService;
     }
 

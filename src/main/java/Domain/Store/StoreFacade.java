@@ -11,13 +11,19 @@ import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import Application.utils.TradingLogger;
+import Domain.ExternalServices.INotificationService;
+import Domain.Pair;
 import Domain.User.IUserRepository;
 import Domain.User.User;
+<<<<<<< HEAD
 import Domain.Pair;
 import Domain.ExternalServices.INotificationService;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.Conditions.Condition;
+=======
+>>>>>>> 348-refactor-tests
 
 
 
@@ -158,7 +164,7 @@ public class StoreFacade {
 
             Store store = this.storeRepository.get(storeId);
             if (store == null) throw new RuntimeException("Store not found");
-            if(!store.isOpen()) throw new RuntimeException("Store is already closed");
+            if(store.isPermanentlyClosed()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);
             store.setPermanentlyClosed(true);
@@ -225,25 +231,45 @@ public class StoreFacade {
     }
 
     public Auction addBid(String auctionId, String userId, float bid, Supplier<Boolean> chargeCallback) {
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Received bid request. auctionId=" + auctionId + ", userId=" + userId + ", bid=" + bid);
+
         if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
         if (this.auctionRepository.get(auctionId) == null) throw new RuntimeException("Auction not found");
         if (this.getUser.apply(userId) == null) throw new RuntimeException("User not found");
         if (bid < 0) throw new RuntimeException("Bid must be greater than 0");
 
         Auction auction = this.auctionRepository.get(auctionId);
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Fetched auction. currentPrice=" + auction.getCurrentPrice() + ", startPrice=" + auction.getStartPrice());
+
         if (bid <= auction.getCurrentPrice() || bid <= auction.getStartPrice()) {
             throw new RuntimeException("Bid must be greater than current and start");
         }
 
-        if (auction.currentBidderId != null)
-            notificationService.sendNotification(auction.getCurrentBidderId(), "You have been outbid on auction " + auctionId + " womp womp :(");
+        if (auction.currentBidderId != null && !auction.currentBidderId.equals(userId)) {
+            TradingLogger.logEvent("StoreFacade", "addBid",
+                "DEBUG: Notifying previous bidder: " + auction.currentBidderId);
+            String storeName = this.getStoreName(auction.getStoreId());
+            String productName = this.itemRepository.getItem(auction.getStoreId(), auction.getProductId()).getProductName();
+            System.out.println("Notifying previous bidder: " + auction.currentBidderId);
+            notificationService.sendNotification(auction.getCurrentBidderId(),
+                "You have been outbid on " + productName + "from " + storeName + " womp womp :(");
+        } else {
+            TradingLogger.logEvent("StoreFacade", "addBid",
+                "DEBUG: No previous bidder to notify for auction " + auctionId + " or it's the same user bidding again.");
+        }
 
         auction.setCurrentPrice(bid);
         auction.setCurrentBidderId(userId);
         auction.setChargeCallback(chargeCallback);
 
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Updated auction with new bid. New currentBidderId=" + userId + ", newPrice=" + bid);
+
         return this.auctionRepository.update(auctionId, auction);
     }
+
 
 
     public Auction closeAuction(String auctionId) {
@@ -320,14 +346,16 @@ public class StoreFacade {
                 throw new RuntimeException("Payment failed for accepted bid");
             }
 
+            
         } catch (Exception ex) {
             // Rollback item amount
             item.setAmount(currentAmount);
             itemRepository.update(itemKey, item);
             throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);
         }
-
-        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! in auction " + auctionId + " 🎉 🔔");
+        String productName = item.getProductName();
+        String storeName = this.getStoreName(storeId);
+        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! purchesed " + productName + " from " + storeName + " 🎉 🔔");
         // Final update: optionally mark buyer (if you have a field), or leave updated amount
         itemRepository.update(itemKey, item);
 
