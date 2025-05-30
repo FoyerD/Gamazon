@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @Profile("prod")
 @EnableJpaRepositories("Infrastructure.JpaSpringRepositories")
-@EntityScan("Domain.Store")
+@EntityScan("Domain")
 public class JpaProdConfig {}

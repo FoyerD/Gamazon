@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Repos.IUserRepository;
@@ -11,6 +12,7 @@ import Domain.User.Member;
 import Domain.User.User;
 
 @Repository
+@Profile("dev")
 public class MemoryUserRepository extends IUserRepository {
     Map<String, User> users;
     public MemoryUserRepository() {
@@ -85,7 +87,7 @@ public class MemoryUserRepository extends IUserRepository {
     }
     @Override
     public boolean userIsMember(String id) {
-        return users.containsKey(id); // Returns true if user is a member
+        return users.containsKey(id);
     }
     @Override
     public List<Member> getAllMembers() {
