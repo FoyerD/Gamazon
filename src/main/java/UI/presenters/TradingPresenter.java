@@ -1,19 +1,20 @@
 package UI.presenters;
 
+import java.util.Date;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import Application.StoreService;
-import Application.MarketService;
-import Application.UserService;
-import Application.utils.Response;
-import Application.utils.Error;
 import Application.DTOs.StoreDTO;
-import UI.webSocketConfigurations.WebSocketNotifier;
+import Application.MarketService;
+import Application.StoreService;
+import Application.UserService;
+import Application.utils.Error;
+import Application.utils.Response;
 import Domain.User.Member;
 import Domain.User.User;
-import java.util.Date;
-import java.util.Map;
+import UI.webSocketConfigurations.WebSocketNotifier;
 
 @Component
 public class TradingPresenter implements ITradingPresenter {

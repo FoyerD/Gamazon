@@ -1,10 +1,10 @@
 package Domain.Shopping;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -12,14 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
-import Application.utils.TradingLogger;
-import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.Pair;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
-import Domain.Store.IProductRepository;
 
 /**
  * Implementation of the IShoppingCartFacade interface.

@@ -1,14 +1,5 @@
 package Domain.Shopping;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,20 +10,36 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import Application.utils.Response;
-import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.Pair;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
 import Domain.Store.Auction;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
-import Domain.Store.IProductRepository;
 
 /**
  * Tests for the ShoppingCartFacade class.
@@ -265,7 +272,7 @@ public class ShoppingCartFacadeTest {
         when(mockBasket.getOrders()).thenReturn(orders);
         
         // Real item and product info
-        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description");
+        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description", null, null);
         when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mockItem);
         
         Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());
@@ -413,7 +420,7 @@ public class ShoppingCartFacadeTest {
         when(mockBasket.getOrders()).thenReturn(orders);
         
         // Real item and product info
-        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description");
+        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description", null, null);
         when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mockItem);
         
         Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());

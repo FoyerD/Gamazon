@@ -1,17 +1,17 @@
 package Domain.management;
 
-import Domain.Store.IPolicyRepository;
-import Domain.Store.Policy;
-import Domain.Shopping.ShoppingBasket;
-import Domain.Store.Item;
-import Domain.User.IUserRepository;
-import Domain.User.Member;
-import Domain.Store.ItemFacade;
-import Domain.Store.ProductFacade;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.springframework.stereotype.Component;
+
+import Domain.Repos.IPolicyRepository;
+import Domain.Repos.IUserRepository;
+import Domain.Shopping.ShoppingBasket;
+import Domain.Store.ItemFacade;
+import Domain.Store.Policy;
+import Domain.Store.ProductFacade;
+import Domain.User.Member;
 
 @Component
 public class PolicyFacade {

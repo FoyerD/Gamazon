@@ -12,6 +12,7 @@ import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import Domain.Repos.IUserRepository;
 import Domain.management.PermissionManager;
 
 

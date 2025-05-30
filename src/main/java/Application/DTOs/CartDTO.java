@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Domain.Pair;
-import Domain.Shopping.IShoppingBasketRepository;
+import Domain.Repos.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCart;
 
 

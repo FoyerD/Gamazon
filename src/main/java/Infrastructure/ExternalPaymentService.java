@@ -1,18 +1,20 @@
 package Infrastructure;
 
-import Application.utils.Response;
-import Application.utils.TradingLogger;
-import Domain.ExternalServices.IExternalPaymentService;
-import org.springframework.http.*;
+import java.util.Date;
+import java.util.Map;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import Application.utils.Error;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Map.Entry;
+import Application.utils.Error;
+import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
+
 
 @Service
 public class ExternalPaymentService implements IExternalPaymentService {

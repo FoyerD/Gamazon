@@ -1,20 +1,26 @@
 package UI;
 
-import Application.*;
+import java.util.List;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import Application.DTOs.ProductDTO;
 import Application.DTOs.UserDTO;
+import Application.ItemService;
+import Application.MarketService;
+import Application.ProductService;
+import Application.StoreService;
+import Application.TokenService;
+import Application.UserService;
 import Application.utils.Response;
 import Domain.management.PermissionType;
 
-import org.hibernate.query.sqm.tree.expression.ValueBindJpaCriteriaParameter;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
 @Component
-//@Profile({"dev", "test"})
-public class AppInitializer implements CommandLineRunner {
+@Order(1)
+public class AppInitializer implements CommandLineRunner, Ordered {
 
     private final UserService userService;
     private final StoreService storeService;
@@ -36,6 +42,11 @@ public class AppInitializer implements CommandLineRunner {
         this.itemService = itemService;
         this.marketService = marketService;
         this.tokenService = tokenService;
+    }
+
+    @Override
+    public int getOrder() {
+        return 1; 
     }
 
     @Override
@@ -83,6 +94,7 @@ public class AppInitializer implements CommandLineRunner {
         var store2 = store2Resp.getValue();
 
         var appointResp = marketService.appointStoreManager(adminToken, tokenService.extractId(buyer.getSessionToken()), store1.getId());
+        System.out.println("Appointing buyer as store manager for store1: " + store1.getManagers().toString());
         if (appointResp.errorOccurred()) {
             System.err.println("❌ Failed to appoint store manager: " + appointResp.getErrorMessage());
             return;

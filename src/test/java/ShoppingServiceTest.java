@@ -1,12 +1,14 @@
-import static org.junit.Assert.*;
-
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,11 +28,11 @@ import Application.StoreService;
 import Application.UserService;
 import Application.utils.Error;
 import Application.utils.Response;
-import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
-import Infrastructure.MemoryRepoManager;
+import Domain.ExternalServices.INotificationService;
 import Domain.FacadeManager;
 import Domain.Pair;
+import Infrastructure.MemoryRepoManager;
 
 public class ShoppingServiceTest {
 
@@ -204,7 +206,7 @@ public class ShoppingServiceTest {
         assertNull("Value should be null", response.getValue());
     }
 
-    @Test
+@Test
     public void testConcurrentCheckout_WithLimitedStock() throws InterruptedException {
         // Use the existing product and store from the setup
         when(this.mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
@@ -347,7 +349,6 @@ public class ShoppingServiceTest {
     //
     // CART MANAGEMENT - REMOVE PRODUCT
     //
-
     @Test
     public void testRemoveProductFromCart_WithQuantity_Success() {
         shoppingService.addProductToCart(store_id, clientToken, product_id, 3);

@@ -3,11 +3,11 @@ package Domain.User;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-
-import org.apache.commons.validator.routines.EmailValidator;
+import Domain.Repos.IUserRepository;
 
 @Component
 public class LoginManager {
