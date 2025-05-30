@@ -49,7 +49,7 @@ public class DiscountFacadeTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        discountFacade = new DiscountFacade(mockDiscountRepository, mockConditionRepository);
+        discountFacade = new DiscountFacade(mockDiscountRepository, mockConditionRepository, mockItemFacade);
         lastCreatedObject = null;
     }
     
@@ -156,12 +156,12 @@ public class DiscountFacadeTest {
      * Checks for circular references in composite conditions
      */
     private void checkNoCircularReferences(CompositeCondition composite) {
-        Set<UUID> visitedIds = new HashSet<>();
+        Set<String> visitedIds = new HashSet<>();
         checkCircularHelper(composite, visitedIds);
     }
     
-    private void checkCircularHelper(Condition condition, Set<UUID> visitedIds) {
-        UUID conditionId = condition.getId();
+    private void checkCircularHelper(Condition condition, Set<String> visitedIds) {
+        String conditionId = condition.getId();
         
         assertFalse("Circular reference detected in condition: " + conditionId, 
                    visitedIds.contains(conditionId));
@@ -261,17 +261,17 @@ public class DiscountFacadeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorWithNullDiscountRepository() {
-        new DiscountFacade(null, mockConditionRepository);
+        new DiscountFacade(null, mockConditionRepository, mockItemFacade);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorWithNullConditionRepository() {
-        new DiscountFacade(mockDiscountRepository, null);
+        new DiscountFacade(mockDiscountRepository, null, mockItemFacade);
     }
 
     @Test
     public void testConstructorWithValidRepositories() {
-        DiscountFacade facade = new DiscountFacade(mockDiscountRepository, mockConditionRepository);
+        DiscountFacade facade = new DiscountFacade(mockDiscountRepository, mockConditionRepository, mockItemFacade);
         assertNotNull("DiscountFacade should be created successfully", facade);
     }
 
@@ -688,7 +688,7 @@ public class DiscountFacadeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddDiscountWithNullDiscount() {
-        discountFacade.addDiscount(testStoreId, null);
+        discountFacade.addDiscount(testStoreId, (Discount)null); //wtf?
     }
 
     @Test
@@ -734,40 +734,40 @@ public class DiscountFacadeTest {
 
     @Test
     public void testGetStoreDiscountsList() {
-        List<Discount> expectedDiscounts = Arrays.asList(mockDiscount1, mockDiscount2);
+        Set<Discount> expectedDiscounts = Set.of(mockDiscount1, mockDiscount2);
         
-        when(mockDiscountRepository.findByStoreId(testStoreId)).thenReturn(expectedDiscounts);
+        when(mockDiscountRepository.getStoreDiscounts(testStoreId)).thenReturn(expectedDiscounts);
         
-        List<Discount> result = discountFacade.getStoreDiscountsList(testStoreId);
+        Set<Discount> result = discountFacade.getStoreDiscounts(testStoreId);
         
         assertEquals("Should return store discounts as list", expectedDiscounts, result);
-        verify(mockDiscountRepository).findByStoreId(testStoreId);
+        verify(mockDiscountRepository).get(testStoreId);
     }
 
     @Test
     public void testUpdateDiscount() {
-        UUID discountId = UUID.randomUUID();
+        String discountId = UUID.randomUUID().toString();
         when(mockDiscount1.getId()).thenReturn(discountId);
-        when(mockDiscountRepository.existsById(discountId)).thenReturn(true);
+        when(mockDiscountRepository.exists(discountId)).thenReturn(true);
         
         discountFacade.updateDiscount(testStoreId, mockDiscount1);
         
-        verify(mockDiscountRepository).existsById(discountId);
+        verify(mockDiscountRepository).exists(discountId);
         verify(mockDiscountRepository).save(eq(testStoreId), eq(mockDiscount1));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testUpdateDiscountWithNonExistentId() {
-        UUID discountId = UUID.randomUUID();
+        String discountId = UUID.randomUUID().toString();
         when(mockDiscount1.getId()).thenReturn(discountId);
-        when(mockDiscountRepository.existsById(discountId)).thenReturn(false);
+        when(mockDiscountRepository.exists(discountId)).thenReturn(false);
         
         discountFacade.updateDiscount(testStoreId, mockDiscount1);
     }
 
     @Test
     public void testRemoveDiscountFromStore() {
-        UUID discountId = UUID.randomUUID();
+        String discountId = UUID.randomUUID().toString();
         Set<Discount> storeDiscounts = new HashSet<>();
         storeDiscounts.add(mockDiscount1);
         
@@ -777,13 +777,13 @@ public class DiscountFacadeTest {
         discountFacade.removeDiscount(testStoreId, discountId);
         
         verify(mockDiscountRepository).getStoreDiscounts(testStoreId);
-        verify(mockDiscountRepository).deleteById(discountId);
+        verify(mockDiscountRepository).delete(discountId);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRemoveDiscountNotInStore() {
-        UUID discountId = UUID.randomUUID();
-        UUID otherDiscountId = UUID.randomUUID();
+        String discountId = UUID.randomUUID().toString();
+        String otherDiscountId = UUID.randomUUID().toString();
         Set<Discount> storeDiscounts = new HashSet<>();
         storeDiscounts.add(mockDiscount1);
         
@@ -794,14 +794,14 @@ public class DiscountFacadeTest {
     }
 
     @Test
-    public void testGetStoreDiscountCount() {
+    public void testGetStoreDiscountReturnedSize() {
         Set<Discount> storeDiscounts = new HashSet<>();
         storeDiscounts.add(mockDiscount1);
         storeDiscounts.add(mockDiscount2);
         
         when(mockDiscountRepository.getStoreDiscounts(testStoreId)).thenReturn(storeDiscounts);
         
-        int result = discountFacade.getStoreDiscountCount(testStoreId);
+        int result = discountFacade.getStoreDiscounts(testStoreId).size();
         
         assertEquals("Should return correct discount count", 2, result);
         verify(mockDiscountRepository).getStoreDiscounts(testStoreId);
@@ -813,42 +813,42 @@ public class DiscountFacadeTest {
 
     @Test
     public void testFindDiscountById() {
-        UUID discountId = UUID.randomUUID();
+        String discountId = UUID.randomUUID().toString();
         
-        when(mockDiscountRepository.findById(discountId)).thenReturn(mockDiscount1);
+        when(mockDiscountRepository.get(discountId)).thenReturn(mockDiscount1);
         
-        Discount result = discountFacade.findDiscountById(discountId);
+        Discount result = discountFacade.getDiscount(discountId);
         
         assertEquals("Should return the discount from repository", mockDiscount1, result);
-        verify(mockDiscountRepository).findById(discountId);
+        verify(mockDiscountRepository).get(discountId);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFindDiscountByIdWithNullId() {
-        discountFacade.findDiscountById(null);
+        discountFacade.getDiscount(null);
     }
 
-    @Test
-    public void testGetAllDiscounts() {
-        Map<UUID, Discount> expectedDiscounts = new HashMap<>();
-        expectedDiscounts.put(UUID.randomUUID(), mockDiscount1);
-        expectedDiscounts.put(UUID.randomUUID(), mockDiscount2);
+    // @Test
+    // public void testGetAllDiscounts() {
+    //     Map<UUID, Discount> expectedDiscounts = new HashMap<>();
+    //     expectedDiscounts.put(UUID.randomUUID(), mockDiscount1);
+    //     expectedDiscounts.put(UUID.randomUUID(), mockDiscount2);
         
-        when(mockDiscountRepository.findAll()).thenReturn(expectedDiscounts);
+    //     when(mockDiscountRepository.findAll()).thenReturn(expectedDiscounts);
         
-        Map<UUID, Discount> result = discountFacade.getAllDiscounts();
+    //     Map<UUID, Discount> result = discountFacade.getAllDiscounts();
         
-        assertEquals("Should return all discounts from repository", expectedDiscounts, result);
-        verify(mockDiscountRepository).findAll();
-    }
+    //     assertEquals("Should return all discounts from repository", expectedDiscounts, result);
+    //     verify(mockDiscountRepository).findAll();
+    // }
 
     @Test
     public void testRemoveDiscountGlobal() {
-        UUID discountId = UUID.randomUUID();
+        String discountId = UUID.randomUUID().toString();
         
         discountFacade.removeDiscount(discountId);
         
-        verify(mockDiscountRepository).deleteById(discountId);
+        verify(mockDiscountRepository).delete(discountId);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -858,63 +858,63 @@ public class DiscountFacadeTest {
 
     @Test
     public void testDiscountExists() {
-        UUID discountId = UUID.randomUUID();
+        String discountId = UUID.randomUUID().toString();
         
-        when(mockDiscountRepository.existsById(discountId)).thenReturn(true);
+        when(mockDiscountRepository.exists(discountId)).thenReturn(true);
         
         boolean result = discountFacade.discountExists(discountId);
         
         assertTrue("Should return true when discount exists", result);
-        verify(mockDiscountRepository).existsById(discountId);
+        verify(mockDiscountRepository).exists(discountId);
     }
 
-    @Test
-    public void testGetDiscountCount() {
-        when(mockDiscountRepository.size()).thenReturn(5);
+    // @Test
+    // public void testGetDiscountCount() {
+    //     when(mockDiscountRepository.size()).thenReturn(5);
         
-        int result = discountFacade.getDiscountCount();
+    //     int result = discountFacade.getDiscountCount();
         
-        assertEquals("Should return correct discount count", 5, result);
-        verify(mockDiscountRepository).size();
-    }
+    //     assertEquals("Should return correct discount count", 5, result);
+    //     verify(mockDiscountRepository).size();
+    // }
 
     @Test
-    public void testFindConditionById() {
-        UUID conditionId = UUID.randomUUID();
+    public void testgeCondition() {
+        String conditionId = UUID.randomUUID().toString();
         
-        when(mockConditionRepository.findById(conditionId)).thenReturn(mockCondition);
+        when(mockConditionRepository.get(conditionId)).thenReturn(mockCondition);
         
-        Condition result = discountFacade.findConditionById(conditionId);
+        Condition result = discountFacade.geCondition(conditionId);
         
         assertEquals("Should return the condition from repository", mockCondition, result);
-        verify(mockConditionRepository).findById(conditionId);
+        verify(mockConditionRepository).get(conditionId);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFindConditionByIdWithNullId() {
-        discountFacade.findConditionById(null);
+    public void testgeConditionWithNullId() {
+        discountFacade.geCondition(null);
     }
 
-    @Test
-    public void testGetAllConditions() {
-        Map<UUID, Condition> expectedConditions = new HashMap<>();
-        expectedConditions.put(UUID.randomUUID(), mockCondition);
+    // @Test
+    // public void testGetAllConditions() {
+    //     Set<Condition> expectedConditions = new HashMap<>();
+    //     expectedConditions.put(UUID.randomUUID(), mockCondition);
         
-        when(mockConditionRepository.findAll()).thenReturn(expectedConditions);
+    //     when(mockConditionRepository.findAll()).thenReturn(expectedConditions);
         
-        Map<UUID, Condition> result = discountFacade.getAllConditions();
+    //     Set<Condition> result = discountFacade.getAllConditions();
         
-        assertEquals("Should return all conditions from repository", expectedConditions, result);
-        verify(mockConditionRepository).findAll();
-    }
+    //     assertEquals("Should return all conditions from repository", expectedConditions, result);
+    //     verify(mockConditionRepository).findAll();
+    // }
 
     @Test
     public void testRemoveConditionGlobal() {
-        UUID conditionId = UUID.randomUUID();
+        String conditionId = UUID.randomUUID().toString();
         
         discountFacade.removeCondition(conditionId);
         
-        verify(mockConditionRepository).deleteById(conditionId);
+        verify(mockConditionRepository).delete(conditionId);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -924,14 +924,14 @@ public class DiscountFacadeTest {
 
     @Test
     public void testConditionExists() {
-        UUID conditionId = UUID.randomUUID();
+        String conditionId = UUID.randomUUID().toString();
         
-        when(mockConditionRepository.existsById(conditionId)).thenReturn(false);
+        when(mockConditionRepository.exists(conditionId)).thenReturn(false);
         
         boolean result = discountFacade.conditionExists(conditionId);
         
         assertFalse("Should return false when condition doesn't exist", result);
-        verify(mockConditionRepository).existsById(conditionId);
+        verify(mockConditionRepository).exists(conditionId);
     }
 
     @Test
@@ -1006,17 +1006,16 @@ public class DiscountFacadeTest {
         Infrastructure.Repositories.MemoryConditionRepository memoryConditionRepo = 
             new Infrastructure.Repositories.MemoryConditionRepository();
         
-        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo);
+        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo, mockItemFacade);
         
         // Add a condition to the store
         MinPriceCondition condition = testFacade.createMinPriceCondition(testStoreId, mockItemFacade, 100.0);
         
         // Retrieve store conditions
-        Map<UUID, Condition> storeConditions = testFacade.getStoreConditions(testStoreId);
+        Set<Condition> storeConditions = testFacade.getStoreConditions(testStoreId);
         
         assertNotNull("Store conditions should not be null", storeConditions);
-        assertTrue("Store should have conditions", storeConditions.containsKey(condition.getId()));
-        assertEquals("Should return the correct condition", condition, storeConditions.get(condition.getId()));
+        assertTrue("Store should have conditions", storeConditions.contains(condition));
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -1030,18 +1029,18 @@ public class DiscountFacadeTest {
         Infrastructure.Repositories.MemoryConditionRepository memoryConditionRepo = 
             new Infrastructure.Repositories.MemoryConditionRepository();
         
-        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo);
+        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo, mockItemFacade);
         
         // Add a condition to the store
         MinPriceCondition condition = testFacade.createMinPriceCondition(testStoreId, mockItemFacade, 100.0);
-        UUID conditionId = condition.getId();
+        String conditionId = condition.getId();
         
         // Remove the condition from the store
         testFacade.removeCondition(testStoreId, conditionId);
         
         // Verify it's removed
-        Map<UUID, Condition> storeConditions = testFacade.getStoreConditions(testStoreId);
-        assertFalse("Condition should be removed from store", storeConditions.containsKey(conditionId));
+        Set<Condition> storeConditions = testFacade.getStoreConditions(testStoreId);
+        assertFalse("Condition should be removed from store", storeConditions.contains(condition));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1050,26 +1049,26 @@ public class DiscountFacadeTest {
         Infrastructure.Repositories.MemoryConditionRepository memoryConditionRepo = 
             new Infrastructure.Repositories.MemoryConditionRepository();
         
-        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo);
+        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo, mockItemFacade);
         
         // Try to remove a condition that doesn't exist in the store
-        UUID nonExistentConditionId = UUID.randomUUID();
+        String nonExistentConditionId = UUID.randomUUID().toString();
         testFacade.removeCondition(testStoreId, nonExistentConditionId);
     }
 
     @Test
-    public void testGetStoreConditionCount() {
+    public void testGetStoreConditionReturnedSize() {
         // Create a real memory repository for this test
         Infrastructure.Repositories.MemoryConditionRepository memoryConditionRepo = 
             new Infrastructure.Repositories.MemoryConditionRepository();
         
-        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo);
+        DiscountFacade testFacade = new DiscountFacade(mockDiscountRepository, memoryConditionRepo, mockItemFacade);
         
         // Add conditions to the store
         testFacade.createMinPriceCondition(testStoreId, mockItemFacade, 100.0);
         testFacade.createMaxPriceCondition(testStoreId, mockItemFacade, 200.0);
         
-        int count = testFacade.getStoreConditionCount(testStoreId);
+        int count = testFacade.getStoreDiscounts(testStoreId).size();
         
         assertEquals("Should return correct condition count for store", 2, count);
     }
@@ -1082,22 +1081,22 @@ public class DiscountFacadeTest {
         Infrastructure.Repositories.MemoryConditionRepository memoryConditionRepo = 
             new Infrastructure.Repositories.MemoryConditionRepository();
         
-        DiscountFacade testFacade = new DiscountFacade(memoryDiscountRepo, memoryConditionRepo);
+        DiscountFacade testFacade = new DiscountFacade(memoryDiscountRepo, memoryConditionRepo, mockItemFacade);
         
         // Add discount and condition to the store
         testFacade.createMinPriceCondition(testStoreId, mockItemFacade, 100.0);
         testFacade.createSimpleDiscount(testStoreId, mockItemFacade, 0.2f, mockQualifier);
         
         // Verify they exist
-        assertTrue("Store should have conditions", testFacade.getStoreConditionCount(testStoreId) > 0);
-        assertTrue("Store should have discounts", testFacade.getStoreDiscountCount(testStoreId) > 0);
+        assertTrue("Store should have conditions", testFacade.getStoreConditions(testStoreId).size() > 0);
+        assertTrue("Store should have discounts", testFacade.getStoreDiscounts(testStoreId).size() > 0);
         
         // Clear store data
-        testFacade.clearStoreDiscountsAndConditions(testStoreId);
+        testFacade.clearAll();
         
         // Verify they're cleared
-        assertEquals("Store should have no conditions", 0, testFacade.getStoreConditionCount(testStoreId));
-        assertEquals("Store should have no discounts", 0, testFacade.getStoreDiscountCount(testStoreId));
+        assertEquals("Store should have no conditions", 0, testFacade.getStoreConditions(testStoreId).size());
+        assertEquals("Store should have no discounts", 0, testFacade.getStoreDiscounts(testStoreId).size());
     }
 
     // ===========================================

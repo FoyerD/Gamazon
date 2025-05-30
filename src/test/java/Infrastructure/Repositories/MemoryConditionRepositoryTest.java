@@ -24,9 +24,9 @@ public class MemoryConditionRepositoryTest {
     private Condition condition3;
     
     private MemoryConditionRepository repository;
-    private UUID condition1Id;
-    private UUID condition2Id;
-    private UUID condition3Id;
+    private String condition1Id;
+    private String condition2Id;
+    private String condition3Id;
     private String testStoreId1 = "store1";
     private String testStoreId2 = "store2";
     
@@ -35,9 +35,9 @@ public class MemoryConditionRepositoryTest {
         MockitoAnnotations.initMocks(this);
         repository = new MemoryConditionRepository();
         
-        condition1Id = UUID.randomUUID();
-        condition2Id = UUID.randomUUID();
-        condition3Id = UUID.randomUUID();
+        condition1Id = UUID.randomUUID().toString();
+        condition2Id = UUID.randomUUID().toString();
+        condition3Id = UUID.randomUUID().toString();
         
         when(condition1.getId()).thenReturn(condition1Id);
         when(condition2.getId()).thenReturn(condition2Id);
@@ -57,7 +57,7 @@ public class MemoryConditionRepositoryTest {
     public void testSaveCondition() {
         repository.save(testStoreId1, condition1);
         
-        assertTrue(repository.existsById(condition1Id));
+        assertNotNull(repository.get(condition1Id));
         assertEquals(1, repository.size());
     }
     
@@ -89,8 +89,8 @@ public class MemoryConditionRepositoryTest {
         repository.save(testStoreId1, condition1);
         repository.save(testStoreId2, condition2);
         
-        assertTrue(repository.existsById(condition1Id));
-        assertTrue(repository.existsById(condition2Id));
+        assertNotNull(repository.get(condition1Id));
+        assertNotNull(repository.get(condition2Id));
         assertEquals(2, repository.size());
     }
     
@@ -99,12 +99,12 @@ public class MemoryConditionRepositoryTest {
         repository.save(testStoreId1, condition1);
         repository.save(testStoreId2, condition1);
         
-        assertTrue(repository.existsById(condition1Id));
+        assertNotNull(repository.get(condition1Id));
         assertEquals(1, repository.size()); // Same condition, so only one entry globally
         
         // Should be in both stores
-        Map<UUID, Condition> store1Conditions = repository.findByStoreId(testStoreId1);
-        Map<UUID, Condition> store2Conditions = repository.findByStoreId(testStoreId2);
+        Map<String, Condition> store1Conditions = repository.findByStoreId(testStoreId1);
+        Map<String, Condition> store2Conditions = repository.findByStoreId(testStoreId2);
         
         assertTrue(store1Conditions.containsKey(condition1Id));
         assertTrue(store2Conditions.containsKey(condition1Id));
@@ -118,19 +118,19 @@ public class MemoryConditionRepositoryTest {
     public void testFindById() {
         repository.save(testStoreId1, condition1);
         
-        Condition found = repository.findById(condition1Id);
+        Condition found = repository.get(condition1Id);
         assertEquals(condition1, found);
     }
     
     @Test
     public void testFindByIdNotFound() {
-        Condition found = repository.findById(UUID.randomUUID());
+        Condition found = repository.get(UUID.randomUUID().toString());
         assertNull(found);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testFindByIdWithNull() {
-        repository.findById(null);
+        repository.get(null);
     }
     
     // ===========================================
@@ -143,8 +143,8 @@ public class MemoryConditionRepositoryTest {
         repository.save(testStoreId1, condition2);
         repository.save(testStoreId2, condition3);
         
-        Map<UUID, Condition> store1Conditions = repository.findByStoreId(testStoreId1);
-        Map<UUID, Condition> store2Conditions = repository.findByStoreId(testStoreId2);
+        Map<String, Condition> store1Conditions = repository.findByStoreId(testStoreId1);
+        Map<String, Condition> store2Conditions = repository.findByStoreId(testStoreId2);
         
         assertEquals(2, store1Conditions.size());
         assertEquals(1, store2Conditions.size());
@@ -160,19 +160,19 @@ public class MemoryConditionRepositoryTest {
     
     @Test
     public void testFindByStoreIdEmpty() {
-        Map<UUID, Condition> conditions = repository.findByStoreId(testStoreId1);
+        Map<String, Condition> conditions = repository.findByStoreId(testStoreId1);
         assertTrue(conditions.isEmpty());
     }
     
     @Test
     public void testFindByStoreIdWithNullStoreId() {
-        Map<UUID, Condition> conditions = repository.findByStoreId(null);
+        Map<String, Condition> conditions = repository.findByStoreId(null);
         assertTrue(conditions.isEmpty());
     }
     
     @Test
     public void testFindByStoreIdWithEmptyStoreId() {
-        Map<UUID, Condition> conditions = repository.findByStoreId("   ");
+        Map<String, Condition> conditions = repository.findByStoreId("   ");
         assertTrue(conditions.isEmpty());
     }
     
@@ -180,10 +180,10 @@ public class MemoryConditionRepositoryTest {
     public void testFindByStoreIdReturnsDefensiveCopy() {
         repository.save(testStoreId1, condition1);
         
-        Map<UUID, Condition> conditions = repository.findByStoreId(testStoreId1);
+        Map<String, Condition> conditions = repository.findByStoreId(testStoreId1);
         conditions.clear(); // Should not affect repository
         
-        Map<UUID, Condition> conditionsAgain = repository.findByStoreId(testStoreId1);
+        Map<String, Condition> conditionsAgain = repository.findByStoreId(testStoreId1);
         assertEquals(1, conditionsAgain.size());
         assertTrue(conditionsAgain.containsKey(condition1Id));
     }
@@ -193,13 +193,13 @@ public class MemoryConditionRepositoryTest {
     // ===========================================
     
     @Test
-    public void testDeleteById() {
+    public void testdelete() {
         repository.save(testStoreId1, condition1);
         repository.save(testStoreId2, condition1);
-        assertTrue(repository.existsById(condition1Id));
+        assertNotNull(repository.get(condition1Id));
         
-        repository.deleteById(condition1Id);
-        assertFalse(repository.existsById(condition1Id));
+        repository.delete(condition1Id);
+        assertNull(repository.get(condition1Id));
         assertEquals(0, repository.size());
         
         // Should be removed from both stores
@@ -208,14 +208,14 @@ public class MemoryConditionRepositoryTest {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testDeleteByIdWithNull() {
-        repository.deleteById(null);
+    public void testdeleteWithNull() {
+        repository.delete(null);
     }
     
     @Test
-    public void testDeleteByIdNotFound() {
+    public void testdeleteNotFound() {
         // Should not throw exception when deleting non-existent ID
-        repository.deleteById(UUID.randomUUID());
+        repository.delete(UUID.randomUUID().toString());
         assertEquals(0, repository.size());
     }
     
@@ -231,9 +231,9 @@ public class MemoryConditionRepositoryTest {
         
         assertEquals(2, deleted);
         assertEquals(1, repository.size());
-        assertFalse(repository.existsById(condition1Id));
-        assertFalse(repository.existsById(condition2Id));
-        assertTrue(repository.existsById(condition3Id));
+        assertNull(repository.get(condition1Id));
+        assertNull(repository.get(condition2Id));
+        assertNotNull(repository.get(condition3Id));
         
         assertTrue(repository.findByStoreId(testStoreId1).isEmpty());
         assertFalse(repository.findByStoreId(testStoreId2).isEmpty());
@@ -273,53 +273,54 @@ public class MemoryConditionRepositoryTest {
     // GLOBAL OPERATIONS TESTS
     // ===========================================
     
-    @Test
-    public void testFindAll() {
-        repository.save(testStoreId1, condition1);
-        repository.save(testStoreId1, condition2);
-        repository.save(testStoreId2, condition3);
+    //TODO! check with aviad if method findAll() is needed
+    // @Test
+    // public void testFindAll() {
+    //     repository.save(testStoreId1, condition1);
+    //     repository.save(testStoreId1, condition2);
+    //     repository.save(testStoreId2, condition3);
         
-        Map<UUID, Condition> all = repository.findAll();
-        assertEquals(3, all.size());
-        assertTrue(all.containsKey(condition1Id));
-        assertTrue(all.containsKey(condition2Id));
-        assertTrue(all.containsKey(condition3Id));
-        assertEquals(condition1, all.get(condition1Id));
-        assertEquals(condition2, all.get(condition2Id));
-        assertEquals(condition3, all.get(condition3Id));
-    }
+    //     Map<String, Condition> all = repository.findAll();
+    //     assertEquals(3, all.size());
+    //     assertTrue(all.containsKey(condition1Id));
+    //     assertTrue(all.containsKey(condition2Id));
+    //     assertTrue(all.containsKey(condition3Id));
+    //     assertEquals(condition1, all.get(condition1Id));
+    //     assertEquals(condition2, all.get(condition2Id));
+    //     assertEquals(condition3, all.get(condition3Id));
+    // }
     
-    @Test
-    public void testFindAllEmpty() {
-        Map<UUID, Condition> all = repository.findAll();
-        assertTrue(all.isEmpty());
-    }
+    // @Test
+    // public void testFindAllEmpty() {
+    //     Map<String, Condition> all = repository.findAll();
+    //     assertTrue(all.isEmpty());
+    // }
     
-    @Test
-    public void testFindAllReturnsDefensiveCopy() {
-        repository.save(testStoreId1, condition1);
+    // @Test
+    // public void testFindAllReturnsDefensiveCopy() {
+    //     repository.save(testStoreId1, condition1);
         
-        Map<UUID, Condition> all = repository.findAll();
-        all.clear(); // Modifying returned map should not affect repository
+    //     Map<String, Condition> all = repository.findAll();
+    //     all.clear(); // Modifying returned map should not affect repository
         
-        assertEquals(1, repository.size());
-        assertTrue(repository.existsById(condition1Id));
-    }
+    //     assertEquals(1, repository.size());
+    //     assertNotNull(repository.get(condition1Id));
+    // }
     
     @Test
     public void testExistsById() {
-        assertFalse(repository.existsById(condition1Id));
+        assertNull(repository.get(condition1Id));
         
         repository.save(testStoreId1, condition1);
-        assertTrue(repository.existsById(condition1Id));
+        assertNotNull(repository.get(condition1Id));
         
-        repository.deleteById(condition1Id);
-        assertFalse(repository.existsById(condition1Id));
+        repository.delete(condition1Id);
+        assertNull(repository.get(condition1Id));
     }
     
     @Test
     public void testExistsByIdWithNull() {
-        assertFalse(repository.existsById(null));
+        assertNull(repository.get(null));
     }
     
     @Test
@@ -331,9 +332,9 @@ public class MemoryConditionRepositoryTest {
         
         repository.clear();
         assertEquals(0, repository.size());
-        assertFalse(repository.existsById(condition1Id));
-        assertFalse(repository.existsById(condition2Id));
-        assertFalse(repository.existsById(condition3Id));
+        assertNull(repository.get(condition1Id));
+        assertNull(repository.get(condition2Id));
+        assertNull(repository.get(condition3Id));
         
         assertTrue(repository.findByStoreId(testStoreId1).isEmpty());
         assertTrue(repository.findByStoreId(testStoreId2).isEmpty());
@@ -352,7 +353,7 @@ public class MemoryConditionRepositoryTest {
         repository.save(testStoreId2, condition3);
         assertEquals(3, repository.size());
         
-        repository.deleteById(condition1Id);
+        repository.delete(condition1Id);
         assertEquals(2, repository.size());
     }
     
@@ -445,7 +446,7 @@ public class MemoryConditionRepositoryTest {
         assertEquals(1, repository.size());
         assertEquals(1, repository.getStoreConditionCount(testStoreId1));
         
-        Condition found = repository.findById(condition1Id);
+        Condition found = repository.get(condition1Id);
         assertEquals(condition1, found);
     }
     
@@ -476,16 +477,16 @@ public class MemoryConditionRepositoryTest {
         
         // Verify global state
         assertEquals(3, repository.size());
-        assertTrue(repository.existsById(condition1Id));
-        assertTrue(repository.existsById(condition2Id));
-        assertTrue(repository.existsById(condition3Id));
+        assertNotNull(repository.get(condition1Id));
+        assertNotNull(repository.get(condition2Id));
+        assertNotNull(repository.get(condition3Id));
         
         // Verify store-specific state
         assertEquals(2, repository.getStoreConditionCount(testStoreId1));
         assertEquals(2, repository.getStoreConditionCount(testStoreId2));
         
-        Map<UUID, Condition> store1Conditions = repository.findByStoreId(testStoreId1);
-        Map<UUID, Condition> store2Conditions = repository.findByStoreId(testStoreId2);
+        Map<String, Condition> store1Conditions = repository.findByStoreId(testStoreId1);
+        Map<String, Condition> store2Conditions = repository.findByStoreId(testStoreId2);
         
         assertTrue(store1Conditions.containsKey(condition1Id));
         assertTrue(store1Conditions.containsKey(condition2Id));
@@ -502,8 +503,8 @@ public class MemoryConditionRepositoryTest {
         assertEquals(2, repository.getStoreConditionCount(testStoreId2));
         
         // Verify global state after partial deletion
-        assertFalse(repository.existsById(condition1Id)); // Only in store1
-        assertTrue(repository.existsById(condition2Id));  // Still in store2
-        assertTrue(repository.existsById(condition3Id));  // Still in store2
+        assertNull(repository.get(condition1Id)); // Only in store1
+        assertNotNull(repository.get(condition2Id));  // Still in store2
+        assertNotNull(repository.get(condition3Id));  // Still in store2
     }
 }

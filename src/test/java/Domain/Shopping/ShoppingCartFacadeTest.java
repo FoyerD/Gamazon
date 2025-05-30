@@ -3,7 +3,6 @@ package Domain.Shopping;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,6 +31,7 @@ import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.IProductRepository;
 
 /**
@@ -67,6 +67,9 @@ public class ShoppingCartFacadeTest {
     
     @Mock
     private ShoppingBasket mockBasket;
+
+    @Mock
+    private DiscountFacade mockDiscountFacade;
     
     // Test constants
     private static final String CLIENT_ID = "client123";
@@ -88,7 +91,8 @@ public class ShoppingCartFacadeTest {
         mockProductRepo = mock(IProductRepository.class);
         mockCart = mock(IShoppingCart.class);
         mockBasket = mock(ShoppingBasket.class);
-        
+        mockDiscountFacade = mock(DiscountFacade.class);
+
         facade = new ShoppingCartFacade(
             mockCartRepo, 
             mockBasketRepo, 
@@ -96,7 +100,8 @@ public class ShoppingCartFacadeTest {
             mockItemFacade, 
             mockStoreFacade, 
             mockReceiptRepo, 
-            mockProductRepo
+            mockProductRepo,
+            mockDiscountFacade
         );
     }
 

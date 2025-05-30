@@ -86,4 +86,11 @@ public class Product {
     public Set<Category> getCategories() {
         return categories;
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product)) return false;
+        Product product = (Product) o;
+        return productId.equals(product.productId);
+    }
 }

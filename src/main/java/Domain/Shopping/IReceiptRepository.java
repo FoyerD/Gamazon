@@ -27,7 +27,7 @@ public interface IReceiptRepository {
      * @param paymentDetails Payment method information (masked)
      * @return The generated receipt ID
      */
-    String savePurchase(String clientId, String storeId, Map<Product, Integer> products, 
+    String savePurchase(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products, 
                        double totalPrice, String paymentDetails);
     
     /**

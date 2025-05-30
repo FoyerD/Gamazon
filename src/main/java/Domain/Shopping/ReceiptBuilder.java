@@ -1,10 +1,13 @@
 package Domain.Shopping;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import Domain.Pair;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
@@ -38,9 +41,10 @@ public class ReceiptBuilder {
         for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
             String storeId = entry.getKey();
             Map<Product, Integer> products = entry.getValue();
-            
+            Map<Product, Double> productPrices = getProductPrices(storeId, products);
+            Map<Product, Pair<Integer, Double>> productsWithPrices = mergeProductMaps(storeId, products, productPrices);
             double storeTotal = calculateStoreTotal(storeId, products);
-            receiptRepo.savePurchase(clientId, storeId, products, storeTotal, paymentDetails);
+            receiptRepo.savePurchase(clientId, storeId, productsWithPrices, storeTotal, paymentDetails);
         }
     }
 
@@ -63,9 +67,10 @@ public class ReceiptBuilder {
             String storeId = entry.getKey();
             Map<Product, Integer> products = entry.getValue();
             Map<Product, Double> productPrices = storeProductPricesMap.get(storeId);
+            Map<Product, Pair<Integer, Double>> productsWithPrices = mergeProductMaps(storeId, products, productPrices);
             
             double storeTotal = calculateStoreTotalWithDiscounts(storeId, products, productPrices);
-            receiptRepo.savePurchase(clientId, storeId, products, storeTotal, paymentDetails);
+            receiptRepo.savePurchase(clientId, storeId, productsWithPrices, storeTotal, paymentDetails);
         }
     }
 
@@ -94,6 +99,42 @@ public class ReceiptBuilder {
         }
         
         return storeTotal;
+    }
+
+    private Map<Product, Double> getProductPrices(String storeId, Map<Product, Integer> products) {
+        Map<Product, Double> productPrices = new HashMap<>();
+        
+        if (products != null) {
+            for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+                Product product = entry.getKey();
+                if (product != null) {
+                    Item item = itemFacade.getItem(storeId, product.getProductId());
+                    if (item != null) {
+                        productPrices.put(product, item.getPrice());
+                    }
+                }
+            }
+        }
+        
+        return productPrices;
+    }
+
+    private Map<Product, Pair<Integer, Double>> mergeProductMaps(String storeId, Map<Product, Integer> products, Map<Product, Double> productPrices) {
+        Map<Product, Pair<Integer, Double>> productsWithPrices = new HashMap<>();
+        
+        if (products != null && productPrices != null) {
+            products.forEach((product, quantity) -> {
+                Double finalPrice = productPrices != null ? productPrices.get(product) : null;
+                if (finalPrice == null) {
+                    // Fallback to original price if no discount is applied
+                    Item item = itemFacade.getItem(storeId, product.getProductId());
+                    finalPrice = item != null ? item.getPrice() : 0.0;
+                }
+                productsWithPrices.put(product, new Pair<>(quantity, finalPrice));
+            });
+        }
+        
+        return productsWithPrices;
     }
 
     /**

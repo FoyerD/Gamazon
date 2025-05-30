@@ -3,7 +3,6 @@ package Domain.Store;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -16,15 +15,6 @@ import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
 import Domain.User.IUserRepository;
 import Domain.User.User;
-<<<<<<< HEAD
-import Domain.Pair;
-import Domain.ExternalServices.INotificationService;
-import Domain.Store.Discounts.Discount;
-import Domain.Store.Discounts.DiscountFacade;
-import Domain.Store.Discounts.Conditions.Condition;
-=======
->>>>>>> 348-refactor-tests
-
 
 
 @Component

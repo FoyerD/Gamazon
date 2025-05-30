@@ -61,4 +61,9 @@ public interface IDiscountRepository {
      * @throws IllegalArgumentException if storeId is null or empty
      */
     Set<Discount> getStoreDiscounts(String storeId);
+
+    /**
+     * Returns the total number of discounts in the repository.
+     */
+    int size();
 }

@@ -25,13 +25,9 @@ public class FacadeManager {
     private LoginManager loginManager;
     private PermissionManager permissionManager;
     private INotificationService notificationService;
-<<<<<<< HEAD
     private DiscountFacade discountFacade;
 
-    public FacadeManager(IRepoManager repoManager, IPaymentService paymentService) {
-=======
     public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService) {
->>>>>>> 348-refactor-tests
         this.repoManager = repoManager;
         this.paymentService = paymentService;
     }

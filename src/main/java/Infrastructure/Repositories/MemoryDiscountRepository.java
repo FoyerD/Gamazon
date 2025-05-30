@@ -201,4 +201,8 @@ public class MemoryDiscountRepository implements IDiscountRepository {
         
         return storeDiscounts.get(discountId);
     }
+
+    public int size() {
+        return discounts.size();
+    }
 }
