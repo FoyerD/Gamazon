@@ -1,7 +1,6 @@
 package UI.presenters;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -9,9 +8,9 @@ import Application.ItemService;
 import Application.MarketService;
 import Application.StoreService;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
-import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType;
 import Domain.Pair;
@@ -73,22 +72,24 @@ public class ManagementPresenter implements IManagementPresenter {
         return itemService.decreaseAmount(sessionToken, new Pair<>(storeId, productId), amount);
     }
 
+
     @Override
     public Response<Void> appointStoreManager(String sessionToken, String appointeeId,
             String storeId) {
             return marketService.appointStoreManager(sessionToken, appointeeId, storeId);
     }
 
+
     @Override
-    public Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername,
+    public Response<Void> removeStoreOwner(String sessionToken,  String managerId,
             String storeId) {
-        return marketService.removeStoreManager(sessionToken, removerUsername, managerUsername, storeId);
+        return marketService.removeStoreOwner(sessionToken, managerId, storeId);
     }
 
     @Override
-    public Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername,
+    public Response<Void> appointStoreOwner(String sessionToken, String appointeeId,
             String storeId) {
-        return marketService.appointStoreOwner(sessionToken, appointerUsername, appointeeUsername, storeId);
+        return marketService.appointStoreOwner(sessionToken, appointeeId, storeId);
     }
 
     @Override
@@ -98,9 +99,10 @@ public class ManagementPresenter implements IManagementPresenter {
     }
 
     @Override
-    public Response<Map<UserDTO, List<PermissionType>>> getStoreManagersPermissions(String sessionToken, String storeId) {
-        return marketService.getManagersPermissions(sessionToken, storeId);
+    public Response<EmployeeInfo> getEmployeeInfo(String sessionToken, String storeId) {
+        return marketService.getEmployeeInfo(sessionToken, storeId);
     }
+
 
     @Override
     public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId) {

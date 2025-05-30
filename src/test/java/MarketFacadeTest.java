@@ -1,36 +1,41 @@
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IUserRepository;
+import Domain.Shopping.Receipt;
+import Domain.Shopping.ShoppingCartFacade;
+import Domain.User.Member;
+import Domain.User.User;
 import Domain.management.MarketFacade;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
-import Domain.ExternalServices.INotificationService;
-import Domain.Repos.IItemRepository;
-import Domain.Repos.IUserRepository;
-import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
-import Domain.Store.StoreFacade;
-import Domain.User.Member;
-import Domain.User.User;
-import org.junit.Before;
-import org.junit.Test;
-
-import Application.utils.Response;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 public class MarketFacadeTest {
 
     private MarketFacade marketFacade;
     private IUserRepository userRepository;
-    private IItemRepository itemRepository;
     private ShoppingCartFacade shoppingCartFacade;
-    private StoreFacade storeFacade;
     private IExternalPaymentService paymentService;
     private IExternalSupplyService supplyService;
     private INotificationService notificationService;
@@ -40,8 +45,6 @@ public class MarketFacadeTest {
     public void setUp() {
         // Create the mock objects
         userRepository = mock(IUserRepository.class);
-        itemRepository = mock(IItemRepository.class);
-        storeFacade = mock(StoreFacade.class);
         paymentService = mock(IExternalPaymentService.class);
         supplyService = mock(IExternalSupplyService.class);
         notificationService = mock(INotificationService.class);
@@ -75,7 +78,6 @@ public class MarketFacadeTest {
         
         // Set up the mock behavior for appointStoreManager
         doAnswer(invocation -> {
-            String appointerId = invocation.getArgument(0);
             String appointeeId = invocation.getArgument(1);
             String storeId = invocation.getArgument(2);
             
@@ -100,10 +102,10 @@ public class MarketFacadeTest {
         String managerId = "managerUser";
         
         // Execute
-        marketFacade.removeStoreManager(removerId, managerId, storeId);
+        marketFacade.removeStoreOwner(removerId, managerId, storeId);
         
         // Verify that permissionManager.removeStoreManager was called with the correct parameters
-        verify(permissionManager).removeStoreManager(removerId, managerId, storeId);
+        verify(permissionManager).removeStoreOwner(removerId, managerId, storeId);
     }
 
     @Test
@@ -116,10 +118,10 @@ public class MarketFacadeTest {
         
         // Set up the permissionManager mock to use our map
         when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
+        when(userRepository.getMember("newOwner")).thenReturn(mock(Member.class));
         
         // Set up the appointStoreOwner method behavior to modify our map
         doAnswer(invocation -> {
-            String appointerId = invocation.getArgument(0);
             String appointeeId = invocation.getArgument(1);
             String storeId = invocation.getArgument(2);
             

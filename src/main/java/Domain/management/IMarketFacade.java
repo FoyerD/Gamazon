@@ -102,13 +102,13 @@ public interface IMarketFacade {
     void appointStoreManager(String appointerId, String appointeeId, String storeId);
 
     /**
-     * 4.4 Remove a store manager from their position.
+     * 4.4 Remove a store owner from their position.
      * 
-     * @param removerUsername Username of the user removing the manager
-     * @param managerUsername Username of the manager being removed
+     * @param removerId ID of the user removing the manager
+     * @param ownerId Username of the manager being removed
      * @param storeId ID of the store
      */
-    void removeStoreManager(String removerUsername, String managerUsername, String storeId);
+    void removeStoreOwner(String removerId, String ownerId, String storeId);
 
 
     /**
@@ -136,10 +136,20 @@ public interface IMarketFacade {
      * 
      * @param storeId ID of the store
      * @param userId ID of the user requesting the information
-     * @return Map of manager usernames to their list of permissions
+     * @return Map of managers to their list of permissions
      */
     Map<Member, List<PermissionType>> getManagersPermissions(String storeId, String userId);
 
+
+
+    /**
+     * part of 4.11 Retrieves all owners and their permissions in a store.
+     *  
+     * @param storeId ID of the store
+     * @param userId ID of the user requesting the information
+     * @return List of owners
+     */
+    List<Member> getOwners(String storeId, String userId);
     /**
      * 4.13 Retrieve the purchase history of a store within a given date range.
      * 

@@ -4,7 +4,6 @@ import UI.presenters.ILoginPresenter;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.*;
