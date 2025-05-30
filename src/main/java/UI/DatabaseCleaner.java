@@ -22,7 +22,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
 
     public DatabaseCleaner(IProductRepository productRepo,
                            IItemRepository itemRepo,
-                           IStoreRepository storeRepo) {
+                            IStoreRepository storeRepo) {
         this.productRepo = productRepo;
         this.itemRepo = itemRepo;
         this.storeRepo = storeRepo;
