@@ -3,12 +3,14 @@ package Infrastructure.MemoryRepositories;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Repos.IShoppingCartRepository;
 import Domain.Shopping.IShoppingCart;
 
 @Repository
+@Profile("dev")
 public class MemoryShoppingCartRepository extends IShoppingCartRepository {
     private final Map<String, IShoppingCart> carts;
 

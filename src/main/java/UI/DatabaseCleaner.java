@@ -9,6 +9,7 @@ import Domain.Repos.IItemRepository;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
 import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
 import jakarta.transaction.Transactional;
@@ -22,6 +23,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IUserRepository userRepo;
     private final IReceiptRepository receiptRepo;
     private final IShoppingBasketRepository shoppingBasketRepo;
+    private final IShoppingCartRepository shoppingCartRepo;
 
     @Value("${app.clean-on-start:false}")
     private boolean cleanOnStart;
@@ -30,13 +32,15 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
                            IItemRepository itemRepo,
                             IStoreRepository storeRepo,
                             IUserRepository userRepo, IReceiptRepository receiptRepo,
-                            IShoppingBasketRepository shoppingBasketRepo) {
+                            IShoppingBasketRepository shoppingBasketRepo, 
+                            IShoppingCartRepository shoppingCartRepo) {
         this.productRepo = productRepo;
         this.itemRepo = itemRepo;
         this.storeRepo = storeRepo;
         this.userRepo = userRepo;
         this.receiptRepo = receiptRepo;
         this.shoppingBasketRepo = shoppingBasketRepo;
+        this.shoppingCartRepo = shoppingCartRepo;
     }
 
     @Override
@@ -55,7 +59,8 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         userRepo.deleteAll();
         receiptRepo.deleteAll();
         shoppingBasketRepo.deleteAll();
-
+        shoppingCartRepo.deleteAll();
+        
         System.out.println("🧹 Database wiped clean (before app init)");
     }
 }

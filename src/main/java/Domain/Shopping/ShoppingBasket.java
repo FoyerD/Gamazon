@@ -62,7 +62,7 @@ public class ShoppingBasket {
      */
     public Map<String, Integer> getOrders() {
         // clone the set to prevent external modification
-        return new HashMap<>(orders);
+        return orders != null ? new HashMap<>(orders) : new HashMap<>();
     }
 
     /**
