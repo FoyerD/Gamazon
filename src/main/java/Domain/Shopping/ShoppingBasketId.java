@@ -15,9 +15,9 @@ public class ShoppingBasketId implements Serializable {
         // Required by JPA
     }
 
-    public ShoppingBasketId(String storeId, String clientId) {
-        this.storeId = storeId;
+    public ShoppingBasketId(String clientId, String storeId) {
         this.clientId = clientId;
+        this.storeId = storeId;
     }
 
     public String getStoreId() {

@@ -100,8 +100,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @return true if the product was successfully added, false otherwise
      */
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public boolean addProductToCart(String storeId, String clientId, String productId, int quantity) {
-        
         // Check for valid arguments
         if (clientId == null || storeId == null || productId == null || quantity <= 0) {
             throw new IllegalArgumentException("Invalid arguments for adding product to cart");
@@ -115,20 +115,32 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             throw new IllegalArgumentException("Store not found");
         }
         
-        
-        IShoppingCart cart = getCart(clientId);
-        ShoppingBasket basket = getBasket(clientId, storeId);
-        
-        basket.addOrder(productId, quantity);
-        basketRepo.update(new Pair<>(clientId, storeId), basket);
+        try {
+            // Get or create the cart
+            IShoppingCart cart = getCart(clientId);
+            
+            // Get or create the basket
+            ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+            if (basket == null) {
+                basket = new ShoppingBasket(storeId, clientId);
+                basketRepo.add(new Pair<>(clientId, storeId), basket);
+            }
+            
+            // Add the product to the basket
+            basket.addOrder(productId, quantity);
+            basketRepo.update(new Pair<>(clientId, storeId), basket);
 
-        if (!cart.hasStore(storeId)) {
-            cart.addStore(storeId);
-            // Fix 1: Using update instead of add
-            cartRepo.update(clientId, cart);
+            // Add the store to the cart if it's not already there
+            if (!cart.hasStore(storeId)) {
+                cart.addStore(storeId);
+                cartRepo.update(clientId, cart);
+            }
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error adding product to cart: " + e.getMessage());
+            return false;
         }
-
-        return true;
     }
 
     /**
@@ -571,7 +583,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         Set<String> storeIds = userCart.getCart();
         if (storeIds != null) {
             for (String storeId : storeIds) {
-                ShoppingBasket basket = getBasket(clientId, storeId);
+                // Get the basket from the repository
+                ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
                 if (basket == null) {
                     continue;
                 }
@@ -582,9 +595,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                     for (Map.Entry<String, Integer> entry : orders.entrySet()) {
                         String productId = entry.getKey();
                         int quantity = entry.getValue();
+                        
+                        // Get the item from the store
                         Item item = itemFacade.getItem(storeId, productId);
-                        // Add null check for item
-                        if (item != null) {
+                        if (item != null && quantity > 0) {
                             viewCart.add(new Pair<>(item, quantity));
                         }
                     }
