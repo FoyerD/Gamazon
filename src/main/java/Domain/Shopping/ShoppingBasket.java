@@ -3,15 +3,45 @@ package Domain.Shopping;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.Table;
+
 /**
  * Represents a collection of products from a specific store in a client's shopping cart.
  * Maintains the mapping between product IDs and their quantities.
  */
+@Entity
+@Table(name = "shopping_baskets")
+@IdClass(ShoppingBasketId.class)
 public class ShoppingBasket {
     
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "basket_orders", 
+        joinColumns = {
+            @JoinColumn(name = "store_id", referencedColumnName = "storeId"),
+            @JoinColumn(name = "client_id", referencedColumnName = "clientId")
+        })
+    @MapKeyColumn(name = "product_id")
+    @Column(name = "quantity")
     private Map<String, Integer> orders;
+
+    @Id
     private String storeId;
+    @Id
     private String clientId;
+
+    protected ShoppingBasket() {
+        // Required by JPA
+        this.orders = new HashMap<>();
+    }
 
     /**
      * Constructs a new shopping basket for a specific store and client.

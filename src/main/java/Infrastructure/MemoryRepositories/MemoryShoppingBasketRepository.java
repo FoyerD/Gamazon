@@ -3,6 +3,7 @@ package Infrastructure.MemoryRepositories;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Pair;
@@ -10,6 +11,7 @@ import Domain.Repos.IShoppingBasketRepository;
 import Domain.Shopping.ShoppingBasket;
 
 @Repository
+@Profile("dev")
 public class MemoryShoppingBasketRepository extends IShoppingBasketRepository {
     
     private Map<Pair<String, String>, ShoppingBasket> baskets;

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IStoreRepository storeRepo;
     private final IUserRepository userRepo;
     private final IReceiptRepository receiptRepo;
+    private final IShoppingBasketRepository shoppingBasketRepo;
 
     @Value("${app.clean-on-start:false}")
     private boolean cleanOnStart;
@@ -27,12 +29,14 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     public DatabaseCleaner(IProductRepository productRepo,
                            IItemRepository itemRepo,
                             IStoreRepository storeRepo,
-                            IUserRepository userRepo, IReceiptRepository receiptRepo) {
+                            IUserRepository userRepo, IReceiptRepository receiptRepo,
+                            IShoppingBasketRepository shoppingBasketRepo) {
         this.productRepo = productRepo;
         this.itemRepo = itemRepo;
         this.storeRepo = storeRepo;
         this.userRepo = userRepo;
         this.receiptRepo = receiptRepo;
+        this.shoppingBasketRepo = shoppingBasketRepo;
     }
 
     @Override
@@ -50,6 +54,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         storeRepo.deleteAll();
         userRepo.deleteAll();
         receiptRepo.deleteAll();
+        shoppingBasketRepo.deleteAll();
 
         System.out.println("🧹 Database wiped clean (before app init)");
     }
