@@ -392,10 +392,10 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             UI.getCurrent().addPollListener(event -> {
                     if (!dbHealthStatus.isDbAvailable()) {
                         Notification.show("⚠️ DB connection lost. You will be logged out.", 3000, Notification.Position.TOP_CENTER);
-                        UI.getCurrent().getPage().setLocation("/logout");
+                        UI.getCurrent().getPage().setLocation("/");
                     }
                 });
-            UI.getCurrent().setPollInterval(10000); // 10 seconds
+            UI.getCurrent().setPollInterval(4000); // 4 seconds
         }
 
     }
