@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -41,11 +43,14 @@ import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
+import UI.DatabaseRelated.DbHealthStatus;
 import UI.presenters.ILoginPresenter;
 import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IUserSessionPresenter;
+
+
 
 @JsModule("./ws-client.js")
 @Route("home")
@@ -84,9 +89,11 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
     private final INotificationPresenter notificationPresenter;
 
+    private final DbHealthStatus dbHealthStatus;
+
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
                         IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
-                        MarketService marketService, PermissionManager permissionManager) {
+                        MarketService marketService, PermissionManager permissionManager, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
         this.notificationPresenter = notificationPresenter;
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;
@@ -94,6 +101,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         this.loginPresenter = loginPresenter;
         this.marketService = marketService;
         this.permissionManager = permissionManager;
+        this.dbHealthStatus = dbHealthStatus;
 
         setSizeFull();
         setSpacing(false);
@@ -378,6 +386,18 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         loadAllProducts();
 
         setupNavigation();
+    
+        if (dbHealthStatus != null){
+            // Poll for DB health status every 10 seconds
+            UI.getCurrent().addPollListener(event -> {
+                    if (!dbHealthStatus.isDbAvailable()) {
+                        Notification.show("⚠️ DB connection lost. You will be logged out.", 3000, Notification.Position.TOP_CENTER);
+                        UI.getCurrent().getPage().setLocation("/logout");
+                    }
+                });
+            UI.getCurrent().setPollInterval(10000); // 10 seconds
+        }
+
     }
 
     private void setupFilterComponents() {
