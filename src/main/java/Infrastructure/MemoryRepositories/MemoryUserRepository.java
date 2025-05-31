@@ -85,10 +85,12 @@ public class MemoryUserRepository extends IUserRepository {
         }
         return null; // User not found
     }
+    
     @Override
     public boolean userIsMember(String id) {
         return users.containsKey(id);
     }
+
     @Override
     public List<Member> getAllMembers() {
         return users.values().stream()
