@@ -20,8 +20,11 @@ public class DbHealthChecker {
         try {
             jdbcTemplate.queryForObject("SELECT 1", Integer.class);
             dbHealthStatus.setDbAvailable(true);
+            System.out.println("[DB CHECK] ✅ Connection OK");
         } catch (Exception e) {
             dbHealthStatus.setDbAvailable(false);
+            System.out.println("[DB CHECK] ❌ Connection FAILED: " + e.getMessage());
         }
     }
+
 }
