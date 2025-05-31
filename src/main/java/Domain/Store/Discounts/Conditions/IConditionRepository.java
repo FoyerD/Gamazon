@@ -16,7 +16,7 @@ public interface IConditionRepository {
      * @param condition the condition to save
      * @throws IllegalArgumentException if condition is null or has a null ID
      */
-    void save(String StoreID, Condition condition);
+    boolean save(String StoreID, Condition condition);
     
     /**
      * Finds a condition by its unique identifier.

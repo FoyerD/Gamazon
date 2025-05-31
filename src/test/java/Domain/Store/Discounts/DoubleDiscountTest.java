@@ -57,7 +57,7 @@ public class DoubleDiscountTest {
         discounts.add(discount1);
         DoubleDiscount discount = new DoubleDiscount(existingId, itemFacade, discounts);
         
-        assertEquals(existingId, discount.getId());
+        assertEquals(existingId.toString(), discount.getId());
     }
     
     @Test(expected = IllegalArgumentException.class)

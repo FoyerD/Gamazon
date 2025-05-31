@@ -50,7 +50,7 @@ public class XorDiscountTest {
         UUID existingId = UUID.randomUUID();
         XorDiscount discountWithId = new XorDiscount(existingId, itemFacade, discount1, discount2);
         
-        assertEquals(existingId, discountWithId.getId());
+        assertEquals(existingId.toString(), discountWithId.getId());
     }
     
     @Test

@@ -62,7 +62,7 @@ public class OrDiscountTest {
         conditions.add(condition1);
         OrDiscount discountWithId = new OrDiscount(existingId, itemFacade, discount, conditions);
         
-        assertEquals(existingId, discountWithId.getId());
+        assertEquals(existingId.toString(), discountWithId.getId());
     }
     
     @Test(expected = IllegalArgumentException.class)

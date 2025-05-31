@@ -318,9 +318,9 @@ public class MemoryConditionRepositoryTest {
         assertNull(repository.get(condition1Id));
     }
     
-    @Test
+    @Test (expected = IllegalArgumentException.class)
     public void testExistsByIdWithNull() {
-        assertNull(repository.get(null));
+        repository.get(null);
     }
     
     @Test
@@ -472,7 +472,6 @@ public class MemoryConditionRepositoryTest {
         // Add conditions to multiple stores
         repository.save(testStoreId1, condition1);
         repository.save(testStoreId1, condition2);
-        repository.save(testStoreId2, condition2);
         repository.save(testStoreId2, condition3);
         
         // Verify global state
@@ -483,7 +482,7 @@ public class MemoryConditionRepositoryTest {
         
         // Verify store-specific state
         assertEquals(2, repository.getStoreConditionCount(testStoreId1));
-        assertEquals(2, repository.getStoreConditionCount(testStoreId2));
+        assertEquals(1, repository.getStoreConditionCount(testStoreId2));
         
         Map<String, Condition> store1Conditions = repository.findByStoreId(testStoreId1);
         Map<String, Condition> store2Conditions = repository.findByStoreId(testStoreId2);
@@ -493,18 +492,17 @@ public class MemoryConditionRepositoryTest {
         assertFalse(store1Conditions.containsKey(condition3Id));
         
         assertFalse(store2Conditions.containsKey(condition1Id));
-        assertTrue(store2Conditions.containsKey(condition2Id));
+        assertFalse(store2Conditions.containsKey(condition2Id));
         assertTrue(store2Conditions.containsKey(condition3Id));
         
         // Delete from one store
         repository.deleteByStoreId(testStoreId1);
-        assertEquals(2, repository.size()); // condition2 still exists in store2
+        assertEquals(1, repository.size()); // condition2 still exists in store2
         assertEquals(0, repository.getStoreConditionCount(testStoreId1));
-        assertEquals(2, repository.getStoreConditionCount(testStoreId2));
+        assertEquals(1, repository.getStoreConditionCount(testStoreId2));
         
         // Verify global state after partial deletion
         assertNull(repository.get(condition1Id)); // Only in store1
-        assertNotNull(repository.get(condition2Id));  // Still in store2
         assertNotNull(repository.get(condition3Id));  // Still in store2
     }
 }

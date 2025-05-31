@@ -54,7 +54,7 @@ public class MaxQuantityConditionTest {
         MaxQuantityCondition conditionWithId = new MaxQuantityCondition(
             existingId, itemFacade, "product1", 7);
         
-        assertEquals(existingId, conditionWithId.getId());
+        assertEquals(existingId.toString().toString(), conditionWithId.getId());
         assertEquals("product1", conditionWithId.getProductId());
         assertEquals(7, conditionWithId.getMaxQuantity());
     }

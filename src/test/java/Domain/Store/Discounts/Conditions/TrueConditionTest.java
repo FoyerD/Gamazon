@@ -40,7 +40,7 @@ public class TrueConditionTest {
         UUID existingId = UUID.randomUUID();
         TrueCondition conditionWithId = new TrueCondition(existingId);
         
-        assertEquals(existingId, conditionWithId.getId());
+        assertEquals(existingId.toString(), conditionWithId.getId());
         assertTrue(conditionWithId.isSatisfied(basket));
     }
     

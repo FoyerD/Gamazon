@@ -74,7 +74,7 @@ public class OrConditionTest {
         UUID existingId = UUID.randomUUID();
         OrCondition condition = new OrCondition(existingId, Set.of(condition1, condition2));
         
-        assertEquals(existingId, condition.getId());
+        assertEquals(existingId.toString(), condition.getId());
     }
     
     @Test

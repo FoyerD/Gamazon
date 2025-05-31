@@ -87,7 +87,7 @@ public class MinPriceConditionTest {
         MinPriceCondition conditionWithId = new MinPriceCondition(
             existingId, itemFacade, 50.0);
         
-        assertEquals(existingId, conditionWithId.getId());
+        assertEquals(existingId.toString(), conditionWithId.getId());
         assertEquals(50.0, conditionWithId.getMinPrice(), 0.001);
     }
     

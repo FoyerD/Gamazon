@@ -51,7 +51,7 @@ public class MinQuantityConditionTest {
         MinQuantityCondition conditionWithId = new MinQuantityCondition(
             existingId, itemFacade, "product1", 3);
         
-        assertEquals(existingId, conditionWithId.getId());
+        assertEquals(existingId.toString(), conditionWithId.getId());
         assertEquals("product1", conditionWithId.getProductId());
         assertEquals(3, conditionWithId.getMinQuantity());
     }

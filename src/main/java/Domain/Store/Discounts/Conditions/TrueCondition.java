@@ -40,7 +40,7 @@ public class TrueCondition implements Condition {
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return id.toString().hashCode();
     }
 
     @Override

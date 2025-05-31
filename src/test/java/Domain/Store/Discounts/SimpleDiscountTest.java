@@ -66,7 +66,7 @@ public class SimpleDiscountTest {
         UUID existingId = UUID.randomUUID();
         SimpleDiscount discount = new SimpleDiscount(existingId, itemFacade, 0.25f, qualifier, condition);
         
-        assertEquals(existingId, discount.getId());
+        assertEquals(existingId.toString(), discount.getId());
         assertEquals(0.25, discount.getDiscountPercentage(), 0.001);
     }
     

@@ -26,7 +26,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
     }
 
     @Override
-    public void save(String storeID, Discount discount) {
+    public boolean save(String storeID, Discount discount) {
         if (discount == null) {
             throw new IllegalArgumentException("Discount cannot be null");
         }
@@ -43,6 +43,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
         // Store in store-specific map
         discountsByStore.computeIfAbsent(storeID, k -> new ConcurrentHashMap<>())
                        .put(discount.getId(), discount);
+        return true;
     }
 
     @Override
@@ -84,9 +85,13 @@ public class MemoryDiscountRepository implements IDiscountRepository {
 
     @Override
     public Set<Discount> getStoreDiscounts(String storeId) {
-        
+        if(storeId == null || storeId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Store ID cannot be null or empty"); 
+        }
         Map<String, Discount> storeDiscounts = discountsByStore.get(storeId);
-        
+        if (storeDiscounts == null) {
+            return new HashSet<>();
+        }
         
         return new HashSet<>(storeDiscounts.values());
     }
@@ -103,7 +108,7 @@ public class MemoryDiscountRepository implements IDiscountRepository {
             return 0;
         }
         
-        Map<String, Discount> storeDiscounts = discountsByStore.remove(storeId);
+        Map<String, Discount> storeDiscounts = discountsByStore.put(storeId, new HashMap<>());
         if (storeDiscounts == null) {
             return 0;
         }

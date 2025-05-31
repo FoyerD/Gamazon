@@ -23,7 +23,7 @@ public class MemoryConditionRepository implements IConditionRepository {
     }
 
     @Override
-    public void save(String storeID, Condition condition) {
+    public boolean save(String storeID, Condition condition) {
         if (condition == null) {
             throw new IllegalArgumentException("Condition cannot be null");
         }
@@ -33,13 +33,13 @@ public class MemoryConditionRepository implements IConditionRepository {
         if (storeID == null || storeID.trim().isEmpty()) {
             throw new IllegalArgumentException("Store ID cannot be null or empty");
         }
-        
         // Store in main conditions map
         conditions.put(condition.getId(), condition);
         
         // Store in store-specific map
         conditionsByStore.computeIfAbsent(storeID, k -> new ConcurrentHashMap<>())
                          .put(condition.getId(), condition);
+        return true;
     }
 
     @Override

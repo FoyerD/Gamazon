@@ -457,7 +457,7 @@ public class DiscountFacade {
     
     private void validateProductId(String productId) {
         if (itemFacade.getProduct(productId) == null) {
-            throw new IllegalArgumentException("Product ID cannot be null or empty");
+            throw new IllegalArgumentException("Product Must exist in the product repository");
         }
     }
     
@@ -506,13 +506,13 @@ public class DiscountFacade {
     
 
     private void validateDiscountId(String id) {
-        if (id == null || id.trim().isEmpty() || !discountExists(id)) {
+        if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("ID cannot be null or empty");
         }
     }
 
     private void validateConditionId(String id) {
-        if (id == null || id.trim().isEmpty() || !conditionExists(id)) {
+        if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("Condition ID cannot be null or empty");
         }
     }

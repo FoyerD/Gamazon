@@ -64,7 +64,7 @@ public class MaxDiscountTest {
         discounts.add(discount1);
         MaxDiscount discount = new MaxDiscount(existingId, itemFacade, discounts);
         
-        assertEquals(existingId, discount.getId());
+        assertEquals(existingId.toString(), discount.getId());
     }
     
     @Test(expected = IllegalArgumentException.class)

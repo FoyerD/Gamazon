@@ -68,7 +68,7 @@ public class AndConditionTest {
         UUID existingId = UUID.randomUUID();
         AndCondition condition = new AndCondition(existingId, Set.of(condition1, condition2));
         
-        assertEquals(existingId, condition.getId());
+        assertEquals(existingId.toString().toString(), condition.getId());
     }
     
     @Test

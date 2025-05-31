@@ -116,7 +116,7 @@ public class MaxPriceConditionTest {
         UUID existingId = UUID.randomUUID();
         MaxPriceCondition conditionWithId = new MaxPriceCondition(existingId, mockItemFacade, 150.0);
         
-        assertEquals("Should use provided UUID", existingId, conditionWithId.getId());
+        assertEquals("Should use provided UUID", existingId.toString(), conditionWithId.getId());
         assertEquals("Should set max price correctly", 150.0, conditionWithId.getMaxPrice(), 0.001);
     }
 

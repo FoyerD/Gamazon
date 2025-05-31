@@ -15,9 +15,10 @@ public interface IDiscountRepository {
      * If a discount with the same ID already exists, it will be updated.
      * 
      * @param discount the discount to save
+     * @return true if the discount was saved successfully
      * @throws IllegalArgumentException if discount is null or has a null ID
      */
-    void save(String StoreID, Discount discount);
+    boolean save(String StoreID, Discount discount);
     
     /**
      * Finds a discount by its unique identifier.

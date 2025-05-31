@@ -82,7 +82,7 @@ public class AndDiscountTest {
         discounts.add(discount2);
         
         AndDiscount discount = new AndDiscount(existingId, itemFacade, discounts);
-        assertEquals(existingId, discount.getId());
+        assertEquals(existingId.toString().toString(), discount.getId());
     }
     
     @Test
