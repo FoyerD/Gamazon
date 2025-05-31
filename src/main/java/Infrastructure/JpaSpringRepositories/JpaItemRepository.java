@@ -24,6 +24,8 @@ public class JpaItemRepository extends IItemRepository {
     public boolean add(Pair<String, String> id, Item value) {
         if (jpaItemRepository.existsById(new ItemId(id.getFirst(), id.getSecond())))
             return false;
+        // Create a lock for the item before saving
+        addLock(id);
         jpaItemRepository.save(value);
         return true;
     }
@@ -34,6 +36,7 @@ public class JpaItemRepository extends IItemRepository {
         Item existing = jpaItemRepository.findById(itemId).orElse(null);
         if (existing != null) {
             jpaItemRepository.deleteById(itemId);
+            removeLock(id);
         }
         return existing;
     }
@@ -70,11 +73,16 @@ public class JpaItemRepository extends IItemRepository {
         if (!jpaItemRepository.existsById(itemId)) {
             return null;
         }
+        // Ensure a lock exists for the item
+        if (getLock(id) == null) {
+            addLock(id);
+        }
         return jpaItemRepository.save(item);
     }
 
     @Override
     public void deleteAll() {
         jpaItemRepository.deleteAll();
+        deleteAllLocks();
     }
 }
