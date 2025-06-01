@@ -1,7 +1,11 @@
 package UI.views;
 
-import UI.presenters.IPurchasePresenter;
-import Application.utils.Response;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -9,21 +13,19 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.presenters.IPurchasePresenter;
 
 
 @Route("checkout")
-public class CheckoutView extends VerticalLayout implements BeforeEnterObserver {
+public class CheckoutView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
     private String sessionToken;
@@ -41,7 +43,8 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
     private final Button backToCartButton = new Button("Return to Cart");
 
     @Autowired
-    public CheckoutView(IPurchasePresenter purchasePresenter) {
+    public CheckoutView(IPurchasePresenter purchasePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
+        super(dbHealthStatus);
         this.purchasePresenter = purchasePresenter;
 
         setSizeFull();

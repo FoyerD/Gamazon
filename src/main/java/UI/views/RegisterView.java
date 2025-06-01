@@ -1,25 +1,28 @@
 package UI.views;
 
-import UI.presenters.ILoginPresenter;
-import Application.DTOs.UserDTO;
-import Application.utils.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.presenters.ILoginPresenter;
+
 @Route("register")
-public class RegisterView extends VerticalLayout {
+public class RegisterView extends BaseView {
 
     private final ILoginPresenter loginPresenter;
 
-    public RegisterView(ILoginPresenter loginPresenter) {
+    public RegisterView(ILoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
+        super(dbHealthStatus);
         this.loginPresenter = loginPresenter;
 
         setSizeFull();

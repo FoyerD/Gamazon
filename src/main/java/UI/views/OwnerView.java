@@ -1,27 +1,34 @@
 package UI.views;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.*;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.component.checkbox.CheckboxGroup;
-import com.vaadin.flow.component.UI;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Route;
+
+import UI.DatabaseRelated.DbHealthStatus;
+
 @Route("owner")
-public class OwnerView extends VerticalLayout implements BeforeEnterObserver {
+public class OwnerView extends BaseView implements BeforeEnterObserver {
 
     private final Grid<PermissionEntry> permissionsGrid;
     private final Button addPermissionButton;
@@ -30,7 +37,8 @@ public class OwnerView extends VerticalLayout implements BeforeEnterObserver {
     private String sessionToken;
 
     @Autowired
-    public OwnerView() {
+    public OwnerView(@Autowired(required = false) DbHealthStatus dbHealthStatus) {
+        super(dbHealthStatus);
         setSizeFull();
         setSpacing(false);
         setPadding(true);
