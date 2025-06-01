@@ -1,4 +1,4 @@
-package UI;
+package UI.DatabaseRelated;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;

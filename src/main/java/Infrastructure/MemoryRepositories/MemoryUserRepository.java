@@ -85,10 +85,12 @@ public class MemoryUserRepository extends IUserRepository {
         }
         return null; // User not found
     }
+    
     @Override
     public boolean userIsMember(String id) {
-        return users.containsKey(id);
+        return users.containsKey(id) && users.get(id) instanceof Member; // Checks if the user is a member
     }
+
     @Override
     public List<Member> getAllMembers() {
         return users.values().stream()
@@ -103,4 +105,8 @@ public class MemoryUserRepository extends IUserRepository {
         this.deleteAllLocks(); // Deletes all locks associated with users
     }
     
+    @Override
+    public List<User> getAllUsers() {
+        return List.copyOf(users.values()); // Returns a list of all users
+    }
 }

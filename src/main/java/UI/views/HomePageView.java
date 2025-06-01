@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -41,15 +43,19 @@ import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ILoginPresenter;
 import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IUserSessionPresenter;
 
+
+
 @JsModule("./ws-client.js")
 @Route("home")
-public class HomePageView extends VerticalLayout implements BeforeEnterObserver {
+public class HomePageView extends BaseView implements BeforeEnterObserver {
 
     private final IProductPresenter productPresenter;
     private final IPurchasePresenter purchasePresenter;
@@ -86,7 +92,8 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
                         IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
-                        MarketService marketService, PermissionManager permissionManager) {
+                        MarketService marketService, PermissionManager permissionManager, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.notificationPresenter = notificationPresenter;
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;
@@ -343,7 +350,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
 
-        // !TODO: Change
+
         if (sessionToken != null) {
             TradingLogger.logEvent("HomePageView", "constructor",
                 "DEBUG: sessionToken is not null. Attempting to extract userId and inject into JS.");
@@ -378,6 +385,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         loadAllProducts();
 
         setupNavigation();
+    
     }
 
     private void setupFilterComponents() {

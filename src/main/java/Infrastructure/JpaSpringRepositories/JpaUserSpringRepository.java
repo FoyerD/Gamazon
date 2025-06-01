@@ -87,4 +87,9 @@ public class JpaUserSpringRepository extends IUserRepository {
     public List<Member> getAllMembers() {
         return jpaRepo.findAllMembers();
     }
+
+    @Override
+    public List<User> getAllUsers() {
+        return jpaRepo.findAll();
+    }
 }
