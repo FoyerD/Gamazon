@@ -25,7 +25,7 @@ public class Policy {
         MIN_QUANTITY_CATEGORY,
         MAX_QUANTITY_CATEGORY,
         CATEGORY_DISALLOW,
-        CATEGORY_AGE
+        CATEGORY_AGE, OR
     }
 
     private final String policyId;
@@ -242,6 +242,11 @@ public class Policy {
                     .map(productLookup)
                     .flatMap(p -> p.getCategories().stream())
                     .anyMatch(c -> c.getName().equalsIgnoreCase(ageCategory));
+            case OR:
+                for (Policy p : subPolicies) {
+                    if (p.isApplicable(basket, member)) return true;
+                }
+                return false;
 
             default:
                 throw new IllegalStateException("Unhandled policy type: " + type);
@@ -265,6 +270,7 @@ public class Policy {
     public int getMinAge() { return minAge; }
     public String getAgeCategory() { return ageCategory; }
     public Function<String, Product> getProductLookup() { return productLookup; }
-    public Function<String, Item> getItemLookup() { return itemLookup; }           
+    public Function<String, Item> getItemLookup() { return itemLookup; }     
+
 }
 
