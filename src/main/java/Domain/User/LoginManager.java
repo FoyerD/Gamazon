@@ -184,6 +184,7 @@ public class LoginManager {
         for (Member member : members) {
             if (member.isLoggedIn()) {
                 member.logout(this);
+                userRepository.update(member.getId(), member);
             }
         }
     }

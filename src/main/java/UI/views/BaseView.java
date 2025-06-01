@@ -1,5 +1,8 @@
 package UI.views;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.UI;
@@ -23,21 +26,45 @@ public abstract class BaseView extends VerticalLayout {
 
     private void setupDbHealthCheck() {
         if (dbHealthStatus != null && logoutManager != null) {
-            UI.getCurrent().addPollListener(event -> {
+            UI ui = UI.getCurrent();  // Capture UI safely now
+
+            ui.addPollListener(event -> {
                 if (!dbHealthStatus.isDbAvailable()) {
-                    Notification.show("⚠️ DB connection lost. You will be logged out.", 3000, Notification.Position.TOP_CENTER);
                     logoutManager.markForceLogoutNeeded();
-                    UI.getCurrent().getSession().close();
-                    UI.getCurrent().getPage().setLocation("/");
+
+                    Notification.show("⚠️ DB connection lost. You will be logged out.", 3000, Notification.Position.TOP_CENTER);
+
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            ui.access(() -> {
+                                ui.getSession().close();
+                                ui.getPage().setLocation("/");
+                            });
+                        }
+                    }, 500); // Delay before redirect
+
                 } else if (logoutManager.shouldForceLogout()) {
                     Notification.show("🔁 DB is back. Please log in again.", 3000, Notification.Position.TOP_CENTER);
+
                     logoutManager.confirmLogoutProcessed();
-                    UI.getCurrent().getSession().close();
-                    UI.getCurrent().getPage().setLocation("/");
+
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            ui.access(() -> {
+                                ui.getSession().close();
+                                ui.getPage().setLocation("/");
+                            });
+                        }
+                    }, 500); // Delay before redirect
                 }
             });
-            UI.getCurrent().setPollInterval(4000);
+
+            ui.setPollInterval(4000);
         }
     }
+
+
 }
 
