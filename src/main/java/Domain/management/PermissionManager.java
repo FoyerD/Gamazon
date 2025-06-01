@@ -13,11 +13,13 @@ import Domain.User.Member;
 
 @Component
 public class PermissionManager {
+
     private IPermissionRepository permissionRepository;
 
     public PermissionManager() {
         this.permissionRepository = null;
     }
+
     @Autowired
     public PermissionManager(IPermissionRepository permissionRepository) {
         this.permissionRepository = permissionRepository;
@@ -35,14 +37,13 @@ public class PermissionManager {
     public void removeStoreOwner(String removerId, String ownerId, String storeId) {
         checkPermission(removerId, storeId, PermissionType.SUPERVISE_MANAGERS);
         Permission permission = permissionRepository.get(storeId, ownerId);
-        if (permission == null || !(permission.isStoreOwner())) {
+        if (permission == null || !permission.isStoreOwner()) {
             throw new IllegalStateException(ownerId + " is not an owner.");
         }
-        
         permissionRepository.remove(storeId, ownerId);
     }
 
-    public Map<String, Map<String, Permission>> getAllStorePermissions(){
+    public Map<String, Map<String, Permission>> getAllStorePermissions() {
         return permissionRepository.getAllPermissions();
     }
 
@@ -51,7 +52,6 @@ public class PermissionManager {
         getOrCreatePermission(appointerId, appointeeId, storeId, RoleType.STORE_OWNER);
     }
 
-    // Currently assigns the first store owner as the permission giver of himself
     public void appointFirstStoreOwner(String appointeeId, String storeId) {
         getOrCreatePermission(appointeeId, appointeeId, storeId, RoleType.STORE_FOUNDER);
     }
@@ -59,7 +59,7 @@ public class PermissionManager {
     public Permission getOrCreatePermission(String giver, String member, String storeId, RoleType role) {
         Permission permission = permissionRepository.get(storeId, member);
         if (permission == null) {
-            permission = new Permission(giver, member);
+            permission = new Permission(giver, storeId, member);
             PermissionFactory.initPermissionAsRole(permission, role);
             permissionRepository.add(storeId, member, permission);
         }
@@ -69,9 +69,8 @@ public class PermissionManager {
     public Permission getOrCreatePermission(String giver, String member, String storeId, RoleType role, Date expDate) {
         Permission permission = permissionRepository.get(storeId, member);
         if (permission == null) {
-            permission = new Permission(giver, member);
+            permission = new Permission(giver, storeId, member, expDate);
             PermissionFactory.initPermissionAsRole(permission, role);
-            permission.setExpirationDate(expDate);
             permissionRepository.add(storeId, member, permission);
         }
         return permission;
@@ -91,7 +90,7 @@ public class PermissionManager {
     public void changeManagerPermissions(String ownerUsername, String managerUsername, String storeId, List<PermissionType> newPermissions) {
         checkPermission(ownerUsername, storeId, PermissionType.MODIFY_OWNER_RIGHTS);
         Permission permission = permissionRepository.get(storeId, managerUsername);
-        if (permission == null || !(permission.isStoreManager())) {
+        if (permission == null || !permission.isStoreManager()) {
             throw new IllegalStateException(managerUsername + " is not a manager.");
         }
         permission.setPermissions(PermissionType.collectionToSet(newPermissions));
@@ -116,17 +115,16 @@ public class PermissionManager {
         return permissionRepository.getAllPermissionsForStore(storeId);
     }
 
-    public void addMarketManager(Member manager){
-        Permission founder = new Permission("system", manager.getId());
+    public void addMarketManager(Member manager) {
+        Permission founder = new Permission("system", "1", manager.getId());
         PermissionFactory.initPermissionAsRole(founder, RoleType.TRADING_MANAGER);
         permissionRepository.add("1", manager.getId(), founder);
     }
 
     public boolean banUser(String bannerId, String userId, Date endDate) {
         checkPermission(bannerId, "1", PermissionType.BAN_USERS);
-        Permission perm = new Permission(bannerId, userId);
+        Permission perm = new Permission(bannerId, "1", userId, endDate);
         PermissionFactory.initPermissionAsRole(perm, RoleType.BANNED_USER);
-        perm.setExpirationDate(endDate);
         permissionRepository.add("1", userId, perm);
         return perm.hasPermission(PermissionType.BANNED);
     }
@@ -146,14 +144,10 @@ public class PermissionManager {
         if (permission == null || !permission.hasPermission(PermissionType.BANNED)) {
             return false;
         }
-        
-        // If the ban has expired, remove it and return false
         if (permission.getExpirationDate() != null && permission.getExpirationDate().before(new Date())) {
             removeAllPermissions("1", userId);
             return false;
         }
-        
-        // User is banned and ban hasn't expired
         return true;
     }
 }
