@@ -66,7 +66,7 @@ public class Receipt {
             Product product = entry.getKey();
             Pair<Integer, Double> qtyPrice = entry.getValue();
             this.products.put(product.getProductId(), 
-                            new ReceiptProduct(qtyPrice.getFirst(), qtyPrice.getSecond()));
+                            new ReceiptProduct(qtyPrice.getFirst(), qtyPrice.getSecond(), product.getName()));
         }
         this.timestamp = LocalDateTime.now();
         this.totalPrice = totalPrice;
@@ -111,7 +111,7 @@ public class Receipt {
         for (Map.Entry<String, ReceiptProduct> entry : products.entrySet()) {
             String productId = entry.getKey();
             ReceiptProduct receiptProduct = entry.getValue();
-            Product product = new Product(productId, "Unknown"); // Use a placeholder name since we don't store it
+            Product product = new Product(productId, receiptProduct.getProductName()); // Use stored product name
             result.put(product, new Pair<>(receiptProduct.getQuantity(), receiptProduct.getPrice()));
         }
         return result;
