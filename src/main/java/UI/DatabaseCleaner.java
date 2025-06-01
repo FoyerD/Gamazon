@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
+import Domain.Repos.IPermissionRepository;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
@@ -25,6 +26,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IReceiptRepository receiptRepo;
     private final IShoppingBasketRepository shoppingBasketRepo;
     private final IShoppingCartRepository shoppingCartRepo;
+    private final IPermissionRepository permissionRepo;
     private final IFeedbackRepository feedbackRepo;
 
     @Value("${app.clean-on-start:false}")
@@ -35,7 +37,8 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
                             IStoreRepository storeRepo,
                             IUserRepository userRepo, IReceiptRepository receiptRepo,
                             IShoppingBasketRepository shoppingBasketRepo, 
-                            IShoppingCartRepository shoppingCartRepo, IFeedbackRepository feedbackRepo) {
+                            IShoppingCartRepository shoppingCartRepo, IPermissionRepository permissionRepo, IFeedbackRepository feedbackRepo) {
+        this.permissionRepo = permissionRepo;
         this.feedbackRepo = feedbackRepo;
         this.productRepo = productRepo;
         this.itemRepo = itemRepo;
@@ -63,6 +66,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         receiptRepo.deleteAll();
         shoppingBasketRepo.deleteAll();
         shoppingCartRepo.deleteAll();
+        permissionRepo.deleteAll();
         feedbackRepo.deleteAll();
         
         System.out.println("🧹 Database wiped clean (before app init)");
