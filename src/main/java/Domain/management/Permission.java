@@ -2,6 +2,7 @@ package Domain.management;
 
 import jakarta.persistence.*;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +51,9 @@ public class Permission {
         this.storeId = storeId;
         this.member = member;
         this.creationDate = new Date();
-        this.expirationDate = new Date(Long.MAX_VALUE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2099, Calendar.DECEMBER, 31);
+        this.expirationDate = calendar.getTime();
     }
 
     public Permission(String permissionGiverId, String storeId, String member, Date expirationDate) {

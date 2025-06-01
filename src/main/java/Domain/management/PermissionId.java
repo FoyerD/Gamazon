@@ -3,33 +3,35 @@ package Domain.management;
 import java.io.Serializable;
 import java.util.Objects;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class PermissionId implements Serializable {
+
     private String storeId;
-    private String userId;
+    private String member;
 
-    public PermissionId() {
-        // Required by JPA
-    }
+    public PermissionId() {}
 
-    public PermissionId(String storeId, String userId) {
+    public PermissionId(String storeId, String member) {
         this.storeId = storeId;
-        this.userId = userId;
+        this.member = member;
     }
 
     public String getStoreId() {
         return storeId;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getMember() {
+        return member;
     }
 
     public void setStoreId(String storeId) {
         this.storeId = storeId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setMember(String member) {
+        this.member = member;
     }
 
     @Override
@@ -38,11 +40,11 @@ public class PermissionId implements Serializable {
         if (!(o instanceof PermissionId)) return false;
         PermissionId that = (PermissionId) o;
         return Objects.equals(storeId, that.storeId) &&
-               Objects.equals(userId, that.userId);
+               Objects.equals(member, that.member);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(storeId, userId);
+        return Objects.hash(storeId, member);
     }
 }
