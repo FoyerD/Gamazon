@@ -47,5 +47,21 @@ public class CartDTO {
         return baskets.get(storeId);
     }
 
+
+    public float getTotalPrice() {
+        float total = 0;
+        for (ShoppingBasketDTO basket : baskets.values()) {
+            total += basket.getTotalPrice();
+        }
+        return total;
+    }
+
+    public float getPreDiscountPrice() {
+        float total = 0;
+        for (ShoppingBasketDTO basket : baskets.values()) {
+            total += basket.getPreDiscountPrice();
+        }
+        return total;
+    }
     
 }

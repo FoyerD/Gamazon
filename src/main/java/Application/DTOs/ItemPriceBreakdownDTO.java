@@ -47,7 +47,6 @@ public class ItemPriceBreakdownDTO {
     
     public void setOriginalPrice(double originalPrice) {
         this.originalPrice = originalPrice;
-        this.finalPrice = originalPrice * (1 - discount); // Recalculate final price
     }
     
     public double getDiscount() {

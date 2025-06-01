@@ -64,4 +64,30 @@ public class ShoppingBasketDTO {
     public void setPriceBreakdowns(Map<String, ItemPriceBreakdownDTO> priceBreakdowns) {
         this.priceBreakdowns = priceBreakdowns;
     }
+
+    public float getTotalPrice() {
+        float total = 0;
+        for (String productId : priceBreakdowns.keySet()) {
+            if(priceBreakdowns.get(productId) != null) {
+                total += priceBreakdowns.get(productId).getFinalPrice() * orders.get(productId).getAmount();
+            } else {
+                // If no price breakdown is available, use the original price from orders
+                total += orders.get(productId).getPrice() * orders.get(productId).getAmount();
+            }
+        }
+        return total;
+    }
+
+    public float getPreDiscountPrice() {
+        float total = 0;
+        for (String productId : priceBreakdowns.keySet()) {
+            if(priceBreakdowns.get(productId) != null) {
+                total += priceBreakdowns.get(productId).getOriginalPrice() * orders.get(productId).getAmount();
+            } else {
+                // If no price breakdown is available, use the original price from orders
+                total += orders.get(productId).getPrice() * orders.get(productId).getAmount();
+            }
+        }
+        return total;
+    }
 }
