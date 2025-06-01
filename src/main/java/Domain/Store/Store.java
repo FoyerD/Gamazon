@@ -14,14 +14,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "store")
+@Table(name = "stores")
 public class Store {
     
     @Id
-    @Column(nullable = false, unique = true)
+    @Column(name = "id", nullable = false, unique = true)
     private String id;
+    
+    @Column(name = "name")
     private String name;
+    
+    @Column(name = "description")
     private String description;
+    
+    @Column(name = "founder_id")
     private String founderId;
     
     @ElementCollection(fetch = FetchType.EAGER)
@@ -31,7 +37,11 @@ public class Store {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "store_managers", joinColumns = @JoinColumn(name = "store_id"))
     private Set<String> managers = Collections.synchronizedSet(new HashSet<>());
+    
+    @Column(name = "is_open")
     private boolean isOpen;
+    
+    @Column(name = "is_permanently_closed")
     private boolean isPermanentlyClosed;
     
     protected Store() {

@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
+import Domain.Notification.INotificationRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IPermissionRepository;
@@ -28,6 +29,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IShoppingCartRepository shoppingCartRepo;
     private final IPermissionRepository permissionRepo;
     private final IFeedbackRepository feedbackRepo;
+    private final INotificationRepository notificationRepo;
 
     @Value("${app.clean-on-start:false}")
     private boolean cleanOnStart;
@@ -37,7 +39,8 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
                             IStoreRepository storeRepo,
                             IUserRepository userRepo, IReceiptRepository receiptRepo,
                             IShoppingBasketRepository shoppingBasketRepo, 
-                            IShoppingCartRepository shoppingCartRepo, IPermissionRepository permissionRepo, IFeedbackRepository feedbackRepo) {
+                            IShoppingCartRepository shoppingCartRepo, IPermissionRepository permissionRepo, 
+                            IFeedbackRepository feedbackRepo, INotificationRepository notificationRepo) {
         this.permissionRepo = permissionRepo;
         this.feedbackRepo = feedbackRepo;
         this.productRepo = productRepo;
@@ -47,6 +50,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         this.receiptRepo = receiptRepo;
         this.shoppingBasketRepo = shoppingBasketRepo;
         this.shoppingCartRepo = shoppingCartRepo;
+        this.notificationRepo = notificationRepo;
     }
 
     @Override
@@ -68,7 +72,8 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         shoppingCartRepo.deleteAll();
         permissionRepo.deleteAll();
         feedbackRepo.deleteAll();
-        
+        notificationRepo.deleteAll();
+
         System.out.println("🧹 Database wiped clean (before app init)");
     }
 }
