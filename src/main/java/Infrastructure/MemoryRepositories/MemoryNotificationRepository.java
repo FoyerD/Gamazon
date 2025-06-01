@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Notification.INotificationRepository;
 
 @Repository
+@Profile("dev")
 public class MemoryNotificationRepository extends INotificationRepository {
 
     private final Map<String, List<String>> notifications = new ConcurrentHashMap<>();
