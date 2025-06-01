@@ -42,6 +42,7 @@ public class GlobalLogoutManager {
                     if (shouldForceLogout && dbHealthStatus.isDbAvailable()) {
                         System.out.println("✅ DB is back. Triggering force logout.");
                         loginPresenter.logOutAllUsers();
+                        shouldForceLogout = false;
                     }
                     Thread.sleep(2000);
                 } catch (InterruptedException ignored) {}
