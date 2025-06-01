@@ -73,18 +73,52 @@ public class DiscountBuilder {
      * Builds a Discount with existing UUID (for updates).
      */
     //TODO! Amit implement this method
-    public Discount buildDiscountWithId(DiscountDTO discountDTO, UUID existingId) {
+    public Discount buildDiscount(DiscountDTO discountDTO, String id) {
         if (discountDTO == null) {
             throw new IllegalArgumentException("DiscountDTO cannot be null");
         }
         
-        if (existingId == null) {
+        if (id == null) {
             throw new IllegalArgumentException("Existing ID cannot be null");
         }
         
-        // For simplicity, this method would require access to the discount constructors with IDs
-        // This would need to be implemented based on the actual discount class constructors
-        throw new UnsupportedOperationException("Update with existing ID not yet implemented - would require discount constructors with UUID parameters");
+        Condition cond = conditionBuilder.buildCondition(discountDTO.getCondition());
+        switch(discountDTO.getType()) {
+            case SIMPLE:
+                return new SimpleDiscount(UUID.fromString(id), itemFacade, discountDTO.getDiscountPercentage(), buildQualifier(discountDTO), cond);
+                
+            case AND:
+                return new AndDiscount(UUID.fromString(id), itemFacade, discountDTO.getSubDiscounts().stream()
+                    .map(this::buildDiscount)
+                    .collect(Collectors.toSet()));
+                    
+            case OR:
+                return new OrDiscount(UUID.fromString(id), itemFacade, buildDiscount(discountDTO.getSubDiscounts().get(0)), 
+                    discountDTO.getSubDiscounts().subList(1, discountDTO.getSubDiscounts().size())
+                        .stream()
+                        .map(subDto -> conditionBuilder.buildCondition(subDto.getCondition()))
+                        .collect(Collectors.toSet()));
+                        
+            case XOR:
+                if (discountDTO.getSubDiscounts().size() != 2) {
+                    throw new IllegalArgumentException("XorDiscount requires exactly 2 sub-discounts");
+                }
+                return new XorDiscount(UUID.fromString(id), itemFacade, buildDiscount(discountDTO.getSubDiscounts().get(0)), 
+                    buildDiscount(discountDTO.getSubDiscounts().get(1)));
+                    
+            case DOUBLE:
+                return new DoubleDiscount(UUID.fromString(id), itemFacade, discountDTO.getSubDiscounts().stream()
+                    .map(this::buildDiscount)
+                    .collect(Collectors.toSet()));
+                    
+            case MAX:
+                return new MaxDiscount(UUID.fromString(id), itemFacade, discountDTO.getSubDiscounts().stream()
+                    .map(this::buildDiscount)
+                    .collect(Collectors.toSet()));
+                    
+            default:
+                throw new IllegalArgumentException("Unknown discount type: " + discountDTO.getType());
+        }
     }
     
     /**

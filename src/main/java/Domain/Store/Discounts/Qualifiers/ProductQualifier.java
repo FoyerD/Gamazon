@@ -19,4 +19,7 @@ public class ProductQualifier implements DiscountQualifier {
         return product.getProductId().equals(this.productId);
     }
 
+    public String getProductId() {
+        return productId;
+    }
 }

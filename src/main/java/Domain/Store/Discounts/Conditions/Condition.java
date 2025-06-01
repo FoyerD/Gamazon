@@ -1,6 +1,5 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.UUID;
 import Domain.Shopping.ShoppingBasket;
 
 public interface Condition {

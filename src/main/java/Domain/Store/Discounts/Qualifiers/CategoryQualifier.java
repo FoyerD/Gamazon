@@ -16,4 +16,7 @@ public class CategoryQualifier implements DiscountQualifier {
         return product.getCategories().contains(this.category);  
     }
 
+    public String getCategory() {
+        return category.getName();
+    }
 }

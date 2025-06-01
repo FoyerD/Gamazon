@@ -67,12 +67,10 @@ public class DiscountDTO {
             DiscountQualifier qualifier = simpleDiscount.getQualifier();
             if (qualifier instanceof ProductQualifier) {
                 dto.qualifierType = QualifierType.PRODUCT;
-                // Note: ProductQualifier doesn't expose productId, might need to be added
-                dto.qualifierValue = getProductIdFromQualifier((ProductQualifier) qualifier);
+                dto.qualifierValue = ((ProductQualifier) qualifier).getProductId();
             } else if (qualifier instanceof CategoryQualifier) {
                 dto.qualifierType = QualifierType.CATEGORY;
-                // Note: CategoryQualifier doesn't expose category, might need to be added
-                dto.qualifierValue = getCategoryFromQualifier((CategoryQualifier) qualifier);
+                dto.qualifierValue = ((CategoryQualifier) qualifier).getCategory();
             } else if (qualifier instanceof StoreQualifier) {
                 dto.qualifierType = QualifierType.STORE;
                 dto.qualifierValue = null; // Store qualifier applies to all products
@@ -122,20 +120,7 @@ public class DiscountDTO {
         return dto;
     }
     
-    // Helper methods to extract qualifier information
-    // Note: These methods may need to be implemented based on the actual qualifier implementations
-    private static String getProductIdFromQualifier(ProductQualifier qualifier) {
-        // This would require ProductQualifier to expose its productId field
-        // For now, return null or implement reflection-based access
-        return null; // TODO: Implement based on ProductQualifier structure
-    }
-    
-    private static String getCategoryFromQualifier(CategoryQualifier qualifier) {
-        // This would require CategoryQualifier to expose its category field
-        // For now, return null or implement reflection-based access
-        return null; // TODO: Implement based on CategoryQualifier structure
-    }
-    
+
     // Getters and setters
     public String getId() {
         return id;
