@@ -17,7 +17,7 @@ import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
-import Domain.Store.Discounts.PriceBreakDown;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.Store.IProductRepository;
 
 /**
@@ -140,7 +140,7 @@ public class CheckoutManager {
         basketsRollbackData.add(basket);
         
         // Calculate discounted prices for all products in the basket
-        Map<String, PriceBreakDown> priceBreakdowns = null;
+        Map<String, ItemPriceBreakdown> priceBreakdowns = null;
         try {
             priceBreakdowns = priceCalculator.calculatePrice(basket);
         } catch (Exception e) {
@@ -171,7 +171,7 @@ public class CheckoutManager {
                                     double unitPrice;
                                     
                                     // Use discounted price if available, otherwise fall back to original price
-                                    PriceBreakDown priceBreakdown = priceBreakdowns.get(productId);
+                                    ItemPriceBreakdown priceBreakdown = priceBreakdowns.get(productId);
                                     if (priceBreakdown != null) {
                                         unitPrice = priceBreakdown.getFinalPrice();
                                         

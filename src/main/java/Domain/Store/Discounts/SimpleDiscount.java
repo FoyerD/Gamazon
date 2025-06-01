@@ -36,13 +36,13 @@ public class SimpleDiscount extends Discount {
     }
 
     @Override
-    public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
+    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket) {
         
-        Map<String, PriceBreakDown> output = new HashMap<>();
+        Map<String, ItemPriceBreakdown> output = new HashMap<>();
 
         for (String productId : basket.getOrders().keySet()) {
             if (!isQualified(productId) || !conditionApplies(basket)) {
-                PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
+                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
                 output.put(productId, priceBreakDown);
                 continue;
             }
@@ -50,7 +50,7 @@ public class SimpleDiscount extends Discount {
             // Apply the discount logic here, e.g., calculate the new price based on discountPercentage
             // This is a placeholder for actual price calculation logic
 
-            PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), this.discountPercentage, null);
+            ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), this.discountPercentage, null);
             output.put(productId, priceBreakDown);
         }
         

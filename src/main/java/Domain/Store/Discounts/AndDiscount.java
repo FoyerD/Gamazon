@@ -49,19 +49,19 @@ public class AndDiscount extends CompositeDiscount {
     }
 
     @Override
-    public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
+    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket) {
 
         if (basket == null || basket.getStoreId() == null || basket.getOrders() == null) {
             throw new IllegalArgumentException("Basket, Store ID, and Orders cannot be null");
         }
         
-        Map<String, PriceBreakDown> output = new HashMap<>();
-        Set<Map<String, PriceBreakDown>> toCompose = this.calculateAllSubDiscounts(basket);
+        Map<String, ItemPriceBreakdown> output = new HashMap<>();
+        Set<Map<String, ItemPriceBreakdown>> toCompose = this.calculateAllSubDiscounts(basket);
 
         // condition only applies if all discounts apply
         if (!conditionApplies(basket)) {
             for (String productId : basket.getOrders().keySet()) {
-                PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
+                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
                 output.put(productId, priceBreakDown);
             }
             return output;
@@ -69,23 +69,23 @@ public class AndDiscount extends CompositeDiscount {
 
         for (String productId : basket.getOrders().keySet()) {
             if (!isQualified(productId) || !conditionApplies(basket)) {
-                PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
+                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
                 output.put(productId, priceBreakDown);
                 continue;
             }
 
             // Apply the composition:
             double bestPercentage = 0;
-            for (Map<String, PriceBreakDown> priceBreakDowns : toCompose) {
+            for (Map<String, ItemPriceBreakdown> priceBreakDowns : toCompose) {
                 if (priceBreakDowns.containsKey(productId)) {
-                    PriceBreakDown priceBreakDown = priceBreakDowns.get(productId);
+                    ItemPriceBreakdown priceBreakDown = priceBreakDowns.get(productId);
                     if (priceBreakDown.getDiscount() > bestPercentage) {
                         bestPercentage = priceBreakDown.getDiscount();
                     }
                 }
             }
 
-            PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), bestPercentage, null);
+            ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), bestPercentage, null);
             output.put(productId, priceBreakDown);
         }
 

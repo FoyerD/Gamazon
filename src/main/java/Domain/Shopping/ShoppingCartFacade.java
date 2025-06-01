@@ -20,6 +20,7 @@ import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.DiscountFacade;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.Store.IProductRepository;
 
 /**
@@ -35,6 +36,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final ItemFacade itemFacade;
     private final StoreFacade storeFacade;
     private CheckoutManager checkoutManager;
+    private final DiscountFacade discountFacade;
 
     /**
      * Constructor to initialize the ShoppingCartFacade with required repositories and services.
@@ -57,6 +59,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         this.itemFacade = itemFacade;
         this.storeFacade = storeFacade;
         this.receiptRepo = receiptRepo;
+        this.discountFacade = discountFacade;
         this.checkoutManager = new CheckoutManager(basketRepo, paymentService, itemFacade, productRepository,
          new ReceiptBuilder(receiptRepo, itemFacade), discountFacade);
     }
@@ -83,7 +86,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @param storeId The ID of the store
      * @return The shopping basket for the specified client and store
      */
-    private ShoppingBasket getBasket(String clientId, String storeId) {
+    @Override
+    public ShoppingBasket getBasket(String clientId, String storeId) {
         ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
         if (basket == null) {
             basket = new ShoppingBasket(storeId, clientId);
@@ -456,5 +460,15 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         }
         
         return usersWithBaskets;
+    }
+
+    @Override
+    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(String clientId, String storeId) {
+        ShoppingBasket basket = getBasket(clientId, storeId);
+        if (basket == null) {
+            return new HashMap<>(); // Return empty map if no basket exists
+        }
+        PriceCalculator priceCalculator = new PriceCalculator(itemFacade, this.discountFacade);
+        return priceCalculator.calculatePrice(basket);
     }
 }

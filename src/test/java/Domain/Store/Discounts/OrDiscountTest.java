@@ -90,8 +90,8 @@ public class OrDiscountTest {
         Map<String, Integer> orders = new HashMap<>();
         orders.put("product1", 1);
         
-        Map<String, PriceBreakDown> subDiscountResult = new HashMap<>();
-        subDiscountResult.put("product1", new PriceBreakDown(100.0, 0.15));
+        Map<String, ItemPriceBreakdown> subDiscountResult = new HashMap<>();
+        subDiscountResult.put("product1", new ItemPriceBreakdown(100.0, 0.15));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -105,11 +105,11 @@ public class OrDiscountTest {
         when(condition2.isSatisfied(basket)).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = orDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = orDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.15, breakdown.getDiscount(), 0.001);
     }
@@ -130,11 +130,11 @@ public class OrDiscountTest {
         when(condition2.isSatisfied(basket)).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = orDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = orDiscount.calculatePrice(basket);
         
         // Verify - should not apply discount when condition not satisfied
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
@@ -152,11 +152,11 @@ public class OrDiscountTest {
         when(discount.isQualified("product1")).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = orDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = orDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }

@@ -3,6 +3,7 @@ package Domain.Store.Discounts;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.jdbc.Expectation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,8 @@ public class DiscountFacade {
     private final IDiscountRepository discountRepository;
     private final IConditionRepository conditionRepository;
     private final ItemFacade itemFacade;
+    private final DiscountBuilder discountBuilder;
+    private final ConditionBuilder conditionBuilder;
     
     @Autowired
     public DiscountFacade(IDiscountRepository discountRepository, IConditionRepository conditionRepository, ItemFacade itemFacade) {
@@ -37,6 +40,8 @@ public class DiscountFacade {
         this.itemFacade = itemFacade;
         this.discountRepository = discountRepository;
         this.conditionRepository = conditionRepository;
+        this.conditionBuilder = new ConditionBuilder(itemFacade);
+        this.discountBuilder = new DiscountBuilder(itemFacade, conditionBuilder);
     }
     
     // ===========================================
@@ -285,14 +290,18 @@ public class DiscountFacade {
     /**
      * Adds a discount to a specific store.
      */
-    public void addDiscount(String storeId, Discount discount) {
+    public boolean addDiscount(String storeId, Discount discount) {
         validateDiscount(discount);
-        discountRepository.save(storeId, discount);
+        return discountRepository.save(storeId, discount);
     }
 
-    //TODO! Amit implement this method
-    public Discount addDiscount(String storeId, DiscountDTO discountDTO) {
-        throw new UnsupportedOperationException("Method not implemented yet");
+    public Discount addDiscount(String storeId, DiscountDTO discountDTO) throws Exception {
+        Discount dis = discountBuilder.buildDiscount(discountDTO);
+        if (addDiscount(storeId, dis)){
+            return dis;
+        } else {
+            throw new Exception("Failed to add discount to store " + storeId);
+        }
     }
     
     /**

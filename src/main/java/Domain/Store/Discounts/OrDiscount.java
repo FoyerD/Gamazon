@@ -31,15 +31,15 @@ public class OrDiscount extends CompositeDiscount {
     }
 
     @Override
-    public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
-        Map<String, PriceBreakDown> output = new HashMap<>();
+    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket) {
+        Map<String, ItemPriceBreakdown> output = new HashMap<>();
 
         Discount discount = this.discounts.iterator().next();
-        Map<String, PriceBreakDown> subDiscounts = discount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> subDiscounts = discount.calculatePrice(basket);
 
         for (String productId : basket.getOrders().keySet()) {
             if (!isQualified(productId) || !conditionApplies(basket)) {
-                PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
+                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
                 output.put(productId, priceBreakDown);
                 continue;
             }

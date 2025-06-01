@@ -15,7 +15,7 @@ public class ItemDTO {
     private final Set<CategoryDTO> categories;
     private final String productName;
     private final double rating;
-    private final PriceBreakDownDTO priceBreakDown; // Only needed for discounts when viewing the cart
+    private final ItemPriceBreakdownDTO priceBreakDown; // Only needed for discounts when viewing the cart
 
     public ItemDTO(String storeId, String productId, double price, int amount, String description, Set<CategoryDTO> categories, String productName, double rating) {
         this.storeId = storeId;
@@ -29,7 +29,7 @@ public class ItemDTO {
         this.priceBreakDown = null; // Only needed for discounts when viewing the cart
     }
 
-    public ItemDTO(String storeId, String productId, double price, int amount, String description, Set<CategoryDTO> categories, String productName, double rating, PriceBreakDownDTO priceBreakDown) {
+    public ItemDTO(String storeId, String productId, double price, int amount, String description, Set<CategoryDTO> categories, String productName, double rating, ItemPriceBreakdownDTO priceBreakDown) {
         this.storeId = storeId;
         this.productId = productId;
         this.price = price;
@@ -57,7 +57,7 @@ public class ItemDTO {
         );
     }
 
-    public static ItemDTO fromItem(Item item, PriceBreakDownDTO priceBreakDown) {
+    public static ItemDTO fromItem(Item item, ItemPriceBreakdownDTO priceBreakDown) {
         return new ItemDTO(
             item.getStoreId(),
             item.getProductId(),
@@ -109,7 +109,7 @@ public class ItemDTO {
         this.amount = amount;
     }
 
-    public PriceBreakDownDTO getPriceBreakDown() {
+    public ItemPriceBreakdownDTO getPriceBreakDown() {
         return priceBreakDown;
     }
 }

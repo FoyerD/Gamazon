@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
+import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
 import Domain.Store.Discounts.Conditions.Condition;
@@ -29,8 +29,8 @@ public abstract class CompositeDiscount extends Discount {
         this.discounts = discounts;
     }
 
-    protected Set<Map<String, PriceBreakDown>> calculateAllSubDiscounts(ShoppingBasket basket) {
-        Set<Map<String, PriceBreakDown>> allSubDiscounts = new HashSet<>();
+    protected Set<Map<String, ItemPriceBreakdown>> calculateAllSubDiscounts(ShoppingBasket basket) {
+        Set<Map<String, ItemPriceBreakdown>> allSubDiscounts = new HashSet<>();
         for (Discount discount : discounts) {
             allSubDiscounts.add(discount.calculatePrice(basket));
         }

@@ -31,23 +31,23 @@ public class DoubleDiscount extends CompositeDiscount {
     }
 
     @Override
-    public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
+    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket) {
         
-        Set<Map<String, PriceBreakDown>> toCompose = this.calculateAllSubDiscounts(basket);
-        Map<String, PriceBreakDown> output = new HashMap<>();
+        Set<Map<String, ItemPriceBreakdown>> toCompose = this.calculateAllSubDiscounts(basket);
+        Map<String, ItemPriceBreakdown> output = new HashMap<>();
 
         for (String productId : basket.getOrders().keySet()) {
             if (!isQualified(productId) || !conditionApplies(basket)) {
-                PriceBreakDown priceBreakDown = new PriceBreakDown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
+                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
                 output.put(productId, priceBreakDown);
                 continue;
             }
 
             // Apply the composition:
             double percentageAccumulator = 1;
-            for (Map<String, PriceBreakDown> priceBreakDowns : toCompose) {
+            for (Map<String, ItemPriceBreakdown> priceBreakDowns : toCompose) {
                 if (priceBreakDowns.containsKey(productId)) {
-                    PriceBreakDown priceBreakDown = priceBreakDowns.get(productId);
+                    ItemPriceBreakdown priceBreakDown = priceBreakDowns.get(productId);
                     percentageAccumulator = percentageAccumulator * (1 - priceBreakDown.getDiscount());
                 }
             }
@@ -55,7 +55,7 @@ public class DoubleDiscount extends CompositeDiscount {
             double originalPrice = itemFacade.getItem(basket.getStoreId(), productId).getPrice();
             // Fixed: store the actual discount percentage, not the remaining price ratio
             double finalDiscountPercentage = 1 - percentageAccumulator;
-            output.put(productId, new PriceBreakDown(originalPrice, finalDiscountPercentage, null));
+            output.put(productId, new ItemPriceBreakdown(originalPrice, finalDiscountPercentage, null));
         }
 
         return output;

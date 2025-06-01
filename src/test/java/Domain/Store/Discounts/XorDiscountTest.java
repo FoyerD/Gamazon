@@ -60,12 +60,12 @@ public class XorDiscountTest {
         orders.put("product1", 1);
         
         // First discount applies with 20% off
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.2));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.2));
         
         // Second discount doesn't apply (0% discount)
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.0));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.0));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -76,11 +76,11 @@ public class XorDiscountTest {
         when(discount1.isQualified("product1")).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = xorDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = xorDiscount.calculatePrice(basket);
         
         // Verify - should apply first discount
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.2, breakdown.getDiscount(), 0.001);
     }
@@ -92,12 +92,12 @@ public class XorDiscountTest {
         orders.put("product1", 1);
         
         // First discount doesn't apply (0% discount)
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.0));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.0));
         
         // Second discount applies with 15% off
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.15));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.15));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -108,11 +108,11 @@ public class XorDiscountTest {
         when(discount1.isQualified("product1")).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = xorDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = xorDiscount.calculatePrice(basket);
         
         // Verify - should apply second discount
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.15, breakdown.getDiscount(), 0.001);
     }
@@ -124,11 +124,11 @@ public class XorDiscountTest {
         orders.put("product1", 1);
         
         // Both discounts apply
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.2));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.2));
         
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.15));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.15));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -139,11 +139,11 @@ public class XorDiscountTest {
         when(discount1.isQualified("product1")).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = xorDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = xorDiscount.calculatePrice(basket);
         
         // Verify - should apply no discount when both apply (XOR logic)
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
@@ -155,11 +155,11 @@ public class XorDiscountTest {
         orders.put("product1", 1);
         
         // Neither discount applies
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.0));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.0));
         
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.0));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.0));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -170,11 +170,11 @@ public class XorDiscountTest {
         when(discount1.isQualified("product1")).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = xorDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = xorDiscount.calculatePrice(basket);
         
         // Verify - should apply no discount when neither applies
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
@@ -193,11 +193,11 @@ public class XorDiscountTest {
         when(discount2.isQualified("product1")).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = xorDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = xorDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }

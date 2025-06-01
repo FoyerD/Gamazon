@@ -7,7 +7,7 @@ import java.util.Set;
 
 import Domain.Store.ItemFacade;
 import Domain.Store.Discounts.DiscountFacade;
-import Domain.Store.Discounts.PriceBreakDown;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.Store.Discounts.Discount;
 
 public class PriceCalculator {
@@ -21,17 +21,17 @@ public class PriceCalculator {
     }
 
 
-    // returns a Map from productId to PriceBreakDown
-public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
+    // returns a Map from productId to ItemPriceBreakdown
+public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket) {
 
-    Map<String, PriceBreakDown> output = new HashMap<>();
+    Map<String, ItemPriceBreakdown> output = new HashMap<>();
     
     if (basket == null) {
         throw new IllegalArgumentException("Shopping basket is null");
     }
     
     Set<Discount> storeDiscounts = discountFacade.getStoreDiscounts(basket.getStoreId());
-    Set<Map<String, PriceBreakDown>> priceBreakDowns = new HashSet<>(); // Discounts to choose from
+    Set<Map<String, ItemPriceBreakdown>> priceBreakDowns = new HashSet<>(); // Discounts to choose from
 
     // add all maps to the set
     for (Discount discount : storeDiscounts) {
@@ -41,11 +41,11 @@ public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
     // iterate over all products in basket, over all price breakdowns and choose the best.
     for (String productId : basket.getOrders().keySet()) {
 
-        PriceBreakDown bestBreakDown = null;
+        ItemPriceBreakdown bestBreakDown = null;
 
         // choose best price breakdown
-        for (Map<String, PriceBreakDown> priceBreakDown : priceBreakDowns) {
-            PriceBreakDown currentBreakDown = priceBreakDown.get(productId);
+        for (Map<String, ItemPriceBreakdown> priceBreakDown : priceBreakDowns) {
+            ItemPriceBreakdown currentBreakDown = priceBreakDown.get(productId);
             if (currentBreakDown != null) {
                 if (bestBreakDown == null || currentBreakDown.getFinalPrice() < bestBreakDown.getFinalPrice()) {
                     bestBreakDown = currentBreakDown;
@@ -57,7 +57,7 @@ public Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket) {
         // Shouldn't happen but for safety
         if (bestBreakDown == null) {
             double originalPrice = itemFacade.getItem(basket.getStoreId(), productId).getPrice();
-            bestBreakDown = new PriceBreakDown(originalPrice, 0.0); // 0% discount
+            bestBreakDown = new ItemPriceBreakdown(originalPrice, 0.0); // 0% discount
         }
 
         output.put(productId, bestBreakDown);

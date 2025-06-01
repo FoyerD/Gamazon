@@ -85,11 +85,11 @@ public class SimpleDiscountTest {
         when(condition.isSatisfied(basket)).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.2, breakdown.getDiscount(), 0.001);
         assertEquals(80.0, breakdown.getFinalPrice(), 0.001);
@@ -109,11 +109,11 @@ public class SimpleDiscountTest {
         when(qualifier.isQualified(product)).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
         assertEquals(100.0, breakdown.getFinalPrice(), 0.001);
@@ -134,11 +134,11 @@ public class SimpleDiscountTest {
         when(condition.isSatisfied(basket)).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
@@ -184,16 +184,16 @@ public class SimpleDiscountTest {
         
         when(condition.isSatisfied(basket)).thenReturn(true);
         
-        Map<String, PriceBreakDown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
         
         assertEquals(2, result.size());
         
         // Product1 should get discount
-        PriceBreakDown breakdown1 = result.get("product1");
+        ItemPriceBreakdown breakdown1 = result.get("product1");
         assertEquals(0.2, breakdown1.getDiscount(), 0.001);
         
         // Product2 should not get discount
-        PriceBreakDown breakdown2 = result.get("product2");
+        ItemPriceBreakdown breakdown2 = result.get("product2");
         assertEquals(0.0, breakdown2.getDiscount(), 0.001);
     }
     

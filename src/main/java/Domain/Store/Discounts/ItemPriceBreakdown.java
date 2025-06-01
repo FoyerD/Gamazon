@@ -6,7 +6,7 @@ import java.util.List;
 // the price breakdown class is used to store the price breakdown of a product
 // along the calculation of the discounts
 
-public class PriceBreakDown {
+public class ItemPriceBreakdown {
     // Class implementation
 
     private List<String> descriptions;
@@ -14,13 +14,13 @@ public class PriceBreakDown {
     private double discount; // INV: between 0 and 1 (percantage)
 
 
-    public PriceBreakDown(double originalPrice, double discount) {
+    public ItemPriceBreakdown(double originalPrice, double discount) {
         this.originalPrice = originalPrice;
         this.discount = discount;
         this.descriptions = new LinkedList<>();
     }
 
-    public PriceBreakDown(double originalPrice, double discount, List<String> descriptions) {
+    public ItemPriceBreakdown(double originalPrice, double discount, List<String> descriptions) {
         this.originalPrice = originalPrice;
         this.discount = discount;
         if (descriptions == null) {

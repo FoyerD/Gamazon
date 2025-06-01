@@ -101,11 +101,11 @@ public class AndDiscountTest {
         when(condition2.isSatisfied(basket)).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = andDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket);
         
         // Verify - should return no discount when conditions not satisfied
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
@@ -116,11 +116,11 @@ public class AndDiscountTest {
         Map<String, Integer> orders = new HashMap<>();
         orders.put("product1", 2);
         
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.1));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.1));
         
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.2));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.2));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -137,11 +137,11 @@ public class AndDiscountTest {
         when(condition2.isSatisfied(basket)).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = andDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket);
         
         // Verify - should apply the maximum discount when all conditions satisfied
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.2, breakdown.getDiscount(), 0.001); // Should pick the higher discount
     }
@@ -258,11 +258,11 @@ public class AndDiscountTest {
         when(condition2.isSatisfied(basket)).thenReturn(false); // This fails the AND
         
         // Execute
-        Map<String, PriceBreakDown> result = andDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket);
         
         // Verify - no discount should apply because conditions aren't met
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
     

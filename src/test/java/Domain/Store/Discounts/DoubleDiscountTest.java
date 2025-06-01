@@ -79,12 +79,12 @@ public class DoubleDiscountTest {
         orders.put("product1", 1);
         
         // First discount gives 20% off
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.2));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.2));
         
         // Second discount gives 10% off
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.1));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.1));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -96,12 +96,12 @@ public class DoubleDiscountTest {
         when(discount2.isQualified("product1")).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = doubleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = doubleDiscount.calculatePrice(basket);
         
         // Verify
         // Combined discount: 1 - (1-0.2)*(1-0.1) = 1 - 0.8*0.9 = 1 - 0.72 = 0.28 (28%)
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.28, breakdown.getDiscount(), 0.001);
         assertEquals(72.0, breakdown.getFinalPrice(), 0.001);
@@ -121,11 +121,11 @@ public class DoubleDiscountTest {
         when(discount2.isQualified("product1")).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = doubleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = doubleDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
@@ -137,11 +137,11 @@ public class DoubleDiscountTest {
         orders.put("product1", 1);
         
         // Only first discount applies
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.25));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.25));
         
         // Second discount doesn't apply to this product
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
         // product1 not in breakdown2, so it gets 0 discount from discount2
         
         when(basket.getOrders()).thenReturn(orders);
@@ -153,11 +153,11 @@ public class DoubleDiscountTest {
         when(discount1.isQualified("product1")).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = doubleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = doubleDiscount.calculatePrice(basket);
         
         // Verify - only first discount should apply
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.25, breakdown.getDiscount(), 0.001);
     }

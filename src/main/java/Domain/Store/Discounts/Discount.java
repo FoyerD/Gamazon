@@ -38,7 +38,7 @@ public abstract class Discount {
     }
 
     // Outputs a map from product to the price breakdown
-    public abstract Map<String, PriceBreakDown> calculatePrice(ShoppingBasket basket);
+    public abstract Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket);
 
     public abstract boolean isQualified(String productId);
 

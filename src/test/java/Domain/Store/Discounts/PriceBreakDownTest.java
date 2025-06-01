@@ -8,11 +8,11 @@ import java.util.List;
 
 public class PriceBreakDownTest {
     
-    private PriceBreakDown priceBreakDown;
+    private ItemPriceBreakdown priceBreakDown;
     
     @Before
     public void setUp() {
-        priceBreakDown = new PriceBreakDown(100.0, 0.2);
+        priceBreakDown = new ItemPriceBreakdown(100.0, 0.2);
     }
     
     @Test
@@ -25,7 +25,7 @@ public class PriceBreakDownTest {
     @Test
     public void testConstructorWithDescriptions() {
         List<String> descriptions = Arrays.asList("Holiday discount", "Member discount");
-        PriceBreakDown breakdown = new PriceBreakDown(150.0, 0.3, descriptions);
+        ItemPriceBreakdown breakdown = new ItemPriceBreakdown(150.0, 0.3, descriptions);
         
         assertEquals(150.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.3, breakdown.getDiscount(), 0.001);
@@ -36,7 +36,7 @@ public class PriceBreakDownTest {
     
     @Test
     public void testConstructorWithNullDescriptions() {
-        PriceBreakDown breakdown = new PriceBreakDown(100.0, 0.1, null);
+        ItemPriceBreakdown breakdown = new ItemPriceBreakdown(100.0, 0.1, null);
         
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.1, breakdown.getDiscount(), 0.001);
@@ -70,19 +70,19 @@ public class PriceBreakDownTest {
     
     @Test
     public void testGetFinalPriceNoDiscount() {
-        PriceBreakDown noDiscount = new PriceBreakDown(100.0, 0.0);
+        ItemPriceBreakdown noDiscount = new ItemPriceBreakdown(100.0, 0.0);
         assertEquals(100.0, noDiscount.getFinalPrice(), 0.001);
     }
     
     @Test
     public void testGetFinalPriceFullDiscount() {
-        PriceBreakDown fullDiscount = new PriceBreakDown(100.0, 1.0);
+        ItemPriceBreakdown fullDiscount = new ItemPriceBreakdown(100.0, 1.0);
         assertEquals(0.0, fullDiscount.getFinalPrice(), 0.001);
     }
     
     @Test
     public void testGetFinalPriceWithHalfDiscount() {
-        PriceBreakDown halfDiscount = new PriceBreakDown(200.0, 0.5);
+        ItemPriceBreakdown halfDiscount = new ItemPriceBreakdown(200.0, 0.5);
         assertEquals(100.0, halfDiscount.getFinalPrice(), 0.001);
     }
     
@@ -101,7 +101,7 @@ public class PriceBreakDownTest {
     
     @Test
     public void testZeroPrice() {
-        PriceBreakDown zeroPrice = new PriceBreakDown(0.0, 0.1);
+        ItemPriceBreakdown zeroPrice = new ItemPriceBreakdown(0.0, 0.1);
         assertEquals(0.0, zeroPrice.getOriginalPrice(), 0.001);
         assertEquals(0.1, zeroPrice.getDiscount(), 0.001);
         assertEquals(0.0, zeroPrice.getFinalPrice(), 0.001);
@@ -109,7 +109,7 @@ public class PriceBreakDownTest {
     
     @Test
     public void testNegativePrice() {
-        PriceBreakDown negativePrice = new PriceBreakDown(-50.0, 0.2);
+        ItemPriceBreakdown negativePrice = new ItemPriceBreakdown(-50.0, 0.2);
         assertEquals(-50.0, negativePrice.getOriginalPrice(), 0.001);
         assertEquals(0.2, negativePrice.getDiscount(), 0.001);
         assertEquals(-40.0, negativePrice.getFinalPrice(), 0.001);

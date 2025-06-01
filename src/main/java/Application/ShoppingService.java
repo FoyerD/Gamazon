@@ -13,18 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OrderedItemDTO;
+import Application.DTOs.ItemPriceBreakdownDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.PriceCalculator;
 import Domain.Store.Item;
 import Domain.Shopping.Receipt;
+import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.User.LoginManager;
 import Domain.User.User;
 import Domain.management.PermissionManager;
@@ -87,7 +90,6 @@ public class ShoppingService{
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
-        
         try {
             if(this.cartFacade == null) {
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
@@ -106,10 +108,18 @@ public class ShoppingService{
                 } else {
                     String storeId = item.getFirst().getStoreId();
                     String storeName = this.cartFacade.getStoreName(storeId);
+
                     ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>(), storeName);
                     basket.getOrders().put(item.getFirst().getProductId(), itemDTO);
                     baskets.put(item.getFirst().getStoreId(), basket);
                 }
+            }
+
+            for(ShoppingBasketDTO basket : baskets.values()) {
+                Map<String, ItemPriceBreakdown> priceBreakDowns = this.cartFacade.getPriceBreakdowns(basket.getClientId(), basket.getStoreId());
+                    Map<String, ItemPriceBreakdownDTO> priceBreakDownsDTOs = priceBreakDowns.entrySet().stream()
+                        .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(), ItemPriceBreakdownDTO.fromPriceBreakDown(entry.getValue())), HashMap::putAll);
+                basket.setPriceBreakdowns(priceBreakDownsDTOs);
             }
 
             CartDTO cart = new CartDTO(clientId, baskets);
@@ -288,18 +298,6 @@ public class ShoppingService{
         }
     }
 
-
-
-    // helper methods
-    //TODO! Amit implement these methods
-    private ShoppingBasketDTO addPriceBreakdownToBasket(ShoppingBasketDTO basket) {
-        throw new UnsupportedOperationException("Method not implemented yet. This method should add price breakdown to the basket.");
-    }
-
-    private CartDTO addPriceBreakdownToCart(CartDTO cart) {
-        // use the helper method above
-        throw new UnsupportedOperationException("Method not implemented yet. This method should add price breakdown to the cart.");
-    }
 
     // View personal purchase history 3.7
     @Transactional

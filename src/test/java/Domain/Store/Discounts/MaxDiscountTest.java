@@ -93,11 +93,11 @@ public class MaxDiscountTest {
         Map<String, Integer> orders = new HashMap<>();
         orders.put("product1", 2);
         
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.1));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.1));
         
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.3));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.3));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -109,11 +109,11 @@ public class MaxDiscountTest {
         when(discount2.isQualified("product1")).thenReturn(true);
         
         // Execute
-        Map<String, PriceBreakDown> result = maxDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = maxDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.3, breakdown.getDiscount(), 0.001); // Should select maximum
     }
@@ -132,11 +132,11 @@ public class MaxDiscountTest {
         when(discount2.isQualified("product1")).thenReturn(false);
         
         // Execute
-        Map<String, PriceBreakDown> result = maxDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = maxDiscount.calculatePrice(basket);
         
         // Verify
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
@@ -162,11 +162,11 @@ public class MaxDiscountTest {
         Map<String, Integer> orders = new HashMap<>();
         orders.put("product1", 1);
         
-        Map<String, PriceBreakDown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new PriceBreakDown(100.0, 0.0));
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.0));
         
-        Map<String, PriceBreakDown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new PriceBreakDown(100.0, 0.0));
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.0));
         
         when(basket.getOrders()).thenReturn(orders);
         when(basket.getStoreId()).thenReturn("store1");
@@ -176,10 +176,10 @@ public class MaxDiscountTest {
         when(discount2.calculatePrice(basket)).thenReturn(breakdown2);
         when(discount1.isQualified("product1")).thenReturn(true);
         
-        Map<String, PriceBreakDown> result = maxDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = maxDiscount.calculatePrice(basket);
         
         assertEquals(1, result.size());
-        PriceBreakDown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get("product1");
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
     
