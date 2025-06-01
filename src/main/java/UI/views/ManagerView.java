@@ -49,6 +49,7 @@ import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType;
 import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ILoginPresenter;
 import UI.presenters.IManagementPresenter;
 import UI.presenters.IProductPresenter;
@@ -81,8 +82,8 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
     @Autowired
     public ManagerView(IManagementPresenter managementPresenter, 
-                       IStorePresenter storePresenter, IProductPresenter productPresenter, LoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
-        super(dbHealthStatus);
+                       IStorePresenter storePresenter, IProductPresenter productPresenter, LoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.storePresenter = storePresenter;
         this.productPresenter = productPresenter;
         this.managementPresenter = managementPresenter;

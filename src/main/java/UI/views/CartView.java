@@ -25,6 +25,7 @@ import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
@@ -49,8 +50,8 @@ public class CartView extends BaseView implements BeforeEnterObserver {
 
     @Autowired
     public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter, 
-                    @Autowired(required = false) DbHealthStatus dbHealthStatus) {
-        super(dbHealthStatus);
+                    @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired (required=false) GlobalLogoutManager globalLogoutManager) {
+        super(dbHealthStatus, globalLogoutManager);
         this.purchasePresenter = purchasePresenter;
         this.storePresenter = storePresenter;
 

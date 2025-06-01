@@ -24,6 +24,7 @@ import Application.DTOs.ItemDTO;
 import Application.utils.Response;
 import Domain.Store.FeedbackDTO;
 import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IStorePresenter;
 
@@ -42,8 +43,8 @@ public class ProductReviewView extends BaseView implements BeforeEnterObserver {
 
     @Autowired
     public ProductReviewView(IProductPresenter productPresenter, IStorePresenter storePresenter, 
-                             @Autowired(required = false) DbHealthStatus dbHealthStatus) {
-        super(dbHealthStatus);
+                             @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.productPresenter = productPresenter;
         this.storePresenter = storePresenter;
 

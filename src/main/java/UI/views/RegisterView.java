@@ -14,6 +14,7 @@ import com.vaadin.flow.router.Route;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ILoginPresenter;
 
 @Route("register")
@@ -21,8 +22,9 @@ public class RegisterView extends BaseView {
 
     private final ILoginPresenter loginPresenter;
 
-    public RegisterView(ILoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
-        super(dbHealthStatus);
+    public RegisterView(ILoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, 
+                        @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.loginPresenter = loginPresenter;
 
         setSizeFull();

@@ -55,4 +55,13 @@ public interface ILoginPresenter {
      * @return Response containing a list of {@link UserDTO} representing all members, or an error.
      */
     Response<List<UserDTO>> getAllMembers(String sessionToken);
+
+
+    /**
+     * Retrieves the currently logged-in user.
+     *
+     * @param sessionToken Token of the session requesting the user details.
+     * @return Response containing void, or an error.
+     */
+    Response<Void> logOutAllUsers();
 }

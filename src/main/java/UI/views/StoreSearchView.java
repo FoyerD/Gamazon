@@ -29,6 +29,7 @@ import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IManagementPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
@@ -53,8 +54,9 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
 
     @Autowired
     public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter, 
-                          IPurchasePresenter purchasePresenter, IProductPresenter productPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
-        super(dbHealthStatus);
+                          IPurchasePresenter purchasePresenter, IProductPresenter productPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, 
+                          @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.storePresenter = storePresenter;
         this.managementPresenter = managementPresenter;
         this.purchasePresenter = purchasePresenter;

@@ -44,6 +44,7 @@ import Application.utils.TradingLogger;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
 import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ILoginPresenter;
 import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
@@ -91,8 +92,8 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
                         IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
-                        MarketService marketService, PermissionManager permissionManager, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
-        super(dbHealthStatus);
+                        MarketService marketService, PermissionManager permissionManager, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.notificationPresenter = notificationPresenter;
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;

@@ -26,6 +26,7 @@ import com.vaadin.flow.router.Route;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ITradingPresenter;
 
 @Route("trading")
@@ -45,8 +46,8 @@ public class TradingView extends BaseView implements BeforeEnterObserver {
     private final Button viewBannedUsersButton;
 
     @Autowired
-    public TradingView(ITradingPresenter tradingPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
-        super(dbHealthStatus);
+    public TradingView(ITradingPresenter tradingPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.tradingPresenter = tradingPresenter;
         
         H2 title = new H2("Store Trading Operations");

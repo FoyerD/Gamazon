@@ -178,5 +178,14 @@ public class LoginManager {
     public List<Member> getAllMembers() {
         return userRepository.getAllMembers();
     }
+
+    public void logOutAllUsers() {
+        List<Member> members = userRepository.getAllMembers();
+        for (Member member : members) {
+            if (member.isLoggedIn()) {
+                member.logout(this);
+            }
+        }
+    }
 }
 
