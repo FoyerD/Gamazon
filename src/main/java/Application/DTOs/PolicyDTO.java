@@ -3,6 +3,8 @@ package Application.DTOs;
 import Domain.Store.Policy;
 import java.util.List;
 
+import org.atmosphere.cpr.Broadcaster.POLICY;
+
 /**
  * Data Transfer Object for Policy.
  * Encapsulates all relevant fields for API interactions.
@@ -88,4 +90,52 @@ public class PolicyDTO {
     public String getDisallowedCategory() { return disallowedCategory; }
     public Integer getMinAge() { return minAge; }
     public String getAgeCategory() { return ageCategory; }
+
+
+    public class Builder {
+        public Builder(String storeId, Policy.Type type) {
+            this.storeId = storeId;
+            this.type = type;
+        }
+
+        private String storeId;
+        private Policy.Type type;
+
+        // For AND policies
+        private List<PolicyDTO> subPolicies = List.of();
+
+        // For quantity policies on all items
+        private int minItemsAll = -1;
+        private int maxItemsAll = -1;
+
+        // For quantity policies on a specific product
+        private String targetProductId = "";
+        private int minItemsProduct = -1;
+        private int maxItemsProduct = -1;
+        
+        // For quantity policies on a specific category
+        private String targetCategory = "";
+        private int minItemsCategory = -1;
+        private int maxItemsCategory = -1;
+
+        // For category disallow policies
+        private String disallowedCategory = "";
+
+        // For age-restriction policies
+        private int minAge = -1;
+        private String ageCategory = "";
+
+
+        public Builder createAND(List<PolicyDTO> policies) {
+            if (this.type != Policy.Type.AND)
+                throw new IllegalStateException("Should be called only with AND");
+            this.subPolicies = policies;
+            return this;
+        }
+
+        public Builder createMaxAll() {
+            return this;
+        }
+
+    }
 }
