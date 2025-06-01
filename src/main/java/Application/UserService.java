@@ -70,7 +70,10 @@ public class UserService {
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "exit", "Couldn't find user", id);
             return Response.error("User not found");
-        }
+        } catch (IllegalStateException e) {
+            TradingLogger.logError(CLASS_NAME, "exit", "Failed to exit user: " + e.getMessage());
+            return Response.error("Failed to exit user: " + e.getMessage());
+        } 
         return Response.success(null);
     }
 

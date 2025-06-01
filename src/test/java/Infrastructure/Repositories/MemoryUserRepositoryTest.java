@@ -132,6 +132,6 @@ public class MemoryUserRepositoryTest {
         // Check if a guest is a member
         userRepository.add(guest.getId(), guest);
         boolean isNotMember = userRepository.userIsMember(guest.getId());
-        assertTrue(isNotMember);  // Since the user exists, the method returns true for both members and guests
+        assertFalse(isNotMember);  // Since the user exists, the method returns true for both members and guests
     }
 }
