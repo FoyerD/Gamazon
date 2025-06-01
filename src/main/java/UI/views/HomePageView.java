@@ -54,7 +54,7 @@ import UI.presenters.IUserSessionPresenter;
 
 @JsModule("./ws-client.js")
 @Route("home")
-public class HomePageView extends VerticalLayout implements BeforeEnterObserver {
+public class HomePageView extends BaseView implements BeforeEnterObserver {
 
     private final IProductPresenter productPresenter;
     private final IPurchasePresenter purchasePresenter;
@@ -89,11 +89,10 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
     private final INotificationPresenter notificationPresenter;
 
-    private final DbHealthStatus dbHealthStatus;
-
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
                         IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
                         MarketService marketService, PermissionManager permissionManager, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
+        super(dbHealthStatus);
         this.notificationPresenter = notificationPresenter;
         this.productPresenter = productPresenter;
         this.sessionPresenter = sessionPresenter;
@@ -101,7 +100,6 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         this.loginPresenter = loginPresenter;
         this.marketService = marketService;
         this.permissionManager = permissionManager;
-        this.dbHealthStatus = dbHealthStatus;
 
         setSizeFull();
         setSpacing(false);
@@ -351,7 +349,7 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
 
-        // !TODO: Change
+
         if (sessionToken != null) {
             TradingLogger.logEvent("HomePageView", "constructor",
                 "DEBUG: sessionToken is not null. Attempting to extract userId and inject into JS.");
@@ -387,17 +385,6 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
 
         setupNavigation();
     
-        if (dbHealthStatus != null){
-            // Poll for DB health status every 10 seconds
-            UI.getCurrent().addPollListener(event -> {
-                    if (!dbHealthStatus.isDbAvailable()) {
-                        Notification.show("⚠️ DB connection lost. You will be logged out.", 3000, Notification.Position.TOP_CENTER);
-                        UI.getCurrent().getPage().setLocation("/");
-                    }
-                });
-            UI.getCurrent().setPollInterval(4000); // 4 seconds
-        }
-
     }
 
     private void setupFilterComponents() {
