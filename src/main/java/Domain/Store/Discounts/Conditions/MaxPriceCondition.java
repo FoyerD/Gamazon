@@ -14,7 +14,7 @@ public class MaxPriceCondition extends SimpleCondition{
     }
 
     // Constructor for loading from repository with existing UUID
-    public MaxPriceCondition(UUID id, ItemFacade itemFacade, double maxPrice) {
+    public MaxPriceCondition(String id, ItemFacade itemFacade, double maxPrice) {
         super(id, itemFacade);
         this.maxPrice = maxPrice;
     }
@@ -30,7 +30,7 @@ public class MaxPriceCondition extends SimpleCondition{
         
         // Calculate total price of entire basket
         for (String productId : shoppingBasket.getOrders().keySet()) {
-            double unitPrice = itemFacade.getItem(shoppingBasket.getStoreId(), productId).getPrice();
+            double unitPrice = itemGetter.apply(shoppingBasket.getStoreId(), productId).getPrice();
             int quantity = shoppingBasket.getQuantity(productId);
             totalBasketPrice += unitPrice * quantity;
         }

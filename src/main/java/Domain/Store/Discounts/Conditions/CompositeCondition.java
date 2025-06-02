@@ -1,21 +1,22 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.Set;
 import java.util.UUID;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public abstract class CompositeCondition implements Condition {
 
-    protected final UUID id;
-    protected Set<Condition> conditions;
+    protected final String id;
+    protected List<Condition> conditions;
 
-    public CompositeCondition(Set<Condition> conditions) {
-        this.id = UUID.randomUUID();
+    public CompositeCondition(List<Condition> conditions) {
+        this.id = UUID.randomUUID().toString();
         this.conditions = conditions;
     }
 
     // Constructor for loading from repository with existing UUID
-    public CompositeCondition(UUID id, Set<Condition> conditions) {
+    public CompositeCondition(String id, List<Condition> conditions) {
         this.id = id;
         this.conditions = conditions;
     }
@@ -26,8 +27,8 @@ public abstract class CompositeCondition implements Condition {
     }
 
     // Getter for repository serialization
-    public Set<Condition> getConditions() {
-        return new HashSet<>(conditions);
+    public List<Condition> getConditions() {
+        return conditions == null ? new ArrayList<>() : new ArrayList<>(conditions);
     }
 
     @Override

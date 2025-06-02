@@ -1,22 +1,25 @@
 package Domain.Store.Discounts.Conditions;
 
 import java.util.UUID;
+import java.util.function.BiFunction;
+
+import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 
 public abstract class SimpleCondition implements Condition {
 
-    protected final UUID id;
-    protected ItemFacade itemFacade; // used for evaluating conditions
+    protected final String id;
+    protected BiFunction<String, String, Item> itemGetter; // used for evaluating conditions
 
     public SimpleCondition(ItemFacade itemFacade) {
-        this.id = UUID.randomUUID();
-        this.itemFacade = itemFacade;
+        this.id = UUID.randomUUID().toString();
+        this.itemGetter = itemFacade::getItem;
     }
 
     // Constructor for loading from repository with existing UUID
-    public SimpleCondition(UUID id, ItemFacade itemFacade) {
+    public SimpleCondition(String id, ItemFacade itemFacade) {
         this.id = id;
-        this.itemFacade = itemFacade;
+        this.itemGetter = itemFacade::getItem;
     }
 
     @Override

@@ -16,7 +16,7 @@ public class MaxQuantityCondition extends SimpleCondition {
     }
 
     // Constructor for loading from repository with existing UUID
-    public MaxQuantityCondition(UUID id, ItemFacade itemFacade, String productId, int maxQuantity) {
+    public MaxQuantityCondition(String id, ItemFacade itemFacade, String productId, int maxQuantity) {
         super(id, itemFacade);
         this.productId = productId;
         this.maxQuantity = maxQuantity;

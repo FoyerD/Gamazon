@@ -1,21 +1,21 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 import Domain.Shopping.ShoppingBasket;
 
 public class OrCondition extends CompositeCondition{
 
-    public OrCondition(Set<Condition> conditions) {
+    public OrCondition(List<Condition> conditions) {
         super(conditions);
     }
 
     public OrCondition(Condition condition1, Condition condition2) {
-        super(Set.of(condition1, condition2));
+        super(List.of(condition1, condition2));
     }
 
     // Constructor for loading from repository with existing UUID
-    public OrCondition(UUID id, Set<Condition> conditions) {
+    public OrCondition(String id, List<Condition> conditions) {
         super(id, conditions);
     }
 

@@ -1,21 +1,20 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.Set;
-import java.util.UUID;
+import java.util.List;
 import Domain.Shopping.ShoppingBasket;
 
 public class AndCondition extends CompositeCondition {
 
-    public AndCondition(Set<Condition> conditions) {
+    public AndCondition(List<Condition> conditions) {
         super(conditions);
     }
 
     public AndCondition(Condition condition1, Condition condition2) {
-        super(Set.of(condition1, condition2));
+        super(List.of(condition1, condition2));
     }
 
     // Constructor for loading from repository with existing UUID
-    public AndCondition(UUID id, Set<Condition> conditions) {
+    public AndCondition(String id, List<Condition> conditions) {
         super(id, conditions);
     }
 

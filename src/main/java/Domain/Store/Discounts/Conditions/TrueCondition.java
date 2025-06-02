@@ -5,14 +5,14 @@ import Domain.Shopping.ShoppingBasket;
 
 public class TrueCondition implements Condition {
 
-    private final UUID id;
+    private final String id;
 
     public TrueCondition() {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
     }
 
     // Constructor for loading from repository with existing UUID
-    public TrueCondition(UUID id) {
+    public TrueCondition(String id) {
         this.id = id;
     }
 

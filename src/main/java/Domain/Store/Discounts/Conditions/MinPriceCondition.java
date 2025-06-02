@@ -14,7 +14,7 @@ public class MinPriceCondition extends SimpleCondition {
     }
 
     // Constructor for loading from repository with existing UUID
-    public MinPriceCondition(UUID id, ItemFacade itemFacade, double minPrice) {
+    public MinPriceCondition(String id, ItemFacade itemFacade, double minPrice) {
         super(id, itemFacade);
         this.minPrice = minPrice;
     }
@@ -25,7 +25,7 @@ public class MinPriceCondition extends SimpleCondition {
         
         // Calculate total price of entire basket
         for (String productId : shoppingBasket.getOrders().keySet()) {
-            double unitPrice = itemFacade.getItem(shoppingBasket.getStoreId(), productId).getPrice();
+            double unitPrice = itemGetter.apply(shoppingBasket.getStoreId(), productId).getPrice();
             int quantity = shoppingBasket.getQuantity(productId);
             totalBasketPrice += unitPrice * quantity;
         }

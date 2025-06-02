@@ -16,7 +16,7 @@ public class MinQuantityCondition extends SimpleCondition{
     }
 
     // Constructor for loading from repository with existing UUID
-    public MinQuantityCondition(UUID id, ItemFacade itemFacade, String productId, int minQuantity) {
+    public MinQuantityCondition(String id, ItemFacade itemFacade, String productId, int minQuantity) {
         super(id, itemFacade);
         this.productId = productId;
         this.minQuantity = minQuantity;

@@ -10,5 +10,4 @@ public enum ConditionType {
     MIN_QUANTITY,
     MAX_PRICE,
     MIN_PRICE
-    
 }
