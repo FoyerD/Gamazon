@@ -6,6 +6,7 @@ import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 import Domain.Notification.INotificationRepository;
+import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IPermissionRepository;
@@ -30,6 +31,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IPermissionRepository permissionRepo;
     private final IFeedbackRepository feedbackRepo;
     private final INotificationRepository notificationRepo;
+    private final IAuctionRepository auctionRepo;
 
     @Value("${app.clean-on-start:false}")
     private boolean cleanOnStart;
@@ -40,7 +42,8 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
                             IUserRepository userRepo, IReceiptRepository receiptRepo,
                             IShoppingBasketRepository shoppingBasketRepo, 
                             IShoppingCartRepository shoppingCartRepo, IPermissionRepository permissionRepo, 
-                            IFeedbackRepository feedbackRepo, INotificationRepository notificationRepo) {
+                            IFeedbackRepository feedbackRepo, INotificationRepository notificationRepo, IAuctionRepository auctionRepo) {
+        this.auctionRepo = auctionRepo;
         this.permissionRepo = permissionRepo;
         this.feedbackRepo = feedbackRepo;
         this.productRepo = productRepo;
@@ -73,6 +76,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         permissionRepo.deleteAll();
         feedbackRepo.deleteAll();
         notificationRepo.deleteAll();
+        auctionRepo.deleteAll();
 
         System.out.println("🧹 Database wiped clean (before app init)");
     }

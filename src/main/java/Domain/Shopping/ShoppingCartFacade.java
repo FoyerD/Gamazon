@@ -221,20 +221,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                         String cardNumber, Date expiryDate, String cvv,
                         long andIncrement, String clientName, String deliveryAddress) {
 
-        Supplier<Boolean> chargeSupplier = () -> {
-            if (!isCardNumber(cardNumber)) {
-                throw new IllegalArgumentException("Invalid card number");
-            }
+        
 
-            paymentService.processPayment(
-                clientId, cardNumber, expiryDate, cvv, 
-                clientName, price
-            );
-
-            return true;
-        };
-
-        storeFacade.addBid(auctionId, clientId, price, chargeSupplier);
+        storeFacade.addBid(auctionId, clientId, price, 
+                cardNumber, expiryDate, cvv, clientName, deliveryAddress);
         return true;
     }
 

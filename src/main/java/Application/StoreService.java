@@ -16,7 +16,7 @@ import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
-
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Store.Item;
@@ -34,6 +34,7 @@ public class StoreService {
     private PermissionManager permissionManager;
     private INotificationService notificationService;
     private IShoppingCartFacade shoppingCartFacade;
+    private IExternalPaymentService externalPaymentService;
 
     public StoreService() {
         this.storeFacade = null;
@@ -41,11 +42,13 @@ public class StoreService {
         this.permissionManager = null;
         this.notificationService = null;
         this.shoppingCartFacade = null;
+        this.externalPaymentService = null;
     }
 
     @Autowired
     public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, 
-                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade) {
+                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, IExternalPaymentService externalPaymentService) {
+        this.externalPaymentService = externalPaymentService;
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
@@ -314,7 +317,7 @@ public class StoreService {
             permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
 
             // Accept the bid for the given auction and product
-            Item item = storeFacade.acceptBid(storeId, productId, auctionId);
+            Item item = storeFacade.acceptBid(storeId, productId, auctionId, externalPaymentService);
             if (item == null) {
                 TradingLogger.logError(CLASS_NAME, method, "Failed to accept bid for auction %s", auctionId);
                 return new Response<>(new Error("Failed to accept bid. It may not exist or the auction is closed."));
