@@ -1,9 +1,9 @@
 package Domain.Store.Discounts.Qualifiers;
 
-import Domain.Store.Product;
+import Domain.Store.Item;
 
 public interface DiscountQualifier {
 
-    public boolean isQualified(Product product);
+    public boolean isQualified(Item item);
 
 }

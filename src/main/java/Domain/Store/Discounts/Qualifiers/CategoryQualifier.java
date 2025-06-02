@@ -1,7 +1,7 @@
 package Domain.Store.Discounts.Qualifiers;
 
 import Domain.Store.Category;
-import Domain.Store.Product;
+import Domain.Store.Item;
 
 public class CategoryQualifier implements DiscountQualifier {
 
@@ -12,8 +12,8 @@ public class CategoryQualifier implements DiscountQualifier {
     }
 
     @Override
-    public boolean isQualified(Product product) {
-        return product.getCategories().contains(this.category);  
+    public boolean isQualified(Item item) {
+        return item.getCategories().contains(this.category);  
     }
 
     public String getCategory() {
