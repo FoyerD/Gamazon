@@ -151,12 +151,21 @@ public class StoreFacade {
     }
 
     public boolean closeStore(String storeId){
+        // First check if store exists
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found");
+        
+        // Then get or create lock
         Object lock = this.storeRepository.getLock(storeId);
-        if (lock == null) throw new RuntimeException("Store not found");
+        if (lock == null) {
+            // If no lock exists, create one
+            this.storeRepository.addLock(storeId);
+            lock = this.storeRepository.getLock(storeId);
+        }
+        
         synchronized (lock) {
-
-            Store store = this.storeRepository.get(storeId);
-            if (store == null) throw new RuntimeException("Store not found");
+            // Refresh store data inside synchronized block
+            store = this.storeRepository.get(storeId);
             if(store.isPermanentlyClosed()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);
@@ -168,12 +177,21 @@ public class StoreFacade {
     }
 
     public boolean closeStoreNotPermanent(String storeId){
+        // First check if store exists
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found");
+        
+        // Then get or create lock
         Object lock = this.storeRepository.getLock(storeId);
-        if (lock == null) throw new RuntimeException("Store not found");
+        if (lock == null) {
+            // If no lock exists, create one
+            this.storeRepository.addLock(storeId);
+            lock = this.storeRepository.getLock(storeId);
+        }
+        
         synchronized (lock) {
-
-            Store store = this.storeRepository.get(storeId);
-            if (store == null) throw new RuntimeException("Store not found");
+            // Refresh store data inside synchronized block
+            store = this.storeRepository.get(storeId);
             if(!store.isOpen()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);

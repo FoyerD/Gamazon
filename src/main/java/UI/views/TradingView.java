@@ -1,33 +1,36 @@
 package UI.views;
 
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.timepicker.TimePicker;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import UI.presenters.ITradingPresenter;
-import Application.DTOs.StoreDTO;
-import Application.utils.Response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Route;
+
+import Application.DTOs.StoreDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.ITradingPresenter;
+
 @Route("trading")
-public class TradingView extends VerticalLayout implements BeforeEnterObserver {
+public class TradingView extends BaseView implements BeforeEnterObserver {
     private final ITradingPresenter tradingPresenter;
     private final TextField storeNameField;
     private final Button closeStoreButton;
@@ -43,7 +46,8 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
     private final Button viewBannedUsersButton;
 
     @Autowired
-    public TradingView(ITradingPresenter tradingPresenter) {
+    public TradingView(ITradingPresenter tradingPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.tradingPresenter = tradingPresenter;
         
         H2 title = new H2("Store Trading Operations");

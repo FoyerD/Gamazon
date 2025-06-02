@@ -12,12 +12,15 @@ public abstract class ILockbasedRepository<V, K> implements IRepository<V, K> {
     public Object getLock(K id) {
         return locks.get(id);
     }
-    protected boolean addLock(K id) {
+    
+    public boolean addLock(K id) {
         return locks.putIfAbsent(id, new Object()) == null;
     }
+    
     protected void removeLock(K id) {
         locks.remove(id);
     }
+    
     protected boolean isIdValid(K id) {
         return id != null && !id.toString().trim().isEmpty();
     }
