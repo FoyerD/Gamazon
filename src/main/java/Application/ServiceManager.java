@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import Application.utils.Response;
 import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
 
 
@@ -62,7 +63,8 @@ public class ServiceManager {
                                             getTokenService(),
                                             facadeManager.getPermissionManager(),
                                             getINotificationService(),
-                                            facadeManager.getShoppingCartFacade());
+                                            facadeManager.getShoppingCartFacade(),
+                                            facadeManager.getPaymentService());
         }
         return storeService;
     }
