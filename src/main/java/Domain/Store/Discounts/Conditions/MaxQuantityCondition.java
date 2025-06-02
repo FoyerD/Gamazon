@@ -1,29 +1,30 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.UUID;
+import java.util.function.BiFunction;
+
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
+import Domain.Store.Item;
 
 public class MaxQuantityCondition extends SimpleCondition {
 
     private String productId;
     private int maxQuantity;
 
-    public MaxQuantityCondition(ItemFacade itemFacade, String productId, int maxQuantity) {
-        super(itemFacade);
+    public MaxQuantityCondition(String productId, int maxQuantity) {
+        super();
         this.productId = productId;
         this.maxQuantity = maxQuantity;
     }
 
     // Constructor for loading from repository with existing UUID
-    public MaxQuantityCondition(String id, ItemFacade itemFacade, String productId, int maxQuantity) {
-        super(id, itemFacade);
+    public MaxQuantityCondition(String id, String productId, int maxQuantity) {
+        super(id);
         this.productId = productId;
         this.maxQuantity = maxQuantity;
     }
 
     @Override
-    public boolean isSatisfied(ShoppingBasket shoppingBasket) {
+    public boolean isSatisfied(ShoppingBasket shoppingBasket, BiFunction<String, String, Item> itemGetter) {
         int quantity = shoppingBasket.getQuantity(productId);
         return quantity <= maxQuantity;
     }

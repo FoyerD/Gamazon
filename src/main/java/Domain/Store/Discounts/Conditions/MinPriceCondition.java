@@ -1,26 +1,27 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.UUID;
+import java.util.function.BiFunction;
+
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
+import Domain.Store.Item;
 
 public class MinPriceCondition extends SimpleCondition {
 
     private double minPrice;
 
-    public MinPriceCondition(ItemFacade itemFacade, double minPrice) {
-        super(itemFacade);
+    public MinPriceCondition(double minPrice) {
+        super();
         this.minPrice = minPrice;
     }
 
     // Constructor for loading from repository with existing UUID
-    public MinPriceCondition(String id, ItemFacade itemFacade, double minPrice) {
-        super(id, itemFacade);
+    public MinPriceCondition(String id, double minPrice) {
+        super(id);
         this.minPrice = minPrice;
     }
 
     @Override
-    public boolean isSatisfied(ShoppingBasket shoppingBasket) {
+    public boolean isSatisfied(ShoppingBasket shoppingBasket, BiFunction<String, String, Item> itemGetter) {
         double totalBasketPrice = 0.0;
         
         // Calculate total price of entire basket

@@ -1,29 +1,30 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.UUID;
+import java.util.function.BiFunction;
+
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
+import Domain.Store.Item;
 
 public class MinQuantityCondition extends SimpleCondition{
 
     private String productId;
     private int minQuantity;
 
-    public MinQuantityCondition(ItemFacade itemFacade, String productId, int minQuantity) {
-        super(itemFacade);
+    public MinQuantityCondition(String productId, int minQuantity) {
+        super();
         this.productId = productId;
         this.minQuantity = minQuantity;
     }
 
-    // Constructor for loading from repository with existing UUID
-    public MinQuantityCondition(String id, ItemFacade itemFacade, String productId, int minQuantity) {
-        super(id, itemFacade);
+    // Constructor for loading from repository with existing ID
+    public MinQuantityCondition(String id, String productId, int minQuantity) {
+        super(id);
         this.productId = productId;
         this.minQuantity = minQuantity;
     }
 
     @Override
-    public boolean isSatisfied(ShoppingBasket shoppingBasket) {
+    public boolean isSatisfied(ShoppingBasket shoppingBasket, BiFunction<String, String, Item> itemGetter) {
         int quantity = shoppingBasket.getQuantity(productId);
         return quantity >= minQuantity;
     }

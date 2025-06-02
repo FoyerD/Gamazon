@@ -1,27 +1,27 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.UUID;
+import java.util.function.BiFunction;
+
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
+import Domain.Store.Item;
 
 public class MaxPriceCondition extends SimpleCondition{
 
     private double maxPrice;
 
-    public MaxPriceCondition(ItemFacade itemFacade, double maxPrice) {
-        super(itemFacade);
+    public MaxPriceCondition(double maxPrice) {
+        super();
         this.maxPrice = maxPrice;
     }
 
-    // Constructor for loading from repository with existing UUID
-    public MaxPriceCondition(String id, ItemFacade itemFacade, double maxPrice) {
-        super(id, itemFacade);
+    // Constructor for loading from repository with existing ID
+    public MaxPriceCondition(String id, double maxPrice) {
+        super(id);
         this.maxPrice = maxPrice;
     }
 
     @Override
-    public boolean isSatisfied(ShoppingBasket shoppingBasket) {
-
+    public boolean isSatisfied(ShoppingBasket shoppingBasket, BiFunction<String, String, Item> itemGetter) {
         if (shoppingBasket == null || shoppingBasket.getStoreId() == null) {
             throw new IllegalArgumentException("ShoppingBasket and StoreId cannot be null");
         }

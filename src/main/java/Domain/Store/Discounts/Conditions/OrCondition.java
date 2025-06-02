@@ -1,8 +1,10 @@
 package Domain.Store.Discounts.Conditions;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.function.BiFunction;
+
 import Domain.Shopping.ShoppingBasket;
+import Domain.Store.Item;
 
 public class OrCondition extends CompositeCondition{
 
@@ -20,9 +22,9 @@ public class OrCondition extends CompositeCondition{
     }
 
     @Override
-    public boolean isSatisfied(ShoppingBasket shoppingBasket) {
+    public boolean isSatisfied(ShoppingBasket shoppingBasket, BiFunction<String, String, Item> itemGetter) {
         for (Condition condition : conditions) {
-            if (condition.isSatisfied(shoppingBasket)) {
+            if (condition.isSatisfied(shoppingBasket, itemGetter)) {
                 return true;
             }
         }

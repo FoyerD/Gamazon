@@ -1,7 +1,10 @@
 package Domain.Store.Discounts.Conditions;
 
 import java.util.UUID;
+import java.util.function.BiFunction;
+
 import Domain.Shopping.ShoppingBasket;
+import Domain.Store.Item;
 
 public class TrueCondition implements Condition {
 
@@ -26,7 +29,7 @@ public class TrueCondition implements Condition {
      * @return true, as this condition is always satisfied
      */
     @Override
-    public boolean isSatisfied(ShoppingBasket basket) {
+    public boolean isSatisfied(ShoppingBasket basket, BiFunction<String, String, Item> itemGetter) {
         return true;
     }
 

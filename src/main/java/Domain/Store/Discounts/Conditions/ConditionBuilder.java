@@ -1,14 +1,11 @@
 package Domain.Store.Discounts.Conditions;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import Application.DTOs.ConditionDTO;
-import Domain.Store.ItemFacade;
 
 
 /**
@@ -17,12 +14,6 @@ import Domain.Store.ItemFacade;
  */
 @Component
 public class ConditionBuilder {
-    
-    private final ItemFacade itemFacade;
-    
-    public ConditionBuilder(ItemFacade itemFacade) {
-        this.itemFacade = itemFacade;
-    }
     
     /**
      * Builds a Condition domain object from a ConditionDTO.
@@ -70,7 +61,7 @@ public class ConditionBuilder {
     /**
      * Builds a Condition with existing UUID (for updates).
      */
-    public Condition buildConditionWithId(ConditionDTO conditionDTO, UUID existingId) {
+    public Condition buildConditionWithId(ConditionDTO conditionDTO, String existingId) {
         if (conditionDTO == null) {
             throw new IllegalArgumentException("ConditionDTO cannot be null");
         }
@@ -81,27 +72,27 @@ public class ConditionBuilder {
         
         switch (conditionDTO.getType()) {
             case MIN_PRICE:
-                return new MinPriceCondition(existingId, itemFacade, conditionDTO.getMinPrice());
+                return new MinPriceCondition(existingId, conditionDTO.getMinPrice());
                 
             case MAX_PRICE:
-                return new MaxPriceCondition(existingId, itemFacade, conditionDTO.getMaxPrice());
+                return new MaxPriceCondition(existingId, conditionDTO.getMaxPrice());
                 
             case MIN_QUANTITY:
-                return new MinQuantityCondition(existingId, itemFacade, conditionDTO.getProductId(), conditionDTO.getMinQuantity());
+                return new MinQuantityCondition(existingId, conditionDTO.getProductId(), conditionDTO.getMinQuantity());
                 
             case MAX_QUANTITY:
-                return new MaxQuantityCondition(existingId, itemFacade, conditionDTO.getProductId(), conditionDTO.getMaxQuantity());
+                return new MaxQuantityCondition(existingId, conditionDTO.getProductId(), conditionDTO.getMaxQuantity());
                 
             case AND:
-                Set<Condition> andConditions = conditionDTO.getSubConditions().stream()
+                List<Condition> andConditions = conditionDTO.getSubConditions().stream()
                     .map(this::buildCondition)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
                 return new AndCondition(existingId, andConditions);
                 
             case OR:
-                Set<Condition> orConditions = conditionDTO.getSubConditions().stream()
+                List<Condition> orConditions = conditionDTO.getSubConditions().stream()
                     .map(this::buildCondition)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
                 return new OrCondition(existingId, orConditions);
                 
             case TRUE:
@@ -120,7 +111,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Min price cannot be negative");
         }
         
-        return new MinPriceCondition(itemFacade, dto.getMinPrice());
+        return new MinPriceCondition(dto.getMinPrice());
     }
     
     private MaxPriceCondition buildMaxPriceCondition(ConditionDTO dto) {
@@ -131,7 +122,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Max price cannot be negative");
         }
         
-        return new MaxPriceCondition(itemFacade, dto.getMaxPrice());
+        return new MaxPriceCondition(dto.getMaxPrice());
     }
     
     private MinQuantityCondition buildMinQuantityCondition(ConditionDTO dto) {
@@ -145,7 +136,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Min quantity cannot be negative");
         }
         
-        return new MinQuantityCondition(itemFacade, dto.getProductId(), dto.getMinQuantity());
+        return new MinQuantityCondition(dto.getProductId(), dto.getMinQuantity());
     }
     
     private MaxQuantityCondition buildMaxQuantityCondition(ConditionDTO dto) {
@@ -159,7 +150,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Max quantity cannot be negative");
         }
         
-        return new MaxQuantityCondition(itemFacade, dto.getProductId(), dto.getMaxQuantity());
+        return new MaxQuantityCondition(dto.getProductId(), dto.getMaxQuantity());
     }
     
     private AndCondition buildAndCondition(ConditionDTO dto) {
@@ -167,9 +158,9 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Sub-conditions cannot be null or empty for AndCondition");
         }
         
-        Set<Condition> conditions = dto.getSubConditions().stream()
+        List<Condition> conditions = dto.getSubConditions().stream()
             .map(this::buildCondition)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
             
         return new AndCondition(conditions);
     }
@@ -179,9 +170,9 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Sub-conditions cannot be null or empty for OrCondition");
         }
         
-        Set<Condition> conditions = dto.getSubConditions().stream()
+        List<Condition> conditions = dto.getSubConditions().stream()
             .map(this::buildCondition)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
             
         return new OrCondition(conditions);
     }
