@@ -219,7 +219,7 @@ public class ProductReviewView extends VerticalLayout implements BeforeEnterObse
         ItemDTO ratedItem = new ItemDTO(
             currentProduct.getStoreId(),
             currentProduct.getProductId(),
-            currentProduct.getPrice(),
+            currentProduct.getPriceBreakDown(),
             currentProduct.getAmount(),
             currentProduct.getDescription(),
             currentProduct.getCategories(),

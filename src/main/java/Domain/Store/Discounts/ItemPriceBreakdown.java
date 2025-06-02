@@ -50,4 +50,36 @@ public class ItemPriceBreakdown {
         return originalPrice * (1 - discount);
     }
 
+    public static ItemPriceBreakdown combineMax(List<ItemPriceBreakdown> breakdowns) {
+        if (breakdowns == null || breakdowns.isEmpty()) {
+            return null;
+        }
+        ItemPriceBreakdown maxBreakdown = breakdowns.get(0);
+        for (int i = 1; i < breakdowns.size(); i++) {
+            ItemPriceBreakdown current = breakdowns.get(i);
+            if (current.getOriginalPrice() != maxBreakdown.getOriginalPrice()) {
+                throw new IllegalArgumentException("All breakdowns must have the same original price to combine");
+            }
+            if (current.getDiscount() < maxBreakdown.getDiscount()) {
+                maxBreakdown = current;
+            }
+        }
+        return maxBreakdown;
+    }
+
+    public static ItemPriceBreakdown combineMultiplicate(List<ItemPriceBreakdown> breakdowns) {
+        if (breakdowns == null || breakdowns.isEmpty()) {
+            return null;
+        }
+        double payPercentage = 1;
+        for (ItemPriceBreakdown breakdown : breakdowns) {
+            if (breakdown == null) {
+                throw new IllegalArgumentException("Breakdowns cannot contain null values");
+            }
+            payPercentage *= 1 - breakdown.getDiscount();
+        }
+        ItemPriceBreakdown combined = new ItemPriceBreakdown(breakdowns.get(0).getOriginalPrice(), 1 - payPercentage);
+        return combined;
+    }
+
 }

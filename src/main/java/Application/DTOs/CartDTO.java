@@ -59,7 +59,7 @@ public class CartDTO {
     public float getPreDiscountPrice() {
         float total = 0;
         for (ShoppingBasketDTO basket : baskets.values()) {
-            total += basket.getPreDiscountPrice();
+            total += basket.getTotalOriginalPrice();
         }
         return total;
     }

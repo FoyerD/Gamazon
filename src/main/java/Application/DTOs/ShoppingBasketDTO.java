@@ -46,7 +46,7 @@ public class ShoppingBasketDTO {
         return storeName;
     }
 
-    public float getTotoalPrice() {
+    public float getTotalPrice() {
         float total = 0;
         for (ItemDTO item : orders.values()) {
             total += item.getTotalPrice();

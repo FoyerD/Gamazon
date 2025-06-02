@@ -601,6 +601,7 @@ public class ShoppingServiceTest {
     }
 
 
+    @Test
     public void GivenExistingUserStoreProductFilledCart_WhenViewingCart_ReturnCorrectFinalPrice(){
         // Add product to cart
         Response<Boolean> addToCartResponse = shoppingService.addProductToCart(store_id, clientToken, product_id, 2);
@@ -620,7 +621,7 @@ public class ShoppingServiceTest {
         assertEquals("Item quantity in cart should be 2", 2, itemInCart.getAmount());
         
         // Calculate expected final price
-        float expectedFinalPrice = itemInCart.getPrice() * itemInCart.getAmount();
+        double expectedFinalPrice = itemInCart.getAmount() * itemInCart.getPrice();
         
         // Check if the final price matches the expected value
         assertEquals("Final price in cart should match expected value", expectedFinalPrice, basket.getTotalPrice(), 0.01);
@@ -646,7 +647,63 @@ public class ShoppingServiceTest {
         assertTrue(storeService.getStoreDiscounts(clientToken, store_id).getValue().contains(response.getValue()));
     }
 
+
     @Test
-    public void GivenExistingMemberStoreProduct_WhenAdding
+    public void GivenExistingUMemberStoreProduct_WhenAddingCompositeDiscount_ReturnTrue(){
+        ConditionDTO condition1 = new ConditionDTO(null,ConditionType.MIN_QUANTITY);
+        condition1.setMinQuantity(2);
+        condition1.setProductId(product_id);
+        ConditionDTO condition2 = new ConditionDTO(null,ConditionType.MAX_PRICE);
+        condition2.setMaxPrice(100.0);
+        condition2.setProductId(product_id);
+        ConditionDTO trueConditionDTO = new ConditionDTO(null,ConditionType.TRUE);
+
+
+        DiscountDTO simpleDiscount1 = new DiscountDTO(null,DiscountType.SIMPLE,condition1);
+        simpleDiscount1.setDiscountPercentage(0.5f);
+        simpleDiscount1.setQualifierType(QualifierType.PRODUCT);
+        simpleDiscount1.setQualifierValue(product_id);
+        DiscountDTO simpleDiscount2 = new DiscountDTO(null,DiscountType.SIMPLE,condition2);
+        simpleDiscount2.setDiscountPercentage(0.3f);
+        simpleDiscount2.setQualifierType(QualifierType.PRODUCT);
+        simpleDiscount2.setQualifierValue(product_id);
+
+        DiscountDTO discount = new DiscountDTO(null,DiscountType.AND,trueConditionDTO);
+        discount.setSubDiscounts(List.of(simpleDiscount1, simpleDiscount2));
+        Response<DiscountDTO> response = storeService.addDiscount(clientToken, store_id, discount);
+        if(response.errorOccurred()) {
+            System.out.println("Error adding discount: " + response.getErrorMessage());
+        }
+        assertEquals("Response discount is not the same type as given discount", discount.getType(), response.getValue().getType());
+        assertEquals(response.getValue().getSubDiscounts().size(), 2);
+        assertTrue(storeService.getStoreDiscounts(clientToken, store_id).getValue().contains(response.getValue()));
+    }
+
+    @Test
+    public void GivenExistingUMemberStoreProduct_WhenAddingOrDiscount_ReturnTrue(){
+        ConditionDTO condition1 = new ConditionDTO(null,ConditionType.MIN_QUANTITY);
+        condition1.setMinQuantity(2);
+        condition1.setProductId(product_id);
+        ConditionDTO condition2 = new ConditionDTO(null,ConditionType.MAX_PRICE);
+        condition2.setMaxPrice(100.0);
+        condition2.setProductId(product_id);
+        ConditionDTO trueConditionDTO = new ConditionDTO(null,ConditionType.TRUE);
+        DiscountDTO simpleDiscount1 = new DiscountDTO(null,DiscountType.SIMPLE,condition1);
+        simpleDiscount1.setDiscountPercentage(0.5f);
+        simpleDiscount1.setQualifierType(QualifierType.PRODUCT);
+        simpleDiscount1.setQualifierValue(product_id);
+        DiscountDTO simpleDiscount2 = new DiscountDTO(null,DiscountType.SIMPLE,condition2);
+        simpleDiscount2.setDiscountPercentage(0.3f);
+        simpleDiscount2.setQualifierType(QualifierType.PRODUCT);
+        simpleDiscount2.setQualifierValue(product_id);
+        DiscountDTO discount = new DiscountDTO(null,DiscountType.OR,trueConditionDTO);
+        discount.setSubDiscounts(List.of(simpleDiscount1, simpleDiscount2));
+        Response<DiscountDTO> response = storeService.addDiscount(clientToken, store_id, discount);
+        if(response.errorOccurred()) {
+            System.out.println("Error adding discount: " + response.getErrorMessage());
+        }  
+        assertEquals("Response discount is not the same type as given discount", discount.getType(), response.getValue().getType());
+        assertEquals(response.getValue().getSubDiscounts().size(), 1);
+        assertEquals(response.getValue().getCondition().getSubConditions().size(), 2);
     }
 }

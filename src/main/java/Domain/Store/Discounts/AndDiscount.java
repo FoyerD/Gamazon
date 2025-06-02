@@ -56,8 +56,7 @@ public class AndDiscount extends CompositeDiscount {
         }
         
         Map<String, ItemPriceBreakdown> output = new HashMap<>();
-        Set<Map<String, ItemPriceBreakdown>> toCompose = this.calculateAllSubDiscounts(basket);
-
+        
         // condition only applies if all discounts apply
         if (!conditionApplies(basket)) {
             for (String productId : basket.getOrders().keySet()) {
@@ -66,7 +65,8 @@ public class AndDiscount extends CompositeDiscount {
             }
             return output;
         }
-
+        
+        Set<Map<String, ItemPriceBreakdown>> toCompose = this.calculateAllSubDiscounts(basket);
         for (String productId : basket.getOrders().keySet()) {
             if (!isQualified(productId) || !conditionApplies(basket)) {
                 ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
