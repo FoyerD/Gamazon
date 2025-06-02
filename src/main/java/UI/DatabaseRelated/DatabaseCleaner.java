@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import Domain.Notification.INotificationRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
+import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IPermissionRepository;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
@@ -27,6 +28,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IReceiptRepository receiptRepo;
     private final IShoppingBasketRepository shoppingBasketRepo;
     private final IShoppingCartRepository shoppingCartRepo;
+    private final IPolicyRepository policyRepo;
     private final IPermissionRepository permissionRepo;
     private final IFeedbackRepository feedbackRepo;
     private final INotificationRepository notificationRepo;
@@ -39,8 +41,10 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
                             IStoreRepository storeRepo,
                             IUserRepository userRepo, IReceiptRepository receiptRepo,
                             IShoppingBasketRepository shoppingBasketRepo, 
-                            IShoppingCartRepository shoppingCartRepo, IPermissionRepository permissionRepo, 
+                            IShoppingCartRepository shoppingCartRepo, IPolicyRepository policyRepo,
+                            IPermissionRepository permissionRepo, 
                             IFeedbackRepository feedbackRepo, INotificationRepository notificationRepo) {
+        this.policyRepo = policyRepo;
         this.permissionRepo = permissionRepo;
         this.feedbackRepo = feedbackRepo;
         this.productRepo = productRepo;
@@ -70,6 +74,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         receiptRepo.deleteAll();
         shoppingBasketRepo.deleteAll();
         shoppingCartRepo.deleteAll();
+        policyRepo.deleteAll();
         permissionRepo.deleteAll();
         feedbackRepo.deleteAll();
         notificationRepo.deleteAll();

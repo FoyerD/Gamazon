@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Repos.IPolicyRepository;
@@ -16,6 +17,7 @@ import java.util.UUID;
  * In-memory implementation of IPolicyRepository for Policy objects.
  */
 @Repository
+@Profile("dev")
 public class MemoryPolicyRepository extends IPolicyRepository {
     // Thread-safe storage of policies by ID
     private final Map<String, Policy> policies = new ConcurrentHashMap<>();
