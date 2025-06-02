@@ -2,6 +2,7 @@ package Domain.Store.Discounts;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -13,8 +14,8 @@ import Domain.Store.Discounts.Conditions.Condition;
 
 public class AndDiscount extends CompositeDiscount {
 
-    public AndDiscount(ItemFacade itemFacade, Set<Discount> discounts) {
-        super(itemFacade, discounts);
+    public AndDiscount(ItemFacade itemFacade, List<Discount> discounts) {
+        super(discounts);
 
         Set<Condition> conditions = new HashSet<>();
 

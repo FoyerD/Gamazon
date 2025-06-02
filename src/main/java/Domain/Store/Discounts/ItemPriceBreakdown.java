@@ -1,7 +1,9 @@
 package Domain.Store.Discounts;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 // the price breakdown class is used to store the price breakdown of a product
 // along the calculation of the discounts
@@ -50,35 +52,39 @@ public class ItemPriceBreakdown {
         return originalPrice * (1 - discount);
     }
 
-    public static ItemPriceBreakdown combineMax(List<ItemPriceBreakdown> breakdowns) {
-        if (breakdowns == null || breakdowns.isEmpty()) {
-            return null;
-        }
-        ItemPriceBreakdown maxBreakdown = breakdowns.get(0);
-        for (int i = 1; i < breakdowns.size(); i++) {
-            ItemPriceBreakdown current = breakdowns.get(i);
-            if (current.getOriginalPrice() != maxBreakdown.getOriginalPrice()) {
-                throw new IllegalArgumentException("All breakdowns must have the same original price to combine");
-            }
-            if (current.getDiscount() < maxBreakdown.getDiscount()) {
-                maxBreakdown = current;
-            }
-        }
-        return maxBreakdown;
+    public static Map<String, ItemPriceBreakdown> combineMaxMap(List<Map<String, ItemPriceBreakdown>> breakdowns) {
+        Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
+        breakdowns.forEach((m) -> {
+                                m.forEach((id, ipb) -> {
+                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMax);
+                                                });
+                                });
+        return combined;
     }
 
-    public static ItemPriceBreakdown combineMultiplicate(List<ItemPriceBreakdown> breakdowns) {
-        if (breakdowns == null || breakdowns.isEmpty()) {
-            return null;
-        }
-        double payPercentage = 1;
-        for (ItemPriceBreakdown breakdown : breakdowns) {
-            if (breakdown == null) {
-                throw new IllegalArgumentException("Breakdowns cannot contain null values");
-            }
-            payPercentage *= 1 - breakdown.getDiscount();
-        }
-        ItemPriceBreakdown combined = new ItemPriceBreakdown(breakdowns.get(0).getOriginalPrice(), 1 - payPercentage);
+    public static Map<String, ItemPriceBreakdown> combineMultiplicateMaps(List<Map<String, ItemPriceBreakdown>> breakdowns) {
+        Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
+        breakdowns.forEach((m) -> {
+                                m.forEach((id, ipb) -> {
+                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMultiplicate);
+                                                });
+                                });
+        return combined;
+    }
+
+    public static ItemPriceBreakdown combineMultiplicate(ItemPriceBreakdown breakdown1, ItemPriceBreakdown breakdown2) {
+        assert breakdown1.getOriginalPrice() == breakdown2.getOriginalPrice();
+        double currPayPercentage = 1 - breakdown1.getDiscount();
+        double newPayPercentage = (1 - breakdown2.getDiscount()) * currPayPercentage;
+        List<String> descriptions = breakdown1.getDescriptions();
+        descriptions.addAll(breakdown2.getDescriptions());
+        ItemPriceBreakdown combined = new ItemPriceBreakdown(breakdown1.getOriginalPrice(), newPayPercentage, descriptions);
+        return combined;
+    }
+
+    public static ItemPriceBreakdown combineMax(ItemPriceBreakdown breakdown1, ItemPriceBreakdown breakdown2) {
+        assert breakdown1.getOriginalPrice() == breakdown2.getOriginalPrice();
+        ItemPriceBreakdown combined = breakdown1.getDiscount() > breakdown2.getDiscount() ? breakdown1 : breakdown2;
         return combined;
     }
 

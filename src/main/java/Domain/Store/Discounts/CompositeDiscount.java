@@ -1,36 +1,34 @@
 package Domain.Store.Discounts;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import Domain.Store.Discounts.ItemPriceBreakdown;
+
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
 import Domain.Store.Discounts.Conditions.Condition;
 
 public abstract class CompositeDiscount extends Discount {
 
-    protected Set<Discount> discounts;
+    protected List<Discount> discounts;
 
-    public CompositeDiscount(ItemFacade itemFacade, Set<Discount> discounts, Condition condition) {
-        super(itemFacade, condition);
+    public CompositeDiscount(List<Discount> discounts, Condition condition) {
+        super(condition);
         this.discounts = discounts;
     }
 
-    public CompositeDiscount(ItemFacade itemFacade, Set<Discount> discounts) {
-        super(itemFacade);
+    public CompositeDiscount(List<Discount> discounts) {
+        super();
         this.discounts = discounts;
     }
 
     // Constructor for loading from repository with existing UUID
-    public CompositeDiscount(UUID id, ItemFacade itemFacade, Set<Discount> discounts, Condition condition) {
-        super(id, itemFacade, condition);
+    public CompositeDiscount(String id, List<Discount> discounts, Condition condition) {
+        super(id, condition);
         this.discounts = discounts;
     }
 
-    protected Set<Map<String, ItemPriceBreakdown>> calculateAllSubDiscounts(ShoppingBasket basket) {
-        Set<Map<String, ItemPriceBreakdown>> allSubDiscounts = new HashSet<>();
+    protected List<Map<String, ItemPriceBreakdown>> calculateAllSubDiscounts(ShoppingBasket basket) {
+        List<Map<String, ItemPriceBreakdown>> allSubDiscounts = new ArrayList<>(discounts.size());
         for (Discount discount : discounts) {
             allSubDiscounts.add(discount.calculatePrice(basket));
         }
@@ -38,27 +36,7 @@ public abstract class CompositeDiscount extends Discount {
     }
 
     // Getter for repository serialization
-    public Set<Discount> getDiscounts() {
-        return new HashSet<>(discounts);
+    public List<Discount> getDiscounts() {
+        return discounts == null ? new ArrayList<>() : new ArrayList<>(discounts);
     }
-
-        // Helper method that validates parameters and creates the set
-    protected static Set<Discount> validateAndCreateSet(ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        if (itemFacade == null) {
-            throw new IllegalArgumentException("ItemFacade cannot be null");
-        }
-        if (discount1 == null) {
-            throw new IllegalArgumentException("discount1 cannot be null");
-        }
-        if (discount2 == null) {
-            throw new IllegalArgumentException("discount2 cannot be null");
-        }
-        
-        Set<Discount> discounts = new HashSet<>();
-        discounts.add(discount1);
-        discounts.add(discount2);
-        return discounts;
-    }
-
-
 }
