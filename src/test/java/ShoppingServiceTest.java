@@ -3,6 +3,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 import java.util.List;
 
+import org.atmosphere.config.service.Disconnect;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,9 +16,14 @@ import static org.mockito.Mockito.when;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CartDTO;
+import Application.DTOs.ConditionDTO;
+import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.UserDTO;
+import Application.DTOs.ConditionDTO.ConditionType;
+import Application.DTOs.DiscountDTO.DiscountType;
+import Application.DTOs.DiscountDTO.QualifierType;
 import Application.ItemService;
 import Application.ProductService;
 import Application.ServiceManager;
@@ -27,6 +33,7 @@ import Application.UserService;
 import Application.utils.Error;
 import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
+import Domain.Store.Discounts.Discount;
 import Domain.ExternalServices.IExternalPaymentService;
 import Infrastructure.MemoryRepoManager;
 import Domain.FacadeManager;
@@ -43,7 +50,7 @@ public class ShoppingServiceTest {
     private FacadeManager facadeManager;
     private ServiceManager serviceManager;
     private ProductService productService;
-    private StoreService storeSerivce;
+    private StoreService storeService;
     private ItemService itemService;
     private INotificationService notificationService;
 
@@ -76,7 +83,7 @@ public class ShoppingServiceTest {
         // Initialize services
         userService = serviceManager.getUserService();
         productService = serviceManager.getProductService();
-        storeSerivce = serviceManager.getStoreService();
+        storeService = serviceManager.getStoreService();
         itemService = serviceManager.getItemService();
         productService = serviceManager.getProductService();
         shoppingService = serviceManager.getShoppingService();
@@ -103,7 +110,7 @@ public class ShoppingServiceTest {
             List.of("Test Cat Description")
         ).getValue().getId();
 
-        store_id = storeSerivce.addStore(
+        store_id = storeService.addStore(
             clientToken, 
             "Test Store", 
             "Test Store Description"
@@ -405,7 +412,7 @@ public class ShoppingServiceTest {
             String clientName = "John Doe";
             String deliveryAddress = "123 Main St";
             String auctionEndDate = "2077-01-01 07:00";
-            Response<AuctionDTO> res = storeSerivce.addAuction(clientToken, store_id, product_id, auctionEndDate.toString(), 49.99f);
+            Response<AuctionDTO> res = storeService.addAuction(clientToken, store_id, product_id, auctionEndDate.toString(), 49.99f);
             mockAuctionId = res.getValue().getAuctionId();
             
 
@@ -466,7 +473,7 @@ public class ShoppingServiceTest {
             String auctionEndDate = "2077-01-01 07:00";
             String deliveryAddress = "123 Main St";
             
-            mockAuctionId = storeSerivce.addAuction(clientToken, store_id, product_id, auctionEndDate.toString(), 101.0).getValue().getAuctionId();
+            mockAuctionId = storeService.addAuction(clientToken, store_id, product_id, auctionEndDate.toString(), 101.0).getValue().getAuctionId();
             // Use our test shopping service to make a bid
             Response<Boolean> response = shoppingService.makeBid(
                 mockAuctionId, 
@@ -593,4 +600,53 @@ public class ShoppingServiceTest {
             finalItemInCart.getAmount());
     }
 
+
+    public void GivenExistingUserStoreProductFilledCart_WhenViewingCart_ReturnCorrectFinalPrice(){
+        // Add product to cart
+        Response<Boolean> addToCartResponse = shoppingService.addProductToCart(store_id, clientToken, product_id, 2);
+        assertFalse("Adding to cart should succeed", addToCartResponse.errorOccurred());
+        
+        // View the cart
+        Response<CartDTO> cartResponse = shoppingService.viewCart(clientToken);
+        assertFalse("Viewing cart should succeed", cartResponse.errorOccurred());
+        
+        CartDTO cart = cartResponse.getValue();
+        assertTrue("Cart should contain the store", cart.getBaskets().containsKey(store_id));
+        
+        ShoppingBasketDTO basket = cart.getBaskets().get(store_id);
+        assertTrue("Basket should contain the product", basket.getOrders().containsKey(product_id));
+        
+        ItemDTO itemInCart = basket.getOrders().get(product_id);
+        assertEquals("Item quantity in cart should be 2", 2, itemInCart.getAmount());
+        
+        // Calculate expected final price
+        float expectedFinalPrice = itemInCart.getPrice() * itemInCart.getAmount();
+        
+        // Check if the final price matches the expected value
+        assertEquals("Final price in cart should match expected value", expectedFinalPrice, basket.getTotalPrice(), 0.01);
+    }
+
+
+    @Test
+    public void GivenExistingMemberStoreProduct_WhenAddingSimpleDiscount_ReturnTrue(){
+        ConditionDTO condition = new ConditionDTO(null,ConditionType.MIN_QUANTITY);
+        condition.setMinQuantity(2);
+        condition.setProductId(product_id);
+        DiscountDTO discount = new DiscountDTO(null,DiscountType.SIMPLE,condition);
+        discount.setDiscountPercentage(0.5f);
+        discount.setQualifierType(QualifierType.PRODUCT);
+        discount.setQualifierValue(product_id);
+        Response<DiscountDTO> response = storeService.addDiscount(clientToken, store_id, discount);
+        if(response.errorOccurred()) {
+            System.out.println("Error adding discount: " + response.getErrorMessage());
+        }
+        assertEquals("Response discount is not the same type as given discount", discount.getType(), response.getValue().getType());
+        assertEquals("Response discount percentage is not the same as given discount", discount.getDiscountPercentage(), response.getValue().getDiscountPercentage(), 0.01);
+        assertEquals("Response discount qualifier type is not the same as given discount", discount.getQualifierType(), response.getValue().getQualifierType());
+        assertTrue(storeService.getStoreDiscounts(clientToken, store_id).getValue().contains(response.getValue()));
+    }
+
+    @Test
+    public void GivenExistingMemberStoreProduct_WhenAdding
+    }
 }

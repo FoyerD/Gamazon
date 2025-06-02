@@ -9,18 +9,16 @@ public class ItemDTO {
 
     private final String storeId;
     private final String productId;
-    private final double price;
     private int amount;
     private final String description;
     private final Set<CategoryDTO> categories;
     private final String productName;
     private final double rating;
-    private final ItemPriceBreakdownDTO priceBreakDown; // Only needed for discounts when viewing the cart
+    private ItemPriceBreakdownDTO priceBreakDown; // Only needed for discounts when viewing the cart
 
-    public ItemDTO(String storeId, String productId, double price, int amount, String description, Set<CategoryDTO> categories, String productName, double rating) {
+    public ItemDTO(String storeId, String productId, ItemPriceBreakdownDTO priceBreakdown, int amount, String description, Set<CategoryDTO> categories, String productName, double rating) {
         this.storeId = storeId;
         this.productId = productId;
-        this.price = price;
         this.amount = amount;
         this.description = description;
         this.categories = categories;
@@ -29,24 +27,12 @@ public class ItemDTO {
         this.priceBreakDown = null; // Only needed for discounts when viewing the cart
     }
 
-    public ItemDTO(String storeId, String productId, double price, int amount, String description, Set<CategoryDTO> categories, String productName, double rating, ItemPriceBreakdownDTO priceBreakDown) {
-        this.storeId = storeId;
-        this.productId = productId;
-        this.price = price;
-        this.amount = amount;
-        this.description = description;
-        this.categories = categories;
-        this.productName = productName;
-        this.rating = rating;
-        this.priceBreakDown = priceBreakDown; // Only needed for discounts when viewing the cart
-    }
-
     // Factory method
     public static ItemDTO fromItem(Item item) {
         return new ItemDTO(
             item.getStoreId(),
             item.getProductId(),
-            item.getPrice(),
+            new ItemPriceBreakdownDTO(item.getPrice(), 0),
             item.getAmount(),
             item.getDescription(),
             item.getCategories().stream()
@@ -54,22 +40,6 @@ public class ItemDTO {
                 .collect(Collectors.toSet()),
             item.getProductName(),
             item.getRating()
-        );
-    }
-
-    public static ItemDTO fromItem(Item item, ItemPriceBreakdownDTO priceBreakDown) {
-        return new ItemDTO(
-            item.getStoreId(),
-            item.getProductId(),
-            item.getPrice(),
-            item.getAmount(),
-            item.getDescription(),
-            item.getCategories().stream()
-                .map(CategoryDTO::fromCategory)
-                .collect(Collectors.toSet()),
-            item.getProductName(),
-            item.getRating(),
-            priceBreakDown
         );
     }
 
@@ -82,7 +52,19 @@ public class ItemDTO {
     }
 
     public double getPrice() {
-        return price;
+        return priceBreakDown != null ? priceBreakDown.getFinalPrice() : 0.0;
+    }
+
+    public double getOriginalPrice() {
+        return priceBreakDown != null ? priceBreakDown.getOriginalPrice() : 0.0;
+    }
+
+    public double getTotalPrice() {
+        return getPrice() * amount;
+    }
+    
+    public double getTotalOriginalPrice() {
+        return getOriginalPrice() * amount;
     }
 
     public int getAmount() {
@@ -111,5 +93,11 @@ public class ItemDTO {
 
     public ItemPriceBreakdownDTO getPriceBreakDown() {
         return priceBreakDown;
+    }
+
+    public void setPriceBreakDown(ItemPriceBreakdownDTO priceBreakDown) {
+        // This method is not typically used, as priceBreakDown is set in the constructor
+        // but can be used if needed for updates.
+        this.priceBreakDown = priceBreakDown;
     }
 }

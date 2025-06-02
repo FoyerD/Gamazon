@@ -44,7 +44,6 @@ public class DiscountBuilder {
         if (discountDTO.getType() == null) {
             throw new IllegalArgumentException("Discount type cannot be null");
         }
-        
         switch (discountDTO.getType()) {
             case SIMPLE:
                 return buildSimpleDiscount(discountDTO);

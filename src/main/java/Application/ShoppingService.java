@@ -117,9 +117,12 @@ public class ShoppingService{
 
             for(ShoppingBasketDTO basket : baskets.values()) {
                 Map<String, ItemPriceBreakdown> priceBreakDowns = this.cartFacade.getPriceBreakdowns(basket.getClientId(), basket.getStoreId());
-                    Map<String, ItemPriceBreakdownDTO> priceBreakDownsDTOs = priceBreakDowns.entrySet().stream()
-                        .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(), ItemPriceBreakdownDTO.fromPriceBreakDown(entry.getValue())), HashMap::putAll);
-                basket.setPriceBreakdowns(priceBreakDownsDTOs);
+                basket.getOrders().forEach((productId, item) -> {
+                    if(priceBreakDowns.containsKey(productId)) {
+                        ItemPriceBreakdownDTO priceBreakDownDTO = ItemPriceBreakdownDTO.fromPriceBreakDown(priceBreakDowns.get(productId));
+                        item.setPriceBreakDown(priceBreakDownDTO);
+                    }
+                });
             }
 
             CartDTO cart = new CartDTO(clientId, baskets);
