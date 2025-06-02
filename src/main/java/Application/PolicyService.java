@@ -1,10 +1,15 @@
 package Application;
 
 import Application.utils.Response;
+import Application.DTOs.CategoryDTO;
 import Application.DTOs.PolicyDTO;
+import Application.DTOs.ProductDTO;
+import Application.DTOs.PolicyDTO.Builder;
 import Application.utils.Error;
 import Application.utils.TradingLogger;
+import Domain.Repos.IProductRepository;
 import Domain.Store.Policy;
+import Domain.Store.Product;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.PolicyFacade;
@@ -22,13 +27,59 @@ public class PolicyService {
     private final PolicyFacade policyFacade;
     private final TokenService tokenService;
     private final PermissionManager permissionManager;
+    private final IProductRepository productRepository;
 
     public PolicyService(PolicyFacade policyFacade,
                          TokenService tokenService,
-                         PermissionManager permissionManager) {
+                         PermissionManager permissionManager,
+                         IProductRepository productRepository) {
         this.policyFacade      = policyFacade;
         this.tokenService      = tokenService;
         this.permissionManager = permissionManager;
+        this.productRepository = productRepository;
+    }
+
+    private PolicyDTO convertPolicyToDTO(Policy policy) {
+        Builder builder = new PolicyDTO.Builder(policy.getStoreId(), policy.getType());
+        Product prod = null;
+
+        switch (policy.getType()) {
+            case AND:
+                return builder.createAND(policy.getSubPolicies().stream().map(this::convertPolicyToDTO).toList()).build();
+
+            case MIN_QUANTITY_ALL:
+                return builder.createMinQuantityAllPolicy(policy.getMinItemsAll()).build(policy.getPolicyId());
+            case MAX_QUANTITY_ALL:
+                return builder.createMaxQuantityAllPolicy(policy.getMaxItemsAll()).build(policy.getPolicyId());
+            case MIN_QUANTITY_PRODUCT:
+                prod = productRepository.get(policy.getTargetProductId());
+                if (prod == null) {
+                    throw new NoSuchElementException("Couldn't find product " + policy.getTargetProductId());
+                }
+                return builder.createMinQuantityProductPolicy(new ProductDTO(prod), policy.getMinItemsProduct()).build(policy.getPolicyId());
+            case MAX_QUANTITY_PRODUCT:
+                prod = productRepository.get(policy.getTargetProductId());
+                if (prod == null) {
+                    throw new NoSuchElementException("Couldn't find product " + policy.getTargetProductId());
+                }
+                return builder.createMaxQuantityProductPolicy(new ProductDTO(prod), policy.getMaxItemsProduct()).build(policy.getPolicyId());
+            case MIN_QUANTITY_CATEGORY:  
+                return builder.createMinQuantityCategoryPolicy(
+                    new CategoryDTO(policy.getTargetCategory(), "Description Unavailable"),
+                    policy.getMinItemsCategory()
+                ).build();
+            case MAX_QUANTITY_CATEGORY:
+                return builder.createMaxQuantityCategoryPolicy(
+                    new CategoryDTO(policy.getTargetCategory(), "Description Unavailable"),
+                    policy.getMaxItemsCategory()
+                ).build();
+            case CATEGORY_DISALLOW:
+                return builder.createCategoryDisallowPolicy(new CategoryDTO(policy.getTargetCategory(), "Description Unavailable")).build(policy.getPolicyId());
+            case CATEGORY_AGE:
+                return builder.createCategoryAgePolicy(new CategoryDTO(policy.getTargetCategory(), "Description Unavailable"), policy.getMinAge()).build(policy.getPolicyId());
+            default:
+                throw new IllegalStateException("Unsupported policy type " + policy.getType().name());
+        }
     }
 
     @Transactional
@@ -48,7 +99,7 @@ public class PolicyService {
 
             List<Policy> policies = policyFacade.getAllStorePolicies(storeId);
             List<PolicyDTO> dtos = policies.stream()
-                                           .map(PolicyDTO::new)
+                                           .map(this::convertPolicyToDTO)
                                            .collect(Collectors.toList());
 
             if (dtos.isEmpty()) {
@@ -86,7 +137,8 @@ public class PolicyService {
             Policy policy = policyFacade.getPolicy(policyId);
             TradingLogger.logEvent(CLASS_NAME, method,
                     "Fetched policy " + policyId + " for store " + storeId);
-            return new Response<>(new PolicyDTO(policy));
+            
+            return new Response<>(convertPolicyToDTO(policy));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
