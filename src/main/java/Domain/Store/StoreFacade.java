@@ -273,7 +273,7 @@ public class StoreFacade {
                 "DEBUG: No previous bidder to notify for auction " + auctionId + " or it's the same user bidding again.");
         }
 
-        auction.setHighestBidder(clientName, bid, cardNumber, expiryDate, cvv, clientName);
+        auction.setHighestBidder(userId, bid, cardNumber, expiryDate, cvv, clientName);
 
         TradingLogger.logEvent("StoreFacade", "addBid",
             "DEBUG: Updated auction with new bid. New currentBidderId=" + userId + ", newPrice=" + bid);
@@ -380,7 +380,7 @@ public class StoreFacade {
 
         // Remove the auction as it's now fulfilled
         this.auctionRepository.remove(auctionId);
-
+        
         return item;
     }
 
