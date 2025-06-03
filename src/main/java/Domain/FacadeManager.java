@@ -3,6 +3,7 @@ package Domain;
 import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
@@ -22,18 +23,24 @@ public class FacadeManager {
     private ItemFacade itemFacade;
     private ProductFacade productFacade;
     private IExternalPaymentService paymentService;
+    private IExternalSupplyService supplyService;
     private LoginManager loginManager;
     private PermissionManager permissionManager;
     private INotificationService notificationService;
     private DiscountFacade discountFacade;
 
-    public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService) {
+    public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService, IExternalSupplyService supplyService) {
         this.repoManager = repoManager;
         this.paymentService = paymentService;
+        this.supplyService = supplyService;
     }
 
     public IExternalPaymentService getPaymentService() {
         return paymentService;
+    }
+
+    public IExternalSupplyService getSupplyService() {
+        return supplyService;
     }
 
     public IMarketFacade getMarketFacade() {
@@ -87,7 +94,8 @@ public class FacadeManager {
                                                 getStoreFacade(),
                                                 repoManager.getReceiptRepository(),
                                                 repoManager.getProductRepository(),
-                                                getDiscountFacade());
+                                                getDiscountFacade(),
+                                                getSupplyService());
         }
         return CartFacade;
     }
