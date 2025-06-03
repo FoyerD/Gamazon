@@ -78,4 +78,10 @@ public abstract class IUserRepository extends ILockbasedRepository<User, String>
      * @return A list of all {@link Member} users.
      */
     abstract public List<Member> getAllMembers();
+
+    /**
+     * Retrieves all users in the repository.
+     * @return A list of all {@link User} objects.
+     */
+    abstract public List<User> getAllUsers();
 }

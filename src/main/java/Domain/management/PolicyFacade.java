@@ -39,6 +39,18 @@ public class PolicyFacade {
         }
     }
 
+    private void injectLookups(Policy policy, String storeId) {
+        policy.injectLookups(
+            productFacade::getProduct,
+            id -> itemFacade.getItem(storeId, id)
+        );
+    }
+    private void injectLookups(List<Policy> policies, String storeId) {
+        for (Policy p : policies) {
+            injectLookups(p, storeId);
+        }
+    }
+
     public Policy createAndPolicy(List<Policy> children, String storeId) 
         {
         String policyId = UUID.randomUUID().toString();
@@ -271,6 +283,7 @@ public class PolicyFacade {
         if (p == null) {
             throw new NoSuchElementException("No policy for ID: " + policyId);
         }
+        injectLookups(p, p.getStoreId());
         return p;
     }
 
@@ -278,7 +291,9 @@ public class PolicyFacade {
         if (storeId == null || storeId.isBlank()) {
             throw new IllegalArgumentException("storeId cannot be empty");
         }
-        return policyRepository.getAllStorePolicies(storeId);
+        List<Policy> policies = policyRepository.getAllStorePolicies(storeId);
+        injectLookups(policies, storeId);
+        return policies;
     }
 
     public boolean isApplicable(String basketId,

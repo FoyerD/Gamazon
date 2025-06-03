@@ -1,5 +1,55 @@
 package UI.views;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Route;
+
+import Application.DTOs.AuctionDTO;
+import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.EmployeeInfo;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
+import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
+import Domain.management.PermissionType;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ILoginPresenter;
 import UI.presenters.IManagementPresenter;
 import UI.presenters.IProductPresenter;
@@ -10,48 +60,9 @@ import UI.views.components.AddUserRoleDialog;
 import UI.views.components.ChangeUserRoleDialog;
 import UI.views.components.EmployeesLayout;
 import UI.views.dataobjects.UserPermission;
-import Application.DTOs.ItemDTO;
-import Application.DTOs.ProductDTO;
-import Application.DTOs.StoreDTO;
-import Application.utils.Response;
-
-import Domain.management.PermissionType;
-import Application.DTOs.UserDTO;
-import Application.DTOs.AuctionDTO;
-import Application.DTOs.ClientOrderDTO;
-import Application.DTOs.EmployeeInfo;
-
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.timepicker.TimePicker;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.LocalDateTime;
-import java.time.Duration;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Route("manager")
-public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
+public class ManagerView extends BaseView implements BeforeEnterObserver {
 
     private final IManagementPresenter managementPresenter;
     private final IProductPresenter productPresenter;
@@ -71,7 +82,8 @@ public class ManagerView extends VerticalLayout implements BeforeEnterObserver {
 
     @Autowired
     public ManagerView(IManagementPresenter managementPresenter, 
-                       IStorePresenter storePresenter, IProductPresenter productPresenter, LoginPresenter loginPresenter) {
+                       IStorePresenter storePresenter, IProductPresenter productPresenter, LoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.storePresenter = storePresenter;
         this.productPresenter = productPresenter;
         this.managementPresenter = managementPresenter;

@@ -1,36 +1,43 @@
 package UI.views;
 
-import UI.presenters.ILoginPresenter;
-import Application.DTOs.UserDTO;
-import Application.utils.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.component.ClientCallable;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.presenters.ILoginPresenter;
 
 @JsModule("./ws-client.js")
 @Route("")
 public class LoginView extends VerticalLayout {
 
     private final ILoginPresenter loginPresenter;
-
+    private final DbHealthStatus dbHealthStatus;
+    
     private final TextField usernameField = new TextField("Username");
     private final PasswordField passwordField = new PasswordField("Password");
     private final Button loginButton = new Button("Log In");
     private final Button guestButton = new Button("Continue as Guest");
 
+    
     @Autowired
-    public LoginView(ILoginPresenter loginPresenter) {
+    public LoginView(ILoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
         this.loginPresenter = loginPresenter;
+        this.dbHealthStatus = dbHealthStatus;
 
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -69,6 +76,12 @@ public class LoginView extends VerticalLayout {
     }
 
     private void login() {
+        if (dbHealthStatus != null && !dbHealthStatus.isDbAvailable()) {
+            Notification.show("🔌 Database is currently unavailable. Please try again later.",
+                            4000, Notification.Position.MIDDLE);
+            return; // Block login
+        }
+
         String username = usernameField.getValue();
         String password = passwordField.getValue();
 
@@ -95,6 +108,12 @@ public class LoginView extends VerticalLayout {
     }
 
     private void loginAsGuest() {
+        if (dbHealthStatus != null && !dbHealthStatus.isDbAvailable()) {
+            Notification.show("🔌 Database is currently unavailable. Please try again later.",
+                            4000, Notification.Position.MIDDLE);
+            return; // Block login
+        }
+
         Response<UserDTO> response = loginPresenter.guestEnter();
         if (response.errorOccurred()) {
             Notification.show("Guest login failed: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);

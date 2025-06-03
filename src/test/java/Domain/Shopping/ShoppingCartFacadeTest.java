@@ -590,11 +590,9 @@ public class ShoppingCartFacadeTest {
     @Test
     public void testMakeBid_Success() {
         // Arrange
-        Supplier<Boolean> mockChargeCallback = mock(Supplier.class);
-        when(mockChargeCallback.get()).thenReturn(true);
-
+        
         Auction mockAuction = mock(Auction.class);
-        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class)))
+        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString()))
             .thenReturn(mockAuction);
 
         // Act
@@ -603,7 +601,7 @@ public class ShoppingCartFacadeTest {
 
         // Assert
         assertTrue("Should return true for successful bid", result);
-        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class));
+        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString());
     }
 
     

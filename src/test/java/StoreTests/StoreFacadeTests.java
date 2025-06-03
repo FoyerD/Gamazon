@@ -1,20 +1,23 @@
 package StoreTests;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.fail;
+
+import java.util.Date;
 
 import Domain.User.Member;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import Application.utils.Response;
 import Domain.Pair;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
@@ -531,6 +534,11 @@ public class StoreFacadeTests {
         String auctionId = "auctionId";
         String userId = "userId";
         float bid = 10.0f;
+        String cardNumber = "1234567890123456";
+        Date expiryDate = new Date();
+        String cvv = "123";
+        String clientName = "John Doe";
+        String deliveryAddress = "123 Main St";
 
         Auction auction = mock(Auction.class);
         when(auction.getAuctionId()).thenReturn(auctionId);
@@ -541,7 +549,7 @@ public class StoreFacadeTests {
         when(userRepository.get(userId)).thenReturn(mock(Member.class));
         when(auctionRepository.update(anyString(), any(Auction.class))).thenReturn(auction);
 
-        assertEquals(auctionId, storeFacade.addBid(auctionId, userId, bid, () -> true).getAuctionId());
+        assertEquals(auctionId, storeFacade.addBid(auctionId, userId, bid, cardNumber, expiryDate, cvv, clientName, deliveryAddress).getAuctionId());
     }
 
     @Test
@@ -549,6 +557,8 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -560,22 +570,26 @@ public class StoreFacadeTests {
         when(auction.getStoreId()).thenReturn(storeId);
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn("user123");
-        when(auction.triggerCharge()).thenReturn(true);
         when(storeRepository.get(storeId)).thenReturn(mock(Store.class));
         when(storeRepository.getLock(storeId)).thenReturn(new Object());
 
         when(itemRepository.update(itemKey, item)).thenReturn(item);
         when(auctionRepository.remove(auctionId)).thenReturn(auction);
 
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
-        Item result = storeFacade.acceptBid(storeId, productId, auctionId);
+
+        Item result = storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
         assertEquals(item, result);
     }
 
     @Test(expected = RuntimeException.class)
     public void givenNoItemInStore_whenAcceptBid_thenThrows() {
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
+
         when(itemRepository.get(any())).thenReturn(null);
-        storeFacade.acceptBid("storeX", "productY", "auctionZ");
+        storeFacade.acceptBid("storeX", "productY", "auctionZ", mockPaymentService);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -583,6 +597,9 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -592,7 +609,7 @@ public class StoreFacadeTests {
         when(auctionRepository.get(auctionId)).thenReturn(null);
         when(itemRepository.update(itemKey, item)).thenReturn(item); // for rollback
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -600,6 +617,9 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -611,7 +631,7 @@ public class StoreFacadeTests {
         when(auction.getStoreId()).thenReturn("wrongStore");
         when(auction.getProductId()).thenReturn("wrongProduct");
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -619,6 +639,9 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -631,7 +654,7 @@ public class StoreFacadeTests {
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn(null);
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
     @Test(expected = RuntimeException.class)
@@ -650,9 +673,11 @@ public class StoreFacadeTests {
         when(auction.getStoreId()).thenReturn(storeId);
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn("user123");
-        when(auction.triggerCharge()).thenReturn(false);
+        
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(-1));
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
 }
