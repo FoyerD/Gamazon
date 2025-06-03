@@ -58,7 +58,8 @@ public interface IShoppingCartFacade {
      * @return true if checkout was successful
      */
     boolean checkout(String clientId, String card_number, Date expiry_date, String cvv, 
-                    long andIncrement, String clientName, String deliveryAddress);
+                    long andIncrement, String clientName, String deliveryAddress, String city, 
+                                        String country, String zipCode);
     
     /**
      * Removes a specific quantity of a product from the cart
