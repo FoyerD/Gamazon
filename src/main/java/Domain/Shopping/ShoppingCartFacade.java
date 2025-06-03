@@ -100,8 +100,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @return true if the product was successfully added, false otherwise
      */
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public boolean addProductToCart(String storeId, String clientId, String productId, int quantity) {
-        
         // Check for valid arguments
         if (clientId == null || storeId == null || productId == null || quantity <= 0) {
             throw new IllegalArgumentException("Invalid arguments for adding product to cart");
@@ -115,20 +115,32 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             throw new IllegalArgumentException("Store not found");
         }
         
-        
-        IShoppingCart cart = getCart(clientId);
-        ShoppingBasket basket = getBasket(clientId, storeId);
-        
-        basket.addOrder(productId, quantity);
-        basketRepo.update(new Pair<>(clientId, storeId), basket);
+        try {
+            // Get or create the cart
+            IShoppingCart cart = getCart(clientId);
+            
+            // Get or create the basket
+            ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+            if (basket == null) {
+                basket = new ShoppingBasket(storeId, clientId);
+                basketRepo.add(new Pair<>(clientId, storeId), basket);
+            }
+            
+            // Add the product to the basket
+            basket.addOrder(productId, quantity);
+            basketRepo.update(new Pair<>(clientId, storeId), basket);
 
-        if (!cart.hasStore(storeId)) {
-            cart.addStore(storeId);
-            // Fix 1: Using update instead of add
-            cartRepo.update(clientId, cart);
+            // Add the store to the cart if it's not already there
+            if (!cart.hasStore(storeId)) {
+                cart.addStore(storeId);
+                cartRepo.update(clientId, cart);
+            }
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error adding product to cart: " + e.getMessage());
+            return false;
         }
-
-        return true;
     }
 
     /**
@@ -209,20 +221,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                         String cardNumber, Date expiryDate, String cvv,
                         long andIncrement, String clientName, String deliveryAddress) {
 
-        Supplier<Boolean> chargeSupplier = () -> {
-            if (!isCardNumber(cardNumber)) {
-                throw new IllegalArgumentException("Invalid card number");
-            }
+        
 
-            paymentService.processPayment(
-                clientId, cardNumber, expiryDate, cvv, 
-                clientName, price
-            );
-
-            return true;
-        };
-
-        storeFacade.addBid(auctionId, clientId, price, chargeSupplier);
+        storeFacade.addBid(auctionId, clientId, price, 
+                cardNumber, expiryDate, cvv, clientName, deliveryAddress);
         return true;
     }
 
@@ -231,178 +233,198 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     public boolean checkout(String clientId, String card_number, Date expiry_date, String cvv,
                 long andIncrement, String clientName, String deliveryAddress) {
     
-    
-    // check for valid arguments
-    if (clientId == null || card_number == null || expiry_date == null || cvv == null) {
-        throw new IllegalArgumentException("Invalid arguments for checkout");
-    }
-    if (!isCardNumber(card_number)){
-        throw new IllegalArgumentException("Invalid card number");
-    }
+        // check for valid arguments
+        if (clientId == null || card_number == null || expiry_date == null || cvv == null) {
+            throw new IllegalArgumentException("Invalid arguments for checkout");
+        }
+        if (!isCardNumber(card_number)){
+            throw new IllegalArgumentException("Invalid card number");
+        }
 
-    IShoppingCart cart = getCart(clientId);
+        IShoppingCart cart = getCart(clientId);
 
-    Map<Pair<String, String>, Integer> itemsrollbackData = new HashMap<>(); // To store rollback information
-    Set<ShoppingBasket> basketsrollbackdata = new HashSet<>();
-    Set<String> cartrollbackdata = new HashSet<>();
-    
-    // Store purchase information for receipt creation
-    Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
-
-    Response<Integer> paymentResponse = new Response<>(-1);
-
-    try {
-        // Iterate over all stores in the cart
-        boolean purchaseSuccess = false;
-        double totalPrice = 0;
+        // Handle empty cart case early
         Set<String> storeIds = cart.getCart();
+        if (storeIds == null || storeIds.isEmpty()) {
+            cart.clear();  // Still need to clear the cart
+            cartRepo.update(clientId, cart);  // And update it in the repository
+            return true;  // Successfully checked out an empty cart
+        }
+
+        Map<Pair<String, String>, Integer> itemsrollbackData = new HashMap<>(); // To store rollback information
+        Set<ShoppingBasket> basketsrollbackdata = new HashSet<>();
+        Set<String> cartrollbackdata = new HashSet<>();
         
-        // Added null check for cart.getCart()
-        if (storeIds != null) {
+        // Store purchase information for receipt creation
+        Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
+
+        Response<Integer> paymentResponse = null;
+
+        try {
+            // Iterate over all stores in the cart
+            boolean purchaseSuccess = false;
+            double totalPrice = 0;
+            
+            // First, verify stock for all items before proceeding
+            boolean anyStoreOpen = false;
             for (String storeId : storeIds) {
-                if(storeFacade.getStore(storeId) == null) {
-                    throw new RuntimeException("Store not found: " + storeId);
+                // Check if store exists and is open
+                if(storeFacade.getStore(storeId) != null && storeFacade.getStore(storeId).isOpen()) {
+                    anyStoreOpen = true;
+                    ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+                    if (basket != null && !basket.isEmpty()) {
+                        Map<String, Integer> orders = basket.getOrders();
+                        if (orders != null) {
+                            for (Map.Entry<String, Integer> entry : orders.entrySet()) {
+                                String productId = entry.getKey();
+                                int quantity = entry.getValue();
+                                
+                                Item item = itemFacade.getItem(storeId, productId);
+                                if (item == null) {
+                                    throw new RuntimeException("Item not found: " + productId);
+                                }
+                                if (item.getAmount() < quantity) {
+                                    throw new RuntimeException("Insufficient stock for item: " + item.getProductName());
+                                }
+                            }
+                        }
+                    }
                 }
-                if(!storeFacade.getStore(storeId).isOpen()) {
-                    throw new RuntimeException("Store is closed: " + storeId);
-                }
+            }
+            
+            // Only throw exception for closed stores if we actually have items to checkout
+            boolean hasItemsToCheckout = false;
+            for (String storeId : storeIds) {
                 ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
                 if (basket != null && !basket.isEmpty()) {
-                    // Track products and prices for this store
-                    Map<Product, Integer> storeProducts = new HashMap<>();
+                    hasItemsToCheckout = true;
+                    break;
+                }
+            }
+            
+            if (hasItemsToCheckout && !anyStoreOpen) {
+                throw new RuntimeException("Cannot checkout: All stores in cart are closed");
+            }
+
+            // Now process the actual checkout
+            if (storeIds != null) {
+                for (String storeId : storeIds) {
+                    // Skip stores that don't exist or are closed
+                    if(storeFacade.getStore(storeId) == null || !storeFacade.getStore(storeId).isOpen()) {
+                        continue;
+                    }
                     
-                    // Added null check for basket.getOrders()
-                    Map<String, Integer> orders = basket.getOrders();
-                    if (orders != null) {
-                        // Fix: Wrap everything in try/catch to handle any potential NPEs due to null collections
-                        try {
-                            // Iterate over all items in the basket with defensive coding
+                    ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+                    if (basket != null && !basket.isEmpty()) {
+                        // Track products and prices for this store
+                        Map<Product, Integer> storeProducts = new HashMap<>();
+                        
+                        Map<String, Integer> orders = basket.getOrders();
+                        if (orders != null) {
                             for (Map.Entry<String, Integer> entry : orders.entrySet()) {
-                                if (entry != null) {
-                                    String productId = entry.getKey();
-                                    Integer quantityObj = entry.getValue();
-                                    
-                                    if (productId != null && quantityObj != null) {
-                                        int quantity = quantityObj;
+                                String productId = entry.getKey();
+                                int quantity = entry.getValue();
+                                
+                                Product product = productRepo.get(productId);
+                                if (product != null) {
+                                    Product productCopy = new Product(product);
+                                    Item item = itemFacade.getItem(storeId, productCopy.getProductId());
+                                    if (item != null) {
+                                        purchaseSuccess = true;
+                                        double productPrice = item.getPrice() * quantity;
+                                        totalPrice += productPrice;
                                         
-                                        // Attempt to decrease the item quantity
-                                        itemFacade.decreaseAmount(new Pair<>(storeId, productId), quantity);
-                                        
-                                        // Get the product object and calculate price
-                                        Product product = productRepo.get(productId);
-                                        if (product != null) {
-                                            // Create a new product object to avoid modifying the original
-                                            Product productCopy = new Product(product);
-                                            Item item = itemFacade.getItem(storeId, productCopy.getProductId());
-                                            if (item != null) {
-                                                purchaseSuccess = true;
-                                                double productPrice = item.getPrice() * quantity;
-                                                totalPrice += productPrice;
-                                                
-                                                // Store product in the store's product map
-                                                storeProducts.put(productCopy, quantity);
-                                                
-                                                // Store rollback data
-                                                itemsrollbackData.put(new Pair<>(storeId, productCopy.getProductId()), quantity);
-                                            }
-                                        }
+                                        storeProducts.put(productCopy, quantity);
+                                        itemsrollbackData.put(new Pair<>(storeId, productCopy.getProductId()), quantity);
                                     }
                                 }
                             }
-                        } catch (NullPointerException e) {
-                            // Catch any NPEs that might occur due to null collections
-                            // Log the error and continue with empty collections
-                            System.err.println("Caught NPE during checkout processing: " + e.getMessage());
                         }
-                    }
 
-                    // Store products for this store
-                    if (!storeProducts.isEmpty()) {
-                        storeProductsMap.put(storeId, storeProducts);
+                        if (!storeProducts.isEmpty()) {
+                            storeProductsMap.put(storeId, storeProducts);
+                        }
+                        
+                        basketsrollbackdata.add(basket);
+                        basket.clear();
+                        basketRepo.update(new Pair<>(clientId, storeId), basket);
+                    }
+                }
+            }
+
+            // Process payment only if there are items to checkout
+            if (purchaseSuccess) {
+                try {
+                    paymentResponse = paymentService.processPayment(
+                        clientId, card_number, expiry_date, cvv, 
+                        clientName, totalPrice
+                    );
+
+                    // Check for error response
+                    if (paymentResponse == null || paymentResponse.getValue() == null || paymentResponse.errorOccurred()) {
+                        throw new RuntimeException("Payment failed: " + 
+                            (paymentResponse != null && paymentResponse.getErrorMessage() != null ? 
+                            paymentResponse.getErrorMessage() : "Unknown error"));
+                    }
+                } catch (Exception e) {
+                    // Ensure we're throwing a RuntimeException
+                    if (e instanceof RuntimeException) {
+                        throw (RuntimeException) e;
+                    } else {
+                        throw new RuntimeException("Payment failed: " + e.getMessage());
+                    }
+                }
+            }
+
+            // Clear the cart
+            if (storeIds != null) {
+                cartrollbackdata.addAll(storeIds);
+            }
+            cart.clear();
+            cartRepo.update(clientId, cart);
+
+            // Create receipts only if there was a purchase
+            if (purchaseSuccess) {
+                String maskedCardNumber = "xxxx-xxxx-xxxx-" + card_number.substring(card_number.length() - 4);
+                String paymentDetails = "Card: " + maskedCardNumber;
+                
+                for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
+                    String storeId = entry.getKey();
+                    Map<Product, Integer> products = entry.getValue();
+                    
+                    double storeTotal = 0.0;
+                    Map<Product, Pair<Integer, Double>> productPrices = new HashMap<>();
+                    
+                    for (Map.Entry<Product, Integer> productEntry : products.entrySet()) {
+                        Product product = productEntry.getKey();
+                        int quantity = productEntry.getValue();
+                        Item item = itemFacade.getItem(storeId, product.getProductId());
+                        
+                        if (item != null) {
+                            double price = item.getPrice();
+                            storeTotal += price * quantity;
+                            productPrices.put(product, new Pair<>(quantity, price));
+                            
+                            itemFacade.decreaseAmount(
+                                new Pair<>(storeId, product.getProductId()),
+                                quantity
+                            );
+                        }
                     }
                     
-                    // Mark the basket as checked out
-                    basketsrollbackdata.add(basket);
-                    basket.clear();
-                    basketRepo.update(new Pair<>(clientId, storeId), basket);
+                    receiptRepo.savePurchase(clientId, storeId, productPrices, storeTotal, paymentDetails);
                 }
             }
-        }
-        // Process payment only if there are items to checkout
-        if (purchaseSuccess) {
-            // Call payment service and check for error response
-            paymentResponse = paymentService.processPayment(
-                clientId, card_number, expiry_date, cvv, 
-                clientName, totalPrice
-            );
 
-            
-            if (paymentResponse == null) {
-                throw new RuntimeException("Payment failed: service returned null response");
+            return true;
+        } catch (Exception e) {
+            if (paymentResponse != null && paymentResponse.getValue() != -1) {
+               paymentService.cancelPayment(paymentResponse.getValue());
             }
-            
-            if(paymentResponse.getValue() == null)
-                throw new RuntimeException("Payment failed: value is null");
-
-            // If payment service returned an error, throw an exception to trigger rollback
-            if (paymentResponse.errorOccurred()) {
-                throw new RuntimeException(paymentResponse.getErrorMessage());
-            }
+            checkoutRollBack(clientId, cart, itemsrollbackData, cartrollbackdata, basketsrollbackdata);
+            throw new RuntimeException("Checkout failed: " + e.getMessage(), e);
         }
-
-        // Clear the cart
-        if (storeIds != null) {
-            cartrollbackdata.addAll(storeIds);
-        }
-        cart.clear();
-        cartRepo.update(clientId, cart);
-        
-        // Create receipts only if there was a purchase
-        if (purchaseSuccess) {
-            // Create masked payment details (only show last 4 digits of card)
-            String maskedCardNumber = "xxxx-xxxx-xxxx-" + card_number.substring(card_number.length() - 4);
-            String paymentDetails = "Card: " + maskedCardNumber;
-            
-            // Now that everything has succeeded, create the receipt records
-            for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
-                String storeId = entry.getKey();
-                Map<Product, Integer> products = entry.getValue();
-                
-                // Calculate store-specific total safely with null checks
-                double storeTotal = 0.0;
-                Map<Product, Pair<Integer, Double>> productPrices = new HashMap<>();
-                if (products != null) {
-
-                    for (Map.Entry<Product, Integer> productEntry : products.entrySet()) {
-                        if (productEntry.getKey() != null && productEntry.getValue() != null) {
-                            Product product = productEntry.getKey();
-                            int qty = productEntry.getValue();
-                            Item item = itemFacade.getItem(storeId, product.getProductId());
-                            if (item != null) {
-                                productPrices.put(product, new Pair<>(qty, item.getPrice()));
-                                storeTotal += item.getPrice() * qty;
-                            }
-                        }
-                    }
-                }
-                
-                // Create and save receipt
-                receiptRepo.savePurchase(clientId, storeId, productPrices, storeTotal, paymentDetails);
-            }
-        }
-
-        return true;
-    } catch (Exception e) {
-        // Rollback all changes and cancel payment if necessary
-        if (paymentResponse.getValue() != -1) {
-           paymentService.cancelPayment(paymentResponse.getValue());
-        }
-        checkoutRollBack(clientId, cart, itemsrollbackData, cartrollbackdata, basketsrollbackdata);
-        
-        // Throw the exception to indicate failure
-        throw new RuntimeException("Checkout failed: " + e.getMessage(), e);
     }
-}
 
     /**
      * Helper method to handle rollback operations during checkout failure
@@ -571,7 +593,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         Set<String> storeIds = userCart.getCart();
         if (storeIds != null) {
             for (String storeId : storeIds) {
-                ShoppingBasket basket = getBasket(clientId, storeId);
+                // Get the basket from the repository
+                ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
                 if (basket == null) {
                     continue;
                 }
@@ -582,9 +605,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                     for (Map.Entry<String, Integer> entry : orders.entrySet()) {
                         String productId = entry.getKey();
                         int quantity = entry.getValue();
+                        
+                        // Get the item from the store
                         Item item = itemFacade.getItem(storeId, productId);
-                        // Add null check for item
-                        if (item != null) {
+                        if (item != null && quantity > 0) {
                             viewCart.add(new Pair<>(item, quantity));
                         }
                     }

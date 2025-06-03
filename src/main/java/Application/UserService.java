@@ -70,7 +70,10 @@ public class UserService {
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "exit", "Couldn't find user", id);
             return Response.error("User not found");
-        }
+        } catch (IllegalStateException e) {
+            TradingLogger.logError(CLASS_NAME, "exit", "Failed to exit user: " + e.getMessage());
+            return Response.error("Failed to exit user: " + e.getMessage());
+        } 
         return Response.success(null);
     }
 
@@ -141,6 +144,7 @@ public class UserService {
      * @return {@link Response} of {@link List} of {@link UserDTO} containing all members' information.
      *         If an error occurs, returns an error message.
      */
+    @Transactional
     public Response<List<UserDTO>> getAllMembers(String sessionToken) {
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getAllMembers", "Received invalid session token", sessionToken);
@@ -156,6 +160,17 @@ public class UserService {
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "getAllMembers", "Couldn't find user with id: " + id, e.getMessage());
             return Response.error("User not found");
+        }
+    }
+
+    public Response<Void> logOutAllUsers() {
+        try {
+            loginManager.logOutAllUsers();
+            TradingLogger.logEvent(CLASS_NAME, "logOutAllUsers", "All users have been logged out.");
+            return Response.success(null);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "logOutAllUsers", "Failed to log out all users: " + e.getMessage());
+            return Response.error("Failed to log out all users: " + e.getMessage());
         }
     }
 }

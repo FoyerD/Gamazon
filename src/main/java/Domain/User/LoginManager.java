@@ -146,7 +146,9 @@ public class LoginManager {
         if (user == null) {
             throw new NoSuchElementException("User not found");
         }
-        
+        if (!user.isLoggedIn()) {
+            throw new IllegalStateException("User is not logged in");
+        }
         user.logout(this);
         return user;
     }
@@ -177,6 +179,16 @@ public class LoginManager {
 
     public List<Member> getAllMembers() {
         return userRepository.getAllMembers();
+    }
+
+    public void logOutAllUsers() {
+        List<User> users = userRepository.getAllUsers();
+        for (User user : users) {
+            if (user.isLoggedIn()) {
+                user.logout(this);
+                userRepository.update(user.getId(), user);
+            }
+        }
     }
 }
 

@@ -1,35 +1,38 @@
 package UI.views;
 
-import UI.presenters.IPurchasePresenter;
-import UI.views.components.BasketLayout;
-import UI.presenters.IProductPresenter;
-import Application.DTOs.CartDTO;
-import Application.DTOs.ItemDTO;
-import Application.DTOs.ShoppingBasketDTO;
-import Application.DTOs.StoreDTO;
-import Application.utils.Response;
-import UI.presenters.IStorePresenter;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.Map;
+import Application.DTOs.CartDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ShoppingBasketDTO;
+import Application.DTOs.StoreDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IPurchasePresenter;
+import UI.presenters.IStorePresenter;
+import UI.views.components.BasketLayout;
 
 @Route("cart")
-public class CartView extends VerticalLayout implements BeforeEnterObserver {
+public class CartView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
     private final IStorePresenter storePresenter;
@@ -46,7 +49,9 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
     private double cartTotal = 0.0;
 
     @Autowired
-    public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter) {
+    public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter, 
+                    @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired (required=false) GlobalLogoutManager globalLogoutManager) {
+        super(dbHealthStatus, globalLogoutManager);
         this.purchasePresenter = purchasePresenter;
         this.storePresenter = storePresenter;
 

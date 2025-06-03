@@ -171,60 +171,51 @@ public class PolicyService {
                     }
                     created = policyFacade.createAndPolicy(
                             details.getSubPolicies(),
-                            details.getPolicyId(),
-                            storeId);
+                            details.getPolicyId());
                     break;
                 case MIN_QUANTITY_ALL:
                     created = policyFacade.createMinQuantityAllPolicy(
                             details.getPolicyId(),
-                            storeId,
                             details.getMinItemsAll());
                     break;
                 case MAX_QUANTITY_ALL:
                     created = policyFacade.createMaxQuantityAllPolicy(
                             details.getPolicyId(),
-                            storeId,
                             details.getMaxItemsAll());
                     break;
                 case MIN_QUANTITY_PRODUCT:
                     created = policyFacade.createMinQuantityProductPolicy(
                             details.getPolicyId(),
                             storeId,
-                            details.getTargetProductId(),
                             details.getMinItemsProduct());
                     break;
                 case MAX_QUANTITY_PRODUCT:
                     created = policyFacade.createMaxQuantityProductPolicy(
                             details.getPolicyId(),
                             storeId,
-                            details.getTargetProductId(),
                             details.getMaxItemsProduct());
                     break;
                 case MIN_QUANTITY_CATEGORY:
                     created = policyFacade.createMinQuantityCategoryPolicy(
                             details.getPolicyId(),
                             storeId,
-                            details.getTargetCategory(),
                             details.getMinItemsCategory());
                     break;
                 case MAX_QUANTITY_CATEGORY:
                     created = policyFacade.createMaxQuantityCategoryPolicy(
                             details.getPolicyId(),
                             storeId,
-                            details.getTargetCategory(),
                             details.getMaxItemsCategory());
                     break;
                 case CATEGORY_DISALLOW:
                     created = policyFacade.createCategoryDisallowPolicy(
                             details.getPolicyId(),
-                            storeId,
-                            details.getDisallowedCategory());
+                            storeId);
                     break;
                 case CATEGORY_AGE:
                     created = policyFacade.createCategoryAgePolicy(
                             details.getPolicyId(),
                             storeId,
-                            details.getAgeCategory(),
                             details.getMinAge());
                     break;
                 default:

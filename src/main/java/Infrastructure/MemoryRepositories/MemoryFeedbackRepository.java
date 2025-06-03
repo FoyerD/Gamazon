@@ -5,11 +5,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Repos.IFeedbackRepository;
 import Domain.Store.Feedback;
+
 @Repository
+@Profile("dev")
 public class MemoryFeedbackRepository extends IFeedbackRepository{
     private Map<String, Feedback> feedbacks;
 

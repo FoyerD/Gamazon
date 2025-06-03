@@ -5,15 +5,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Repos.IPolicyRepository;
 import Domain.Store.Policy;
 
+import java.util.UUID;
+
 /**
  * In-memory implementation of IPolicyRepository for Policy objects.
  */
 @Repository
+@Profile("dev")
 public class MemoryPolicyRepository extends IPolicyRepository {
     // Thread-safe storage of policies by ID
     private final Map<String, Policy> policies = new ConcurrentHashMap<>();
@@ -34,6 +38,9 @@ public class MemoryPolicyRepository extends IPolicyRepository {
      */
     @Override
     public boolean add(String id, Policy policy) {
+        if (id == null || id.trim().isEmpty() || policy == null) {
+            return false;
+        }
         return policies.putIfAbsent(id, policy) == null;
     }
 
