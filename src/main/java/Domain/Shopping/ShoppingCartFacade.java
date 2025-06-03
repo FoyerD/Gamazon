@@ -15,6 +15,7 @@ import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
@@ -33,6 +34,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingBasketRepository basketRepo;
     private final IReceiptRepository receiptRepo;
     private final IExternalPaymentService paymentService;
+    private final IExternalSupplyService supplyService;
     private final ItemFacade itemFacade;
     private final StoreFacade storeFacade;
     private CheckoutManager checkoutManager;
@@ -52,7 +54,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     @Autowired
     public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo,
      IExternalPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade,
-      IReceiptRepository receiptRepo, IProductRepository productRepository, DiscountFacade discountFacade) {
+      IReceiptRepository receiptRepo, IProductRepository productRepository, DiscountFacade discountFacade, IExternalSupplyService supplyService) {
+        this.supplyService = supplyService;
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
@@ -274,9 +277,14 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             return true;
         } else {
             // Perform rollback and throw exception
-            Integer transactionId = result.getTransactionId();
-            if(transactionId != -1)
-                paymentService.cancelPayment(transactionId);
+            Integer paymentTransactionId = result.getPaymentTransactionId();
+            Integer supplyTransactionId = result.getSupplyTransactionId();
+            
+            if(paymentTransactionId != -1)
+                paymentService.cancelPayment(paymentTransactionId);
+            if(supplyTransactionId != -1)
+                supplyService.cancelSupply(supplyTransactionId);
+
             checkoutManager.performRollback(clientId, cart, result);
             cartRepo.update(clientId, cart);
             throw new RuntimeException("Checkout failed: " + result.getErrorMessage());
