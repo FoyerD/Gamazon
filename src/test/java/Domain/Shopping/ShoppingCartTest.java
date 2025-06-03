@@ -25,6 +25,7 @@ public class ShoppingCartTest {
     public void testConstructor_Default() {
         assertEquals(CLIENT_ID, cart.getClientId());
         assertTrue(cart.getCart().isEmpty());
+        
     }
     
     @Test
@@ -51,6 +52,11 @@ public class ShoppingCartTest {
         assertEquals(1, cart.getCart().size());
         assertTrue(cart.getCart().contains(STORE_ID));
         assertFalse(cart.getCart().contains(STORE_ID2));
+
+        assertEquals(2, returnedCart.size());
+        assertTrue(returnedCart.contains(STORE_ID));
+        assertTrue(returnedCart.contains(STORE_ID2));
+
     }
     
     @Test
@@ -59,6 +65,7 @@ public class ShoppingCartTest {
         
         assertEquals(1, cart.getCart().size());
         assertTrue(cart.getCart().contains(STORE_ID));
+
     }
     
     @Test
@@ -68,6 +75,7 @@ public class ShoppingCartTest {
         
         assertEquals(1, cart.getCart().size());
         assertTrue(cart.getCart().contains(STORE_ID));
+
     }
     
     @Test
@@ -80,6 +88,7 @@ public class ShoppingCartTest {
         assertEquals(1, cart.getCart().size());
         assertFalse(cart.getCart().contains(STORE_ID));
         assertTrue(cart.getCart().contains(STORE_ID2));
+
     }
     
     @Test
@@ -90,6 +99,8 @@ public class ShoppingCartTest {
         
         assertEquals(1, cart.getCart().size());
         assertTrue(cart.getCart().contains(STORE_ID));
+        assertFalse(cart.getCart().contains("nonexistent"));
+
     }
     
     @Test
@@ -112,6 +123,8 @@ public class ShoppingCartTest {
         cart.clear();
         
         assertTrue(cart.getCart().isEmpty());
+        assertEquals(0, cart.getCart().size());
+
     }
     
     @Test
