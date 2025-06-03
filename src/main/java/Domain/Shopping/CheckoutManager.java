@@ -67,6 +67,7 @@ public class CheckoutManager {
         Set<String> cartRollbackData = new HashSet<>();
         Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
         Map<String, Map<Product, Double>> storeProductPricesMap = new HashMap<>(); // Store discounted prices
+        Response<Integer> paymentResponse = new Response<>(-1);
         
         try {
             boolean purchaseSuccess = false;
@@ -92,10 +93,9 @@ public class CheckoutManager {
                     }
                 }
             }
-
             // Process payment if there are items to checkout
             if (purchaseSuccess) {
-                Response<Integer> paymentResponse = paymentService.processPayment(
+                paymentResponse = paymentService.processPayment(
                     clientId, cardNumber, expiryDate, cvv, 
                     clientName, totalPrice
                 );
@@ -117,10 +117,10 @@ public class CheckoutManager {
                 receiptBuilder.createReceiptsWithDiscounts(clientId, storeProductsMap, storeProductPricesMap, cardNumber);
             }
 
-            return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData);
+            return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData, paymentResponse.getValue());
             
         } catch (Exception e) {
-            return new CheckoutResult(false, e.getMessage(), itemsRollbackData, cartRollbackData, basketsRollbackData);
+            return new CheckoutResult(false, e.getMessage(), itemsRollbackData, cartRollbackData, basketsRollbackData, paymentResponse.getValue());
         }
     }
 
@@ -297,11 +297,13 @@ public class CheckoutManager {
         private final Map<Pair<String, String>, Integer> itemsRollbackData;
         private final Set<String> cartRollbackData;
         private final Set<ShoppingBasket> basketsRollbackData;
+        private final Integer transactionId; // ID of the processed payment, if successful
 
         public CheckoutResult(boolean success, String errorMessage,
                             Map<Pair<String, String>, Integer> itemsRollbackData,
                             Set<String> cartRollbackData,
-                            Set<ShoppingBasket> basketsRollbackData) {
+                            Set<ShoppingBasket> basketsRollbackData, Integer transactionId) {
+            this.transactionId = transactionId;
             this.success = success;
             this.errorMessage = errorMessage;
             this.itemsRollbackData = itemsRollbackData;
@@ -314,5 +316,6 @@ public class CheckoutManager {
         public Map<Pair<String, String>, Integer> getItemsRollbackData() { return itemsRollbackData; }
         public Set<String> getCartRollbackData() { return cartRollbackData; }
         public Set<ShoppingBasket> getBasketsRollbackData() { return basketsRollbackData; }
+        public Integer getTransactionId() { return transactionId; }
     }
 }

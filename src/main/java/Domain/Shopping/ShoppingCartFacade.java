@@ -274,6 +274,9 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             return true;
         } else {
             // Perform rollback and throw exception
+            Integer transactionId = result.getTransactionId();
+            if(transactionId != -1)
+                paymentService.cancelPayment(transactionId);
             checkoutManager.performRollback(clientId, cart, result);
             cartRepo.update(clientId, cart);
             throw new RuntimeException("Checkout failed: " + result.getErrorMessage());
