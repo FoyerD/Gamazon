@@ -120,6 +120,24 @@ public class PolicyDTO {
     public Integer getMinAge() { return minAge; }
     public CategoryDTO getAgeCategory() { return ageCategory; }
 
+    public Policy toPolicy() {
+        Policy.Builder policyBuilder = new Policy.Builder(type);
+        return policyBuilder.policyId(policyId)
+        .storeId(storeId)
+        .subPolicies(this.subPolicies.stream().map(PolicyDTO::toPolicy).toList())
+        .minItemsAll(this.minItemsAll)
+        .maxItemsAll(this.maxItemsAll)
+        .targetProductId(this.targetProduct.getId())
+        .minItemsProduct(this.minItemsProduct)
+        .maxItemsProduct(this.maxItemsProduct)
+        .targetCategory(this.targetCategory.getName())
+        .minItemsCategory(this.minItemsCategory)
+        .maxItemsCategory(this.maxItemsCategory)
+        .disallowedCategory(this.disallowedCategory.getName())
+        .ageCategory(this.ageCategory.getName())
+        .minAge(this.minAge).build();
+
+    }
 
     public static class Builder {
         public Builder(String storeId, Policy.Type type) {
@@ -275,4 +293,6 @@ public class PolicyDTO {
             return new PolicyDTO(policyId, this);
         }
     }
+
+
 }

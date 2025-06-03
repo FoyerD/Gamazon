@@ -170,52 +170,52 @@ public class PolicyService {
                         throw new IllegalArgumentException("AND policy needs children");
                     }
                     created = policyFacade.createAndPolicy(
-                            details.getSubPolicies(),
-                            details.getPolicyId());
+                            details.getSubPolicies().stream().map(PolicyDTO::toPolicy).toList(),
+                            storeId); // TODO: AND policies willnot work. lookup functions aren't defined. Refctoring needed :(
                     break;
                 case MIN_QUANTITY_ALL:
                     created = policyFacade.createMinQuantityAllPolicy(
-                            details.getPolicyId(),
+                            storeId,
                             details.getMinItemsAll());
                     break;
                 case MAX_QUANTITY_ALL:
                     created = policyFacade.createMaxQuantityAllPolicy(
-                            details.getPolicyId(),
+                            storeId,
                             details.getMaxItemsAll());
                     break;
                 case MIN_QUANTITY_PRODUCT:
                     created = policyFacade.createMinQuantityProductPolicy(
-                            details.getPolicyId(),
                             storeId,
+                            details.getTargetProduct().getId(),
                             details.getMinItemsProduct());
                     break;
                 case MAX_QUANTITY_PRODUCT:
                     created = policyFacade.createMaxQuantityProductPolicy(
-                            details.getPolicyId(),
                             storeId,
+                            details.getTargetProduct().getId(),
                             details.getMaxItemsProduct());
                     break;
                 case MIN_QUANTITY_CATEGORY:
                     created = policyFacade.createMinQuantityCategoryPolicy(
-                            details.getPolicyId(),
                             storeId,
+                            details.getTargetCategory().getName(),
                             details.getMinItemsCategory());
                     break;
                 case MAX_QUANTITY_CATEGORY:
                     created = policyFacade.createMaxQuantityCategoryPolicy(
-                            details.getPolicyId(),
                             storeId,
+                            details.getTargetCategory().getName(),
                             details.getMaxItemsCategory());
                     break;
                 case CATEGORY_DISALLOW:
                     created = policyFacade.createCategoryDisallowPolicy(
-                            details.getPolicyId(),
-                            storeId);
+                            storeId,
+                            details.getDisallowedCategory().getName());
                     break;
                 case CATEGORY_AGE:
                     created = policyFacade.createCategoryAgePolicy(
-                            details.getPolicyId(),
                             storeId,
+                            details.getAgeCategory().getName(),
                             details.getMinAge());
                     break;
                 default:
@@ -225,7 +225,7 @@ public class PolicyService {
             TradingLogger.logEvent(CLASS_NAME, method,
                     "Created policy " + created.getPolicyId() +
                     " (" + created.getType() + ") for store " + storeId);
-            return new Response<>(new PolicyDTO(created));
+            return new Response<>(convertPolicyToDTO(created));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
@@ -258,7 +258,7 @@ public class PolicyService {
             TradingLogger.logEvent(CLASS_NAME, method,
                     "Updated policy " + policyId + " for store " + storeId);
             Policy updated = policyFacade.getPolicy(policyId);
-            return new Response<>(new PolicyDTO(updated));
+            return new Response<>(convertPolicyToDTO(updated));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());

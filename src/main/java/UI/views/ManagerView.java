@@ -118,13 +118,14 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
         // Create tabs for different sections
         Tab employeesTab = new Tab(VaadinIcon.USERS.create(), new Span("Employees"));
+        Tab policiesTab = new Tab(VaadinIcon.ABACUS.create(), new Span("Store Policies"));
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
         Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
         
 
         // Style all tabs to have white text and icons
-        for (Tab tab : new Tab[]{employeesTab, itemsTab, auctionsTab, historyTab}) {
+        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, historyTab}) {
             tab.getStyle().set("color", " #ffffff");
             // Get the icon and span components from the tab
             tab.getChildren().forEach(component -> {
@@ -132,7 +133,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             });
         }
         
-        Tabs tabs = new Tabs(employeesTab, itemsTab, auctionsTab, historyTab);
+        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, historyTab);
         tabs.getStyle()
             .set("margin", "1rem 0")
             .set("--lumo-contrast-60pct", " #ffffff"); 
@@ -161,9 +162,6 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 }
             }
         );
-
-
-      
 
         // Tab change listener
         tabs.addSelectedChangeListener(event -> {
