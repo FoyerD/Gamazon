@@ -6,7 +6,6 @@ import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 
 public interface Condition {
-    
     /**
      * Gets the unique identifier for this condition
      * @return UUID of this condition

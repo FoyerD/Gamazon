@@ -1,19 +1,19 @@
 package Application;
 
-import Application.utils.Response;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import Application.DTOs.PolicyDTO;
 import Application.utils.Error;
+import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.PolicyFacade;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class PolicyService {

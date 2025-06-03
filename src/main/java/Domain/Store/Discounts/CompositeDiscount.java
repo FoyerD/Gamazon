@@ -46,4 +46,8 @@ public abstract class CompositeDiscount extends Discount {
     public List<Discount> getDiscounts() {
         return discounts == null ? new ArrayList<>() : new ArrayList<>(discounts);
     }
+
+    public MergeType getMergeType() {
+        return mergeType;
+    }
 }

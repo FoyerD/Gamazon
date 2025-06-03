@@ -2,7 +2,6 @@ package Domain.Store.Discounts;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -80,33 +79,23 @@ public class DiscountBuilder {
                 return new SimpleDiscount(id,discountDTO.getDiscountPercentage(), buildQualifier(discountDTO), cond);
                 
             case AND:
-                return new AndDiscount(id, discountDTO.getSubDiscounts().stream()
-                    .map(this::buildDiscount)
-                    .collect(Collectors.toList()));
+                return new AndDiscount(id,
+                    discountDTO.getSubDiscounts().stream().map(this::buildDiscount).collect(Collectors.toList()),
+                    cond,
+                    discountDTO.getMergeType());
                     
             case OR:
-                return new OrDiscount(id, buildDiscount(discountDTO.getSubDiscounts().get(0)), 
-                    discountDTO.getSubDiscounts().subList(1, discountDTO.getSubDiscounts().size())
-                        .stream()
-                        .map(subDto -> conditionBuilder.buildCondition(subDto.getCondition()))
-                        .collect(Collectors.toSet()));
+                return new OrDiscount(id,
+                    discountDTO.getSubDiscounts().stream().map(this::buildDiscount).collect(Collectors.toList()),
+                    cond,
+                    discountDTO.getMergeType());
                         
             case XOR:
-                if (discountDTO.getSubDiscounts().size() != 2) {
-                    throw new IllegalArgumentException("XorDiscount requires exactly 2 sub-discounts");
-                }
-                return new XorDiscount(UUID.fromString(id), itemFacade, buildDiscount(discountDTO.getSubDiscounts().get(0)), 
-                    buildDiscount(discountDTO.getSubDiscounts().get(1)));
-                    
-            case DOUBLE:
-                return new DoubleDiscount(UUID.fromString(id), itemFacade, discountDTO.getSubDiscounts().stream()
-                    .map(this::buildDiscount)
-                    .collect(Collectors.toSet()));
-                    
-            case MAX:
-                return new MaxDiscount(UUID.fromString(id), itemFacade, discountDTO.getSubDiscounts().stream()
-                    .map(this::buildDiscount)
-                    .collect(Collectors.toSet()));
+            List<Discount> subDis = discountDTO.getSubDiscounts().stream().map(this::buildDiscount).collect(Collectors.toList());
+                return new XorDiscount(id,
+                    ,
+                    cond,
+                    discountDTO.getMergeType());
                     
             default:
                 throw new IllegalArgumentException("Unknown discount type: " + discountDTO.getType());

@@ -17,4 +17,8 @@ public class StoreQualifier implements DiscountQualifier {
         return item.getStoreId() == storeId; // all in the store products are qualified
     }
 
+    public String getStoreId() {
+        return storeId;
+    }
+
 }

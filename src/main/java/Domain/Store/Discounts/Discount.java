@@ -10,6 +10,11 @@ import Domain.Store.Discounts.Conditions.Condition;
 import Domain.Store.Discounts.Conditions.TrueCondition;
 
 public abstract class Discount {
+    public enum MergeType {
+        MAX,
+        MUL
+    }
+
 
     protected final String id;
     protected Condition condition;

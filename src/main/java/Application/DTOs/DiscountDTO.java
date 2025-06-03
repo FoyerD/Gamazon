@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import Domain.Store.Discounts.AndDiscount;
 import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.Discount.MergeType;
 import Domain.Store.Discounts.OrDiscount;
 import Domain.Store.Discounts.SimpleDiscount;
 import Domain.Store.Discounts.XorDiscount;
@@ -13,15 +14,13 @@ import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 import Domain.Store.Discounts.Qualifiers.ProductQualifier;
 import Domain.Store.Discounts.Qualifiers.StoreQualifier;
 
-public class DiscountDTO {
-    
+
+public class DiscountDTO { 
     public enum DiscountType {
         SIMPLE,
         AND,
         OR,
         XOR,
-        DOUBLE,
-        MAX
     }
     
     public enum QualifierType {
@@ -41,6 +40,7 @@ public class DiscountDTO {
     
     // Fields for composite discounts
     private List<DiscountDTO> subDiscounts;
+    private MergeType mergeType; // Only applicable for composite discounts
     
     // Default constructor for JSON serialization
     public DiscountDTO() {}
@@ -77,7 +77,7 @@ public class DiscountDTO {
                 dto.qualifierValue = ((CategoryQualifier) qualifier).getCategory();
             } else if (qualifier instanceof StoreQualifier) {
                 dto.qualifierType = QualifierType.STORE;
-                dto.qualifierValue = null; // Store qualifier applies to all products
+                dto.qualifierValue = ((StoreQualifier) qualifier).getStoreId(); // Store qualifier applies to all products
             } else {
                 throw new IllegalArgumentException("Unknown qualifier type: " + qualifier.getClass().getSimpleName());
             }
@@ -88,6 +88,7 @@ public class DiscountDTO {
             dto.subDiscounts = andDiscount.getDiscounts().stream()
                 .map(DiscountDTO::fromDiscount)
                 .collect(Collectors.toList());
+            dto.mergeType = andDiscount.getMergeType();
                 
         } else if (discount instanceof OrDiscount) {
             OrDiscount orDiscount = (OrDiscount) discount;
@@ -95,6 +96,7 @@ public class DiscountDTO {
             dto.subDiscounts = orDiscount.getDiscounts().stream()
                 .map(DiscountDTO::fromDiscount)
                 .collect(Collectors.toList());
+            dto.mergeType = orDiscount.getMergeType();
                 
         } else if (discount instanceof XorDiscount) {
             XorDiscount xorDiscount = (XorDiscount) discount;
@@ -102,20 +104,7 @@ public class DiscountDTO {
             dto.subDiscounts = xorDiscount.getDiscounts().stream()
                 .map(DiscountDTO::fromDiscount)
                 .collect(Collectors.toList());
-                
-        } else if (discount instanceof DoubleDiscount) {
-            DoubleDiscount doubleDiscount = (DoubleDiscount) discount;
-            dto.type = DiscountType.DOUBLE;
-            dto.subDiscounts = doubleDiscount.getDiscounts().stream()
-                .map(DiscountDTO::fromDiscount)
-                .collect(Collectors.toList());
-                
-        } else if (discount instanceof MaxDiscount) {
-            MaxDiscount maxDiscount = (MaxDiscount) discount;
-            dto.type = DiscountType.MAX;
-            dto.subDiscounts = maxDiscount.getDiscounts().stream()
-                .map(DiscountDTO::fromDiscount)
-                .collect(Collectors.toList());
+            dto.mergeType = xorDiscount.getMergeType();
                 
         } else {
             throw new IllegalArgumentException("Unknown discount type: " + discount.getClass().getSimpleName());
@@ -144,6 +133,13 @@ public class DiscountDTO {
     
     public ConditionDTO getCondition() {
         return condition;
+    }
+
+    public MergeType getMergeType() {
+        return mergeType;
+    }
+    public void setMergeType(MergeType mergeType) {
+        this.mergeType = mergeType;
     }
     
     public void setCondition(ConditionDTO condition) {
@@ -217,8 +213,6 @@ public class DiscountDTO {
             case AND:
             case OR:
             case XOR:
-            case DOUBLE:
-            case MAX:
                 sb.append(", subDiscounts=").append(getSubDiscountCount());
                 break;
         }

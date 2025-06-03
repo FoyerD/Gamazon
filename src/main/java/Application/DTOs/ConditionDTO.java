@@ -3,18 +3,27 @@ package Application.DTOs;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Domain.Store.Discounts.Conditions.*;
+import Domain.Store.Discounts.Conditions.AndCondition;
+import Domain.Store.Discounts.Conditions.Condition;
+import Domain.Store.Discounts.Conditions.MaxPriceCondition;
+import Domain.Store.Discounts.Conditions.MaxQuantityCondition;
+import Domain.Store.Discounts.Conditions.MinPriceCondition;
+import Domain.Store.Discounts.Conditions.MinQuantityCondition;
+import Domain.Store.Discounts.Conditions.OrCondition;
+import Domain.Store.Discounts.Conditions.TrueCondition;
 
 public class ConditionDTO {
-    
-    public enum ConditionType {
-        MIN_PRICE,
-        MAX_PRICE,
-        MIN_QUANTITY,
-        MAX_QUANTITY,
+        public enum ConditionType {
+        TRUE,
         AND,
         OR,
-        TRUE
+        XOR,
+        MAX,
+        DOUBLE,
+        MAX_QUANTITY,
+        MIN_QUANTITY,
+        MAX_PRICE,
+        MIN_PRICE
     }
     
     private String id;
@@ -39,58 +48,87 @@ public class ConditionDTO {
         this.type = type;
     }
     
-    // Factory methods for creating from domain objects
     public static ConditionDTO fromCondition(Condition condition) {
         if (condition == null) {
             return null;
         }
-        
-        ConditionDTO dto = new ConditionDTO();
-        dto.id = condition.getId();
-        
         if (condition instanceof MinPriceCondition) {
-            MinPriceCondition minPriceCondition = (MinPriceCondition) condition;
-            dto.type = ConditionType.MIN_PRICE;
-            dto.minPrice = minPriceCondition.getMinPrice();
-            
+            return fromMinPriceCondition((MinPriceCondition) condition);
         } else if (condition instanceof MaxPriceCondition) {
-            MaxPriceCondition maxPriceCondition = (MaxPriceCondition) condition;
-            dto.type = ConditionType.MAX_PRICE;
-            dto.maxPrice = maxPriceCondition.getMaxPrice();
-            
+            return fromMaxPriceCondition((MaxPriceCondition) condition);
         } else if (condition instanceof MinQuantityCondition) {
-            MinQuantityCondition minQuantityCondition = (MinQuantityCondition) condition;
-            dto.type = ConditionType.MIN_QUANTITY;
-            dto.productId = minQuantityCondition.getProductId();
-            dto.minQuantity = minQuantityCondition.getMinQuantity();
-            
+            return fromMinQuantityCondition((MinQuantityCondition) condition);
         } else if (condition instanceof MaxQuantityCondition) {
-            MaxQuantityCondition maxQuantityCondition = (MaxQuantityCondition) condition;
-            dto.type = ConditionType.MAX_QUANTITY;
-            dto.productId = maxQuantityCondition.getProductId();
-            dto.maxQuantity = maxQuantityCondition.getMaxQuantity();
-            
+            return fromMaxQuantityCondition((MaxQuantityCondition) condition);
         } else if (condition instanceof AndCondition) {
-            AndCondition andCondition = (AndCondition) condition;
-            dto.type = ConditionType.AND;
-            dto.subConditions = andCondition.getConditions().stream()
-                .map(ConditionDTO::fromCondition)
-                .collect(Collectors.toList());
-                
+            return fromAndCondition((AndCondition) condition);
         } else if (condition instanceof OrCondition) {
-            OrCondition orCondition = (OrCondition) condition;
-            dto.type = ConditionType.OR;
-            dto.subConditions = orCondition.getConditions().stream()
-                .map(ConditionDTO::fromCondition)
-                .collect(Collectors.toList());
-                
+            return fromOrCondition((OrCondition) condition);
         } else if (condition instanceof TrueCondition) {
-            dto.type = ConditionType.TRUE;
-            
+            return fromTrueCondition((TrueCondition) condition);
         } else {
             throw new IllegalArgumentException("Unknown condition type: " + condition.getClass().getSimpleName());
         }
-        
+    }
+
+    private static ConditionDTO fromMinPriceCondition(MinPriceCondition condition) {
+        ConditionDTO dto = new ConditionDTO();
+        dto.id = condition.getId();
+        dto.type = ConditionType.MIN_PRICE;
+        dto.minPrice = condition.getMinPrice();
+        return dto;
+    }
+
+    private static ConditionDTO fromMaxPriceCondition(MaxPriceCondition condition) {
+        ConditionDTO dto = new ConditionDTO();
+        dto.id = condition.getId();
+        dto.type = ConditionType.MAX_PRICE;
+        dto.maxPrice = condition.getMaxPrice();
+        return dto;
+    }
+
+    private static ConditionDTO fromMinQuantityCondition(MinQuantityCondition condition) {
+        ConditionDTO dto = new ConditionDTO();
+        dto.id = condition.getId();
+        dto.type = ConditionType.MIN_QUANTITY;
+        dto.productId = condition.getProductId();
+        dto.minQuantity = condition.getMinQuantity();
+        return dto;
+    }
+
+    private static ConditionDTO fromMaxQuantityCondition(MaxQuantityCondition condition) {
+        ConditionDTO dto = new ConditionDTO();
+        dto.id = condition.getId();
+        dto.type = ConditionType.MAX_QUANTITY;
+        dto.productId = condition.getProductId();
+        dto.maxQuantity = condition.getMaxQuantity();
+        return dto;
+    }
+
+    private static ConditionDTO fromAndCondition(AndCondition condition) {
+        ConditionDTO dto = new ConditionDTO();
+        dto.id = condition.getId();
+        dto.type = ConditionType.AND;
+        dto.subConditions = condition.getConditions().stream()
+            .map(ConditionDTO::fromCondition)
+            .collect(Collectors.toList());
+        return dto;
+    }
+
+    private static ConditionDTO fromOrCondition(OrCondition condition) {
+        ConditionDTO dto = new ConditionDTO();
+        dto.id = condition.getId();
+        dto.type = ConditionType.OR;
+        dto.subConditions = condition.getConditions().stream()
+            .map(ConditionDTO::fromCondition)
+            .collect(Collectors.toList());
+        return dto;
+    }
+
+    private static ConditionDTO fromTrueCondition(TrueCondition condition) {
+        ConditionDTO dto = new ConditionDTO();
+        dto.id = condition.getId();
+        dto.type = ConditionType.TRUE;
         return dto;
     }
     
