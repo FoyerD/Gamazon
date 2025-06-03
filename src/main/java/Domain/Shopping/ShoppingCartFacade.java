@@ -15,6 +15,7 @@ import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
@@ -33,6 +34,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final IShoppingBasketRepository basketRepo;
     private final IReceiptRepository receiptRepo;
     private final IExternalPaymentService paymentService;
+    private final IExternalSupplyService supplyService;
     private final ItemFacade itemFacade;
     private final StoreFacade storeFacade;
     private CheckoutManager checkoutManager;
@@ -52,7 +54,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     @Autowired
     public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo,
      IExternalPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade,
-      IReceiptRepository receiptRepo, IProductRepository productRepository, DiscountFacade discountFacade) {
+      IReceiptRepository receiptRepo, IProductRepository productRepository, DiscountFacade discountFacade, IExternalSupplyService supplyService) {
+        this.supplyService = supplyService;
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
@@ -61,7 +64,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         this.receiptRepo = receiptRepo;
         this.discountFacade = discountFacade;
         this.checkoutManager = new CheckoutManager(basketRepo, paymentService, itemFacade, productRepository,
-         new ReceiptBuilder(receiptRepo, itemFacade), discountFacade);
+         new ReceiptBuilder(receiptRepo, itemFacade), discountFacade, supplyService);
     }
 
     /**
@@ -250,7 +253,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      */
     @Override
     public boolean checkout(String clientId, String cardNumber, Date expiryDate, String cvv,
-                           long andIncrement, String clientName, String deliveryAddress) {
+                           String clientName, String deliveryAddress, String city, String country, String zipCode) {
         
         // Validate arguments
         if (clientId == null || cardNumber == null || expiryDate == null || cvv == null) {
@@ -265,7 +268,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         // Process checkout using CheckoutManager
         CheckoutManager.CheckoutResult result = checkoutManager.processCheckout(
             clientId, cart, cardNumber, expiryDate, cvv, 
-            andIncrement, clientName, deliveryAddress
+            clientName, deliveryAddress, city, country, zipCode
         );
         
         if (result.isSuccess()) {
@@ -274,6 +277,14 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             return true;
         } else {
             // Perform rollback and throw exception
+            Integer paymentTransactionId = result.getPaymentTransactionId();
+            Integer supplyTransactionId = result.getSupplyTransactionId();
+
+            if(paymentTransactionId != -1)
+                paymentService.cancelPayment(paymentTransactionId);
+            if(supplyTransactionId != -1)
+                supplyService.cancelSupply(supplyTransactionId);
+
             checkoutManager.performRollback(clientId, cart, result);
             cartRepo.update(clientId, cart);
             throw new RuntimeException("Checkout failed: " + result.getErrorMessage());

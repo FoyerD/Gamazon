@@ -12,12 +12,14 @@ import org.springframework.stereotype.Component;
 import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 
 /**
  * Manages the checkout process including inventory updates, payment processing, and rollback operations.
@@ -27,6 +29,7 @@ import Domain.Store.Discounts.ItemPriceBreakdown;
 public class CheckoutManager {
     private final IShoppingBasketRepository basketRepo;
     private final IExternalPaymentService paymentService;
+    private final IExternalSupplyService supplyService;
     private final ItemFacade itemFacade;
     private final IProductRepository productRepo;
     private final ReceiptBuilder receiptBuilder;
@@ -37,7 +40,8 @@ public class CheckoutManager {
                           ItemFacade itemFacade, 
                           IProductRepository productRepo,
                           ReceiptBuilder receiptBuilder,
-                          DiscountFacade discountFacade) {
+                          DiscountFacade discountFacade, IExternalSupplyService supplyService) {
+        this.supplyService = supplyService;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
         this.itemFacade = itemFacade;
@@ -53,20 +57,22 @@ public class CheckoutManager {
      * @param cardNumber The payment card number
      * @param expiryDate The card expiry date
      * @param cvv The card CVV
-     * @param andIncrement Payment tracking identifier
      * @param clientName The client's name
      * @param deliveryAddress The delivery address
      * @return CheckoutResult containing success status and any error messages
      */
     public CheckoutResult processCheckout(String clientId, IShoppingCart cart, 
                                         String cardNumber, Date expiryDate, String cvv,
-                                        long andIncrement, String clientName, String deliveryAddress) {
+                                        String clientName, String deliveryAddress, String city, 
+                                        String country, String zipCode) {
         
         Map<Pair<String, String>, Integer> itemsRollbackData = new HashMap<>();
         Set<ShoppingBasket> basketsRollbackData = new HashSet<>();
         Set<String> cartRollbackData = new HashSet<>();
         Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
         Map<String, Map<Product, Double>> storeProductPricesMap = new HashMap<>(); // Store discounted prices
+        Response<Integer> paymentResponse = new Response<>(-1);
+        Response<Integer> supplyResponse = new Response<>(-1);
         
         try {
             boolean purchaseSuccess = false;
@@ -92,10 +98,9 @@ public class CheckoutManager {
                     }
                 }
             }
-
             // Process payment if there are items to checkout
             if (purchaseSuccess) {
-                Response<Integer> paymentResponse = paymentService.processPayment(
+                paymentResponse = paymentService.processPayment(
                     clientId, cardNumber, expiryDate, cvv, 
                     clientName, totalPrice
                 );
@@ -103,6 +108,10 @@ public class CheckoutManager {
                 if (paymentResponse == null || paymentResponse.errorOccurred()) {
                     String errorMsg = paymentResponse != null ? paymentResponse.getErrorMessage() : "service returned null response";
                     throw new RuntimeException("Payment failed: " + errorMsg);
+                }
+
+                if(paymentResponse.getValue() == -1) {
+                    throw new RuntimeException("Payment failed: Invalid transaction ID");
                 }
             }
 
@@ -117,10 +126,24 @@ public class CheckoutManager {
                 receiptBuilder.createReceiptsWithDiscounts(clientId, storeProductsMap, storeProductPricesMap, cardNumber);
             }
 
-            return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData);
+            supplyResponse = supplyService.supplyOrder(
+                clientName, deliveryAddress, city, country, zipCode
+            );
+            
+            if (supplyResponse == null || supplyResponse.errorOccurred()) {
+                String errorMsg = supplyResponse != null ? supplyResponse.getErrorMessage() : "service returned null response";
+                throw new RuntimeException("Supply failed: " + errorMsg);
+            }
+
+            if(supplyResponse.getValue() == -1) {
+                throw new RuntimeException("Supply failed: Invalid transaction ID");
+            }
+        
+
+            return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData, paymentResponse.getValue(), supplyResponse.getValue());
             
         } catch (Exception e) {
-            return new CheckoutResult(false, e.getMessage(), itemsRollbackData, cartRollbackData, basketsRollbackData);
+            return new CheckoutResult(false, e.getMessage(), itemsRollbackData, cartRollbackData, basketsRollbackData, paymentResponse.getValue(), supplyResponse.getValue());
         }
     }
 
@@ -297,11 +320,15 @@ public class CheckoutManager {
         private final Map<Pair<String, String>, Integer> itemsRollbackData;
         private final Set<String> cartRollbackData;
         private final Set<ShoppingBasket> basketsRollbackData;
+        private final Integer paymentTransactionId; // ID of the processed payment, if successful
+        private final Integer supplyTransactionId; // ID of the processed supply, if successful
 
         public CheckoutResult(boolean success, String errorMessage,
                             Map<Pair<String, String>, Integer> itemsRollbackData,
                             Set<String> cartRollbackData,
-                            Set<ShoppingBasket> basketsRollbackData) {
+                            Set<ShoppingBasket> basketsRollbackData, Integer paymentTransactionId, Integer supplyTransactionId) {
+            this.paymentTransactionId = paymentTransactionId;
+            this.supplyTransactionId = supplyTransactionId;
             this.success = success;
             this.errorMessage = errorMessage;
             this.itemsRollbackData = itemsRollbackData;
@@ -314,5 +341,7 @@ public class CheckoutManager {
         public Map<Pair<String, String>, Integer> getItemsRollbackData() { return itemsRollbackData; }
         public Set<String> getCartRollbackData() { return cartRollbackData; }
         public Set<ShoppingBasket> getBasketsRollbackData() { return basketsRollbackData; }
+        public Integer getPaymentTransactionId() { return paymentTransactionId; }
+        public Integer getSupplyTransactionId() { return supplyTransactionId; }
     }
 }
