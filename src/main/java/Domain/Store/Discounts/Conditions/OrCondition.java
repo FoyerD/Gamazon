@@ -16,7 +16,7 @@ public class OrCondition extends CompositeCondition{
         super(List.of(condition1, condition2));
     }
 
-    // Constructor for loading from repository with existing UUID
+    // Constructor for loading from repository with existing ID
     public OrCondition(String id, List<Condition> conditions) {
         super(id, conditions);
     }

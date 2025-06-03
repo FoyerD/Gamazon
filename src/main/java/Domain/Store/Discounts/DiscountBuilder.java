@@ -8,11 +8,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import Application.DTOs.DiscountDTO;
-import Domain.Store.ItemFacade;
 import Domain.Store.Category;
 import Domain.Store.Discounts.Conditions.Condition;
 import Domain.Store.Discounts.Conditions.ConditionBuilder;
-import Domain.Store.Discounts.Qualifiers.*;
+import Domain.Store.Discounts.Qualifiers.CategoryQualifier;
+import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
+import Domain.Store.Discounts.Qualifiers.ProductQualifier;
+import Domain.Store.Discounts.Qualifiers.StoreQualifier;
 
 /**
  * Builder class for creating Discount domain objects from DTOs.
@@ -21,11 +23,9 @@ import Domain.Store.Discounts.Qualifiers.*;
 @Component
 public class DiscountBuilder {
     
-    private final ItemFacade itemFacade;
     private final ConditionBuilder conditionBuilder;
     
-    public DiscountBuilder(ItemFacade itemFacade, ConditionBuilder conditionBuilder) {
-        this.itemFacade = itemFacade;
+    public DiscountBuilder(ConditionBuilder conditionBuilder) {
         this.conditionBuilder = conditionBuilder;
     }
     
@@ -57,19 +57,13 @@ public class DiscountBuilder {
             case XOR:
                 return buildXorDiscount(discountDTO);
                 
-            case DOUBLE:
-                return buildDoubleDiscount(discountDTO);
-                
-            case MAX:
-                return buildMaxDiscount(discountDTO);
-                
             default:
                 throw new IllegalArgumentException("Unknown discount type: " + discountDTO.getType());
         }
     }
     
     /**
-     * Builds a Discount with existing UUID (for updates).
+     * Builds a Discount with existing ID (for updates).
      */
     public Discount buildDiscount(DiscountDTO discountDTO, String id) {
         if (discountDTO == null) {
@@ -83,15 +77,15 @@ public class DiscountBuilder {
         Condition cond = conditionBuilder.buildCondition(discountDTO.getCondition());
         switch(discountDTO.getType()) {
             case SIMPLE:
-                return new SimpleDiscount(UUID.fromString(id), itemFacade, discountDTO.getDiscountPercentage(), buildQualifier(discountDTO), cond);
+                return new SimpleDiscount(id,discountDTO.getDiscountPercentage(), buildQualifier(discountDTO), cond);
                 
             case AND:
-                return new AndDiscount(UUID.fromString(id), itemFacade, discountDTO.getSubDiscounts().stream()
+                return new AndDiscount(id, discountDTO.getSubDiscounts().stream()
                     .map(this::buildDiscount)
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toList()));
                     
             case OR:
-                return new OrDiscount(UUID.fromString(id), itemFacade, buildDiscount(discountDTO.getSubDiscounts().get(0)), 
+                return new OrDiscount(id, buildDiscount(discountDTO.getSubDiscounts().get(0)), 
                     discountDTO.getSubDiscounts().subList(1, discountDTO.getSubDiscounts().size())
                         .stream()
                         .map(subDto -> conditionBuilder.buildCondition(subDto.getCondition()))

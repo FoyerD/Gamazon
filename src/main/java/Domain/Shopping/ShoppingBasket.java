@@ -2,6 +2,10 @@ package Domain.Shopping;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
+
+import Domain.Store.Item;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 
 /**
  * Represents a collection of products from a specific store in a client's shopping cart.
@@ -136,5 +140,14 @@ public class ShoppingBasket {
      */
     public String getClientId() {
         return clientId;
+    }
+
+    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(BiFunction<String, String, Item> itemGetter) {
+        Map<String, ItemPriceBreakdown> priceBreakdowns = new HashMap<>();
+        for (String productId : orders.keySet()) {
+            ItemPriceBreakdown priceBreakdown = new ItemPriceBreakdown(itemGetter.apply(storeId, productId)); // Placeholder, should be replaced with actual price retrieval logic
+            priceBreakdowns.put(productId, priceBreakdown);
+        }
+        return priceBreakdowns;
     }
 }

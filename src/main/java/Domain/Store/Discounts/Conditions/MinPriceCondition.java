@@ -14,7 +14,7 @@ public class MinPriceCondition extends SimpleCondition {
         this.minPrice = minPrice;
     }
 
-    // Constructor for loading from repository with existing UUID
+    // Constructor for loading from repository with existing ID
     public MinPriceCondition(String id, double minPrice) {
         super(id);
         this.minPrice = minPrice;

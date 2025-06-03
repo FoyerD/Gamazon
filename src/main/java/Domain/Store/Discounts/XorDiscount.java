@@ -1,70 +1,38 @@
 package Domain.Store.Discounts;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
+import Domain.Store.Item;
+import Domain.Store.Discounts.Conditions.Condition;
+import Domain.Store.Discounts.Conditions.TrueCondition;
 
 public class XorDiscount extends CompositeDiscount {
 
-    public XorDiscount(ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        super(itemFacade, validateAndCreateSet(itemFacade, discount1, discount2));
+    public XorDiscount(Discount discount1, Discount discount2, MergeType mergeType) {
+        super(List.of(discount1, discount2), new TrueCondition(), mergeType);
     }
 
-    // Constructor for loading from repository with existing UUID
-    public XorDiscount(UUID id, ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        super(id, itemFacade, validateAndCreateSet(itemFacade, discount1, discount2), null);
+    // Constructor for loading from repository with existing ID
+    public XorDiscount(String id, Discount discount1, Discount discount2, Condition condition, MergeType mergeType) {
+        super(id, List.of(discount1, discount2), condition, mergeType);
     }
 
     @Override
-    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket) {
-        
-        Map<String, ItemPriceBreakdown> output = new HashMap<>(); // Fixed: use HashMap instead of immutable Map.of()
-
-        Discount discount1 = discounts.iterator().next();
-        Discount discount2 = discounts.stream().skip(1).findFirst().orElse(null);
-
-        Map<String, ItemPriceBreakdown> subDiscount1 = discount1.calculatePrice(basket);
-        Map<String, ItemPriceBreakdown> subDiscount2 = (discount2 != null) ? discount2.calculatePrice(basket) : Map.of();
-
-        for (String productId : basket.getOrders().keySet()) {
-            if (!isQualified(productId) || !conditionApplies(basket)) {
-                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
-                output.put(productId, priceBreakDown);
-                continue;
-            }
-
-            // Fixed XOR logic: only one of the discounts should apply
-            ItemPriceBreakdown breakdown1 = subDiscount1.get(productId);
-            ItemPriceBreakdown breakdown2 = subDiscount2.get(productId);
-            
-            boolean discount1Applies = breakdown1 != null && breakdown1.getDiscount() > 0;
-            boolean discount2Applies = breakdown2 != null && breakdown2.getDiscount() > 0;
-            
-            if (discount1Applies && !discount2Applies) {
-                output.put(productId, breakdown1);
-            } else if (!discount1Applies && discount2Applies) {
-                output.put(productId, breakdown2);
-            } else {
-                // If both or none apply, no discount
-                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
-                output.put(productId, priceBreakDown);
-            }
+    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket, BiFunction<String, String, Item> itemGetter) {        
+        Map<String, ItemPriceBreakdown> output = null;
+        if (basket == null || basket.getStoreId() == null || basket.getOrders() == null) {
+            throw new IllegalArgumentException("Basket, Store ID, and Orders cannot be null");
+        }
+        if (!conditionApplies(basket, itemGetter)) {
+            output = this.discounts.get(0).calculatePrice(basket, itemGetter);
+        }
+        else{
+            output = this.discounts.get(1).calculatePrice(basket, itemGetter);
         }
 
         return output;
-    }
-
-    @Override
-    public boolean isQualified(String productId) {
-        for (Discount discount : discounts) {
-            if (discount.isQualified(productId)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

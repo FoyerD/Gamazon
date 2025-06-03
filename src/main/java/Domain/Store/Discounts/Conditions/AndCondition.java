@@ -16,7 +16,7 @@ public class AndCondition extends CompositeCondition {
         super(List.of(condition1, condition2));
     }
 
-    // Constructor for loading from repository with existing UUID
+    // Constructor for loading from repository with existing ID
     public AndCondition(String id, List<Condition> conditions) {
         super(id, conditions);
     }

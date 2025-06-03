@@ -59,7 +59,7 @@ public class ConditionBuilder {
     }
     
     /**
-     * Builds a Condition with existing UUID (for updates).
+     * Builds a Condition with existing ID (for updates).
      */
     public Condition buildConditionWithId(ConditionDTO conditionDTO, String existingId) {
         if (conditionDTO == null) {

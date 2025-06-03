@@ -14,7 +14,7 @@ public class TrueCondition implements Condition {
         this.id = UUID.randomUUID().toString();
     }
 
-    // Constructor for loading from repository with existing UUID
+    // Constructor for loading from repository with existing ID
     public TrueCondition(String id) {
         this.id = id;
     }

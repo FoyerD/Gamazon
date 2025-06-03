@@ -3,10 +3,14 @@ package Application.DTOs;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Domain.Store.Discounts.*;
+import Domain.Store.Discounts.AndDiscount;
+import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.OrDiscount;
+import Domain.Store.Discounts.SimpleDiscount;
+import Domain.Store.Discounts.XorDiscount;
+import Domain.Store.Discounts.Qualifiers.CategoryQualifier;
 import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 import Domain.Store.Discounts.Qualifiers.ProductQualifier;
-import Domain.Store.Discounts.Qualifiers.CategoryQualifier;
 import Domain.Store.Discounts.Qualifiers.StoreQualifier;
 
 public class DiscountDTO {

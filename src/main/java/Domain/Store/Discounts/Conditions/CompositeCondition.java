@@ -14,7 +14,7 @@ public abstract class CompositeCondition implements Condition {
         this.conditions = conditions;
     }
 
-    // Constructor for loading from repository with existing UUID
+    // Constructor for loading from repository with existing ID
     public CompositeCondition(String id, List<Condition> conditions) {
         this.id = id;
         this.conditions = conditions;

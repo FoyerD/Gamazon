@@ -1,62 +1,58 @@
 package Domain.Store.Discounts;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import Domain.Store.Discounts.Conditions.Condition;
+import java.util.function.BiFunction;
+
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
-import Domain.Store.Discounts.Conditions.OrCondition;
+import Domain.Store.Item;
+import Domain.Store.Discounts.Conditions.Condition;
+import Domain.Store.Discounts.Conditions.TrueCondition;
 
 public class OrDiscount extends CompositeDiscount {
 
-    public OrDiscount(ItemFacade itemFacade, Discount discount, Set<Condition> conditions) {
-        super(itemFacade, validateAndCreateSet(itemFacade, discount, discount));
-
-        if (itemFacade == null || discount == null || conditions == null) {
-            throw new IllegalArgumentException("ItemFacade, Discount, and Conditions cannot be null");
-        }
-
-        this.setCondition(new OrCondition(conditions));
+    public OrDiscount(List<Discount> discounts, MergeType mergeType) {
+        super(discounts, new TrueCondition(), mergeType);
     }
 
-    // Constructor for loading from repository with existing UUID
-    public OrDiscount(UUID id, ItemFacade itemFacade, Discount discount, Set<Condition> conditions) {
-        super(id, itemFacade, validateAndCreateSet(itemFacade, discount, discount), new OrCondition(conditions));
-
-        if (itemFacade == null || discount == null || conditions == null) {
-            throw new IllegalArgumentException("ItemFacade, Discount, and Conditions cannot be null");
-        }
+    // Constructor for loading from repository with existing ID
+    public OrDiscount(String id, List<Discount> discounts, Condition condition, MergeType mergeType) {
+        super(id, discounts, condition, mergeType);
     }
 
     @Override
-    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket) {
+    public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket, BiFunction<String, String, Item> itemGetter) {
+
+        if (basket == null || basket.getStoreId() == null || basket.getOrders() == null) {
+            throw new IllegalArgumentException("Basket, Store ID, and Orders cannot be null");
+        }
+        
         Map<String, ItemPriceBreakdown> output = new HashMap<>();
-
-        Discount discount = this.discounts.iterator().next();
-        Map<String, ItemPriceBreakdown> subDiscounts = discount.calculatePrice(basket);
-
-        for (String productId : basket.getOrders().keySet()) {
-            if (!isQualified(productId) || !conditionApplies(basket)) {
-                ItemPriceBreakdown priceBreakDown = new ItemPriceBreakdown(itemFacade.getItem(basket.getStoreId(), productId).getPrice(), 0, null);
-                output.put(productId, priceBreakDown);
-                continue;
-            }
-
-            output.put(productId, subDiscounts.get(productId));
+        
+        // condition only applies if all discounts apply
+        if (!conditionApplies(basket, itemGetter)) {
+            output = basket.getPriceBreakdowns(itemGetter);
+            return output;
         }
-     
-        return output;
-    }
-
-    @Override
-    public boolean isQualified(String productId) {
-        for (Discount discount : discounts) {
-            if (discount.isQualified(productId)) {
-                return true;
+        for (Condition cond : this.discounts.stream().map(Discount::getCondition).toList()) {
+            if (cond.isSatisfied(basket, itemGetter)) {
+                List<Map<String, ItemPriceBreakdown>> allSubDiscounts = calculateAllSubDiscounts(basket, itemGetter);
+                switch(mergeType){
+                    case MAX:
+                        output = ItemPriceBreakdown.combineMaxMap(allSubDiscounts);
+                        break;
+                    case MUL:
+                        output = ItemPriceBreakdown.combineMultiplicateMaps(allSubDiscounts);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unsupported merge type: " + mergeType);
+                }
             }
         }
-        return false;
+
+
+        output = basket.getPriceBreakdowns(itemGetter);
+        return output; // If any condition is not satisfied, return original prices
     }
 }

@@ -5,6 +5,4 @@ public enum DiscountType {
     AND,
     OR,
     XOR,
-    MAX,
-    DOUBLE
 }

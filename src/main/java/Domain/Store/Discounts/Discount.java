@@ -24,7 +24,7 @@ public abstract class Discount {
         this.condition = new TrueCondition();
     }
 
-    // Constructor for loading from repository with existing UUID
+    // Constructor for loading from repository with existing ID
     public Discount(String id, Condition condition) {
         this.id = id;
         this.condition = condition;
@@ -35,9 +35,7 @@ public abstract class Discount {
     }
 
     // Outputs a map from product to the price breakdown
-    public abstract Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket);
-
-    public abstract boolean isQualified(String productId);
+    public abstract Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket, BiFunction<String, String, Item> itemGetter);
 
     public boolean conditionApplies(ShoppingBasket basket, BiFunction<String, String, Item> itemGetter) {
         if (condition == null) {
