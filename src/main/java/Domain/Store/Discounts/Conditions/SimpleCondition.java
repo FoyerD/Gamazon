@@ -6,10 +6,6 @@ public abstract class SimpleCondition implements Condition {
 
     protected final String id;
 
-    public SimpleCondition() {
-        this.id = UUID.randomUUID().toString();
-    }
-
     // Constructor for loading from repository with existing ID
     public SimpleCondition(String id) {
         this.id = id;

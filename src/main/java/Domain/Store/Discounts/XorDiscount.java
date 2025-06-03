@@ -7,13 +7,8 @@ import java.util.function.BiFunction;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
-import Domain.Store.Discounts.Conditions.TrueCondition;
 
 public class XorDiscount extends CompositeDiscount {
-
-    public XorDiscount(Discount discount1, Discount discount2, MergeType mergeType) {
-        super(List.of(discount1, discount2), new TrueCondition(), mergeType);
-    }
 
     // Constructor for loading from repository with existing ID
     public XorDiscount(String id, Discount discount1, Discount discount2, Condition condition, MergeType mergeType) {

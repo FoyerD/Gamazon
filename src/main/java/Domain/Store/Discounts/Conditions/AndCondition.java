@@ -8,13 +8,6 @@ import Domain.Store.Item;
 
 public class AndCondition extends CompositeCondition {
 
-    public AndCondition(List<Condition> conditions) {
-        super(conditions);
-    }
-
-    public AndCondition(Condition condition1, Condition condition2) {
-        super(List.of(condition1, condition2));
-    }
 
     // Constructor for loading from repository with existing ID
     public AndCondition(String id, List<Condition> conditions) {

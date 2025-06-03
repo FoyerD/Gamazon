@@ -10,12 +10,6 @@ public class MaxQuantityCondition extends SimpleCondition {
     private String productId;
     private int maxQuantity;
 
-    public MaxQuantityCondition(String productId, int maxQuantity) {
-        super();
-        this.productId = productId;
-        this.maxQuantity = maxQuantity;
-    }
-
     // Constructor for loading from repository with existing ID
     public MaxQuantityCondition(String id, String productId, int maxQuantity) {
         super(id);

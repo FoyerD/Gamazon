@@ -1,13 +1,11 @@
 package Domain.Store.Discounts;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
-import Domain.Store.Discounts.Conditions.TrueCondition;
 
 public abstract class Discount {
     public enum MergeType {
@@ -18,25 +16,24 @@ public abstract class Discount {
 
     protected final String id;
     protected Condition condition;
-
-    public Discount(Condition condition) {
-        this.id = UUID.randomUUID().toString();
-        this.condition = condition;
-    }
-
-    public Discount() {
-        this.id = UUID.randomUUID().toString();
-        this.condition = new TrueCondition();
-    }
+    protected String storeId;
 
     // Constructor for loading from repository with existing ID
-    public Discount(String id, Condition condition) {
+    public Discount(String id, String storeId, Condition condition) {
         this.id = id;
         this.condition = condition;
+        this.storeId = storeId;
     }
 
     public String getId() {
         return id.toString();
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
 
     // Outputs a map from product to the price breakdown

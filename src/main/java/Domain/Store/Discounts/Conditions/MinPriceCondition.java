@@ -9,11 +9,6 @@ public class MinPriceCondition extends SimpleCondition {
 
     private double minPrice;
 
-    public MinPriceCondition(double minPrice) {
-        super();
-        this.minPrice = minPrice;
-    }
-
     // Constructor for loading from repository with existing ID
     public MinPriceCondition(String id, double minPrice) {
         super(id);

@@ -15,18 +15,6 @@ public abstract class CompositeDiscount extends Discount {
     protected List<Discount> discounts;
     protected MergeType mergeType;
 
-    public CompositeDiscount(List<Discount> discounts, Condition condition, MergeType mergeType) {
-        super(condition);
-        this.discounts = discounts;
-        this.mergeType = mergeType;
-    }
-
-    public CompositeDiscount(List<Discount> discounts, MergeType mergeType) {
-        super();
-        this.discounts = discounts;
-        this.mergeType = mergeType;
-    }
-
     // Constructor for loading from repository with existing ID
     public CompositeDiscount(String id, List<Discount> discounts, Condition condition, MergeType mergeType) {
         super(id, condition);

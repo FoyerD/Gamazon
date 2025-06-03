@@ -9,11 +9,6 @@ public abstract class CompositeCondition implements Condition {
     protected final String id;
     protected List<Condition> conditions;
 
-    public CompositeCondition(List<Condition> conditions) {
-        this.id = UUID.randomUUID().toString();
-        this.conditions = conditions;
-    }
-
     // Constructor for loading from repository with existing ID
     public CompositeCondition(String id, List<Condition> conditions) {
         this.id = id;

@@ -9,11 +9,6 @@ public class MaxPriceCondition extends SimpleCondition{
 
     private double maxPrice;
 
-    public MaxPriceCondition(double maxPrice) {
-        super();
-        this.maxPrice = maxPrice;
-    }
-
     // Constructor for loading from repository with existing ID
     public MaxPriceCondition(String id, double maxPrice) {
         super(id);

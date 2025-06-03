@@ -8,13 +8,8 @@ import java.util.function.BiFunction;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
-import Domain.Store.Discounts.Conditions.TrueCondition;
 
 public class OrDiscount extends CompositeDiscount {
-
-    public OrDiscount(List<Discount> discounts, MergeType mergeType) {
-        super(discounts, new TrueCondition(), mergeType);
-    }
 
     // Constructor for loading from repository with existing ID
     public OrDiscount(String id, List<Discount> discounts, Condition condition, MergeType mergeType) {

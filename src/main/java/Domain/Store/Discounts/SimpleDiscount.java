@@ -7,26 +7,12 @@ import java.util.function.BiFunction;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
-import Domain.Store.Discounts.Conditions.TrueCondition;
 import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 
 public class SimpleDiscount extends Discount {
 
     private DiscountQualifier qualifier;
     private double discountPercentage; // INV: between 0 and 1 (percentage)
-
-    public SimpleDiscount(double discountPercentage, DiscountQualifier qualifier, Condition condition) {
-        super(condition);
-        this.qualifier = qualifier;
-        this.discountPercentage = discountPercentage;
-    }
-
-    public SimpleDiscount(double discountPercentage, DiscountQualifier qualifier) {
-        super();
-        this.qualifier = qualifier;
-        this.discountPercentage = discountPercentage;
-        this.setCondition(new TrueCondition());
-    }
 
     // Constructor for loading from repository with existing ID
     public SimpleDiscount(String id, double discountPercentage, DiscountQualifier qualifier, Condition condition) {

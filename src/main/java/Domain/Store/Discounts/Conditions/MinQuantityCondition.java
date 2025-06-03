@@ -10,11 +10,6 @@ public class MinQuantityCondition extends SimpleCondition{
     private String productId;
     private int minQuantity;
 
-    public MinQuantityCondition(String productId, int minQuantity) {
-        super();
-        this.productId = productId;
-        this.minQuantity = minQuantity;
-    }
 
     // Constructor for loading from repository with existing ID
     public MinQuantityCondition(String id, String productId, int minQuantity) {

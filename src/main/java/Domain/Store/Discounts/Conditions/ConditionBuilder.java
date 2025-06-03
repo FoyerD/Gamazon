@@ -111,7 +111,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Min price cannot be negative");
         }
         
-        return new MinPriceCondition(dto.getMinPrice());
+        return new MinPriceCondition(dto.getId(), dto.getMinPrice());
     }
     
     private MaxPriceCondition buildMaxPriceCondition(ConditionDTO dto) {
@@ -122,7 +122,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Max price cannot be negative");
         }
         
-        return new MaxPriceCondition(dto.getMaxPrice());
+        return new MaxPriceCondition(dto.getId(), dto.getMaxPrice());
     }
     
     private MinQuantityCondition buildMinQuantityCondition(ConditionDTO dto) {
@@ -136,7 +136,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Min quantity cannot be negative");
         }
         
-        return new MinQuantityCondition(dto.getProductId(), dto.getMinQuantity());
+        return new MinQuantityCondition(dto.getId(), dto.getProductId(), dto.getMinQuantity());
     }
     
     private MaxQuantityCondition buildMaxQuantityCondition(ConditionDTO dto) {
@@ -150,7 +150,7 @@ public class ConditionBuilder {
             throw new IllegalArgumentException("Max quantity cannot be negative");
         }
         
-        return new MaxQuantityCondition(dto.getProductId(), dto.getMaxQuantity());
+        return new MaxQuantityCondition(dto.getId(), dto.getProductId(), dto.getMaxQuantity());
     }
     
     private AndCondition buildAndCondition(ConditionDTO dto) {
@@ -162,7 +162,7 @@ public class ConditionBuilder {
             .map(this::buildCondition)
             .collect(Collectors.toList());
             
-        return new AndCondition(conditions);
+        return new AndCondition(dto.getId(), conditions);
     }
     
     private OrCondition buildOrCondition(ConditionDTO dto) {
@@ -174,7 +174,7 @@ public class ConditionBuilder {
             .map(this::buildCondition)
             .collect(Collectors.toList());
             
-        return new OrCondition(conditions);
+        return new OrCondition(dto.getId(), conditions);
     }
     
     private TrueCondition buildTrueCondition(ConditionDTO dto) {
