@@ -1,6 +1,6 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -36,7 +36,7 @@ public interface IConditionRepository {
     void delete(String id);
     
     
-    Set<Condition> getStoreConditions(String storeId);
+    List<Condition> getStoreConditions(String storeId);
  
     
     /**

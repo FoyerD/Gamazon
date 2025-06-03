@@ -1,8 +1,8 @@
 package Infrastructure.Repositories;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -164,8 +164,8 @@ public class MemoryConditionRepository implements IConditionRepository {
     }
 
     @Override
-    public Set<Condition> getStoreConditions(String storeId) {
+    public List<Condition> getStoreConditions(String storeId) {
         Map<String, Condition> storeConditions = conditionsByStore.get(storeId);
-        return storeConditions != null ? Set.copyOf(storeConditions.values()) : Set.of();
+        return storeConditions != null ? List.copyOf(storeConditions.values()) : List.of();
     }
 }

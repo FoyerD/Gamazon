@@ -1,7 +1,7 @@
 package Domain.Store.Discounts;
 
 
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -61,7 +61,7 @@ public interface IDiscountRepository {
      * @return the count of discounts for the specified store
      * @throws IllegalArgumentException if storeId is null or empty
      */
-    Set<Discount> getStoreDiscounts(String storeId);
+    List<Discount> getStoreDiscounts(String storeId);
 
     /**
      * Returns the total number of discounts in the repository.

@@ -1,13 +1,11 @@
 package Infrastructure.Repositories;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 import org.springframework.stereotype.Repository;
 
@@ -84,16 +82,16 @@ public class MemoryDiscountRepository implements IDiscountRepository {
 
 
     @Override
-    public Set<Discount> getStoreDiscounts(String storeId) {
+    public List<Discount> getStoreDiscounts(String storeId) {
         if(storeId == null || storeId.trim().isEmpty()) {
             throw new IllegalArgumentException("Store ID cannot be null or empty"); 
         }
         Map<String, Discount> storeDiscounts = discountsByStore.get(storeId);
         if (storeDiscounts == null) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
         
-        return new HashSet<>(storeDiscounts.values());
+        return new ArrayList<>(storeDiscounts.values());
     }
 
 

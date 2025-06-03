@@ -13,15 +13,15 @@ import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 public class SimpleDiscount extends Discount {
 
     private DiscountQualifier qualifier;
-    private float discountPercentage; // INV: between 0 and 1 (percentage)
+    private double discountPercentage; // INV: between 0 and 1 (percentage)
 
-    public SimpleDiscount(float discountPercentage, DiscountQualifier qualifier, Condition condition) {
+    public SimpleDiscount(double discountPercentage, DiscountQualifier qualifier, Condition condition) {
         super(condition);
         this.qualifier = qualifier;
         this.discountPercentage = discountPercentage;
     }
 
-    public SimpleDiscount(float discountPercentage, DiscountQualifier qualifier) {
+    public SimpleDiscount(double discountPercentage, DiscountQualifier qualifier) {
         super();
         this.qualifier = qualifier;
         this.discountPercentage = discountPercentage;
@@ -29,7 +29,7 @@ public class SimpleDiscount extends Discount {
     }
 
     // Constructor for loading from repository with existing ID
-    public SimpleDiscount(String id, float discountPercentage, DiscountQualifier qualifier, Condition condition) {
+    public SimpleDiscount(String id, double discountPercentage, DiscountQualifier qualifier, Condition condition) {
         super(id, condition);
         this.qualifier = qualifier;
         this.discountPercentage = discountPercentage;
@@ -65,7 +65,7 @@ public class SimpleDiscount extends Discount {
         return qualifier;
     }
 
-    public float getDiscountPercentage() {
+    public double getDiscountPercentage() {
         return discountPercentage;
     }
 }

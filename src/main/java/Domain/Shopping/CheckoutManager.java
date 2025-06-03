@@ -12,13 +12,12 @@ import org.springframework.stereotype.Component;
 import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
-import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
-import Domain.Store.IProductRepository;
 
 /**
  * Manages the checkout process including inventory updates, payment processing, and rollback operations.
@@ -31,7 +30,6 @@ public class CheckoutManager {
     private final ItemFacade itemFacade;
     private final IProductRepository productRepo;
     private final ReceiptBuilder receiptBuilder;
-    private final PriceCalculator priceCalculator;
 
     @Autowired
     public CheckoutManager(IShoppingBasketRepository basketRepo, 
@@ -45,7 +43,6 @@ public class CheckoutManager {
         this.itemFacade = itemFacade;
         this.productRepo = productRepo;
         this.receiptBuilder = receiptBuilder;
-        this.priceCalculator = new PriceCalculator(itemFacade, discountFacade);
     }
 
     /**
@@ -142,7 +139,8 @@ public class CheckoutManager {
         // Calculate discounted prices for all products in the basket
         Map<String, ItemPriceBreakdown> priceBreakdowns = null;
         try {
-            priceBreakdowns = priceCalculator.calculatePrice(basket);
+            //TODO!
+            priceBreakdowns = calculateDiscountedPricePrice(basket);
         } catch (Exception e) {
             System.err.println("Error calculating discounted prices, falling back to original prices: " + e.getMessage());
             priceBreakdowns = new HashMap<>();

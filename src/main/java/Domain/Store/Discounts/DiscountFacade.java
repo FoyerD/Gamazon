@@ -1,16 +1,26 @@
 package Domain.Store.Discounts;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
+import java.util.UUID;
 
-import org.hibernate.jdbc.Expectation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.DTOs.DiscountDTO;
 import Domain.Store.ItemFacade;
-import Domain.Store.Discounts.Conditions.*;
+import Domain.Store.Discounts.Discount.MergeType;
+import Domain.Store.Discounts.Conditions.AndCondition;
+import Domain.Store.Discounts.Conditions.Condition;
+import Domain.Store.Discounts.Conditions.ConditionBuilder;
+import Domain.Store.Discounts.Conditions.IConditionRepository;
+import Domain.Store.Discounts.Conditions.MaxPriceCondition;
+import Domain.Store.Discounts.Conditions.MaxQuantityCondition;
+import Domain.Store.Discounts.Conditions.MinPriceCondition;
+import Domain.Store.Discounts.Conditions.MinQuantityCondition;
+import Domain.Store.Discounts.Conditions.OrCondition;
+import Domain.Store.Discounts.Conditions.TrueCondition;
 import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
+
 
 /**
  * Facade class for creating, storing, and retrieving discounts and conditions.
@@ -40,8 +50,8 @@ public class DiscountFacade {
         this.itemFacade = itemFacade;
         this.discountRepository = discountRepository;
         this.conditionRepository = conditionRepository;
-        this.conditionBuilder = new ConditionBuilder(itemFacade);
-        this.discountBuilder = new DiscountBuilder(itemFacade, conditionBuilder);
+        this.conditionBuilder = new ConditionBuilder();
+        this.discountBuilder = new DiscountBuilder(conditionBuilder);
     }
     
     // ===========================================
@@ -51,13 +61,13 @@ public class DiscountFacade {
     /**
      * Creates and saves a MinPriceCondition for a specific store.
      */
-    public MinPriceCondition createMinPriceCondition(String storeId, ItemFacade itemFacade, double minPrice) {
+    public MinPriceCondition createMinPriceCondition(String storeId, double minPrice) {
         validateItemFacade(itemFacade);
         if (minPrice < 0) {
             throw new IllegalArgumentException("Min price cannot be negative");
         }
         
-        MinPriceCondition condition = new MinPriceCondition(itemFacade, minPrice);
+        MinPriceCondition condition = new MinPriceCondition(UUID.randomUUID().toString(), minPrice);
         conditionRepository.save(storeId, condition);
         return condition;
     }
@@ -65,13 +75,13 @@ public class DiscountFacade {
     /**
      * Creates and saves a MaxPriceCondition for a specific store.
      */
-    public MaxPriceCondition createMaxPriceCondition(String storeId, ItemFacade itemFacade, double maxPrice) {
+    public MaxPriceCondition createMaxPriceCondition(String storeId, double maxPrice) {
         validateItemFacade(itemFacade);
         if (maxPrice < 0) {
             throw new IllegalArgumentException("Max price cannot be negative");
         }
         
-        MaxPriceCondition condition = new MaxPriceCondition(itemFacade, maxPrice);
+        MaxPriceCondition condition = new MaxPriceCondition(UUID.randomUUID().toString(), maxPrice);
         conditionRepository.save(storeId, condition);
         return condition;
     }
@@ -79,14 +89,14 @@ public class DiscountFacade {
     /**
      * Creates and saves a MinQuantityCondition for a specific store.
      */
-    public MinQuantityCondition createMinQuantityCondition(String storeId, ItemFacade itemFacade, String productId, int minQuantity) {
+    public MinQuantityCondition createMinQuantityCondition(String storeId, String productId, int minQuantity) {
         validateItemFacade(itemFacade);
         validateProductId(productId);
         if (minQuantity < 0) {
             throw new IllegalArgumentException("Min quantity cannot be negative");
         }
         
-        MinQuantityCondition condition = new MinQuantityCondition(itemFacade, productId, minQuantity);
+        MinQuantityCondition condition = new MinQuantityCondition(UUID.randomUUID().toString(), productId, minQuantity);
         conditionRepository.save(storeId, condition);
         return condition;
     }
@@ -94,14 +104,14 @@ public class DiscountFacade {
     /**
      * Creates and saves a MaxQuantityCondition for a specific store.
      */
-    public MaxQuantityCondition createMaxQuantityCondition(String storeId, ItemFacade itemFacade, String productId, int maxQuantity) {
+    public MaxQuantityCondition createMaxQuantityCondition(String storeId, String productId, int maxQuantity) {
         validateItemFacade(itemFacade);
         validateProductId(productId);
         if (maxQuantity < 0) {
             throw new IllegalArgumentException("Max quantity cannot be negative");
         }
         
-        MaxQuantityCondition condition = new MaxQuantityCondition(itemFacade, productId, maxQuantity);
+        MaxQuantityCondition condition = new MaxQuantityCondition(UUID.randomUUID().toString(), productId, maxQuantity);
         conditionRepository.save(storeId, condition);
         return condition;
     }
@@ -109,22 +119,10 @@ public class DiscountFacade {
     /**
      * Creates and saves an AndCondition for a specific store.
      */
-    public AndCondition createAndCondition(String storeId, Set<Condition> conditions) {
+    public AndCondition createAndCondition(String storeId, List<Condition> conditions) {
         validateConditionSet(conditions);
         
-        AndCondition condition = new AndCondition(conditions);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
-    
-    /**
-     * Creates and saves an AndCondition with two conditions for a specific store.
-     */
-    public AndCondition createAndCondition(String storeId, Condition condition1, Condition condition2) {
-        validateCondition(condition1);
-        validateCondition(condition2);
-        
-        AndCondition condition = new AndCondition(condition1, condition2);
+        AndCondition condition = new AndCondition(UUID.randomUUID().toString(), conditions);
         conditionRepository.save(storeId, condition);
         return condition;
     }
@@ -132,22 +130,10 @@ public class DiscountFacade {
     /**
      * Creates and saves an OrCondition for a specific store.
      */
-    public OrCondition createOrCondition(String storeId, Set<Condition> conditions) {
+    public OrCondition createOrCondition(String storeId, List<Condition> conditions) {
         validateConditionSet(conditions);
         
-        OrCondition condition = new OrCondition(conditions);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
-    
-    /**
-     * Creates and saves an OrCondition with two conditions for a specific store.
-     */
-    public OrCondition createOrCondition(String storeId, Condition condition1, Condition condition2) {
-        validateCondition(condition1);
-        validateCondition(condition2);
-        
-        OrCondition condition = new OrCondition(condition1, condition2);
+        OrCondition condition = new OrCondition(UUID.randomUUID().toString(), conditions);
         conditionRepository.save(storeId, condition);
         return condition;
     }
@@ -157,7 +143,7 @@ public class DiscountFacade {
      */
     public TrueCondition createTrueCondition(String storeId) {
         
-        TrueCondition condition = new TrueCondition();
+        TrueCondition condition = new TrueCondition(UUID.randomUUID().toString());
         conditionRepository.save(storeId, condition);
         return condition;
     }
@@ -169,28 +155,14 @@ public class DiscountFacade {
     /**
      * Creates and saves a SimpleDiscount with condition for a specific store.
      */
-    public SimpleDiscount createSimpleDiscount(String storeId, ItemFacade itemFacade, float discountPercentage, 
+    public SimpleDiscount createSimpleDiscount(String storeId, float discountPercentage, 
                                              DiscountQualifier qualifier, Condition condition) {
         validateItemFacade(itemFacade);
         validateDiscountPercentage(discountPercentage);
         validateQualifier(qualifier);
         validateCondition(condition);
         
-        SimpleDiscount discount = new SimpleDiscount(itemFacade, discountPercentage, qualifier, condition);
-        discountRepository.save(storeId, discount);
-        return discount;
-    }
-    
-    /**
-     * Creates and saves a SimpleDiscount without condition (uses TrueCondition) for a specific store.
-     */
-    public SimpleDiscount createSimpleDiscount(String storeId, ItemFacade itemFacade, float discountPercentage, 
-                                             DiscountQualifier qualifier) {
-        validateItemFacade(itemFacade);
-        validateDiscountPercentage(discountPercentage);
-        validateQualifier(qualifier);
-        
-        SimpleDiscount discount = new SimpleDiscount(itemFacade, discountPercentage, qualifier);
+        SimpleDiscount discount = new SimpleDiscount(UUID.randomUUID().toString(), discountPercentage, qualifier, condition);
         discountRepository.save(storeId, discount);
         return discount;
     }
@@ -198,37 +170,21 @@ public class DiscountFacade {
     /**
      * Creates and saves an AndDiscount from a set of discounts for a specific store.
      */
-    public AndDiscount createAndDiscount(String storeId, ItemFacade itemFacade, Set<Discount> discounts) {
+    public AndDiscount createAndDiscount(String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
         validateItemFacade(itemFacade);
         validateDiscountSet(discounts);
         
-        AndDiscount discount = new AndDiscount(itemFacade, discounts);
+        AndDiscount discount = new AndDiscount(UUID.randomUUID().toString(), discounts, condition, mergeType);
         discountRepository.save(storeId, discount);
         return discount;
     }
     
-    /**
-     * Creates and saves an AndDiscount from two discounts for a specific store.
-     */
-    public AndDiscount createAndDiscount(String storeId, ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        validateItemFacade(itemFacade);
-        validateDiscount(discount1);
-        validateDiscount(discount2);
-        
-        AndDiscount discount = new AndDiscount(itemFacade, discount1, discount2);
-        discountRepository.save(storeId, discount);
-        return discount;
-    }
     
     /**
      * Creates and saves an OrDiscount for a specific store.
      */
-    public OrDiscount createOrDiscount(String storeId, ItemFacade itemFacade, Discount discount, Set<Condition> conditions) {
-        validateItemFacade(itemFacade);
-        validateDiscount(discount);
-        validateConditionSet(conditions);
-        
-        OrDiscount orDiscount = new OrDiscount(itemFacade, discount, conditions);
+    public OrDiscount createOrDiscount(String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
+        OrDiscount orDiscount = new OrDiscount(UUID.randomUUID().toString(), discounts, condition, mergeType);
         discountRepository.save(storeId, orDiscount);
         return orDiscount;
     }
@@ -236,49 +192,12 @@ public class DiscountFacade {
     /**
      * Creates and saves a XorDiscount for a specific store.
      */
-    public XorDiscount createXorDiscount(String storeId, ItemFacade itemFacade, Discount discount1, Discount discount2) {
+    public XorDiscount createXorDiscount(String storeId, Discount discount1, Discount discount2, Condition condition, MergeType mergeType) {
         validateItemFacade(itemFacade);
         validateDiscount(discount1);
         validateDiscount(discount2);
         
-        XorDiscount discount = new XorDiscount(itemFacade, discount1, discount2);
-        discountRepository.save(storeId, discount);
-        return discount;
-    }
-    
-    /**
-     * Creates and saves a DoubleDiscount for a specific store.
-     */
-    public DoubleDiscount createDoubleDiscount(String storeId, ItemFacade itemFacade, Set<Discount> discounts) {
-        validateItemFacade(itemFacade);
-        validateDiscountSet(discounts);
-        
-        DoubleDiscount discount = new DoubleDiscount(itemFacade, discounts);
-        discountRepository.save(storeId, discount);
-        return discount;
-    }
-    
-    /**
-     * Creates and saves a MaxDiscount from a set of discounts for a specific store.
-     */
-    public MaxDiscount createMaxDiscount(String storeId, ItemFacade itemFacade, Set<Discount> discounts) {
-        validateItemFacade(itemFacade);
-        validateDiscountSet(discounts);
-        
-        MaxDiscount discount = new MaxDiscount(itemFacade, discounts);
-        discountRepository.save(storeId, discount);
-        return discount;
-    }
-    
-    /**
-     * Creates and saves a MaxDiscount from two discounts for a specific store.
-     */
-    public MaxDiscount createMaxDiscount(String storeId, ItemFacade itemFacade, Discount discount1, Discount discount2) {
-        validateItemFacade(itemFacade);
-        validateDiscount(discount1);
-        validateDiscount(discount2);
-        
-        MaxDiscount discount = new MaxDiscount(itemFacade, discount1, discount2);
+        XorDiscount discount = new XorDiscount(UUID.randomUUID().toString(), discount1, discount2, condition, mergeType);
         discountRepository.save(storeId, discount);
         return discount;
     }
@@ -316,7 +235,7 @@ public class DiscountFacade {
     /**
      * Gets all discounts for a specific store.
      */
-    public Set<Discount> getStoreDiscounts(String storeId) {
+    public List<Discount> getStoreDiscounts(String storeId) {
         return discountRepository.getStoreDiscounts(storeId);
     }
     
@@ -324,7 +243,7 @@ public class DiscountFacade {
     /**
      * Gets all conditions for a specific store (requires casting repository).
      */
-    public Set<Condition> getStoreConditions(String storeId) {
+    public List<Condition> getStoreConditions(String storeId) {
         return conditionRepository.getStoreConditions(storeId);
     }
     
@@ -349,7 +268,7 @@ public class DiscountFacade {
         validateDiscountId(discountId);
         
         // Verify the discount belongs to this store
-        Set<Discount> storeDiscounts = getStoreDiscounts(storeId);
+        List<Discount> storeDiscounts = getStoreDiscounts(storeId);
         boolean found = storeDiscounts.stream().anyMatch(d -> d.getId().equals(discountId));
         
         if (!found) {
@@ -367,7 +286,7 @@ public class DiscountFacade {
         validateConditionId(conditionId);
         
         // Verify the condition belongs to this store
-        Set<Condition> storeConditions = getStoreConditions(storeId);
+        List<Condition> storeConditions = getStoreConditions(storeId);
         if (storeConditions.stream().noneMatch(c -> c.getId().equals(conditionId))) {
             throw new IllegalArgumentException("Condition with ID " + conditionId + " not found in store " + storeId);
         }
@@ -489,7 +408,7 @@ public class DiscountFacade {
     }
 
     
-    private void validateConditionSet(Set<Condition> conditions) {
+    private void validateConditionSet(List<Condition> conditions) {
         if (conditions == null || conditions.isEmpty()) {
             throw new IllegalArgumentException("Conditions set cannot be null or empty");
         }
@@ -504,7 +423,7 @@ public class DiscountFacade {
         }
     }
     
-    private void validateDiscountSet(Set<Discount> discounts) {
+    private void validateDiscountSet(List<Discount> discounts) {
         if (discounts == null || discounts.isEmpty()) {
             throw new IllegalArgumentException("Discounts set cannot be null or empty");
         }

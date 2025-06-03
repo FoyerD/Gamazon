@@ -1,12 +1,13 @@
 package Domain.Store.Discounts;
 
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import Application.DTOs.DiscountDTO;
+import Application.DTOs.DiscountDTO.QualifierType;
 import Domain.Store.Category;
 import Domain.Store.Discounts.Conditions.Condition;
 import Domain.Store.Discounts.Conditions.ConditionBuilder;
@@ -36,29 +37,7 @@ public class DiscountBuilder {
      * @throws IllegalArgumentException if the DTO is invalid or has unknown type
      */
     public Discount buildDiscount(DiscountDTO discountDTO) {
-        if (discountDTO == null) {
-            throw new IllegalArgumentException("DiscountDTO cannot be null");
-        }
-        
-        if (discountDTO.getType() == null) {
-            throw new IllegalArgumentException("Discount type cannot be null");
-        }
-        switch (discountDTO.getType()) {
-            case SIMPLE:
-                return buildSimpleDiscount(discountDTO);
-                
-            case AND:
-                return buildAndDiscount(discountDTO);
-                
-            case OR:
-                return buildOrDiscount(discountDTO);
-                
-            case XOR:
-                return buildXorDiscount(discountDTO);
-                
-            default:
-                throw new IllegalArgumentException("Unknown discount type: " + discountDTO.getType());
-        }
+        return buildDiscount(discountDTO, UUID.randomUUID().toString());
     }
     
     /**
@@ -74,26 +53,27 @@ public class DiscountBuilder {
         }
         
         Condition cond = conditionBuilder.buildCondition(discountDTO.getCondition());
+        List<Discount> subDiscounts = discountDTO.getSubDiscounts().stream().map((ddto) -> buildDiscount(ddto)).collect(Collectors.toList());
         switch(discountDTO.getType()) {
             case SIMPLE:
-                return new SimpleDiscount(id,discountDTO.getDiscountPercentage(), buildQualifier(discountDTO), cond);
+                return new SimpleDiscount(id,discountDTO.getDiscountPercentage(), makeQualifier(discountDTO.getQualifierType(), discountDTO.getQualifierValue()), cond);
                 
             case AND:
                 return new AndDiscount(id,
-                    discountDTO.getSubDiscounts().stream().map(this::buildDiscount).collect(Collectors.toList()),
+                    subDiscounts,
                     cond,
                     discountDTO.getMergeType());
                     
             case OR:
                 return new OrDiscount(id,
-                    discountDTO.getSubDiscounts().stream().map(this::buildDiscount).collect(Collectors.toList()),
+                    subDiscounts,
                     cond,
                     discountDTO.getMergeType());
                         
             case XOR:
-            List<Discount> subDis = discountDTO.getSubDiscounts().stream().map(this::buildDiscount).collect(Collectors.toList());
                 return new XorDiscount(id,
-                    ,
+                    subDiscounts.get(0),
+                    subDiscounts.get(1),
                     cond,
                     discountDTO.getMergeType());
                     
@@ -102,131 +82,39 @@ public class DiscountBuilder {
         }
     }
     
-    /**
-     * Builds a SimpleDiscount with an existing condition ID.
-     * 
-     * @param discountDTO The discount DTO
-     * @param existingCondition The existing condition to use
-     * @return The built SimpleDiscount
-     */
-    public SimpleDiscount buildSimpleDiscountWithCondition(DiscountDTO discountDTO, Condition existingCondition) {
-        validateSimpleDiscountDTO(discountDTO);
-        
-        if (existingCondition == null) {
-            throw new IllegalArgumentException("Existing condition cannot be null");
+
+    public DiscountQualifier makeQualifier(QualifierType type, String value) {
+        if (type == null) {
+            throw new IllegalArgumentException("Qualifier type cannot be null");
         }
         
-        DiscountQualifier qualifier = buildQualifier(discountDTO);
-        
-        return new SimpleDiscount(itemFacade, discountDTO.getDiscountPercentage(), qualifier, existingCondition);
-    }
-    
-    private SimpleDiscount buildSimpleDiscount(DiscountDTO dto) {
-        validateSimpleDiscountDTO(dto);
-        
-        DiscountQualifier qualifier = buildQualifier(dto);
-        Condition condition = conditionBuilder.buildCondition(dto.getCondition());
-        
-        return new SimpleDiscount(itemFacade, dto.getDiscountPercentage(), qualifier, condition);
-    }
-    
-    private AndDiscount buildAndDiscount(DiscountDTO dto) {
-        validateCompositeDiscountDTO(dto);
-        
-        Set<Discount> discounts = dto.getSubDiscounts().stream()
-            .map(this::buildDiscount)
-            .collect(Collectors.toSet());
-            
-        return new AndDiscount(itemFacade, discounts);
-    }
-    
-    private OrDiscount buildOrDiscount(DiscountDTO dto) {
-        validateCompositeDiscountDTO(dto);
-        
-        // OrDiscount needs a base discount and conditions
-        // Based on the first sub-discount and remaining conditions
-        if (dto.getSubDiscounts().size() < 1) {
-            throw new IllegalArgumentException("OrDiscount requires at least one sub-discount");
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException("Qualifier value cannot be null or empty");
         }
         
-        Discount baseDiscount = buildDiscount(dto.getSubDiscounts().get(0));
-        
-        // Convert remaining discounts to conditions (this might need domain model adjustment)
-        Set<Condition> conditions = dto.getSubDiscounts().subList(1, dto.getSubDiscounts().size())
-            .stream()
-            .map(subDto -> conditionBuilder.buildCondition(subDto.getCondition()))
-            .collect(Collectors.toSet());
-            
-        return new OrDiscount(itemFacade, baseDiscount, conditions);
-    }
-    
-    private XorDiscount buildXorDiscount(DiscountDTO dto) {
-        validateCompositeDiscountDTO(dto);
-        
-        if (dto.getSubDiscounts().size() != 2) {
-            throw new IllegalArgumentException("XorDiscount requires exactly 2 sub-discounts");
-        }
-        
-        Discount discount1 = buildDiscount(dto.getSubDiscounts().get(0));
-        Discount discount2 = buildDiscount(dto.getSubDiscounts().get(1));
-        
-        return new XorDiscount(itemFacade, discount1, discount2);
-    }
-    
-    private DoubleDiscount buildDoubleDiscount(DiscountDTO dto) {
-        validateCompositeDiscountDTO(dto);
-        
-        Set<Discount> discounts = dto.getSubDiscounts().stream()
-            .map(this::buildDiscount)
-            .collect(Collectors.toSet());
-            
-        return new DoubleDiscount(itemFacade, discounts);
-    }
-    
-    private MaxDiscount buildMaxDiscount(DiscountDTO dto) {
-        validateCompositeDiscountDTO(dto);
-        
-        Set<Discount> discounts = dto.getSubDiscounts().stream()
-            .map(this::buildDiscount)
-            .collect(Collectors.toSet());
-            
-        return new MaxDiscount(itemFacade, discounts);
-    }
-    
-    private DiscountQualifier buildQualifier(DiscountDTO dto) {
-        if (dto.getQualifierType() == null) {
-            throw new IllegalArgumentException("Qualifier type cannot be null for SimpleDiscount");
-        }
-        
-        switch (dto.getQualifierType()) {
+        switch (type) {
             case PRODUCT:
-                if (dto.getQualifierValue() == null || dto.getQualifierValue().trim().isEmpty()) {
-                    throw new IllegalArgumentException("Product ID required for ProductQualifier");
-                }
-                return new ProductQualifier(dto.getQualifierValue());
+                return new ProductQualifier(value);
                 
             case CATEGORY:
-                if (dto.getQualifierValue() == null || dto.getQualifierValue().trim().isEmpty()) {
-                    throw new IllegalArgumentException("Category name required for CategoryQualifier");
-                }
-                // This would need a way to get Category by name - might need CategoryRepository
-                Category category = createCategoryFromName(dto.getQualifierValue());
-                return new CategoryQualifier(category);
+                return new CategoryQualifier(makeCategory(value));
                 
             case STORE:
-                return new StoreQualifier();
+                return new StoreQualifier(value);
                 
             default:
-                throw new IllegalArgumentException("Unknown qualifier type: " + dto.getQualifierType());
+                throw new IllegalArgumentException("Unknown qualifier type: " + type);
         }
+
     }
-    
-    private Category createCategoryFromName(String categoryName) {
-        // This is a placeholder - would need proper Category creation/lookup
-        // Might need to inject a CategoryRepository or CategoryFacade
-        return new Category(categoryName, "Default description for " + categoryName);
+
+    private Category makeCategory(String category) {
+        if (category == null || category.isEmpty()) {
+            throw new IllegalArgumentException("Category cannot be null or empty");
+        }
+        return new Category(category, "Containing all products in category " + category);
     }
-    
+
     /**
      * Validates a DiscountDTO for SimpleDiscount creation.
      */
@@ -235,11 +123,7 @@ public class DiscountBuilder {
             throw new IllegalArgumentException("Expected SIMPLE discount type");
         }
         
-        if (dto.getDiscountPercentage() == null) {
-            throw new IllegalArgumentException("Discount percentage cannot be null");
-        }
-        
-        if (dto.getDiscountPercentage() < 0 || dto.getDiscountPercentage() > 1) {
+        if (dto.getDiscountPercentage() > 1 || dto.getDiscountPercentage() < 0) {
             throw new IllegalArgumentException("Discount percentage must be between 0 and 1");
         }
         
@@ -292,8 +176,6 @@ public class DiscountBuilder {
             case AND:
             case OR:
             case XOR:
-            case DOUBLE:
-            case MAX:
                 validateCompositeDiscountDTO(discountDTO);
                 break;
                 
