@@ -253,7 +253,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      */
     @Override
     public boolean checkout(String clientId, String cardNumber, Date expiryDate, String cvv,
-                           long andIncrement, String clientName, String deliveryAddress, String city, String country, String zipCode) {
+                           String clientName, String deliveryAddress, String city, String country, String zipCode) {
         
         // Validate arguments
         if (clientId == null || cardNumber == null || expiryDate == null || cvv == null) {
@@ -268,7 +268,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         // Process checkout using CheckoutManager
         CheckoutManager.CheckoutResult result = checkoutManager.processCheckout(
             clientId, cart, cardNumber, expiryDate, cvv, 
-            andIncrement, clientName, deliveryAddress, city, country, zipCode
+            clientName, deliveryAddress, city, country, zipCode
         );
         
         if (result.isSuccess()) {

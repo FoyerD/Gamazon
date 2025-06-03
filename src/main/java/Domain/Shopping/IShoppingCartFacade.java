@@ -52,13 +52,12 @@ public interface IShoppingCartFacade {
      * @param card_number The payment card number
      * @param expiry_date The card expiry date
      * @param cvv The card security code
-     * @param andIncrement Transaction identifier
      * @param clientName The client's name
      * @param deliveryAddress The delivery address
      * @return true if checkout was successful
      */
     boolean checkout(String clientId, String card_number, Date expiry_date, String cvv, 
-                    long andIncrement, String clientName, String deliveryAddress, String city, 
+                    String clientName, String deliveryAddress, String city, 
                                         String country, String zipCode);
     
     /**

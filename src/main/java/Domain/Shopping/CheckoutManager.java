@@ -57,14 +57,13 @@ public class CheckoutManager {
      * @param cardNumber The payment card number
      * @param expiryDate The card expiry date
      * @param cvv The card CVV
-     * @param andIncrement Payment tracking identifier
      * @param clientName The client's name
      * @param deliveryAddress The delivery address
      * @return CheckoutResult containing success status and any error messages
      */
     public CheckoutResult processCheckout(String clientId, IShoppingCart cart, 
                                         String cardNumber, Date expiryDate, String cvv,
-                                        long andIncrement, String clientName, String deliveryAddress, String city, 
+                                        String clientName, String deliveryAddress, String city, 
                                         String country, String zipCode) {
         
         Map<Pair<String, String>, Integer> itemsRollbackData = new HashMap<>();
