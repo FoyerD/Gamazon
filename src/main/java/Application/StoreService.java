@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.CategoryDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
@@ -375,6 +376,27 @@ public class StoreService {
             return new Response<>(new StoreDTO(store));
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error retrieving store by name %s: %s", storeId, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<List<CategoryDTO>> getAllStoreCategories(String sessionToken, String storeId) {
+                String method = "getAllStoreCategories";
+        try {
+            if(!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+            List<CategoryDTO> categories = this.storeFacade.getAllStoreCategories(storeId).stream().map(CategoryDTO::fromCategory).collect(Collectors.toList());
+            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + categories.size() + " categories for store " + storeId);
+            return new Response<>(categories);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error retrieving categories for store %s: %s", storeId, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }

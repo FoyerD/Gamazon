@@ -2,13 +2,15 @@ package UI.views.components;
 
 import Application.DTOs.PolicyDTO;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.dom.Style.AlignItems;
+import com.vaadin.flow.dom.Style.JustifyContent;
+import com.vaadin.flow.dom.Style.TextAlign;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -36,7 +38,6 @@ public class PoliciesLayout extends VerticalLayout {
         setSpacing(true);
 
         buildLayout();
-        refreshPolicies();
     }
 
     private void buildLayout() {
@@ -77,14 +78,14 @@ public class PoliciesLayout extends VerticalLayout {
         // add(addButton, policyGrid);
     }
 
-    private Button buildRemoveButton(PolicyDTO policy) {
-        Button remove = new Button("Remove", e -> {
-            onRemove.accept(policy);
-            refreshPolicies();
-        });
-        remove.getStyle().set("color", "red");
-        return remove;
-    }
+    // private Button buildRemoveButton(PolicyDTO policy) {
+    //     Button remove = new Button("Remove", e -> {
+    //         onRemove.accept(policy);
+    //         refreshPolicies();
+    //     });
+    //     remove.getStyle().set("color", "red");
+    //     return remove;
+    // }
 
     public void refreshPolicies() {
         tileContainer.removeAll();
@@ -100,20 +101,20 @@ public class PoliciesLayout extends VerticalLayout {
 
     private Div buildPolicyTile(PolicyDTO policy) {
         Div tile = new Div();
+
         tile.getStyle()
             .set("width", "280px")
             .set("min-height", "200px")
-            .set("border", "10px solidrgb(190, 200, 226)")
+            .set("border", "5px solid rgb(165, 190, 240)") // dark border
             .set("border-radius", "10px")
             .set("padding", "16px")
-            .set("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
-            .set("background-color", "#fff")
+            .set("background-color", "rgb(214, 228, 255)") // light background
             .set("display", "flex")
             .set("flex-direction", "column")
-            .set("justify-content", "space-between")
             .set("cursor", "pointer")
             .set("transition", "transform 0.2s, box-shadow 0.2s")
-            .set("box-shadow", "0 2px 5px rgba(0,0,0,0.2)");;
+            .set("box-shadow", "0 2px 5px rgba(0,0,0,0.2)");
+
 
         // hover effect
         tile.getElement().addEventListener("mouseover", e -> 
@@ -126,11 +127,18 @@ public class PoliciesLayout extends VerticalLayout {
             .set("transform", "translateY(0)")
             .set("box-shadow", "0 2px 5px rgba(0,0,0,0.2)"));
 
+
+        Div title = new Div(policy.getType().toString());
+        title.getStyle()
+            .setFontWeight("bold")
+            .set("color", "rgb(76, 76, 76)")
+            .setTextAlign(TextAlign.CENTER);
+
+
         VerticalLayout content = new VerticalLayout();
         content.setPadding(false);
         content.setSpacing(false);
 
-        content.add(new Span("Type: " + policy.getType().name().toLowerCase().replace('_', ' ')));
 
         if (policy.getTargetProduct() != null) {
             content.add(new Span("Product: " + policy.getTargetProduct().getProductName()));
@@ -148,22 +156,22 @@ public class PoliciesLayout extends VerticalLayout {
             content.add(new Span("Min Age: " + policy.getMinAge()));
         }
         if (policy.getMinItemsAll() != null && policy.getMinItemsAll() > 0) {
-            content.add(new Span("Min All: " + policy.getMinItemsAll()));
+            content.add(new Span("Min quantity: " + policy.getMinItemsAll()));
         }
         if (policy.getMaxItemsAll() != null && policy.getMaxItemsAll() > 0) {
-            content.add(new Span("Max All: " + policy.getMaxItemsAll()));
+            content.add(new Span("Max quantity: " + policy.getMaxItemsAll()));
         }
         if (policy.getMinItemsProduct() != null && policy.getMinItemsProduct() > 0) {
-            content.add(new Span("Min Product: " + policy.getMinItemsProduct()));
+            content.add(new Span("Min quantity: " + policy.getMinItemsProduct()));
         }
         if (policy.getMaxItemsProduct() != null && policy.getMaxItemsProduct() > 0) {
-            content.add(new Span("Max Product: " + policy.getMaxItemsProduct()));
+            content.add(new Span("Max quantity: " + policy.getMaxItemsProduct()));
         }
         if (policy.getMinItemsCategory() != null && policy.getMinItemsCategory() > 0) {
-            content.add(new Span("Min Category: " + policy.getMinItemsCategory()));
+            content.add(new Span("Min quantity: " + policy.getMinItemsCategory()));
         }
         if (policy.getMaxItemsCategory() != null && policy.getMaxItemsCategory() > 0) {
-            content.add(new Span("Max Category: " + policy.getMaxItemsCategory()));
+            content.add(new Span("Max quantity: " + policy.getMaxItemsCategory()));
         }
 
         // if (policy.getSubPolicies() != null && !policy.getSubPolicies().isEmpty()) {
@@ -182,7 +190,7 @@ public class PoliciesLayout extends VerticalLayout {
         // footer.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
         // footer.setWidthFull();
 
-        tile.add(content);
+        tile.add(title, content);
         return tile;
     }
     

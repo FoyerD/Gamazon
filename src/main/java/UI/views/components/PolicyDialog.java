@@ -56,7 +56,6 @@ public class PolicyDialog extends Dialog {
 
 
     private void setupForm() {
-        typeCombo.setItemLabelGenerator(t -> t.name().toLowerCase().replace("_", " "));
         typeCombo.setItems(Arrays.asList(Policy.Type.values()).stream().filter(t -> !t.equals(Policy.Type.AND)).toList());
         typeCombo.setRequired(true);
         binder.forField(typeCombo)
@@ -64,7 +63,9 @@ public class PolicyDialog extends Dialog {
                 .bind(PolicyFormModel::getType, PolicyFormModel::setType);
 
         productCombo.setItemLabelGenerator(ItemDTO::getProductName);
-        productCombo.setItems(productSupplier.get());
+        List<ItemDTO> products = productSupplier.get();
+        if (products != null)
+            productCombo.setItems(products);
         binder.forField(productCombo)
                 .bind(PolicyFormModel::getProduct, PolicyFormModel::setProduct);
 
@@ -128,25 +129,25 @@ public class PolicyDialog extends Dialog {
             case MIN_QUANTITY_ALL -> minField.setVisible(true);
             case MAX_QUANTITY_ALL -> maxField.setVisible(true);
             case MIN_QUANTITY_PRODUCT -> {
-                minField.setVisible(true);
                 productCombo.setVisible(true);
+                minField.setVisible(true);
             }
             case MAX_QUANTITY_PRODUCT -> {
-                maxField.setVisible(true);
                 productCombo.setVisible(true);
+                maxField.setVisible(true);
             }
             case MIN_QUANTITY_CATEGORY -> {
-                minField.setVisible(true);
                 categoryCombo.setVisible(true);
+                minField.setVisible(true);
             }
             case MAX_QUANTITY_CATEGORY -> {
-                maxField.setVisible(true);
                 categoryCombo.setVisible(true);
+                maxField.setVisible(true);
             }
             case CATEGORY_DISALLOW -> categoryCombo.setVisible(true);
             case CATEGORY_AGE -> {
-                categoryCombo.setVisible(true);
                 ageField.setVisible(true);
+                categoryCombo.setVisible(true);
             }
             case AND -> Notification.show("cannot choose AND type");
         }

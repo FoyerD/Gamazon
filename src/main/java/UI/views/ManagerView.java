@@ -31,6 +31,7 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -249,6 +250,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
     private void showStorePolicies() {
         mainContent.add(policiesLayout);
+        policiesLayout.refreshPolicies();
     }
 
     private void showAddPolicy() {
@@ -263,7 +265,12 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
 
         Supplier<List<CategoryDTO>> categorySupplier = () -> {
-            return null;
+            Response<List<CategoryDTO>> res = storePresenter.getStoreCategories(sessionToken, currentStoreId);
+            if (res.errorOccurred()) {
+                Notification.show("Failed fetching categories for store: " + res.getErrorMessage(), 3000, Position.BOTTOM_END);
+                return null;
+            }
+            return res.getValue();
         };
 
         Function<PolicyDTO, Boolean> onSave = p -> {
