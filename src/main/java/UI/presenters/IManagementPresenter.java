@@ -5,6 +5,7 @@ import java.util.List;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
@@ -170,4 +171,21 @@ public interface IManagementPresenter {
      */
     public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId);
 
+
+    /**
+     * Gets the purchase policies of a store.
+     * 
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store whose purchase history is requested.
+     * @return Response with a list of {@link PolicyDTO} representing the purchase history, or error.
+     */
+    public Response<List<PolicyDTO>> getStorePolicies(String sessionToken, String storeId);
+
+    /**
+     * 
+     * @param sessionToken Session identifier for authentication.
+     * @param policy policy to be saved
+     * @return Response of void, or error
+     */
+    public Response<PolicyDTO> savePolicy(String sessionToken, PolicyDTO policy);
 }

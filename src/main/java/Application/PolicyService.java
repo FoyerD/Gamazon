@@ -2,14 +2,14 @@ package Application;
 
 import Application.utils.Response;
 import Application.DTOs.CategoryDTO;
+import Application.DTOs.ItemDTO;
 import Application.DTOs.PolicyDTO;
-import Application.DTOs.ProductDTO;
 import Application.DTOs.PolicyDTO.Builder;
 import Application.utils.Error;
 import Application.utils.TradingLogger;
-import Domain.Repos.IProductRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Store.Item;
 import Domain.Store.Policy;
-import Domain.Store.Product;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.PolicyFacade;
@@ -27,42 +27,44 @@ public class PolicyService {
     private final PolicyFacade policyFacade;
     private final TokenService tokenService;
     private final PermissionManager permissionManager;
-    private final IProductRepository productRepository;
+    private final IItemRepository itemRepository;
 
     public PolicyService(PolicyFacade policyFacade,
                          TokenService tokenService,
                          PermissionManager permissionManager,
-                         IProductRepository productRepository) {
+                         IItemRepository itemRepository) {
         this.policyFacade      = policyFacade;
         this.tokenService      = tokenService;
         this.permissionManager = permissionManager;
-        this.productRepository = productRepository;
+        this.itemRepository = itemRepository;
     }
 
     private PolicyDTO convertPolicyToDTO(Policy policy) {
         Builder builder = new PolicyDTO.Builder(policy.getStoreId(), policy.getType());
-        Product prod = null;
+        Item prod = null;
 
         switch (policy.getType()) {
-            case AND:
-                return builder.createAND(policy.getSubPolicies().stream().map(this::convertPolicyToDTO).toList()).build();
+            // TODO: Deprecated
+            // case AND: 
+            //      return builder.createAND(policy.getSubPolicies().stream().map(this::convertPolicyToDTO).toList()).build();
+
 
             case MIN_QUANTITY_ALL:
                 return builder.createMinQuantityAllPolicy(policy.getMinItemsAll()).build(policy.getPolicyId());
             case MAX_QUANTITY_ALL:
                 return builder.createMaxQuantityAllPolicy(policy.getMaxItemsAll()).build(policy.getPolicyId());
             case MIN_QUANTITY_PRODUCT:
-                prod = productRepository.get(policy.getTargetProductId());
+                prod = itemRepository.getItem(policy.getStoreId(), policy.getTargetProductId());
                 if (prod == null) {
                     throw new NoSuchElementException("Couldn't find product " + policy.getTargetProductId());
                 }
-                return builder.createMinQuantityProductPolicy(new ProductDTO(prod), policy.getMinItemsProduct()).build(policy.getPolicyId());
+                return builder.createMinQuantityProductPolicy(ItemDTO.fromItem(prod), policy.getMinItemsProduct()).build(policy.getPolicyId());
             case MAX_QUANTITY_PRODUCT:
-                prod = productRepository.get(policy.getTargetProductId());
+                prod = itemRepository.getItem(policy.getStoreId(), policy.getTargetProductId());
                 if (prod == null) {
                     throw new NoSuchElementException("Couldn't find product " + policy.getTargetProductId());
                 }
-                return builder.createMaxQuantityProductPolicy(new ProductDTO(prod), policy.getMaxItemsProduct()).build(policy.getPolicyId());
+                return builder.createMaxQuantityProductPolicy(ItemDTO.fromItem(prod), policy.getMaxItemsProduct()).build(policy.getPolicyId());
             case MIN_QUANTITY_CATEGORY:  
                 return builder.createMinQuantityCategoryPolicy(
                     new CategoryDTO(policy.getTargetCategory(), "Description Unavailable"),
@@ -165,14 +167,15 @@ public class PolicyService {
 
             Policy created;
             switch (details.getType()) {
-                case AND:
-                    if (details.getSubPolicies() == null || details.getSubPolicies().isEmpty()) {
-                        throw new IllegalArgumentException("AND policy needs children");
-                    }
-                    created = policyFacade.createAndPolicy(
-                            details.getSubPolicies().stream().map(PolicyDTO::toPolicy).toList(),
-                            storeId); // TODO: AND policies willnot work. lookup functions aren't defined. Refctoring needed :(
-                    break;
+                // TODO: Deprecated
+                // case AND:
+                //     if (details.getSubPolicies() == null || details.getSubPolicies().isEmpty()) {
+                //         throw new IllegalArgumentException("AND policy needs children");
+                //     }
+                //     created = policyFacade.createAndPolicy(
+                //             details.getSubPolicies().stream().map(PolicyDTO::toPolicy).toList(),
+                //             storeId); // TODO: AND policies willnot work. lookup functions aren't defined. Refctoring needed :(
+                //     break;
                 case MIN_QUANTITY_ALL:
                     created = policyFacade.createMinQuantityAllPolicy(
                             storeId,
@@ -186,13 +189,13 @@ public class PolicyService {
                 case MIN_QUANTITY_PRODUCT:
                     created = policyFacade.createMinQuantityProductPolicy(
                             storeId,
-                            details.getTargetProduct().getId(),
+                            details.getTargetProduct().getProductId(),
                             details.getMinItemsProduct());
                     break;
                 case MAX_QUANTITY_PRODUCT:
                     created = policyFacade.createMaxQuantityProductPolicy(
                             storeId,
-                            details.getTargetProduct().getId(),
+                            details.getTargetProduct().getProductId(),
                             details.getMaxItemsProduct());
                     break;
                 case MIN_QUANTITY_CATEGORY:

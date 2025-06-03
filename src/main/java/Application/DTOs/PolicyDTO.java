@@ -13,15 +13,16 @@ public class PolicyDTO {
     private final String storeId;
     private final Policy.Type type;
 
+    // TODO: Deprecated
     // For AND policies
-    private final List<PolicyDTO> subPolicies;
+    // private final List<PolicyDTO> subPolicies;
 
     // For quantity policies on all items
     private final Integer minItemsAll;
     private final Integer maxItemsAll;
 
     // For quantity policies on a specific product
-    private final ProductDTO targetProduct;
+    private final ItemDTO targetProduct;
     private final Integer minItemsProduct;
     private final Integer maxItemsProduct;
 
@@ -37,50 +38,15 @@ public class PolicyDTO {
     private final Integer minAge;
     private final CategoryDTO ageCategory;
 
-    // public PolicyDTO(Policy policy) {
-    //     this.policyId = policy.getPolicyId();
-    //     this.storeId  = policy.getStoreId();
-    //     this.type     = policy.getType();
-
-    //     // Initialize optionals based on policy type
-    //     this.subPolicies = (type == Policy.Type.AND)
-    //         ? policy.getSubPolicies().stream().map(PolicyDTO::new).toList() : null;
-
-    //     this.minItemsAll = (type == Policy.Type.MIN_QUANTITY_ALL)
-    //         ? policy.getMinItemsAll() : null;
-    //     this.maxItemsAll = (type == Policy.Type.MAX_QUANTITY_ALL)
-    //         ? policy.getMaxItemsAll() : null;
-
-    //     this.targetProduct = (type == Policy.Type.MIN_QUANTITY_PRODUCT || type == Policy.Type.MAX_QUANTITY_PRODUCT)
-    //         ? policy.getTargetProductId() : null;
-    //     this.minItemsProduct = (type == Policy.Type.MIN_QUANTITY_PRODUCT)
-    //         ? policy.getMinItemsProduct() : null;
-    //     this.maxItemsProduct = (type == Policy.Type.MAX_QUANTITY_PRODUCT)
-    //         ? policy.getMaxItemsProduct() : null;
-
-    //     this.targetCategory = (type == Policy.Type.MIN_QUANTITY_CATEGORY || type == Policy.Type.MAX_QUANTITY_CATEGORY)
-    //         ? policy.getTargetCategory() : null;
-    //     this.minItemsCategory = (type == Policy.Type.MIN_QUANTITY_CATEGORY)
-    //         ? policy.getMinItemsCategory() : null;
-    //     this.maxItemsCategory = (type == Policy.Type.MAX_QUANTITY_CATEGORY)
-    //         ? policy.getMaxItemsCategory() : null;
-
-    //     this.disallowedCategory = (type == Policy.Type.CATEGORY_DISALLOW)
-    //         ? policy.getDisallowedCategory() : null;
-
-    //     this.minAge = (type == Policy.Type.CATEGORY_AGE)
-    //         ? policy.getMinAge() : null;
-    //     this.ageCategory = (type == Policy.Type.CATEGORY_AGE)
-    //         ? policy.getAgeCategory() : null;
-    // }
 
     public PolicyDTO(String policyId, Builder builder) {
         this.policyId = policyId;
         this.type = builder.type;
         this.storeId = builder.storeId;
         
+        // TODO: Deprecated
         // For AND policies
-        this.subPolicies = builder.subPolicies;
+        //this.subPolicies = builder.subPolicies;
 
         // For quantity policies on all items
         this.minItemsAll = builder.minItemsAll;
@@ -107,10 +73,10 @@ public class PolicyDTO {
 
     public String getStoreId()  { return storeId;  }
     public Policy.Type getType() { return type; }
-    public List<PolicyDTO> getSubPolicies() { return subPolicies; }
+    // public List<PolicyDTO> getSubPolicies() { return subPolicies; }
     public Integer getMinItemsAll() { return minItemsAll; }
     public Integer getMaxItemsAll() { return maxItemsAll; }
-    public ProductDTO getTargetProduct() { return targetProduct; }
+    public ItemDTO getTargetProduct() { return targetProduct; }
     public Integer getMinItemsProduct() { return minItemsProduct; }
     public Integer getMaxItemsProduct() { return maxItemsProduct; }
     public CategoryDTO getTargetCategory() { return targetCategory; }
@@ -124,10 +90,10 @@ public class PolicyDTO {
         Policy.Builder policyBuilder = new Policy.Builder(type);
         return policyBuilder.policyId(policyId)
         .storeId(storeId)
-        .subPolicies(this.subPolicies.stream().map(PolicyDTO::toPolicy).toList())
+        // .subPolicies(this.subPolicies.stream().map(PolicyDTO::toPolicy).toList())
         .minItemsAll(this.minItemsAll)
         .maxItemsAll(this.maxItemsAll)
-        .targetProductId(this.targetProduct.getId())
+        .targetProductId(this.targetProduct.getProductId())
         .minItemsProduct(this.minItemsProduct)
         .maxItemsProduct(this.maxItemsProduct)
         .targetCategory(this.targetCategory.getName())
@@ -148,15 +114,16 @@ public class PolicyDTO {
         private String storeId;
         private Policy.Type type;
 
+        // TODO: Deprecated
         // For AND policies
-        private List<PolicyDTO> subPolicies = List.of();
+        // private List<PolicyDTO> subPolicies = List.of();
 
         // For quantity policies on all items
         private int minItemsAll = -1;
         private int maxItemsAll = -1;
 
         // For quantity policies on a specific product
-        private ProductDTO targetProduct = null;
+        private ItemDTO targetProduct = null;
         private int minItemsProduct = -1;
         private int maxItemsProduct = -1;
         
@@ -178,11 +145,13 @@ public class PolicyDTO {
             }
         }
 
-        public Builder createAND(List<PolicyDTO> policies) {
-            commonSetup(Policy.Type.AND);
-            this.subPolicies = policies;
-            return this;
-        }
+        // TODO: Deprecated
+
+        // public Builder createAND(List<PolicyDTO> policies) {
+        //     commonSetup(Policy.Type.AND);
+        //     this.subPolicies = policies;
+        //     return this;
+        // }
 
         public Builder createMaxAll(int minQuantity) {
             commonSetup(Policy.Type.MAX_QUANTITY_ALL);
@@ -216,7 +185,7 @@ public class PolicyDTO {
             return this;
         }
 
-        public Builder createMinQuantityProductPolicy(ProductDTO product, int minQuantity) {
+        public Builder createMinQuantityProductPolicy(ItemDTO product, int minQuantity) {
             commonSetup(Policy.Type.MIN_QUANTITY_PRODUCT);
 
             if (minQuantity < 1) {
@@ -230,7 +199,7 @@ public class PolicyDTO {
             return this;
         }
 
-        public Builder createMaxQuantityProductPolicy(ProductDTO product, int maxQuantity) {
+        public Builder createMaxQuantityProductPolicy(ItemDTO product, int maxQuantity) {
             commonSetup(Policy.Type.MAX_QUANTITY_PRODUCT);
             if (maxQuantity < 1) {
                 throw new IllegalArgumentException("Maximum Quantity must be ≥ 1");
