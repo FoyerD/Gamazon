@@ -16,6 +16,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
@@ -205,25 +206,18 @@ public class TradingView extends BaseView implements BeforeEnterObserver {
         if (response.errorOccurred()) {
             Notification.show("Failed to ban user: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
-            // First disable all interactive elements immediately
-            UI.getCurrent().getPage().executeJs(
-                "if (document.querySelector('.user-menu')) {" +
-                "  document.querySelectorAll('button:not(.view-only), input:not(.view-only), select:not(.view-only), a:not(.view-only)').forEach(el => {" +
-                "    el.disabled = true;" +
-                "    el.style.pointerEvents = 'none';" +
-                "    el.style.opacity = '0.5';" +
-                "  });" +
-                "}"
+            // Show notification and clear fields
+            Notification notification = new Notification(
+                "User '" + username + "' banned successfully until " + endDateTime,
+                3000,
+                Notification.Position.MIDDLE
             );
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            notification.open();
             
-            // Then show notification and clear fields
-            Notification.show("User '" + username + "' banned successfully until " + endDateTime, 3000, Notification.Position.MIDDLE);
             usernameToBanField.clear();
             banEndDatePicker.clear();
             banEndTimePicker.clear();
-            
-            // Finally reload the page
-            UI.getCurrent().getPage().executeJs("setTimeout(() => window.location.reload(), 1000);");
         }
     }
 
