@@ -84,6 +84,68 @@ const disableInteractiveElements = () => {
   });
 };
 
+const enableInteractiveElements = () => {
+  // Re-enable all interactive elements
+  const interactiveSelectors = [
+    'button:not(.view-only)',
+    'input:not(.view-only)',
+    'select:not(.view-only)',
+    'a:not(.view-only)',
+    'vaadin-button:not(.view-only)',
+    'vaadin-text-field:not(.view-only)',
+    'vaadin-number-field:not(.view-only)',
+    'vaadin-combo-box:not(.view-only)',
+    'vaadin-date-picker:not(.view-only)',
+    'vaadin-time-picker:not(.view-only)',
+    'vaadin-grid:not(.view-only)',
+    'vaadin-select:not(.view-only)',
+    'vaadin-checkbox:not(.view-only)',
+    'vaadin-radio-button:not(.view-only)',
+    '[role="button"]:not(.view-only)',
+    '[tabindex]:not(.view-only)',
+    '[data-trading-button]'
+  ].join(',');
+
+  document.querySelectorAll(interactiveSelectors).forEach(el => {
+    // Enable the element
+    el.disabled = false;
+    el.removeAttribute('disabled');
+    el.style.pointerEvents = '';
+    el.style.opacity = '';
+    el.style.cursor = '';
+
+    // For Vaadin components, ensure they're properly enabled
+    if (el.tagName.toLowerCase().startsWith('vaadin-')) {
+      el.removeAttribute('aria-disabled');
+      if (typeof el.enable === 'function') {
+        el.enable();
+      }
+    }
+  });
+
+  // Restore cart button style
+  const cartBtn = document.querySelector('[data-view-cart]');
+  if (cartBtn) {
+    cartBtn.style.backgroundColor = '#38a169';
+    cartBtn.style.color = 'white';
+    cartBtn.style.border = '';
+  }
+
+  // Restore trading button style
+  const tradingBtn = document.querySelector('[data-trading-button]');
+  if (tradingBtn) {
+    tradingBtn.style.backgroundColor = '#4299e1';
+    tradingBtn.style.color = 'white';
+    tradingBtn.style.cursor = '';
+    tradingBtn.style.opacity = '';
+  }
+
+  // Delay page refresh to ensure notification is visible
+  setTimeout(() => {
+    window.location.reload();
+  }, 3000); // 3 second delay before refresh
+};
+
 const connectWebSocket = (userId) => {
   if (!userId) return;
 
@@ -107,6 +169,9 @@ const connectWebSocket = (userId) => {
           if (payload.type === 'USER_BANNED') {
             disableInteractiveElements();
             showNotification(payload.message || 'You have been banned.', 'error');
+          } else if (payload.type === 'USER_UNBANNED') {
+            showNotification(payload.message || 'Your ban has been lifted. The page will refresh in 3 seconds...', 'success');
+            enableInteractiveElements();
           } else {
             showNotification(payload.message || message.body);
           }

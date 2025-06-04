@@ -262,7 +262,8 @@ public class MarketFacade implements IMarketFacade {
         }
         boolean result = permissionManager.unbanUser(unbannerId, userId);
         if (result) {
-            notificationService.sendNotification(userId, "Your ban has been lifted. You can now use the system again.");
+            String unbanMessage = "{\"type\": \"USER_UNBANNED\", \"message\": \"Your ban has been lifted. You can now use the system again.\"}";
+            notificationService.sendNotification(userId, unbanMessage);
         }
         return result;
     }
