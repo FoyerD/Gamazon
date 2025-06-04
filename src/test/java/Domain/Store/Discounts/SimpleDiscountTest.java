@@ -8,19 +8,14 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
-import Domain.Store.Product;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
 import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 
 public class SimpleDiscountTest {
-    
-    @Mock
-    private ItemFacade itemFacade;
     
     @Mock
     private DiscountQualifier qualifier;
@@ -32,64 +27,75 @@ public class SimpleDiscountTest {
     private ShoppingBasket basket;
     
     @Mock
-    private Product product;
-    
-    @Mock
     private Item item;
     
+    @Mock
+    private BiFunction<String, String, Item> itemGetter;
+    
     private SimpleDiscount simpleDiscount;
+    private final String STORE_ID = "store123";
+    private final String PRODUCT_ID = "product1";
     
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        simpleDiscount = new SimpleDiscount(itemFacade, 0.2f, qualifier, condition);
+        simpleDiscount = new SimpleDiscount("test-id", STORE_ID, 0.2, qualifier, condition);
     }
     
     @Test
-    public void testConstructorWithCondition() {
+    public void testConstructorValid() {
         assertNotNull(simpleDiscount);
+        assertEquals("test-id", simpleDiscount.getId());
+        assertEquals(STORE_ID, simpleDiscount.getStoreId());
         assertEquals(condition, simpleDiscount.getCondition());
-        assertNotNull(simpleDiscount.getId());
         assertEquals(0.2, simpleDiscount.getDiscountPercentage(), 0.001);
         assertEquals(qualifier, simpleDiscount.getQualifier());
     }
     
-    @Test
-    public void testConstructorWithoutCondition() {
-        SimpleDiscount discount = new SimpleDiscount(itemFacade, 0.15f, qualifier);
-        assertNotNull(discount.getCondition());
-        assertEquals(0.15, discount.getDiscountPercentage(), 0.001);
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullId() {
+        new SimpleDiscount(null, STORE_ID, 0.2, qualifier, condition);
     }
     
-    @Test
-    public void testConstructorWithExistingUUID() {
-        UUID existingId = UUID.randomUUID();
-        SimpleDiscount discount = new SimpleDiscount(existingId, itemFacade, 0.25f, qualifier, condition);
-        
-        assertEquals(existingId.toString(), discount.getId());
-        assertEquals(0.25, discount.getDiscountPercentage(), 0.001);
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() {
+        new SimpleDiscount("", STORE_ID, 0.2, qualifier, condition);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullStoreId() {
+        new SimpleDiscount("test-id", null, 0.2, qualifier, condition);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyStoreId() {
+        new SimpleDiscount("test-id", "", 0.2, qualifier, condition);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullCondition() {
+        new SimpleDiscount("test-id", STORE_ID, 0.2, qualifier, null);
     }
     
     @Test
     public void testCalculatePriceQualifiedWithCondition() {
         // Setup
         Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 2);
+        orders.put(PRODUCT_ID, 2);
         
         when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
-        when(itemFacade.getProduct("product1")).thenReturn(product);
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(100.0);
-        when(qualifier.isQualified(product)).thenReturn(true);
-        when(condition.isSatisfied(basket)).thenReturn(true);
+        when(qualifier.isQualified(item)).thenReturn(true);
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(true);
         
         // Execute
-        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket, itemGetter);
         
         // Verify
         assertEquals(1, result.size());
-        ItemPriceBreakdown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get(PRODUCT_ID);
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.2, breakdown.getDiscount(), 0.001);
         assertEquals(80.0, breakdown.getFinalPrice(), 0.001);
@@ -99,21 +105,21 @@ public class SimpleDiscountTest {
     public void testCalculatePriceNotQualified() {
         // Setup
         Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 2);
+        orders.put(PRODUCT_ID, 2);
         
         when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
-        when(itemFacade.getProduct("product1")).thenReturn(product);
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(100.0);
-        when(qualifier.isQualified(product)).thenReturn(false);
+        when(qualifier.isQualified(item)).thenReturn(false);
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(true);
         
         // Execute
-        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket, itemGetter);
         
         // Verify
         assertEquals(1, result.size());
-        ItemPriceBreakdown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get(PRODUCT_ID);
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
         assertEquals(100.0, breakdown.getFinalPrice(), 0.001);
@@ -123,83 +129,124 @@ public class SimpleDiscountTest {
     public void testCalculatePriceConditionNotSatisfied() {
         // Setup
         Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 2);
+        orders.put(PRODUCT_ID, 2);
         
         when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
-        when(itemFacade.getProduct("product1")).thenReturn(product);
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(100.0);
-        when(qualifier.isQualified(product)).thenReturn(true);
-        when(condition.isSatisfied(basket)).thenReturn(false);
+        when(qualifier.isQualified(item)).thenReturn(true);
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(false);
+        when(basket.getPriceBreakdowns(itemGetter)).thenReturn(createOriginalPriceBreakdown());
         
         // Execute
-        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket, itemGetter);
         
-        // Verify
+        // Verify - should return original prices when condition not satisfied
         assertEquals(1, result.size());
-        ItemPriceBreakdown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get(PRODUCT_ID);
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
     
     @Test
     public void testIsQualified() {
-        when(itemFacade.getProduct("product1")).thenReturn(product);
-        when(qualifier.isQualified(product)).thenReturn(true);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
+        when(qualifier.isQualified(item)).thenReturn(true);
         
-        assertTrue(simpleDiscount.isQualified("product1"));
+        assertTrue(simpleDiscount.isQualified(STORE_ID, PRODUCT_ID, itemGetter));
     }
     
     @Test
     public void testIsNotQualified() {
-        when(itemFacade.getProduct("product1")).thenReturn(product);
-        when(qualifier.isQualified(product)).thenReturn(false);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
+        when(qualifier.isQualified(item)).thenReturn(false);
         
-        assertFalse(simpleDiscount.isQualified("product1"));
+        assertFalse(simpleDiscount.isQualified(STORE_ID, PRODUCT_ID, itemGetter));
     }
     
     @Test
     public void testMultipleProductsInBasket() {
+        String product2Id = "product2";
         Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 1);
-        orders.put("product2", 2);
+        orders.put(PRODUCT_ID, 1);
+        orders.put(product2Id, 2);
         
         when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
+        when(basket.getStoreId()).thenReturn(STORE_ID);
         
         // Setup for product1 (qualified)
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
-        when(itemFacade.getProduct("product1")).thenReturn(product);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(50.0);
-        when(qualifier.isQualified(product)).thenReturn(true);
+        when(qualifier.isQualified(item)).thenReturn(true);
         
         // Setup for product2 (not qualified) 
         Item item2 = mock(Item.class);
-        Product product2 = mock(Product.class);
-        when(itemFacade.getItem("store1", "product2")).thenReturn(item2);
-        when(itemFacade.getProduct("product2")).thenReturn(product2);
+        when(itemGetter.apply(STORE_ID, product2Id)).thenReturn(item2);
         when(item2.getPrice()).thenReturn(75.0);
-        when(qualifier.isQualified(product2)).thenReturn(false);
+        when(qualifier.isQualified(item2)).thenReturn(false);
         
-        when(condition.isSatisfied(basket)).thenReturn(true);
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(true);
         
-        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = simpleDiscount.calculatePrice(basket, itemGetter);
         
         assertEquals(2, result.size());
         
         // Product1 should get discount
-        ItemPriceBreakdown breakdown1 = result.get("product1");
+        ItemPriceBreakdown breakdown1 = result.get(PRODUCT_ID);
         assertEquals(0.2, breakdown1.getDiscount(), 0.001);
         
         // Product2 should not get discount
-        ItemPriceBreakdown breakdown2 = result.get("product2");
+        ItemPriceBreakdown breakdown2 = result.get(product2Id);
         assertEquals(0.0, breakdown2.getDiscount(), 0.001);
     }
     
     @Test
-    public void testHasUniqueId() {
-        SimpleDiscount another = new SimpleDiscount(itemFacade, 0.2f, qualifier, condition);
-        assertNotEquals(simpleDiscount.getId(), another.getId());
+    public void testConditionApplies() {
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(true);
+        assertTrue(simpleDiscount.conditionApplies(basket, itemGetter));
+        
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(false);
+        assertFalse(simpleDiscount.conditionApplies(basket, itemGetter));
+    }
+    
+    @Test
+    public void testSettersAndGetters() {
+        // Test setStoreId
+        simpleDiscount.setStoreId("newStore");
+        assertEquals("newStore", simpleDiscount.getStoreId());
+        
+        // Test setCondition
+        Condition newCondition = mock(Condition.class);
+        simpleDiscount.setCondition(newCondition);
+        assertEquals(newCondition, simpleDiscount.getCondition());
+    }
+    
+    @Test
+    public void testEquals() {
+        SimpleDiscount same = new SimpleDiscount("test-id", "other-store", 0.5, qualifier, condition);
+        SimpleDiscount different = new SimpleDiscount("different-id", STORE_ID, 0.2, qualifier, condition);
+        
+        assertEquals("Discounts with same ID should be equal", simpleDiscount, same);
+        assertNotEquals("Discounts with different ID should not be equal", simpleDiscount, different);
+    }
+    
+    @Test
+    public void testHashCode() {
+        assertEquals("Hash code should be based on ID", 
+                    simpleDiscount.getId().hashCode(), simpleDiscount.hashCode());
+    }
+    
+    @Test
+    public void testToString() {
+        String toString = simpleDiscount.toString();
+        assertTrue("ToString should contain class name", toString.contains("SimpleDiscount"));
+        assertTrue("ToString should contain ID", toString.contains("test-id"));
+    }
+    
+    private Map<String, ItemPriceBreakdown> createOriginalPriceBreakdown() {
+        Map<String, ItemPriceBreakdown> breakdown = new HashMap<>();
+        breakdown.put(PRODUCT_ID, new ItemPriceBreakdown(100.0, 0.0));
+        return breakdown;
     }
 }

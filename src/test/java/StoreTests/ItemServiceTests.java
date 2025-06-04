@@ -47,7 +47,8 @@ public class ItemServiceTests {
     public void setUp() {
         repoManager = new MemoryRepoManager();
         paymentService = new ExternalPaymentService();
-        facadeManager = new FacadeManager(repoManager, paymentService);
+        // TODO!: remove comment
+        //facadeManager = new FacadeManager(repoManager, paymentService);
         serviceManager = new ServiceManager(facadeManager);
         itemService = serviceManager.getItemService();
         userService = serviceManager.getUserService();

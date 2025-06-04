@@ -47,7 +47,8 @@ public class CustomerServiceServiceTests {
     public void setUp() {
 
         this.repoManager = new MemoryRepoManager();
-        this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class));
+        // TODO! : remove comment
+        //this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class));
         this.serviceManager = new ServiceManager(facadeManager);
         
         

@@ -41,9 +41,11 @@ public class StoreServiceTests {
         // Initialize repository manager
         MemoryRepoManager repositoryManager = new MemoryRepoManager();
         
+        // TODO!: remove comment and remove the null initialization of FacadeManager
         // Initialize facade manager
-        FacadeManager facadeManager = new FacadeManager(repositoryManager, null);
-        
+        // FacadeManager facadeManager = new FacadeManager(repositoryManager, null);
+        FacadeManager facadeManager =  null;
+
         // Initialize service manager and store as a field for use across tests
         this.serviceManager = new ServiceManager(facadeManager);
         

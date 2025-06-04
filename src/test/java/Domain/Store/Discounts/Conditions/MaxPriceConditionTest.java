@@ -7,9 +7,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import java.util.UUID;
+import java.util.function.BiFunction;
+import java.util.HashMap;
+import java.util.Map;
+
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
 import Domain.Store.Item;
 
 public class MaxPriceConditionTest {
@@ -17,117 +19,132 @@ public class MaxPriceConditionTest {
     private MaxPriceCondition maxPriceCondition;
     
     @Mock
-    private ItemFacade mockItemFacade;
+    private BiFunction<String, String, Item> mockItemGetter;
     
-    private ShoppingBasket validShoppingBasket;
+    @Mock
+    private ShoppingBasket mockBasket;
+    
+    @Mock
+    private Item mockItem1;
+    
+    @Mock
+    private Item mockItem2;
+    
     private String storeId;
-    private String clientId;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         
         // Create condition with max price of 100.0
-        maxPriceCondition = new MaxPriceCondition(mockItemFacade, 100.0);
+        maxPriceCondition = new MaxPriceCondition("test-id", 100.0);
         
-        // Create valid shopping basket
         storeId = "store123";
-        clientId = "client456";
-        validShoppingBasket = new ShoppingBasket(storeId, clientId);
         
         // Mock items with specific prices
-        Item item1 = new Item(storeId, "item1", 30.0, 10, "Test item 1");
-        Item item2 = new Item(storeId, "item2", 20.0, 10, "Test item 2");
-        Item item3 = new Item(storeId, "item3", 20.0, 10, "Test item 3");
-        Item item4 = new Item(storeId, "item4", 50.0, 10, "Test item 4");
+        when(mockItem1.getPrice()).thenReturn(30.0);
+        when(mockItem2.getPrice()).thenReturn(20.0);
         
-        when(mockItemFacade.getItem(storeId, "item1")).thenReturn(item1);
-        when(mockItemFacade.getItem(storeId, "item2")).thenReturn(item2);
-        when(mockItemFacade.getItem(storeId, "item3")).thenReturn(item3);
-        when(mockItemFacade.getItem(storeId, "item4")).thenReturn(item4);
+        when(mockItemGetter.apply(storeId, "item1")).thenReturn(mockItem1);
+        when(mockItemGetter.apply(storeId, "item2")).thenReturn(mockItem2);
         
-        // Add some items to the basket for testing
-        validShoppingBasket.addOrder("item1", 2); // 2 items at 30.0 each = 60.0
-        validShoppingBasket.addOrder("item2", 1); // 1 item at 20.0 each = 20.0
-        // Total basket price = 80.0
+        when(mockBasket.getStoreId()).thenReturn(storeId);
     }
 
     @Test
     public void testIsSatisfiedWhenPriceBelowMaximum() {
-        // Basket total is 80.0, which is below maximum of 100.0
+        // Setup basket with total price of 80.0 (below maximum of 100.0)
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("item1", 2); // 2 * 30.0 = 60.0
+        orders.put("item2", 1); // 1 * 20.0 = 20.0
+        // Total: 80.0
+        
+        when(mockBasket.getOrders()).thenReturn(orders);
+        when(mockBasket.getQuantity("item1")).thenReturn(2);
+        when(mockBasket.getQuantity("item2")).thenReturn(1);
+        
         assertTrue("Should be satisfied when price is below maximum", 
-                  maxPriceCondition.isSatisfied(validShoppingBasket));
+                  maxPriceCondition.isSatisfied(mockBasket, mockItemGetter));
     }
 
     @Test
     public void testIsSatisfiedWhenPriceEqualsMaximum() {
-        // Add more items to reach exactly 100.0
-        validShoppingBasket.addOrder("item3", 1); // 1 item at 20.0 = 20.0
-        // Total basket price = 100.0
+        // Setup basket with total price of exactly 100.0
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("item1", 2); // 2 * 30.0 = 60.0
+        orders.put("item2", 2); // 2 * 20.0 = 40.0
+        // Total: 100.0
+        
+        when(mockBasket.getOrders()).thenReturn(orders);
+        when(mockBasket.getQuantity("item1")).thenReturn(2);
+        when(mockBasket.getQuantity("item2")).thenReturn(2);
         
         assertTrue("Should be satisfied when price equals maximum", 
-                  maxPriceCondition.isSatisfied(validShoppingBasket));
+                  maxPriceCondition.isSatisfied(mockBasket, mockItemGetter));
     }
 
     @Test
     public void testIsSatisfiedWhenPriceAboveMaximum() {
-        // Add more items to exceed 100.0
-        validShoppingBasket.addOrder("item3", 2); // 2 items at 20.0 each = 40.0
-        validShoppingBasket.addOrder("item4", 1); // 1 item at 50.0 each = 50.0
-        // Total basket price = 170.0
+        // Setup basket with total price of 150.0 (above maximum of 100.0)
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put("item1", 3); // 3 * 30.0 = 90.0
+        orders.put("item2", 3); // 3 * 20.0 = 60.0
+        // Total: 150.0
+        
+        when(mockBasket.getOrders()).thenReturn(orders);
+        when(mockBasket.getQuantity("item1")).thenReturn(3);
+        when(mockBasket.getQuantity("item2")).thenReturn(3);
         
         assertFalse("Should not be satisfied when price is above maximum", 
-                   maxPriceCondition.isSatisfied(validShoppingBasket));
+                   maxPriceCondition.isSatisfied(mockBasket, mockItemGetter));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testIsSatisfiedWhenShoppingBasketIsNull() {
-        // This should throw IllegalArgumentException: "ShoppingBasket and StoreId cannot be null"
-        maxPriceCondition.isSatisfied(null);
+        maxPriceCondition.isSatisfied(null, mockItemGetter);
     }
 
     @Test(expected = IllegalArgumentException.class) 
     public void testIsSatisfiedWhenStoreIdIsNull() {
-        // Create basket with null store ID
-        ShoppingBasket basketWithNullStoreId = new ShoppingBasket(null, clientId);
-        basketWithNullStoreId.addOrder("item1", 1);
-        
-        // This should throw IllegalArgumentException: "ShoppingBasket and StoreId cannot be null"
-        maxPriceCondition.isSatisfied(basketWithNullStoreId);
+        when(mockBasket.getStoreId()).thenReturn(null);
+        maxPriceCondition.isSatisfied(mockBasket, mockItemGetter);
     }
 
     @Test
     public void testZeroQuantity() {
-        // Create empty basket (no items)
-        ShoppingBasket emptyBasket = new ShoppingBasket(storeId, clientId);
+        // Empty basket (no items)
+        Map<String, Integer> emptyOrders = new HashMap<>();
+        when(mockBasket.getOrders()).thenReturn(emptyOrders);
         
         assertTrue("Should be satisfied when basket is empty (total price = 0)", 
-                  maxPriceCondition.isSatisfied(emptyBasket));
+                  maxPriceCondition.isSatisfied(mockBasket, mockItemGetter));
     }
 
     @Test
     public void testGetters() {
         assertEquals("Max price getter should return correct value", 
                     100.0, maxPriceCondition.getMaxPrice(), 0.001);
+        assertEquals("ID should be correct", "test-id", maxPriceCondition.getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNegativePrice() {
+        new MaxPriceCondition("test-id", -10.0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithZeroPrice() {
+        new MaxPriceCondition("test-id", 0.0);
     }
 
     @Test
-    public void testConstructorWithExistingUUID() {
-        UUID existingId = UUID.randomUUID();
-        MaxPriceCondition conditionWithId = new MaxPriceCondition(existingId, mockItemFacade, 150.0);
+    public void testHasCorrectId() {
+        MaxPriceCondition condition1 = new MaxPriceCondition("id-1", 100.0);
+        MaxPriceCondition condition2 = new MaxPriceCondition("id-2", 100.0);
         
-        assertEquals("Should use provided UUID", existingId.toString(), conditionWithId.getId());
-        assertEquals("Should set max price correctly", 150.0, conditionWithId.getMaxPrice(), 0.001);
-    }
-
-    @Test
-    public void testHasUniqueId() {
-        MaxPriceCondition condition1 = new MaxPriceCondition(mockItemFacade, 100.0);
-        MaxPriceCondition condition2 = new MaxPriceCondition(mockItemFacade, 100.0);
-        
-        assertNotEquals("Each condition should have unique ID", 
+        assertEquals("id-1", condition1.getId());
+        assertEquals("id-2", condition2.getId());
+        assertNotEquals("Each condition should have different ID", 
                        condition1.getId(), condition2.getId());
-        assertNotNull("ID should not be null", condition1.getId());
-        assertNotNull("ID should not be null", condition2.getId());
     }
 }

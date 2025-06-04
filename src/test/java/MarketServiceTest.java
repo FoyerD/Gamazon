@@ -64,10 +64,11 @@ public class MarketServiceTest {
         mockPaymentService = mock(IExternalPaymentService.class);
         mockSupplyService = mock(IExternalSupplyService.class);
         mockNotificationService = mock(INotificationService.class);
+        mockSupplyService = mock(IExternalSupplyService.class);
 
         // Initialize dependency injectors
         repositoryManager = new MemoryRepoManager();
-        facadeManager = new FacadeManager(repositoryManager, mockPaymentService);
+        facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
         serviceManager = new ServiceManager(facadeManager);
         
         // Get the services

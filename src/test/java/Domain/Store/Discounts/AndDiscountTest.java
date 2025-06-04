@@ -8,20 +8,15 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.List;
+import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
-import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
+import Domain.Store.Discounts.Discount.MergeType;
 
 public class AndDiscountTest {
-    
-    @Mock
-    private ItemFacade itemFacade;
     
     @Mock
     private ShoppingBasket basket;
@@ -36,7 +31,7 @@ public class AndDiscountTest {
     private Item item;
     
     @Mock
-    private DiscountQualifier qualifier;
+    private Condition condition;
     
     @Mock
     private Condition condition1;
@@ -44,7 +39,12 @@ public class AndDiscountTest {
     @Mock
     private Condition condition2;
     
+    @Mock
+    private BiFunction<String, String, Item> itemGetter;
+    
     private AndDiscount andDiscount;
+    private final String STORE_ID = "store123";
+    private final String PRODUCT_ID = "product1";
     
     @Before
     public void setUp() {
@@ -53,226 +53,235 @@ public class AndDiscountTest {
         when(discount1.getCondition()).thenReturn(condition1);
         when(discount2.getCondition()).thenReturn(condition2);
         
-        Set<Discount> discounts = new HashSet<>();
-        discounts.add(discount1);
-        discounts.add(discount2);
+        List<Discount> discounts = List.of(discount1, discount2);
         
-        andDiscount = new AndDiscount(itemFacade, discounts);
+        andDiscount = new AndDiscount("test-id", STORE_ID, discounts, condition, MergeType.MAX);
     }
     
     @Test
-    public void testConstructorWithSet() {
+    public void testConstructorValid() {
         assertNotNull(andDiscount);
-        assertNotNull(andDiscount.getId());
-        assertNotNull(andDiscount.getCondition());
+        assertEquals("test-id", andDiscount.getId());
+        assertEquals(STORE_ID, andDiscount.getStoreId());
+        assertEquals(condition, andDiscount.getCondition());
     }
     
-    @Test
-    public void testConstructorWithTwoDiscounts() {
-        AndDiscount discount = new AndDiscount(itemFacade, discount1, discount2);
-        assertNotNull(discount);
-        assertNotNull(discount.getId());
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullId() {
+        new AndDiscount(null, STORE_ID, List.of(discount1), condition, MergeType.MAX);
     }
     
-    @Test
-    public void testConstructorWithExistingUUID() {
-        UUID existingId = UUID.randomUUID();
-        Set<Discount> discounts = new HashSet<>();
-        discounts.add(discount1);
-        discounts.add(discount2);
-        
-        AndDiscount discount = new AndDiscount(existingId, itemFacade, discounts);
-        assertEquals(existingId.toString().toString(), discount.getId());
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() {
+        new AndDiscount("", STORE_ID, List.of(discount1), condition, MergeType.MAX);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullStoreId() {
+        new AndDiscount("test-id", null, List.of(discount1), condition, MergeType.MAX);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullCondition() {
+        new AndDiscount("test-id", STORE_ID, List.of(discount1), null, MergeType.MAX);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullDiscounts() {
+        new AndDiscount("test-id", STORE_ID, null, condition, MergeType.MAX);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyDiscounts() {
+        new AndDiscount("test-id", STORE_ID, List.of(), condition, MergeType.MAX);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullMergeType() {
+        new AndDiscount("test-id", STORE_ID, List.of(discount1), condition, null);
     }
     
     @Test
     public void testCalculatePriceWhenConditionNotSatisfied() {
         // Setup
         Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 2);
+        orders.put(PRODUCT_ID, 2);
         
         when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(basket.getPriceBreakdowns(itemGetter)).thenReturn(createOriginalPriceBreakdown());
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(100.0);
         
-        // Mock the AND condition to return false (not all conditions satisfied)
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(false);
+        // Main condition not satisfied
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(false);
         
         // Execute
-        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket, itemGetter);
         
-        // Verify - should return no discount when conditions not satisfied
+        // Verify - should return original prices when main condition not satisfied
         assertEquals(1, result.size());
-        ItemPriceBreakdown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get(PRODUCT_ID);
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.0, breakdown.getDiscount(), 0.001);
     }
     
     @Test
-    public void testCalculatePriceWhenAllConditionsSatisfied() {
+    public void testCalculatePriceWhenNotAllSubConditionsSatisfied() {
         // Setup
         Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 2);
-        
-        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
-        breakdown1.put("product1", new ItemPriceBreakdown(100.0, 0.1));
-        
-        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
-        breakdown2.put("product1", new ItemPriceBreakdown(100.0, 0.2));
+        orders.put(PRODUCT_ID, 2);
         
         when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(basket.getPriceBreakdowns(itemGetter)).thenReturn(createOriginalPriceBreakdown());
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(100.0);
         
-        when(discount1.calculatePrice(basket)).thenReturn(breakdown1);
-        when(discount2.calculatePrice(basket)).thenReturn(breakdown2);
-        when(discount1.isQualified("product1")).thenReturn(true);
-        when(discount2.isQualified("product1")).thenReturn(true);
-        
-        // Mock all conditions to be satisfied
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(true);
+        // Main condition satisfied but not all sub-conditions
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(false);
         
         // Execute
-        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket, itemGetter);
         
-        // Verify - should apply the maximum discount when all conditions satisfied
+        // Verify - should return original prices when not all conditions satisfied
         assertEquals(1, result.size());
-        ItemPriceBreakdown breakdown = result.get("product1");
+        ItemPriceBreakdown breakdown = result.get(PRODUCT_ID);
+        assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
+        assertEquals(0.0, breakdown.getDiscount(), 0.001);
+    }
+    
+    @Test
+    public void testCalculatePriceWhenAllConditionsSatisfiedWithMaxMerge() {
+        // Setup
+        Map<String, Integer> orders = new HashMap<>();
+        orders.put(PRODUCT_ID, 2);
+        
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put(PRODUCT_ID, new ItemPriceBreakdown(100.0, 0.1));
+        
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put(PRODUCT_ID, new ItemPriceBreakdown(100.0, 0.2));
+        
+        when(basket.getOrders()).thenReturn(orders);
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
+        when(item.getPrice()).thenReturn(100.0);
+        
+        when(discount1.calculatePrice(basket, itemGetter)).thenReturn(breakdown1);
+        when(discount2.calculatePrice(basket, itemGetter)).thenReturn(breakdown2);
+        
+        // All conditions satisfied
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(true);
+        
+        // Execute
+        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket, itemGetter);
+        
+        // Verify - should apply maximum discount with MAX merge type
+        assertEquals(1, result.size());
+        ItemPriceBreakdown breakdown = result.get(PRODUCT_ID);
         assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
         assertEquals(0.2, breakdown.getDiscount(), 0.001); // Should pick the higher discount
     }
     
     @Test
-    public void testIsQualifiedWhenAnyDiscountQualifies() {
-        // CORRECT LOGIC: isQualified should return true if ANY discount qualifies
-        // This is for efficiency - if any discount could apply, it's worth processing
-        when(discount1.isQualified("product1")).thenReturn(true);
-        when(discount2.isQualified("product1")).thenReturn(false);
-        
-        assertTrue("AndDiscount should qualify if ANY discount qualifies", 
-                  andDiscount.isQualified("product1"));
-        
-        // Test the other way around
-        when(discount1.isQualified("product1")).thenReturn(false);
-        when(discount2.isQualified("product1")).thenReturn(true);
-        
-        assertTrue("AndDiscount should qualify if ANY discount qualifies", 
-                  andDiscount.isQualified("product1"));
-    }
-    
-    @Test
-    public void testIsQualifiedWhenBothDiscountsQualify() {
-        when(discount1.isQualified("product1")).thenReturn(true);
-        when(discount2.isQualified("product1")).thenReturn(true);
-        
-        assertTrue("AndDiscount should qualify when both discounts qualify", 
-                  andDiscount.isQualified("product1"));
-    }
-    
-    @Test
-    public void testIsQualifiedWhenNoDiscountsQualify() {
-        when(discount1.isQualified("product1")).thenReturn(false);
-        when(discount2.isQualified("product1")).thenReturn(false);
-        
-        assertFalse("AndDiscount should not qualify when no discounts qualify", 
-                   andDiscount.isQualified("product1"));
-    }
-    
-    @Test
-    public void testAndCompositionLogic() {
-        // This test demonstrates the AND composition logic:
-        // - CONDITIONS: ALL conditions must be satisfied for any discounts to apply
-        // - QUALIFICATION: ANY discount qualifying means processing is worthwhile
-        // - APPLICATION: Individual discounts apply to products they qualify for
+    public void testCalculatePriceWhenAllConditionsSatisfiedWithMulMerge() {
+        // Setup with MUL merge type
+        AndDiscount mulAndDiscount = new AndDiscount("test-mul-id", STORE_ID, 
+                                                    List.of(discount1, discount2), condition, MergeType.MUL);
         
         Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 1); // qualifies for discount1 only
-        orders.put("product2", 1); // qualifies for discount2 only  
-        orders.put("product3", 1); // qualifies for both discounts
-        orders.put("product4", 1); // qualifies for neither discount
+        orders.put(PRODUCT_ID, 1);
+        
+        Map<String, ItemPriceBreakdown> breakdown1 = new HashMap<>();
+        breakdown1.put(PRODUCT_ID, new ItemPriceBreakdown(100.0, 0.2));
+        
+        Map<String, ItemPriceBreakdown> breakdown2 = new HashMap<>();
+        breakdown2.put(PRODUCT_ID, new ItemPriceBreakdown(100.0, 0.1));
         
         when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
-        
-        // Setup items
-        Item item1 = mock(Item.class);
-        Item item2 = mock(Item.class);
-        Item item3 = mock(Item.class);
-        Item item4 = mock(Item.class);
-        
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item1);
-        when(itemFacade.getItem("store1", "product2")).thenReturn(item2);
-        when(itemFacade.getItem("store1", "product3")).thenReturn(item3);
-        when(itemFacade.getItem("store1", "product4")).thenReturn(item4);
-        
-        when(item1.getPrice()).thenReturn(100.0);
-        when(item2.getPrice()).thenReturn(100.0);
-        when(item3.getPrice()).thenReturn(100.0);
-        when(item4.getPrice()).thenReturn(100.0);
-        
-        // Setup discount qualifications
-        when(discount1.isQualified("product1")).thenReturn(true);
-        when(discount1.isQualified("product2")).thenReturn(false);
-        when(discount1.isQualified("product3")).thenReturn(true);
-        when(discount1.isQualified("product4")).thenReturn(false);
-        
-        when(discount2.isQualified("product1")).thenReturn(false);
-        when(discount2.isQualified("product2")).thenReturn(true);
-        when(discount2.isQualified("product3")).thenReturn(true);
-        when(discount2.isQualified("product4")).thenReturn(false);
-        
-        // Test qualification logic (efficiency check)
-        assertTrue("Product1 should qualify (discount1 qualifies)", 
-                  andDiscount.isQualified("product1"));
-        assertTrue("Product2 should qualify (discount2 qualifies)", 
-                  andDiscount.isQualified("product2"));
-        assertTrue("Product3 should qualify (both qualify)", 
-                  andDiscount.isQualified("product3"));
-        assertFalse("Product4 should not qualify (neither qualifies)", 
-                   andDiscount.isQualified("product4"));
-    }
-    
-    @Test
-    public void testConditionsApplyToAllDiscounts() {
-        // Test that when conditions are not satisfied, no discounts apply
-        // even if individual discounts would qualify for specific products
-        
-        Map<String, Integer> orders = new HashMap<>();
-        orders.put("product1", 1);
-        
-        when(basket.getOrders()).thenReturn(orders);
-        when(basket.getStoreId()).thenReturn("store1");
-        when(itemFacade.getItem("store1", "product1")).thenReturn(item);
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(itemGetter.apply(STORE_ID, PRODUCT_ID)).thenReturn(item);
         when(item.getPrice()).thenReturn(100.0);
         
-        // Product qualifies for discount1
-        when(discount1.isQualified("product1")).thenReturn(true);
-        when(discount2.isQualified("product1")).thenReturn(false);
+        when(discount1.calculatePrice(basket, itemGetter)).thenReturn(breakdown1);
+        when(discount2.calculatePrice(basket, itemGetter)).thenReturn(breakdown2);
         
-        // But not all conditions are satisfied
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(false); // This fails the AND
+        // All conditions satisfied
+        when(condition.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(true);
         
         // Execute
-        Map<String, ItemPriceBreakdown> result = andDiscount.calculatePrice(basket);
+        Map<String, ItemPriceBreakdown> result = mulAndDiscount.calculatePrice(basket, itemGetter);
         
-        // Verify - no discount should apply because conditions aren't met
+        // Verify - should apply multiplicative discount: 1 - (1-0.2)*(1-0.1) = 1 - 0.8*0.9 = 0.28
         assertEquals(1, result.size());
-        ItemPriceBreakdown breakdown = result.get("product1");
-        assertEquals(0.0, breakdown.getDiscount(), 0.001);
+        ItemPriceBreakdown breakdown = result.get(PRODUCT_ID);
+        assertEquals(100.0, breakdown.getOriginalPrice(), 0.001);
+        assertEquals(0.28, breakdown.getDiscount(), 0.001);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testCalculatePriceWithNullBasket() {
+        andDiscount.calculatePrice(null, itemGetter);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testCalculatePriceWithBasketNullStoreId() {
+        when(basket.getStoreId()).thenReturn(null);
+        andDiscount.calculatePrice(basket, itemGetter);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testCalculatePriceWithBasketNullOrders() {
+        when(basket.getStoreId()).thenReturn(STORE_ID);
+        when(basket.getOrders()).thenReturn(null);
+        andDiscount.calculatePrice(basket, itemGetter);
     }
     
     @Test
-    public void testHasUniqueId() {
-        Set<Discount> discounts = new HashSet<>();
-        discounts.add(discount1);
-        discounts.add(discount2);
-        AndDiscount another = new AndDiscount(itemFacade, discounts);
+    public void testGetDiscounts() {
+        List<Discount> discounts = andDiscount.getDiscounts();
+        assertEquals(2, discounts.size());
+        assertTrue(discounts.contains(discount1));
+        assertTrue(discounts.contains(discount2));
+    }
+    
+    @Test
+    public void testGetMergeType() {
+        assertEquals(MergeType.MAX, andDiscount.getMergeType());
+    }
+    
+    @Test
+    public void testEquals() {
+        AndDiscount same = new AndDiscount("test-id", "other-store", List.of(discount1), condition, MergeType.MUL);
+        AndDiscount different = new AndDiscount("different-id", STORE_ID, List.of(discount1), condition, MergeType.MAX);
         
-        assertNotEquals(andDiscount.getId(), another.getId());
+        assertEquals("Discounts with same ID should be equal", andDiscount, same);
+        assertNotEquals("Discounts with different ID should not be equal", andDiscount, different);
+    }
+    
+    @Test
+    public void testHashCode() {
+        assertEquals("Hash code should be based on ID", 
+                    andDiscount.getId().hashCode(), andDiscount.hashCode());
+    }
+    
+    @Test
+    public void testToString() {
+        String toString = andDiscount.toString();
+        assertTrue("ToString should contain class name", toString.contains("AndDiscount"));
+        assertTrue("ToString should contain ID", toString.contains("test-id"));
+    }
+    
+    private Map<String, ItemPriceBreakdown> createOriginalPriceBreakdown() {
+        Map<String, ItemPriceBreakdown> breakdown = new HashMap<>();
+        breakdown.put(PRODUCT_ID, new ItemPriceBreakdown(100.0, 0.0));
+        return breakdown;
     }
 }
