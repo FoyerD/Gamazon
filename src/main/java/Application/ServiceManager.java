@@ -2,14 +2,9 @@ package Application;
 
 
 
-import org.springframework.stereotype.Service;
-
 import Application.utils.Response;
 import Domain.FacadeManager;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
-import Domain.management.PermissionManager;
-import Domain.management.PolicyFacade;
 
 
 
@@ -25,7 +20,6 @@ public class ServiceManager {
     private FacadeManager facadeManager;
     private INotificationService notificationService;
     private PolicyService policyService;
-    
 
     public ServiceManager(FacadeManager facadeManager) {
         this.facadeManager = facadeManager;
@@ -127,7 +121,7 @@ public class ServiceManager {
         }
         return shoppingService;
     }
-
+    
     public void injectINotificationService(INotificationService notificationService) {
         this.notificationService = notificationService;
     }

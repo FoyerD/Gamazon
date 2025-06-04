@@ -25,3 +25,4 @@ public interface IRepoManager {
     public IUserRepository getUserRepository();
     public IPolicyRepository getPolicyRepository();
 }
+

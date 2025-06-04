@@ -6,22 +6,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Pair;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IShoppingCartRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Policy;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
+import Domain.User.Member;
+import Domain.management.PolicyFacade;
+
 
 /**
  * Implementation of the IShoppingCartFacade interface.
@@ -36,6 +41,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final ItemFacade itemFacade;
     private final StoreFacade storeFacade;
     private final IProductRepository productRepo;
+    private final PolicyFacade policyFacade;
+    private final Function<String, Member> memberLookup;
 
     /**
      * Constructor to initialize the ShoppingCartFacade with required repositories and services.
@@ -47,9 +54,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @param storeFacade The facade for store management
      * @param receiptRepo The repository for receipts
      * @param productRepository The repository for products
+     * @param policyFacade The facade for policy management
      */
     @Autowired
-    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IExternalPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository) {
+    public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo, IExternalPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade, IReceiptRepository receiptRepo, IProductRepository productRepository, PolicyFacade policyFacade, IUserRepository userRepository) {
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
@@ -57,6 +65,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         this.storeFacade = storeFacade;
         this.receiptRepo = receiptRepo;
         this.productRepo = productRepository;
+        this.policyFacade = policyFacade;
+        this.memberLookup = userRepository::getMember;
     }
 
     /**
@@ -297,8 +307,19 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             for (String storeId : storeIds) {
                 ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
                 if (basket != null && !basket.isEmpty()) {
+                    // Check if cart abids by policies
+                    List<Policy> policies = policyFacade.getAllStorePolicies(storeId);
+                    Member member = this.memberLookup.apply(clientId);
+                    for (Policy policy : policies) {
+                        if (!policy.isApplicable(basket, member)) {
+                            throw new RuntimeException("Checkout failed: Basket does not comply with store policies");
+                        }
+                    }
+
+
+                    // Track products and prices for this store
+                    Map<Product, Integer> storeProducts = new HashMap<>();
                     hasItemsToCheckout = true;
-                    break;
                 }
             }
             
@@ -312,8 +333,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                     // Skip stores that don't exist or are closed
                     if(storeFacade.getStore(storeId) == null || !storeFacade.getStore(storeId).isOpen()) {
                         continue;
-                    }
-                    
+                    }                    
                     ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
                     if (basket != null && !basket.isEmpty()) {
                         // Track products and prices for this store

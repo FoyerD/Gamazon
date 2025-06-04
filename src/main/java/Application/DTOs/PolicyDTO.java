@@ -1,7 +1,6 @@
 package Application.DTOs;
 
 import Domain.Store.Policy;
-import java.util.List;
 
 
 /**

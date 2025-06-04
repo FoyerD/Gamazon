@@ -16,13 +16,13 @@ import Infrastructure.MemoryRepositories.MemoryAuctionRepository;
 import Infrastructure.MemoryRepositories.MemoryFeedbackRepository;
 import Infrastructure.MemoryRepositories.MemoryItemRepository;
 import Infrastructure.MemoryRepositories.MemoryPermissionRepository;
+import Infrastructure.MemoryRepositories.MemoryPolicyRepository;
 import Infrastructure.MemoryRepositories.MemoryProductRepository;
 import Infrastructure.MemoryRepositories.MemoryReceiptRepository;
 import Infrastructure.MemoryRepositories.MemoryShoppingBasketRepository;
 import Infrastructure.MemoryRepositories.MemoryShoppingCartRepository;
 import Infrastructure.MemoryRepositories.MemoryStoreRepository;
 import Infrastructure.MemoryRepositories.MemoryUserRepository;
-import Infrastructure.MemoryRepositories.MemoryPolicyRepository;
 
 public class MemoryRepoManager implements IRepoManager {
     private MemoryItemRepository itemRepository;
@@ -107,7 +107,7 @@ public class MemoryRepoManager implements IRepoManager {
         }
         return userRepository;
     }
-    
+
     @Override
     public IPolicyRepository getPolicyRepository() {
         if (policyRepository == null) {
