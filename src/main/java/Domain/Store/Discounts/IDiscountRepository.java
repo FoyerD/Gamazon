@@ -9,7 +9,7 @@ import Domain.ILockbasedRepository;
  * Repository interface for managing discount entities.
  * Provides CRUD operations for discounts using UUID as the primary key.
  */
-public abstract class IDiscountRepository  extends ILockbasedRepository<String, Discount> {
+public abstract class IDiscountRepository  extends ILockbasedRepository<Discount, String> {
     
     /**
      * Saves a discount to the repository.
@@ -20,7 +20,7 @@ public abstract class IDiscountRepository  extends ILockbasedRepository<String, 
      * @return true if the discount was saved successfully
      * @throws IllegalArgumentException if discount is null or has a null ID
      */
-    abstract Discount save(String discountId, Discount discount);
+    public abstract boolean add(String discountId, Discount discount);
     
     /**
      * Finds a discount by its unique identifier.
@@ -29,7 +29,7 @@ public abstract class IDiscountRepository  extends ILockbasedRepository<String, 
      * @return the discount if found, null otherwise
      * @throws IllegalArgumentException if id is null
      */
-    abstract Discount get(String id);
+    public abstract Discount get(String id);
     
     /**
      * Deletes a discount by its unique identifier.
@@ -37,7 +37,7 @@ public abstract class IDiscountRepository  extends ILockbasedRepository<String, 
      * @param id the UUID of the discount to delete
      * @throws IllegalArgumentException if id is null
      */
-    abstract void remove(String id);
+    public abstract Discount remove(String id);
     
     
     /**
@@ -47,15 +47,19 @@ public abstract class IDiscountRepository  extends ILockbasedRepository<String, 
      * @return true if a discount exists with the given ID, false otherwise
      * @throws IllegalArgumentException if id is null
      */
-    abstract boolean exists(String id);
+    public abstract boolean exists(String id);
     
     /**
      * Removes all discounts from the repository.
      * Primarily used for testing purposes.
      */
-    abstract void clear();
+    public abstract void clear();
     
     
+    //TODO! Roi or Itay or Almog or anyone adding a DB to this,
+    // this method should only return HEAD DISCOUNTS, i.e
+    // the discounts that have no parent discount.
+    // please make sure to implement this correctly, otherwise some diocunts will be applied multiple times.
     /**
      * Gets all the discounts for a specific store.
      * 
@@ -63,10 +67,10 @@ public abstract class IDiscountRepository  extends ILockbasedRepository<String, 
      * @return the count of discounts for the specified store
      * @throws IllegalArgumentException if storeId is null or empty
      */
-    abstract List<Discount> getStoreDiscounts(String storeId);
+    public abstract List<Discount> getStoreDiscounts(String storeId);
 
     /**
      * Returns the total number of discounts in the repository.
      */
-    abstract int size();
+    public abstract int size();
 }
