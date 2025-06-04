@@ -2,7 +2,6 @@ package Domain.Store.Discounts.Conditions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public abstract class CompositeCondition implements Condition {
 
@@ -11,6 +10,12 @@ public abstract class CompositeCondition implements Condition {
 
     // Constructor for loading from repository with existing ID
     public CompositeCondition(String id, List<Condition> conditions) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("ID cannot be null or empty");
+        }
+        if (conditions == null || conditions.isEmpty()) {
+            throw new IllegalArgumentException("Conditions list cannot be null or empty");
+        }
         this.id = id;
         this.conditions = conditions;
     }

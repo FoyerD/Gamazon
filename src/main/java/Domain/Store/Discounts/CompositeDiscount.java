@@ -16,8 +16,14 @@ public abstract class CompositeDiscount extends Discount {
     protected MergeType mergeType;
 
     // Constructor for loading from repository with existing ID
-    public CompositeDiscount(String id, List<Discount> discounts, Condition condition, MergeType mergeType) {
-        super(id, condition);
+    public CompositeDiscount(String id, String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
+        super(id, storeId, condition);
+        if(mergeType == null) {
+            throw new IllegalArgumentException("MergeType cannot be null");
+        }
+        if(discounts == null || discounts.isEmpty()) {
+            throw new IllegalArgumentException("Discounts list cannot be null or empty");
+        }
         this.mergeType = mergeType;
         this.discounts = discounts;
     }

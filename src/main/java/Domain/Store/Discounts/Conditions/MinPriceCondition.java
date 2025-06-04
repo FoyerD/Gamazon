@@ -12,6 +12,9 @@ public class MinPriceCondition extends SimpleCondition {
     // Constructor for loading from repository with existing ID
     public MinPriceCondition(String id, double minPrice) {
         super(id);
+        if (minPrice <= 0) {
+            throw new IllegalArgumentException("Min price must be greater than zero");
+        }
         this.minPrice = minPrice;
     }
 

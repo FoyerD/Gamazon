@@ -8,6 +8,9 @@ public class CategoryQualifier implements DiscountQualifier {
     private Category category;
 
     public CategoryQualifier(Category category) {
+        if(category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
+        }
         this.category = category;
     }
 

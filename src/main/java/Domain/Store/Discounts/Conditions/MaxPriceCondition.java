@@ -12,6 +12,9 @@ public class MaxPriceCondition extends SimpleCondition{
     // Constructor for loading from repository with existing ID
     public MaxPriceCondition(String id, double maxPrice) {
         super(id);
+        if(maxPrice <= 0) {
+            throw new IllegalArgumentException("Max price cannot be negative");
+        }
         this.maxPrice = maxPrice;
     }
 

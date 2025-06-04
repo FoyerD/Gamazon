@@ -14,6 +14,12 @@ public class MinQuantityCondition extends SimpleCondition{
     // Constructor for loading from repository with existing ID
     public MinQuantityCondition(String id, String productId, int minQuantity) {
         super(id);
+        if (productId == null || productId.isEmpty()) {
+            throw new IllegalArgumentException("Product ID cannot be null or empty");
+        }
+        if (minQuantity <= 0) {
+            throw new IllegalArgumentException("Min quantity must be greater than zero");
+        }
         this.productId = productId;
         this.minQuantity = minQuantity;
     }

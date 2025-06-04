@@ -56,22 +56,25 @@ public class DiscountBuilder {
         List<Discount> subDiscounts = discountDTO.getSubDiscounts().stream().map((ddto) -> buildDiscount(ddto)).collect(Collectors.toList());
         switch(discountDTO.getType()) {
             case SIMPLE:
-                return new SimpleDiscount(id,discountDTO.getDiscountPercentage(), makeQualifier(discountDTO.getQualifierType(), discountDTO.getQualifierValue()), cond);
+                return new SimpleDiscount(id, discountDTO.getStoreId(), discountDTO.getDiscountPercentage(), makeQualifier(discountDTO.getQualifierType(), discountDTO.getQualifierValue()), cond);
                 
             case AND:
                 return new AndDiscount(id,
+                    discountDTO.getStoreId(),
                     subDiscounts,
                     cond,
                     discountDTO.getMergeType());
                     
             case OR:
                 return new OrDiscount(id,
+                    discountDTO.getStoreId(),
                     subDiscounts,
                     cond,
                     discountDTO.getMergeType());
                         
             case XOR:
                 return new XorDiscount(id,
+                    discountDTO.getStoreId(),
                     subDiscounts.get(0),
                     subDiscounts.get(1),
                     cond,

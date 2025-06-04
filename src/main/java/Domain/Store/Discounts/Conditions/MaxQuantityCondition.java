@@ -13,6 +13,12 @@ public class MaxQuantityCondition extends SimpleCondition {
     // Constructor for loading from repository with existing ID
     public MaxQuantityCondition(String id, String productId, int maxQuantity) {
         super(id);
+        if (productId == null || productId.isEmpty()) {
+            throw new IllegalArgumentException("Product ID cannot be null or empty");
+        }
+        if (maxQuantity <= 0) {
+            throw new IllegalArgumentException("Max quantity must be greater than zero");
+        }
         this.productId = productId;
         this.maxQuantity = maxQuantity;
     }

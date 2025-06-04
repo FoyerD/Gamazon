@@ -12,8 +12,8 @@ public class AndDiscount extends CompositeDiscount {
 
 
     // Constructor for loading from repository with existing ID
-    public AndDiscount(String id, List<Discount> discounts, Condition condition, MergeType mergeType) {
-        super(id, discounts, condition, mergeType);
+    public AndDiscount(String id, String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
+        super(id, storeId, discounts, condition, mergeType);
     }
 
     @Override

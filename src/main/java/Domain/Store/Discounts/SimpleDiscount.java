@@ -15,8 +15,8 @@ public class SimpleDiscount extends Discount {
     private double discountPercentage; // INV: between 0 and 1 (percentage)
 
     // Constructor for loading from repository with existing ID
-    public SimpleDiscount(String id, double discountPercentage, DiscountQualifier qualifier, Condition condition) {
-        super(id, condition);
+    public SimpleDiscount(String id, String storeId, double discountPercentage, DiscountQualifier qualifier, Condition condition) {
+        super(id, storeId, condition);
         this.qualifier = qualifier;
         this.discountPercentage = discountPercentage;
     }

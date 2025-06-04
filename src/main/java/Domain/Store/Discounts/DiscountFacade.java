@@ -162,7 +162,7 @@ public class DiscountFacade {
         validateQualifier(qualifier);
         validateCondition(condition);
         
-        SimpleDiscount discount = new SimpleDiscount(UUID.randomUUID().toString(), discountPercentage, qualifier, condition);
+        SimpleDiscount discount = new SimpleDiscount(UUID.randomUUID().toString(), storeId, discountPercentage, qualifier, condition);
         discountRepository.save(storeId, discount);
         return discount;
     }
@@ -174,7 +174,7 @@ public class DiscountFacade {
         validateItemFacade(itemFacade);
         validateDiscountSet(discounts);
         
-        AndDiscount discount = new AndDiscount(UUID.randomUUID().toString(), discounts, condition, mergeType);
+        AndDiscount discount = new AndDiscount(UUID.randomUUID().toString(), storeId, discounts, condition, mergeType);
         discountRepository.save(storeId, discount);
         return discount;
     }
@@ -184,7 +184,7 @@ public class DiscountFacade {
      * Creates and saves an OrDiscount for a specific store.
      */
     public OrDiscount createOrDiscount(String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
-        OrDiscount orDiscount = new OrDiscount(UUID.randomUUID().toString(), discounts, condition, mergeType);
+        OrDiscount orDiscount = new OrDiscount(UUID.randomUUID().toString(), storeId, discounts, condition, mergeType);
         discountRepository.save(storeId, orDiscount);
         return orDiscount;
     }
@@ -197,7 +197,7 @@ public class DiscountFacade {
         validateDiscount(discount1);
         validateDiscount(discount2);
         
-        XorDiscount discount = new XorDiscount(UUID.randomUUID().toString(), discount1, discount2, condition, mergeType);
+        XorDiscount discount = new XorDiscount(UUID.randomUUID().toString(), storeId, discount1, discount2, condition, mergeType);
         discountRepository.save(storeId, discount);
         return discount;
     }

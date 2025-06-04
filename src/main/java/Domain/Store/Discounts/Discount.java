@@ -20,6 +20,15 @@ public abstract class Discount {
 
     // Constructor for loading from repository with existing ID
     public Discount(String id, String storeId, Condition condition) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("ID cannot be null or empty");
+        }
+        if (storeId == null || storeId.isEmpty()) {
+            throw new IllegalArgumentException("Store ID cannot be null or empty");
+        }
+        if (condition == null) {
+            throw new IllegalArgumentException("Condition cannot be null");
+        }
         this.id = id;
         this.condition = condition;
         this.storeId = storeId;

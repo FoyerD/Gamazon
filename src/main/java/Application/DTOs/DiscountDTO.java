@@ -33,7 +33,8 @@ public class DiscountDTO {
     private String id;
     private DiscountType type;
     private ConditionDTO condition;
-    
+    private String storeId; // Store ID for simple discounts
+
     // Fields for simple discounts
     private double discountPercentage;
     private QualifierType qualifierType;
@@ -47,10 +48,18 @@ public class DiscountDTO {
     public DiscountDTO() {}
     
     // Constructor for basic initialization
-    public DiscountDTO(String id, DiscountType type, ConditionDTO condition) {
+    public DiscountDTO(String id, String storeId, DiscountType type, ConditionDTO condition) {
         this.id = id;
+        this.storeId = storeId;
         this.type = type;
         this.condition = condition;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
     
     // Factory method to create from domain object

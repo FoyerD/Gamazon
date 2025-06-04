@@ -12,8 +12,8 @@ import Domain.Store.Discounts.Conditions.Condition;
 public class OrDiscount extends CompositeDiscount {
 
     // Constructor for loading from repository with existing ID
-    public OrDiscount(String id, List<Discount> discounts, Condition condition, MergeType mergeType) {
-        super(id, discounts, condition, mergeType);
+    public OrDiscount(String id, String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
+        super(id, storeId, discounts, condition, mergeType);
     }
 
     @Override

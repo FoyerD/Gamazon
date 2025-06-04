@@ -7,6 +7,9 @@ public class ProductQualifier implements DiscountQualifier {
     private String productId;
 
     public ProductQualifier(String productId) {
+        if (productId == null || productId.isEmpty()) {
+            throw new IllegalArgumentException("Product ID cannot be null or empty");
+        }
         this.productId = productId;
     }
 
