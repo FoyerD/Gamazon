@@ -38,15 +38,12 @@ public class AndDiscount extends CompositeDiscount {
         }
 
         List<Map<String, ItemPriceBreakdown>> allSubDiscounts = calculateAllSubDiscounts(basket, itemGetter);
-        switch(mergeType){
-            case MAX:
-                output = ItemPriceBreakdown.combineMaxMap(allSubDiscounts);
-                break;
-            case MUL:
-                output = ItemPriceBreakdown.combineMultiplicateMaps(allSubDiscounts);
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported merge type: " + mergeType);
+        if (mergeType == MergeType.MAX) {
+            output = ItemPriceBreakdown.combineMaxMap(allSubDiscounts);
+        } else if (mergeType == MergeType.MUL) {
+            output = ItemPriceBreakdown.combineMultiplicateMaps(allSubDiscounts);
+        } else {
+            throw new IllegalArgumentException("Unsupported merge type: " + mergeType);
         }
 
         return output;
