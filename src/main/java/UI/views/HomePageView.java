@@ -157,6 +157,7 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         cartBtn.getStyle()
             .set("background-color", "#38a169")
             .set("color", "white");
+        cartBtn.getElement().setAttribute("data-view-cart", "true");
 
         Button registerBtn = new Button("Register", e -> UI.getCurrent().navigate("register"));
         registerBtn.getStyle().set("background-color", " #6b46c1").set("color", "white");
@@ -606,6 +607,10 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         tradingButton.getStyle()
             .set("background-color", "#4299e1")
             .set("color", "white");
+        
+        // Add data attribute to identify trading button
+        tradingButton.getElement().setAttribute("data-trading-button", "true");
+        
         add(tradingButton);
     }
 
@@ -637,33 +642,73 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
                 // If ban status changed, update UI
                 if (wasBanned != isBanned) {
                     if (isBanned) {
-                        // Remove action columns
+                        // Remove action columns from product grid
                         List<Grid.Column<ItemDTO>> columnsToRemove = new ArrayList<>();
                         productGrid.getColumns().forEach(column -> {
                             String header = column.getHeaderText();
-                            if (header != null && (header.equals("Actions") || header.equals("Cart") || header.equals("Auction"))) {
+                            if (header != null && (
+                                header.equals("Actions") || 
+                                header.equals("Cart") || // Remove "Add to Cart" column
+                                header.equals("Auction") ||
+                                header.toLowerCase().contains("edit") ||
+                                header.toLowerCase().contains("delete"))) {
                                 columnsToRemove.add(column);
                             }
                         });
                         columnsToRemove.forEach(column -> productGrid.removeColumn(column));
                         
-                        // Disable interactive components
+                        // Disable all interactive components except view cart
                         searchBar.setEnabled(false);
                         filterBtn.setEnabled(false);
                         refreshBtn.setEnabled(false);
-                        cartBtn.setEnabled(false);
                         goToSearchBtn.setEnabled(false);
+                        minPriceField.setEnabled(false);
+                        maxPriceField.setEnabled(false);
+                        minRatingField.setEnabled(false);
+                        maxRatingField.setEnabled(false);
+                        minAmountField.setEnabled(false);
+                        categoryFilter.setEnabled(false);
+                        
+                        // Keep cart button enabled but update its style to indicate read-only
+                        cartBtn.setEnabled(true);
+                        cartBtn.getStyle()
+                            .set("background-color", "#718096")
+                            .set("color", "white")
+                            .set("border", "2px solid #4a5568");
+                        
+                        // Disable trading operations button
+                        getChildren()
+                            .filter(component -> component instanceof Button)
+                            .map(component -> (Button) component)
+                            .filter(button -> "Trading Operations".equals(button.getText()))
+                            .findFirst()
+                            .ifPresent(button -> {
+                                button.setEnabled(false);
+                                button.getStyle()
+                                    .set("background-color", "#718096")
+                                    .set("color", "white")
+                                    .set("cursor", "not-allowed")
+                                    .set("opacity", "0.5");
+                            });
+                        
+                        // Call the frontend disableInteractiveElements function
+                        UI.getCurrent().getPage().executeJs(
+                            "if (typeof disableInteractiveElements === 'function') {" +
+                            "  disableInteractiveElements();" +
+                            "}"
+                        );
                         
                         // Show ban notification
-                        Notification.show("Your account has been banned. Some features are disabled.", 
-                                       5000, Notification.Position.MIDDLE);
-                    } else {
-                        // Refresh the page to restore all functionality
-                        UI.getCurrent().getPage().reload();
+                        Notification notification = new Notification(
+                            "Your account has been banned. You can still view your cart but other features are disabled.",
+                            5000,
+                            Notification.Position.MIDDLE
+                        );
+                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                        notification.open();
                     }
                 }
             }
         }
-        this.user =(UserDTO)UI.getCurrent().getSession().getAttribute("user");
     }
 }

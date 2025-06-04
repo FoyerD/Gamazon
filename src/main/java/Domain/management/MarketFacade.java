@@ -240,8 +240,16 @@ public class MarketFacade implements IMarketFacade {
         }
         boolean result = permissionManager.banUser(bannerId, userId, endDate);
         if (result) {
-            String message = String.format("You have been banned until %s", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate));
-            notificationService.sendNotification(userId, message);
+            String banMessage = String.format(
+                "{\"type\": \"USER_BANNED\", \"message\": \"You are banned until %s\"}",
+                endDate.toString()
+            );
+            
+            notificationService.sendNotification(userId, banMessage);
+            
+
+            //String message = String.format("You have been banned until %s", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate));
+            //notificationService.sendNotification(userId, message);
         }
         return result;
     }
