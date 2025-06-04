@@ -6,7 +6,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import Domain.Repos.IItemRepository;
 import Domain.Repos.IPolicyRepository;
+import Domain.Repos.IProductRepository;
 import Domain.Repos.IUserRepository;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
@@ -23,14 +25,15 @@ public class PolicyFacade {
     private final ProductFacade productFacade;
 
     public PolicyFacade(IPolicyRepository policyRepository,
-                        IUserRepository userRepository,
-                        ItemFacade itemFacade,
-                        ProductFacade productFacade) {
+                        IUserRepository userRepoMock,
+                        ItemFacade itemFacadeMock,
+                        ProductFacade productFacadeMock) {
         this.policyRepository = policyRepository;
-        this.userRepository    = userRepository;
-        this.itemFacade        = itemFacade;
-        this.productFacade     = productFacade;
+        this.userRepository    = userRepoMock;
+        this.itemFacade        = itemFacadeMock;
+        this.productFacade     = productFacadeMock;
     }
+    
 
     private void validateIds(String policyId, String storeId) {
         if (policyId == null || policyId.isBlank() ||

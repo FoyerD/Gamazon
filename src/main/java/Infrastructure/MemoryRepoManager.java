@@ -5,6 +5,7 @@ import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IPermissionRepository;
+import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
@@ -21,6 +22,7 @@ import Infrastructure.MemoryRepositories.MemoryShoppingBasketRepository;
 import Infrastructure.MemoryRepositories.MemoryShoppingCartRepository;
 import Infrastructure.MemoryRepositories.MemoryStoreRepository;
 import Infrastructure.MemoryRepositories.MemoryUserRepository;
+import Infrastructure.MemoryRepositories.MemoryPolicyRepository;
 
 public class MemoryRepoManager implements IRepoManager {
     private MemoryItemRepository itemRepository;
@@ -33,6 +35,7 @@ public class MemoryRepoManager implements IRepoManager {
     private MemoryFeedbackRepository feedbackRepository;
     private MemoryProductRepository productRepository;
     private MemoryUserRepository userRepository;
+    private MemoryPolicyRepository policyRepository;
     
     @Override
     public IStoreRepository getStoreRepository() {
@@ -105,4 +108,11 @@ public class MemoryRepoManager implements IRepoManager {
         return userRepository;
     }
     
+    @Override
+    public IPolicyRepository getPolicyRepository() {
+        if (policyRepository == null) {
+            policyRepository = new MemoryPolicyRepository();
+        }
+        return policyRepository;
+    }
 }

@@ -4,6 +4,7 @@ import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IPermissionRepository;
+import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
@@ -22,4 +23,5 @@ public interface IRepoManager {
     public IFeedbackRepository getFeedbackRepository();
     public IProductRepository getProductRepository();
     public IUserRepository getUserRepository();
+    public IPolicyRepository getPolicyRepository();
 }

@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class MarketServiceTest {
-    // Use concrete implementations instead of interfaces where appropriate
+    // Use concrete implementations instead of interfaces where possible
     private ServiceManager serviceManager;
     private FacadeManager facadeManager;
     private MemoryRepoManager repositoryManager;
@@ -196,8 +196,8 @@ public class MarketServiceTest {
         thread2.start();
         
         // Wait for both threads to complete
-        thread1.join();  // Wait up to 5 seconds
-        thread2.join();
+        thread1.join(5000);  // Wait up to 5 seconds
+        thread2.join(5000);
         
         // Print diagnostic information
         System.out.println("Thread 1 success: " + threadSuccess[0]);
@@ -302,8 +302,8 @@ public class MarketServiceTest {
         thread2.start();
         
         // Wait for both threads to complete
-        thread1.join();
-        thread2.join();
+        thread1.join(5000);
+        thread2.join(5000);
         
         // Print diagnostic information
         System.out.println("Thread 1 success: " + threadSuccess[0]);

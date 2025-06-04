@@ -8,6 +8,9 @@ import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
+import Domain.management.PermissionManager;
+import Domain.management.PolicyFacade;
+
 
 
 public class ServiceManager {
@@ -21,6 +24,8 @@ public class ServiceManager {
     private ShoppingService shoppingService;
     private FacadeManager facadeManager;
     private INotificationService notificationService;
+    private PolicyService policyService;
+    
 
     public ServiceManager(FacadeManager facadeManager) {
         this.facadeManager = facadeManager;
@@ -40,6 +45,16 @@ public class ServiceManager {
                                         facadeManager.getPermissionManager());
         }
         return itemService;
+    }
+
+    public PolicyService getPolicyService() {
+        if (policyService == null) {
+            policyService = new PolicyService(facadeManager.getPolicyFacade(),
+                                            getTokenService(),
+                                            facadeManager.getPermissionManager(),
+                                            facadeManager.getRepositoryManager().getItemRepository());
+        }
+        return policyService;
     }
 
     public INotificationService getINotificationService() {
