@@ -19,6 +19,8 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
+import Domain.Shopping.IShoppingCart;
+import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
 import Domain.Store.Item;
@@ -92,28 +94,39 @@ public class ShoppingService{
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
+
+            // Get the cart and baskets
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
             Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
-            for (Pair<Item, Integer> item : itemsMap) {
-                ItemDTO itemDTO = ItemDTO.fromItem(item.getFirst());
-                itemDTO.setAmount(item.getSecond());
+            
+            // For each item in the cart
+            for (Pair<Item, Integer> itemPair : itemsMap) {
+                Item item = itemPair.getFirst();
+                Integer quantity = itemPair.getSecond();
+                String storeId = item.getStoreId();
                 
-                if(baskets.containsKey(item.getFirst().getStoreId())){
-                    baskets.get(item.getFirst().getStoreId()).getOrders().put(item.getFirst().getProductId(), itemDTO);
+                // Create or get the basket for this store
+                ShoppingBasketDTO basketDTO;
+                if (baskets.containsKey(storeId)) {
+                    basketDTO = baskets.get(storeId);
                 } else {
-                    String storeId = item.getFirst().getStoreId();
-                    String storeName = this.cartFacade.getStoreName(storeId);
-                    ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>(), storeName);
-                    basket.getOrders().put(item.getFirst().getProductId(), itemDTO);
-                    baskets.put(item.getFirst().getStoreId(), basket);
+                    String storeName = cartFacade.getStoreName(storeId);
+                    basketDTO = new ShoppingBasketDTO(storeId, clientId, new HashMap<>(), storeName);
+                    baskets.put(storeId, basketDTO);
                 }
+                
+                // Add the item to the basket
+                ItemDTO itemDTO = ItemDTO.fromItem(item);
+                itemDTO.setAmount(quantity);
+                basketDTO.getOrders().put(item.getProductId(), itemDTO);
             }
-            CartDTO cart = new CartDTO(clientId, baskets);
+
+            CartDTO cartDTO = new CartDTO(clientId, baskets);
             TradingLogger.logEvent(CLASS_NAME, method, "Cart viewed for user " + clientId + " with " + itemsMap.size() + " items");
-            return new Response<>(cart);
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error viewing cart: %s", ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
+            return new Response<>(cartDTO);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, method, "Error viewing cart: " + e.getMessage());
+            return new Response<>(new Error("Error viewing cart: " + e.getMessage()));
         }
     }
 

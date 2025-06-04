@@ -21,6 +21,13 @@ public enum PermissionType {
     OVERSEE_OFFERS,
     CONTROL_CONTRACTS;
 
+    @Override
+    public String toString() {
+        // Converts enum name to "Title Case" with spaces
+        return name().toLowerCase()
+                     .replace('_', ' ');
+    }
+    
     public static Set<PermissionType> collectionToSet(Collection<PermissionType> perms) {
         return EnumSet.copyOf(perms);
     }

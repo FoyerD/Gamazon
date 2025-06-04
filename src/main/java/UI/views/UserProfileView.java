@@ -3,35 +3,38 @@ package UI.views;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 
+import Application.DTOs.ReceiptDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Application.DTOs.ReceiptDTO;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
 
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
-
 @Route("user-profile")
-public class UserProfileView extends VerticalLayout implements BeforeEnterObserver {
+public class UserProfileView extends BaseView implements BeforeEnterObserver {
 
     private String sessionToken = null;
     private UserDTO userDTO = null;
 
     private final IPurchasePresenter purchasePresenter;
 
-    public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter) {
+    public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.purchasePresenter = purchasePresenter;
 
         // Set yellow-themed layout styles
@@ -175,8 +178,7 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
             Notification.show("Error fetching purchase history: " + receipts.getErrorMessage(), 3000, Notification.Position.BOTTOM_END);
         } else if (receipts.getValue().isEmpty()) {
             Notification.show("No purchase history found.", 3000, Notification.Position.BOTTOM_END);
-        }
-        else {
+        } else {
 
 
             receiptGrid.addColumn(ReceiptDTO::getStoreName).setHeader("Store").setAutoWidth(true);

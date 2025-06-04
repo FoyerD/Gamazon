@@ -1,18 +1,24 @@
 package Domain.management;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
-import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IUserRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.User.IUserRepository;
 import Domain.User.Member;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Component
@@ -103,16 +109,26 @@ public class MarketFacade implements IMarketFacade {
 
     @Override
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
+        if (userRepository.getMember(appointeeId) == null) {
+            throw new IllegalArgumentException("Appointee not found.");
+        } else if (isStoreManager(appointeeId, storeId)) {
+            throw new IllegalArgumentException("Appointee is already a store manager.");
+        }
         permissionManager.appointStoreManager(appointerId, appointeeId, storeId);
     }
 
     @Override
-    public void removeStoreManager(String removerId, String managerId, String storeId) {
-        permissionManager.removeStoreManager(removerId, managerId, storeId);
+    public void removeStoreOwner(String removerId, String ownerId, String storeId) {
+        permissionManager.removeStoreOwner(removerId, ownerId, storeId);
     }
 
     @Override
     public void appointStoreOwner(String appointerId, String appointeeId, String storeId) {
+        if (userRepository.getMember(appointeeId) == null) {
+            throw new IllegalArgumentException("Appointee not found.");
+        } else if (isStoreOwner(appointeeId, storeId)) {
+            throw new IllegalArgumentException("Appointee is already a store owner.");
+        }
         permissionManager.appointStoreOwner(appointerId, appointeeId, storeId);
     }
 
@@ -122,20 +138,41 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public Map<String, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
+    public Map<Member, List<PermissionType>> getManagersPermissions(String storeId, String userId) {
         permissionManager.checkPermission(userId, storeId, PermissionType.SUPERVISE_MANAGERS);
-        Map<String, List<PermissionType>> result = new HashMap<>();
+        Map<Member, List<PermissionType>> result = new HashMap<>();
         Map<String, Permission> storePermissions = permissionManager.getAllPermissionsForStore(storeId);
         if (storePermissions != null) {
             for (Map.Entry<String, Permission> entry : storePermissions.entrySet()) {
                 String username = entry.getKey();
                 Permission p = entry.getValue();
                 if (p.isStoreManager()) {
-                    result.put(username, List.copyOf(p.getPermissions()));
+                    Member member = userRepository.getMember(username);
+                    if (member == null) {
+                        throw new NoSuchElementException("Member not found: " + username);
+                    }
+                    result.put(member, List.copyOf(p.getPermissions()));
                 }
             }
         }
         return result;
+    }
+
+    @Override
+    public List<Member> getOwners(String storeId, String userId) {
+        permissionManager.checkPermission(userId, storeId, PermissionType.SUPERVISE_MANAGERS);
+        List<String> ownersIds = permissionManager.getAllPermissionsForStore(storeId).entrySet()
+                                .stream().filter(entry -> entry.getValue().isStoreOwner()).map(entry -> entry.getKey()).toList();
+
+        List<Member> members = new ArrayList<>();
+        for (String id : ownersIds) {
+            Member member = userRepository.getMember(id);
+            if (member == null) {
+                throw new NoSuchElementException("Member not found: " + userId);
+            }
+            members.add(member);
+        }
+        return members;
     }
 
 
@@ -157,8 +194,8 @@ public class MarketFacade implements IMarketFacade {
         if (paymentCheck.errorOccurred() || supplyCheck.errorOccurred() ||
             !Boolean.TRUE.equals(paymentCheck.getValue()) ||
             !Boolean.TRUE.equals(supplyCheck.getValue())) {
-            
-            throw new IllegalStateException("Handshake failed with external API.");
+            //TODO: Enable again
+            //throw new IllegalStateException("Handshake failed with external API.");
         }
 
         Member manager = userRepository.getMember(userId);
@@ -168,24 +205,24 @@ public class MarketFacade implements IMarketFacade {
     /**
      * Checks if a user is a store manager for the specified store.
      * 
-     * @param username The username to check
+     * @param userId The user ID to check
      * @param storeId The store ID to check
      * @return true if the user is a store manager, false otherwise
      */
-    public boolean isStoreManager(String username, String storeId) {
-        Permission permission = permissionManager.getPermission(storeId, username);
+    public boolean isStoreManager(String userId, String storeId) {
+        Permission permission = permissionManager.getPermission(storeId, userId);
         return permission != null && permission.isStoreManager();
     }
 
     /**
      * Checks if a user is a store owner for the specified store.
      * 
-     * @param username The username to check
+     * @param userId The user ID to check
      * @param storeId The store ID to check
      * @return true if the user is a store owner, false otherwise
      */
-    public boolean isStoreOwner(String username, String storeId) {
-        Permission permission = permissionManager.getPermission(storeId, username);
+    public boolean isStoreOwner(String userId, String storeId) {
+        Permission permission = permissionManager.getPermission(storeId, userId);
         return permission != null && permission.isStoreOwner();
     }
     

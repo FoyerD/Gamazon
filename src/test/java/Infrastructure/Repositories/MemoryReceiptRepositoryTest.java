@@ -13,6 +13,7 @@ import Domain.Pair;
 import Domain.Shopping.Receipt;
 import Domain.Store.Category;
 import Domain.Store.Product;
+import Infrastructure.MemoryRepositories.MemoryReceiptRepository;
 
 /**
  * Test class for MemoryReceiptRepository

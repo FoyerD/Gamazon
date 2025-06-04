@@ -1,20 +1,29 @@
 package Domain.Store;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.TradingLogger;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
-import Domain.User.IUserRepository;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
 import Domain.User.User;
+import Domain.management.Permission;
 
 
 
@@ -147,12 +156,21 @@ public class StoreFacade {
     }
 
     public boolean closeStore(String storeId){
+        // First check if store exists
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found");
+        
+        // Then get or create lock
         Object lock = this.storeRepository.getLock(storeId);
-        if (lock == null) throw new RuntimeException("Store not found");
+        if (lock == null) {
+            // If no lock exists, create one
+            this.storeRepository.addLock(storeId);
+            lock = this.storeRepository.getLock(storeId);
+        }
+        
         synchronized (lock) {
-
-            Store store = this.storeRepository.get(storeId);
-            if (store == null) throw new RuntimeException("Store not found");
+            // Refresh store data inside synchronized block
+            store = this.storeRepository.get(storeId);
             if(store.isPermanentlyClosed()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);
@@ -164,12 +182,21 @@ public class StoreFacade {
     }
 
     public boolean closeStoreNotPermanent(String storeId){
+        // First check if store exists
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found");
+        
+        // Then get or create lock
         Object lock = this.storeRepository.getLock(storeId);
-        if (lock == null) throw new RuntimeException("Store not found");
+        if (lock == null) {
+            // If no lock exists, create one
+            this.storeRepository.addLock(storeId);
+            lock = this.storeRepository.getLock(storeId);
+        }
+        
         synchronized (lock) {
-
-            Store store = this.storeRepository.get(storeId);
-            if (store == null) throw new RuntimeException("Store not found");
+            // Refresh store data inside synchronized block
+            store = this.storeRepository.get(storeId);
             if(!store.isOpen()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);
@@ -219,7 +246,8 @@ public class StoreFacade {
         return store.getName();
     }
 
-    public Auction addBid(String auctionId, String userId, float bid, Supplier<Boolean> chargeCallback) {
+    public Auction addBid(String auctionId, String userId, float bid, String cardNumber, Date expiryDate, String cvv
+                            , String clientName, String deliveryAddress) {
         TradingLogger.logEvent("StoreFacade", "addBid",
             "DEBUG: Received bid request. auctionId=" + auctionId + ", userId=" + userId + ", bid=" + bid);
 
@@ -236,12 +264,12 @@ public class StoreFacade {
             throw new RuntimeException("Bid must be greater than current and start");
         }
 
-        if (auction.currentBidderId != null && !auction.currentBidderId.equals(userId)) {
+        if (auction.getCurrentBidderId() != null && !auction.getCurrentBidderId().equals(userId)) {
             TradingLogger.logEvent("StoreFacade", "addBid",
-                "DEBUG: Notifying previous bidder: " + auction.currentBidderId);
+                "DEBUG: Notifying previous bidder: " + auction.getCurrentBidderId());
             String storeName = this.getStoreName(auction.getStoreId());
             String productName = this.itemRepository.getItem(auction.getStoreId(), auction.getProductId()).getProductName();
-            System.out.println("Notifying previous bidder: " + auction.currentBidderId);
+            System.out.println("Notifying previous bidder: " + auction.getCurrentBidderId());
             notificationService.sendNotification(auction.getCurrentBidderId(),
                 "You have been outbid on " + productName + "from " + storeName + " womp womp :(");
         } else {
@@ -249,9 +277,7 @@ public class StoreFacade {
                 "DEBUG: No previous bidder to notify for auction " + auctionId + " or it's the same user bidding again.");
         }
 
-        auction.setCurrentPrice(bid);
-        auction.setCurrentBidderId(userId);
-        auction.setChargeCallback(chargeCallback);
+        auction.setHighestBidder(userId, bid, cardNumber, expiryDate, cvv, clientName);
 
         TradingLogger.logEvent("StoreFacade", "addBid",
             "DEBUG: Updated auction with new bid. New currentBidderId=" + userId + ", newPrice=" + bid);
@@ -279,9 +305,13 @@ public class StoreFacade {
         return this.auctionRepository.getAllProductAuctions(productId);
     }
 
-    public Item acceptBid(String storeId, String productId, String auctionId) {
+    public Item acceptBid(String storeId, String productId, String auctionId, IExternalPaymentService paymentService) {
         if (!isInitialized()) {
             throw new RuntimeException("StoreFacade is not initialized");
+        }
+
+        if(paymentService == null) {
+            throw new RuntimeException("Payment service is not set");
         }
 
         // Retrieve the item first and attempt to reserve one unit
@@ -326,9 +356,10 @@ public class StoreFacade {
         }
 
         // Charge the user using stored callback
+        Integer success = -1;
         try {
-            boolean success = auction.triggerCharge();
-            if (!success) {
+            success = paymentService.processPayment(auction.getCurrentBidderId(), auction.getCardNumber(), auction.getCardExpiryDate(), auction.getCvv(), auction.getClientName(), auction.getCurrentPrice()).getValue();
+            if (success == -1) {
                 // Rollback item amount
                 item.setAmount(currentAmount);
                 itemRepository.update(itemKey, item);
@@ -340,6 +371,9 @@ public class StoreFacade {
             // Rollback item amount
             item.setAmount(currentAmount);
             itemRepository.update(itemKey, item);
+            if(success != -1) {
+                paymentService.cancelPayment(success);
+            }
             throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);
         }
         String productName = item.getProductName();
@@ -350,8 +384,16 @@ public class StoreFacade {
 
         // Remove the auction as it's now fulfilled
         this.auctionRepository.remove(auctionId);
-
+        
         return item;
+    }
+
+    public List<Category>getAllStoreCategories(String storeId) {
+        if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
+        if (this.storeRepository.get(storeId) == null) throw new RuntimeException("Store not found");
+        return this.itemRepository.getAvailabeItems().stream()
+            .flatMap(item -> item.getCategories().stream())
+            .collect(Collectors.toSet()).stream().toList();
     }
 
 

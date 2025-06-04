@@ -1,5 +1,7 @@
 package Application;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +38,7 @@ public class UserService {
         try {
             User guest = loginManager.createGuest();
             String token = tokenService.generateToken(guest.getId());
-            UserDTO guestDto = new UserDTO(token, guest.getName());
+            UserDTO guestDto = new UserDTO(token, guest.getId(), guest.getName());
             TradingLogger.logEvent(CLASS_NAME, "guestEntry", "New Guest has entered.");
     
             return Response.success(guestDto);
@@ -68,7 +70,10 @@ public class UserService {
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "exit", "Couldn't find user", id);
             return Response.error("User not found");
-        }
+        } catch (IllegalStateException e) {
+            TradingLogger.logError(CLASS_NAME, "exit", "Failed to exit user: " + e.getMessage());
+            return Response.error("Failed to exit user: " + e.getMessage());
+        } 
         return Response.success(null);
     }
 
@@ -93,7 +98,7 @@ public class UserService {
         try {
             Member member = loginManager.register(id, username, password, email);
             TradingLogger.logEvent(CLASS_NAME, "register", "Guest has registed as " + username +".");
-            return Response.success(new UserDTO(sessionToken, member.getName(), email));
+            return Response.success(new UserDTO(sessionToken, member));
         } catch (IllegalStateException e) {
             TradingLogger.logError(CLASS_NAME, "register", "Failed to register " + username + ": " + e.getMessage());
             return Response.error("Failed to register " + username + ": " + e.getMessage());
@@ -122,13 +127,50 @@ public class UserService {
             Member member = loginManager.login(username, password);
             String token = tokenService.generateToken(member.getId());
             TradingLogger.logEvent(CLASS_NAME, "login", username + " has logged in.");
-            return Response.success(new UserDTO(token, member.getName(), member.getEmail()));
+            return Response.success(new UserDTO(token, member));
         } catch (IllegalArgumentException | NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "login", "Attempted login has failed. Username: " + username + " Password: " + password, e.getMessage());
             return Response.error("Invalid username or password: " + e.getMessage());
         } catch (Exception e) {
             TradingLogger.logError(CLASS_NAME, "login", "Attempted login has failed. Username: " + username + " Password: " + password, e.getMessage());
             return Response.error("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+
+    /***
+     * Retrieves all members of the system.
+     * @param sessionToken The token of the session requesting the member list.
+     * @return {@link Response} of {@link List} of {@link UserDTO} containing all members' information.
+     *         If an error occurs, returns an error message.
+     */
+    @Transactional
+    public Response<List<UserDTO>> getAllMembers(String sessionToken) {
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, "getAllMembers", "Received invalid session token", sessionToken);
+            return Response.error("Invalid token");
+        }
+
+        String id = tokenService.extractId(sessionToken);
+        try {
+            List<Member> members = loginManager.getAllMembers();
+            return Response.success(members.stream()
+                .map(UserDTO::new)
+                .collect(Collectors.toList()));
+        } catch (NoSuchElementException e) {
+            TradingLogger.logError(CLASS_NAME, "getAllMembers", "Couldn't find user with id: " + id, e.getMessage());
+            return Response.error("User not found");
+        }
+    }
+
+    public Response<Void> logOutAllUsers() {
+        try {
+            loginManager.logOutAllUsers();
+            TradingLogger.logEvent(CLASS_NAME, "logOutAllUsers", "All users have been logged out.");
+            return Response.success(null);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "logOutAllUsers", "Failed to log out all users: " + e.getMessage());
+            return Response.error("Failed to log out all users: " + e.getMessage());
         }
     }
 }

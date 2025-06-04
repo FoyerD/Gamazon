@@ -1,20 +1,33 @@
 package Domain.Store;
 
+import jakarta.persistence.*;
+
 import java.util.Date;
-import java.util.function.Supplier;
 
-
+@Entity
+@Table(name = "auctions")
 public class Auction {
-    String auctionId;
-    Date auctionStartDate;
-    Date auctionEndDate;
-    double startPrice;
-    double currentPrice;
-    String storeId;
-    String productId;
-    String currentBidderId;
+    @Id
+    private String auctionId;
 
-    private Supplier<Boolean> chargeCallback;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date auctionStartDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date auctionEndDate;
+    
+    private double startPrice;
+    private double currentPrice;
+    private String storeId;
+    private String productId;
+
+    private String currentBidderId;
+    private String cardNumber;
+    private String cvv;
+    private String clientName;
+    
+    @Temporal(TemporalType.DATE)
+    private Date cardExpiryDate;
+
 
 
     public Auction(String auctionId, Date auctionStartDate,
@@ -28,9 +41,13 @@ public class Auction {
         this.storeId = storeId;
         this.productId = productId;
         this.currentBidderId = null;
+        this.cardNumber = null;
+        this.cvv = null;
+        this.clientName = null;
+        this.cardExpiryDate = null;
     }
 
-    public Auction() {
+    protected Auction() { // changed to protected for JPA
         this.auctionId = null;
         this.auctionStartDate = null;
         this.auctionEndDate = null;
@@ -39,6 +56,10 @@ public class Auction {
         this.storeId = null;
         this.productId = null;
         this.currentBidderId = null;
+        this.cardNumber = null;
+        this.cvv = null;
+        this.clientName = null;
+        this.cardExpiryDate = null;
     }
 
     public String getAuctionId() {
@@ -68,9 +89,7 @@ public class Auction {
     public double getCurrentPrice() {
         return currentPrice;
     }
-    public void setCurrentPrice(double currentPrice) {
-        this.currentPrice = currentPrice;
-    }
+    
     public String getStoreId() {
         return storeId;
     }
@@ -86,19 +105,31 @@ public class Auction {
     public String getCurrentBidderId() {
         return currentBidderId;
     }
-    public void setCurrentBidderId(String currentBidderId) {
-        this.currentBidderId = currentBidderId;
-    }
     
-    public void setChargeCallback(Supplier<Boolean> chargeCallback) {
-        this.chargeCallback = chargeCallback;
+    public Date getCardExpiryDate() {
+        return cardExpiryDate;
     }
 
-    public boolean triggerCharge() {
-        if (chargeCallback == null) {
-            throw new IllegalStateException("No payment callback defined.");
-        }
-        return chargeCallback.get();
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setHighestBidder(String clientId, double price,
+                          String cardNumber, Date expiryDate, String cvv, String clientName) {
+        this.currentBidderId = clientId;
+        this.currentPrice = price;
+        this.cardNumber = cardNumber;
+        this.cardExpiryDate = expiryDate;
+        this.cvv = cvv;
+        this.clientName = clientName;
     }
     
     public boolean isAuctionOpen() {

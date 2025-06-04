@@ -23,6 +23,28 @@ import Infrastructure.Repositories.MemoryShoppingBasketRepository;
 import Infrastructure.Repositories.MemoryShoppingCartRepository;
 import Infrastructure.Repositories.MemoryStoreRepository;
 import Infrastructure.Repositories.MemoryUserRepository;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IPermissionRepository;
+import Domain.Repos.IPolicyRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
+import Infrastructure.MemoryRepositories.MemoryAuctionRepository;
+import Infrastructure.MemoryRepositories.MemoryFeedbackRepository;
+import Infrastructure.MemoryRepositories.MemoryItemRepository;
+import Infrastructure.MemoryRepositories.MemoryPermissionRepository;
+import Infrastructure.MemoryRepositories.MemoryProductRepository;
+import Infrastructure.MemoryRepositories.MemoryReceiptRepository;
+import Infrastructure.MemoryRepositories.MemoryShoppingBasketRepository;
+import Infrastructure.MemoryRepositories.MemoryShoppingCartRepository;
+import Infrastructure.MemoryRepositories.MemoryStoreRepository;
+import Infrastructure.MemoryRepositories.MemoryUserRepository;
+import Infrastructure.MemoryRepositories.MemoryPolicyRepository;
 
 public class MemoryRepoManager implements IRepoManager {
     private MemoryItemRepository itemRepository;
@@ -116,4 +138,11 @@ public class MemoryRepoManager implements IRepoManager {
         return policyRepository;
     }
     
+    @Override
+    public IPolicyRepository getPolicyRepository() {
+        if (policyRepository == null) {
+            policyRepository = new MemoryPolicyRepository();
+        }
+        return policyRepository;
+    }
 }

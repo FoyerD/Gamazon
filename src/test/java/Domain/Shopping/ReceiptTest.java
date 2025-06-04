@@ -63,12 +63,14 @@ public class ReceiptTest {
         LocalDateTime timestamp = receipt.getTimestamp();
         assertTrue(timestamp.isBefore(now) || timestamp.isEqual(now));
         assertTrue(timestamp.isAfter(now.minusSeconds(10)));
+        assertTrue(timestamp.isBefore(now.plusSeconds(10)));
     }
     
     @Test
     public void testGetReceiptId() {
         assertNotNull(receipt.getReceiptId());
         assertTrue(receipt.getReceiptId().length() > 0);
+        assertTrue(receipt.getReceiptId().matches("^[a-zA-Z0-9-]+$")); // Check for alphanumeric and hyphen
     }
     
     @Test
@@ -90,6 +92,7 @@ public class ReceiptTest {
         // Verify that the returned map is a copy (products are immutable)
         retrievedProducts.clear();
         assertEquals(2, receipt.getProducts().size());
+
     }
     
     @Test
@@ -137,7 +140,5 @@ public class ReceiptTest {
         assertEquals(Integer.valueOf(1), product2Details.getFirst());
         assertEquals(Double.valueOf(10.0), product1Details.getSecond(), 0.001);
         assertEquals(Double.valueOf(15.0), product2Details.getSecond(), 0.001);
-
-
     }
 }

@@ -1,10 +1,13 @@
 package Domain.User;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.apache.commons.validator.routines.EmailValidator;
+
+import Domain.Repos.IUserRepository;
 
 @Component
 public class LoginManager {
@@ -143,7 +146,9 @@ public class LoginManager {
         if (user == null) {
             throw new NoSuchElementException("User not found");
         }
-        
+        if (!user.isLoggedIn()) {
+            throw new IllegalStateException("User is not logged in");
+        }
         user.logout(this);
         return user;
     }
@@ -169,6 +174,21 @@ public class LoginManager {
     public boolean isLoggedin(String username) {
         Member user = userRepository.getMemberByUsername(username);
         return user.isLoggedIn();
+    }
+
+
+    public List<Member> getAllMembers() {
+        return userRepository.getAllMembers();
+    }
+
+    public void logOutAllUsers() {
+        List<User> users = userRepository.getAllUsers();
+        for (User user : users) {
+            if (user.isLoggedIn()) {
+                user.logout(this);
+                userRepository.update(user.getId(), user);
+            }
+        }
     }
 }
 

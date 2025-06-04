@@ -1,30 +1,35 @@
 package UI.views;
 
-import UI.presenters.IProductPresenter;
-import UI.presenters.IStorePresenter;
-import Application.DTOs.ItemDTO;
-import Application.utils.Response;
-import Domain.Store.FeedbackDTO;
-import Domain.Store.ItemFilter;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
+import Application.DTOs.ItemDTO;
+import Application.utils.Response;
+import Domain.Store.FeedbackDTO;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IStorePresenter;
 
 @Route("product-review/:productId")
-public class ProductReviewView extends VerticalLayout implements BeforeEnterObserver {
+public class ProductReviewView extends BaseView implements BeforeEnterObserver {
 
     private final IProductPresenter productPresenter;
     private final IStorePresenter storePresenter;
@@ -37,7 +42,9 @@ public class ProductReviewView extends VerticalLayout implements BeforeEnterObse
     private final VerticalLayout reviewsLayout = new VerticalLayout();
 
     @Autowired
-    public ProductReviewView(IProductPresenter productPresenter, IStorePresenter storePresenter) {
+    public ProductReviewView(IProductPresenter productPresenter, IStorePresenter storePresenter, 
+                             @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager);
         this.productPresenter = productPresenter;
         this.storePresenter = storePresenter;
 

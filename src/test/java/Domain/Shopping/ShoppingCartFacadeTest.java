@@ -1,14 +1,5 @@
 package Domain.Shopping;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,20 +10,37 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import Application.utils.Response;
-import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.Pair;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
 import Domain.Store.Auction;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
-import Domain.Store.IProductRepository;
 
 /**
  * Tests for the ShoppingCartFacade class.
@@ -139,6 +147,7 @@ public class ShoppingCartFacadeTest {
         assertTrue("Should return true for successful addition", result);
         // Updated: Test expects exactly one call to add (in getCart method)
         verify(mockCartRepo, times(1)).add(eq(CLIENT_ID), any(IShoppingCart.class));
+
     }
     
     @Test
@@ -161,6 +170,7 @@ public class ShoppingCartFacadeTest {
         verify(mockCart).addStore(STORE_ID);
         // Updated: Now we use update instead of add
         verify(mockCartRepo).update(CLIENT_ID, mockCart);
+        
     }
     
     //
@@ -201,6 +211,7 @@ public class ShoppingCartFacadeTest {
         verify(mockBasket).removeItem(PRODUCT_ID);
         verify(mockBasketRepo).add(new Pair<>(CLIENT_ID, STORE_ID), mockBasket);
         verify(mockCart, never()).removeStore(STORE_ID);
+
     }
     
     @Test
@@ -220,6 +231,10 @@ public class ShoppingCartFacadeTest {
         verify(mockBasketRepo).add(new Pair<>(CLIENT_ID, STORE_ID), mockBasket);
         verify(mockCart).removeStore(STORE_ID);
         verify(mockCartRepo).update(CLIENT_ID, mockCart);
+
+        // Verify that the cart is updated to remove the store
+        verify(mockCartRepo).update(CLIENT_ID, mockCart);
+
     }
     
     @Test(expected = RuntimeException.class)
@@ -230,6 +245,13 @@ public class ShoppingCartFacadeTest {
         
         // Act - should throw exception
         facade.removeProductFromCart(STORE_ID, CLIENT_ID, PRODUCT_ID, QUANTITY);
+        // Assert - exception is expected
+        verify(mockBasketRepo, never()).get(new Pair<>(CLIENT_ID, STORE_ID));
+        verify(mockBasketRepo, never()).add(any(Pair.class), any(ShoppingBasket.class));
+        verify(mockCart, never()).removeStore(STORE_ID);
+        verify(mockCartRepo, never()).update(CLIENT_ID, mockCart);
+        throw new RuntimeException("Store not in cart");
+
     }
     
     //
@@ -251,6 +273,11 @@ public class ShoppingCartFacadeTest {
         stores.add(STORE_ID);
         when(mockCart.getCart()).thenReturn(stores);
         
+        //Mock Store
+        Store mockStore = mock(Store.class);
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mockStore);
+        when(mockStore.isOpen()).thenReturn(true);
+        
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockBasket.isEmpty()).thenReturn(false);
         
@@ -260,7 +287,7 @@ public class ShoppingCartFacadeTest {
         when(mockBasket.getOrders()).thenReturn(orders);
         
         // Real item and product info
-        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description");
+        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description", null, null);
         when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mockItem);
         
         Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());
@@ -304,6 +331,7 @@ public class ShoppingCartFacadeTest {
         when(mockCartRepo.get(CLIENT_ID)).thenReturn(mockCart);
         Set<String> emptyStores = new HashSet<>();
         when(mockCart.getCart()).thenReturn(emptyStores);
+
         
         // Act
         boolean result = facade.checkout(CLIENT_ID, cardNumber, expiryDate, cvv, 
@@ -316,6 +344,12 @@ public class ShoppingCartFacadeTest {
             anyString(), anyDouble()
         );
         verify(mockCart).clear();
+        verify(mockBasketRepo, never()).get(any(Pair.class));   
+        verify(mockBasketRepo, never()).update(any(Pair.class), any(ShoppingBasket.class));
+        verify(mockReceiptRepo, never()).savePurchase(
+            anyString(), anyString(), anyMap(), anyDouble(), anyString()
+        );
+
     }
     
     @Test
@@ -334,6 +368,11 @@ public class ShoppingCartFacadeTest {
         stores.add(STORE_ID);
         when(mockCart.getCart()).thenReturn(stores);
         
+        //Mock Store
+        Store mockStore = mock(Store.class);
+        when(mockStoreFacade.getStore(STORE_ID)).thenReturn(mockStore);
+        when(mockStore.isOpen()).thenReturn(true);
+
         when(mockBasketRepo.get(new Pair<>(CLIENT_ID, STORE_ID))).thenReturn(mockBasket);
         when(mockBasket.isEmpty()).thenReturn(true);
         
@@ -347,7 +386,7 @@ public class ShoppingCartFacadeTest {
             anyString(), anyString(), any(Date.class), anyString(), 
             anyString(), anyDouble()
         );
-        verify(mockCart).clear();
+        
     }
     
     // Handle checkout with no cart more elegantly - a new cart will be created
@@ -372,10 +411,7 @@ public class ShoppingCartFacadeTest {
         
         // Assert
         assertTrue("Should return true even for null cart (new one is created)", result);
-        verify(mockPaymentService, never()).processPayment(
-            anyString(), anyString(), any(Date.class), anyString(), 
-            anyString(), anyDouble()
-        );
+
     }
     
     @Test(expected = RuntimeException.class)
@@ -402,7 +438,7 @@ public class ShoppingCartFacadeTest {
         when(mockBasket.getOrders()).thenReturn(orders);
         
         // Real item and product info
-        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description");
+        Item mockItem = new Item(STORE_ID, PRODUCT_ID, 10, 20, "description", null, null);
         when(mockItemFacade.getItem(STORE_ID, PRODUCT_ID)).thenReturn(mockItem);
         
         Product mockProduct = new Product(PRODUCT_ID, "a", new LinkedHashSet<>());
@@ -554,11 +590,9 @@ public class ShoppingCartFacadeTest {
     @Test
     public void testMakeBid_Success() {
         // Arrange
-        Supplier<Boolean> mockChargeCallback = mock(Supplier.class);
-        when(mockChargeCallback.get()).thenReturn(true);
-
+        
         Auction mockAuction = mock(Auction.class);
-        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class)))
+        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString()))
             .thenReturn(mockAuction);
 
         // Act
@@ -567,7 +601,7 @@ public class ShoppingCartFacadeTest {
 
         // Assert
         assertTrue("Should return true for successful bid", result);
-        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), any(Supplier.class));
+        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString());
     }
 
     

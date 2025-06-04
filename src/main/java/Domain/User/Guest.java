@@ -1,8 +1,13 @@
 package Domain.User;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "guest")
 public class Guest extends User{
     public static final String NAME = "Guest";
-    private Guest() {
+    protected  Guest() {
         super(NAME);
     }
     public static synchronized Guest createGuest() {

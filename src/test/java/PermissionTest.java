@@ -15,11 +15,12 @@ public class PermissionTest {
 
     private Permission permission;
     private static final String PERMISSION_GIVER = "test1";
+    private static final String STORE_ID = "store123";
     private static final String PERMISSION_OWNER = "test2";
 
     @Before
     public void setUp() {
-        permission = new Permission(PERMISSION_GIVER, PERMISSION_OWNER);
+        permission = new Permission(PERMISSION_GIVER, STORE_ID, PERMISSION_OWNER);
     }
 
     @Test

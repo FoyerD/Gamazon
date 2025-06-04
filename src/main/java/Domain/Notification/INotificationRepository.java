@@ -2,7 +2,7 @@ package Domain.Notification;
 
 import java.util.List;
 
-import Domain.ILockbasedRepository;
+import Domain.Repos.ILockbasedRepository;
 
 /**
  * Abstract repository class for managing notifications.

@@ -1,8 +1,5 @@
 package Domain;
 
-
-
-
 import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
@@ -16,6 +13,7 @@ import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PolicyFacade;
+import Infrastructure.MemoryRepositories.MemoryItemRepository;
 
 public class FacadeManager {
     private IRepoManager repoManager;
@@ -124,5 +122,10 @@ public class FacadeManager {
                                             getProductFacade());
         }
         return policyFacade;
+    }
+
+    public IRepoManager getRepositoryManager()
+    {
+        return repoManager;
     }
 }

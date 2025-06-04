@@ -6,7 +6,11 @@ import org.springframework.stereotype.Service;
 
 import Application.utils.Response;
 import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
+import Domain.management.PermissionManager;
+import Domain.management.PolicyFacade;
+
 
 
 public class ServiceManager {
@@ -42,6 +46,16 @@ public class ServiceManager {
         return itemService;
     }
 
+    public PolicyService getPolicyService() {
+        if (policyService == null) {
+            policyService = new PolicyService(facadeManager.getPolicyFacade(),
+                                            getTokenService(),
+                                            facadeManager.getPermissionManager(),
+                                            facadeManager.getRepositoryManager().getItemRepository());
+        }
+        return policyService;
+    }
+
     public INotificationService getINotificationService() {
         if (notificationService == null) {
             notificationService = new INotificationService() {
@@ -63,7 +77,8 @@ public class ServiceManager {
                                             getTokenService(),
                                             facadeManager.getPermissionManager(),
                                             getINotificationService(),
-                                            facadeManager.getShoppingCartFacade());
+                                            facadeManager.getShoppingCartFacade(),
+                                            facadeManager.getPaymentService());
         }
         return storeService;
     }
@@ -119,5 +134,9 @@ public class ServiceManager {
                                             facadeManager.getPermissionManager());
         }
         return policyService;
+    }
+  
+    public void injectINotificationService(INotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 }

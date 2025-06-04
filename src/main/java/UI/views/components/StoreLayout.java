@@ -5,8 +5,6 @@ import com.vaadin.flow.component.button.Button;
 
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -68,18 +66,25 @@ public class StoreLayout extends VerticalLayout {
     }
 
     private HorizontalLayout actionButtons() {
-        Button ownerButton = new Button("Owner Actions", e -> onOwnerButton.accept(store));
-        ownerButton.getStyle()
-            .set("background-color", "#4a9eff")
-            .set("color", "white");
-
-        Button managerButton = new Button("Manager Actions", e -> onManagerButton.accept(store));
-        managerButton.getStyle()
-            .set("background-color", "#4a9eff")
-            .set("color", "white");
-
-        HorizontalLayout buttons = new HorizontalLayout(ownerButton, managerButton);
+        HorizontalLayout buttons = new HorizontalLayout();
         buttons.setSpacing(true);
+
+        if (onOwnerButton != null) {
+            Button ownerButton = new Button("Owner Actions", e -> onOwnerButton.accept(store));
+            ownerButton.getStyle()
+                .set("background-color", "#4a9eff")
+                .set("color", "white");
+            buttons.add(ownerButton);
+        }
+
+        if (onManagerButton != null) {
+            Button managerButton = new Button("Management Actions", e -> onManagerButton.accept(store));
+            managerButton.getStyle()
+                .set("background-color", "#4a9eff")
+                .set("color", "white");
+            buttons.add(managerButton);
+        }
+
         return buttons;
     }
 }

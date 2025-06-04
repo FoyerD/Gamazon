@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Domain.Pair;
-import Domain.Shopping.IShoppingBasketRepository;
+import Domain.Repos.IShoppingBasketRepository;
 import Domain.Shopping.IShoppingCart;
 
 
@@ -14,14 +14,14 @@ public class CartDTO {
 
     public CartDTO(String clientId, Map<String, ShoppingBasketDTO> baskets) {
         this.clientId = clientId;
-        this.baskets = baskets;
+        this.baskets = baskets != null ? baskets : new HashMap<>();
     }
 
     public CartDTO(IShoppingCart cart){
         this.clientId = cart.getClientId();
         this.baskets = new HashMap<>();
         for (String storeId : cart.getCart()) {
-            ShoppingBasketDTO basket = new ShoppingBasketDTO(storeId, clientId, null);
+            ShoppingBasketDTO basket = new ShoppingBasketDTO(storeId, clientId, new HashMap<>());
             baskets.put(storeId, basket);
         }
     }
@@ -30,7 +30,7 @@ public class CartDTO {
         this.clientId = cart.getClientId();
         this.baskets = new HashMap<>();
         for (String storeId : cart.getCart()) {
-            ShoppingBasketDTO basket = new ShoppingBasketDTO(basketRepository.get(new Pair<>(storeId, clientId)));
+            ShoppingBasketDTO basket = new ShoppingBasketDTO(basketRepository.get(new Pair<>(clientId, storeId)));
             baskets.put(storeId, basket);
         }
     }
