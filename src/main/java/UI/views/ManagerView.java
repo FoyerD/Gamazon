@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -40,9 +43,11 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.CategoryDTO;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
@@ -59,6 +64,8 @@ import UI.views.components.AddItemForm;
 import UI.views.components.AddUserRoleDialog;
 import UI.views.components.ChangeUserRoleDialog;
 import UI.views.components.EmployeesLayout;
+import UI.views.components.PoliciesLayout;
+import UI.views.components.PolicyDialog;
 import UI.views.dataobjects.UserPermission;
 
 @Route("manager")
@@ -75,6 +82,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
     private String currentStoreId;
 
     private final EmployeesLayout employeesLayout;
+    private final PoliciesLayout policiesLayout;
     private final VerticalLayout mainContent = new VerticalLayout();
 
 
@@ -118,13 +126,14 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
         // Create tabs for different sections
         Tab employeesTab = new Tab(VaadinIcon.USERS.create(), new Span("Employees"));
+        Tab policiesTab = new Tab(VaadinIcon.ABACUS.create(), new Span("Store Policies"));
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
         Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
         
 
         // Style all tabs to have white text and icons
-        for (Tab tab : new Tab[]{employeesTab, itemsTab, auctionsTab, historyTab}) {
+        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, historyTab}) {
             tab.getStyle().set("color", " #ffffff");
             // Get the icon and span components from the tab
             tab.getChildren().forEach(component -> {
@@ -132,7 +141,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             });
         }
         
-        Tabs tabs = new Tabs(employeesTab, itemsTab, auctionsTab, historyTab);
+        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, historyTab);
         tabs.getStyle()
             .set("margin", "1rem 0")
             .set("--lumo-contrast-60pct", " #ffffff"); 
@@ -162,14 +171,26 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             }
         );
 
-
-      
+        policiesLayout = new PoliciesLayout(
+            () -> {
+                Response<List<PolicyDTO>> policiesRes = managementPresenter.getStorePolicies(sessionToken, currentStoreId);
+                if (policiesRes.errorOccurred()) {
+                    Notification.show("Failed to fetch policies: " + policiesRes.getErrorMessage(), 3000, Notification.Position.MIDDLE);
+                    return null;
+                }
+                return policiesRes.getValue();
+            },
+            this::showAddPolicy,
+            p -> {}
+        );
 
         // Tab change listener
         tabs.addSelectedChangeListener(event -> {
             mainContent.removeAll();
             if (event.getSelectedTab().equals(employeesTab)) {
                 showEmployeesInfo();
+            } else if (event.getSelectedTab().equals(policiesTab)) {
+                showStorePolicies();
             } else if (event.getSelectedTab().equals(itemsTab)) {
                 showItemsView();
             } else if (event.getSelectedTab().equals(auctionsTab)) {
@@ -225,6 +246,49 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
     
     private void showEmployeesInfo() {
         mainContent.add(employeesLayout);
+    }
+
+    private void showStorePolicies() {
+        mainContent.add(policiesLayout);
+        policiesLayout.refreshPolicies();
+    }
+
+    private void showAddPolicy() {
+        Supplier<List<ItemDTO>> itemSupplier = () -> {
+            Response<List<ItemDTO>> res = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+            if (res.errorOccurred()) {
+                Notification.show("Failed fetching items for store: " + res.getErrorMessage());
+                return null;
+            }
+            return res.getValue();
+        };
+
+
+        Supplier<List<CategoryDTO>> categorySupplier = () -> {
+            Response<List<CategoryDTO>> res = storePresenter.getStoreCategories(sessionToken, currentStoreId);
+            if (res.errorOccurred()) {
+                Notification.show("Failed fetching categories for store: " + res.getErrorMessage(), 3000, Position.BOTTOM_END);
+                return null;
+            }
+            return res.getValue();
+        };
+
+        Function<PolicyDTO, Boolean> onSave = p -> {
+            Response<PolicyDTO> res = managementPresenter.savePolicy(sessionToken, p);
+            if (res.errorOccurred()) {
+                Notification.show("Failed to save Policy : " + res.getErrorMessage());
+                return false;
+            }
+            policiesLayout.refreshPolicies();
+            return true;
+        };
+        PolicyDialog dialog = new PolicyDialog(
+            currentStoreId,
+            itemSupplier, 
+            categorySupplier,
+            onSave);
+
+        dialog.open();
     }
 
     private void showItemsView() {
@@ -287,8 +351,8 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         });
 
         H3 title = new H3("Store Items");
-        title.getStyle().set("color", "#ffffff");
-        mainContent.add(new H3("Store Items"), addButton, itemsGrid);
+        title.getStyle().set("color", " #ffffff");
+        mainContent.add(title, addButton, itemsGrid);
     }
 
     private void showAuctionsView() {

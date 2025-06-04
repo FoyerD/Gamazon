@@ -22,15 +22,30 @@ public class Policy {
 
     /** Supported policy types */
     public enum Type {
-        AND,
-        MIN_QUANTITY_ALL,
-        MAX_QUANTITY_ALL,
-        MIN_QUANTITY_PRODUCT,
-        MAX_QUANTITY_PRODUCT,
-        MIN_QUANTITY_CATEGORY,
-        MAX_QUANTITY_CATEGORY,
-        CATEGORY_DISALLOW,
-        CATEGORY_AGE, OR
+        MIN_QUANTITY_ALL("Minimum quantity for all items"),
+        MAX_QUANTITY_ALL("Maximum quantity for all items"),
+        MIN_QUANTITY_PRODUCT("Minimum quantity for a product"),
+        MAX_QUANTITY_PRODUCT("Maximum quantity for a product"),
+        MIN_QUANTITY_CATEGORY("Minimum quantity for a category"),
+        MAX_QUANTITY_CATEGORY("Maximum quantity for a category"),
+        CATEGORY_DISALLOW("Disallowed category"),
+        CATEGORY_AGE("Age-restricted category");
+
+        private final String displayName;
+
+        Type(String displayName) {
+            this.displayName = displayName;
+        }
+
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 
     @Id
@@ -208,12 +223,6 @@ public class Policy {
     public boolean isApplicable(ShoppingBasket basket, Member member) {
         switch (type) {
 
-            case AND:
-                for (Policy p : subPolicies) {
-                    if (!p.isApplicable(basket, member)) return false;
-                }
-                return true;
-
             case MIN_QUANTITY_ALL:
                 return basket.getOrders().values().stream()
                              .allMatch(q -> q >= minItemsAll);
@@ -256,11 +265,6 @@ public class Policy {
                     .map(productLookup)
                     .flatMap(p -> p.getCategories().stream())
                     .anyMatch(c -> c.getName().equalsIgnoreCase(ageCategory));
-            case OR:
-                for (Policy p : subPolicies) {
-                    if (p.isApplicable(basket, member)) return true;
-                }
-                return false;
 
             default:
                 throw new IllegalStateException("Unhandled policy type: " + type);

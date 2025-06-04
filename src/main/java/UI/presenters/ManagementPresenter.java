@@ -6,10 +6,12 @@ import org.springframework.stereotype.Component;
 
 import Application.ItemService;
 import Application.MarketService;
+import Application.PolicyService;
 import Application.StoreService;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType;
@@ -21,11 +23,13 @@ public class ManagementPresenter implements IManagementPresenter {
     private final MarketService marketService;
     private final StoreService storeService;
     private final ItemService itemService;
+    private final PolicyService policyService;
 
-    public ManagementPresenter(MarketService marketService, StoreService storeService, ItemService itemService){
+    public ManagementPresenter(MarketService marketService, StoreService storeService, ItemService itemService, PolicyService policyService){
         this.marketService = marketService;
         this.storeService = storeService;
         this.itemService = itemService;
+        this.policyService = policyService;
     }
 
     @Override
@@ -107,6 +111,16 @@ public class ManagementPresenter implements IManagementPresenter {
     @Override
     public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId) {
         return marketService.getStorePurchaseHistory(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<PolicyDTO> savePolicy(String sessionToken, PolicyDTO policy) {
+        return policyService.createPolicy(sessionToken, policy.getStoreId(), policy);
+    }
+
+    @Override
+    public Response<List<PolicyDTO>> getStorePolicies(String sessionToken, String storeId) {
+        return policyService.getAllStorePolicies(sessionToken, storeId);
     }
     
 }

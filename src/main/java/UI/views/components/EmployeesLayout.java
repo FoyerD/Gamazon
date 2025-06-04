@@ -11,7 +11,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
@@ -34,6 +34,8 @@ public class EmployeesLayout extends VerticalLayout {
                             Consumer<UserPermission> onPermissionChange,
                             Consumer<UserDTO> ownerRemover) {
         H3 header = new H3("Store Employees");
+        header.getStyle().setColor(" #ffffff");
+
         this.refreshButton = new Button("Refresh", VaadinIcon.REFRESH.create());
         this.addUserButton = new Button("Add", VaadinIcon.PLUS.create());
 
@@ -43,10 +45,16 @@ public class EmployeesLayout extends VerticalLayout {
         this.managersGrid = new Grid<>(UserPermission.class);
 
         managersCountSpan = new Span();
-        managersCountSpan.getStyle().set("font-weight", "bold").set("margin-left", "1em");
+        managersCountSpan.getStyle()
+            .set("font-weight", "bold")
+            .set("margin-left", "1em")
+            .setColor(" #ffffff");
 
         ownersCountSpan = new Span();
-        ownersCountSpan.getStyle().set("font-weight", "bold").set("margin-left", "1em");
+        ownersCountSpan.getStyle()
+            .set("font-weight", "bold")
+            .set("margin-left", "1em")
+            .setColor(" #ffffff");
         this.employeeInfoSupplier = employeeInfoSupplier;
 
         // Configure the grid
