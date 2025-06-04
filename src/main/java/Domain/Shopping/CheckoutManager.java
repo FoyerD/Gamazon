@@ -163,7 +163,8 @@ public class CheckoutManager {
         Map<String, ItemPriceBreakdown> priceBreakdowns = null;
         try {
             //TODO! Amit make new method to calculate discound for A given basket accross all store disocunts (maby take the best one?)
-            priceBreakdowns = calculateDiscountedPricePrice(basket);
+            // TODO! remove comment when implemented
+            // priceBreakdowns = calculateDiscountedPricePrice(basket);
         } catch (Exception e) {
             System.err.println("Error calculating discounted prices, falling back to original prices: " + e.getMessage());
             priceBreakdowns = new HashMap<>();

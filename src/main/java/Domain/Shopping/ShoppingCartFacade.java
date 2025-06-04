@@ -479,7 +479,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         if (basket == null) {
             return new HashMap<>(); // Return empty map if no basket exists
         }
-        PriceCalculator priceCalculator = new PriceCalculator(itemFacade, this.discountFacade);
-        return priceCalculator.calculatePrice(basket);
+        // TODO! remove comment when all is implementted
+        // PriceCalculator priceCalculator = new PriceCalculator(itemFacade, this.discountFacade);
+        // return priceCalculator.calculatePrice(basket);
+
+        return new HashMap<>(); // Placeholder return until PriceCalculator is implemented
     }
 }

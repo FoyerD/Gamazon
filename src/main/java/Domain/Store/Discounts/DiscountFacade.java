@@ -163,7 +163,8 @@ public class DiscountFacade {
         validateCondition(condition);
         
         SimpleDiscount discount = new SimpleDiscount(UUID.randomUUID().toString(), storeId, discountPercentage, qualifier, condition);
-        discountRepository.save(storeId, discount);
+        // TODO! remove comment when implemented
+        //discountRepository.save(storeId, discount);
         return discount;
     }
     
@@ -175,7 +176,8 @@ public class DiscountFacade {
         validateDiscountSet(discounts);
         
         AndDiscount discount = new AndDiscount(UUID.randomUUID().toString(), storeId, discounts, condition, mergeType);
-        discountRepository.save(storeId, discount);
+        // TODO! remove comment when implemented
+        // discountRepository.save(storeId, discount);
         return discount;
     }
     
@@ -185,7 +187,8 @@ public class DiscountFacade {
      */
     public OrDiscount createOrDiscount(String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
         OrDiscount orDiscount = new OrDiscount(UUID.randomUUID().toString(), storeId, discounts, condition, mergeType);
-        discountRepository.save(storeId, orDiscount);
+        // TODO! remove comment when implemented
+        //discountRepository.save(storeId, orDiscount);
         return orDiscount;
     }
     
@@ -198,7 +201,8 @@ public class DiscountFacade {
         validateDiscount(discount2);
         
         XorDiscount discount = new XorDiscount(UUID.randomUUID().toString(), storeId, discount1, discount2, condition, mergeType);
-        discountRepository.save(storeId, discount);
+        // TODO! remove comment when implemented
+        //discountRepository.save(storeId, discount);
         return discount;
     }
     
@@ -211,7 +215,9 @@ public class DiscountFacade {
      */
     public boolean addDiscount(String storeId, Discount discount) {
         validateDiscount(discount);
-        return discountRepository.save(storeId, discount);
+        // TODO! remove comment when implemented
+        //return discountRepository.save(storeId, discount);
+        return true; // Placeholder for actual implementation
     }
 
     public Discount addDiscount(String storeId, DiscountDTO discountDTO) throws Exception {
@@ -257,8 +263,8 @@ public class DiscountFacade {
         if (!discountRepository.exists(discount.getId())) {
             throw new IllegalArgumentException("Discount with ID " + discount.getId() + " does not exist");
         }
-        
-        discountRepository.save(storeId, discount);
+        // TODO! remove comment when implemented
+        //discountRepository.save(storeId, discount);
     }
     
     /**
@@ -274,8 +280,8 @@ public class DiscountFacade {
         if (!found) {
             throw new IllegalArgumentException("Discount with ID " + discountId + " not found in store " + storeId);
         }
-        
-        discountRepository.delete(discountId);
+        // TODO! remove comment when implemented
+        // discountRepository.delete(discountId);
         return true;
     }
     
@@ -315,7 +321,8 @@ public class DiscountFacade {
      */
     public void removeDiscount(String id) {
         validateDiscountId(id);
-        discountRepository.delete(id);
+        // TODO! remove comment when implemented
+        // discountRepository.delete(id);
     }
 
     /**

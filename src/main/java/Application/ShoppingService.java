@@ -21,10 +21,8 @@ import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
 import Domain.Shopping.IShoppingCartFacade;
-import Domain.Shopping.PriceCalculator;
 import Domain.Store.Item;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
@@ -262,8 +260,8 @@ public class ShoppingService{
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
-
-            cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+            // TODO! remove comment
+            // cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
             TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
             return new Response<>(true);
         } catch (Exception ex) {

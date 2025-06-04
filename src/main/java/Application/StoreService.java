@@ -25,17 +25,10 @@ import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
-import Domain.Store.Discounts.DiscountBuilder;
 import Domain.Store.Discounts.DiscountFacade;
-import Domain.Store.Discounts.Conditions.ConditionBuilder;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.Permission;
-import Domain.Shopping.IShoppingCartFacade;
-import Domain.Store.Discounts.Conditions.Condition;
-import Domain.management.Permission;
-import Domain.management.PermissionManager;
-import Domain.management.PermissionType;
 
 @Service
 public class StoreService {
@@ -388,14 +381,15 @@ public class StoreService {
                 return new Response<>(new Error("Invalid token"));
             }
 
-            Set<Discount> discounts = this.discountFacade.getStoreDiscounts(storeID);
+            // TODO! reomve comment when discountFacade is implemented
+            // Set<Discount> discounts = this.discountFacade.getStoreDiscounts(storeID);
             
             Set<DiscountDTO> output = new HashSet<>();
 
-            for (Discount discount : discounts) {
-                DiscountDTO dto = DiscountDTO.fromDiscount(discount);
-                output.add(dto);
-            }
+            // for (Discount discount : discounts) {
+            //     DiscountDTO dto = DiscountDTO.fromDiscount(discount);
+            //     output.add(dto);
+            // }
 
             return new Response<>(output);
         } catch (Exception ex) {
@@ -446,21 +440,23 @@ public class StoreService {
                 return new Response<>(new Error("Invalid token"));
             }
 
-            Set<Condition> conditions = this.discountFacade.getStoreConditions(storeID);
+            // TODO! reomve comment when discountFacade is implemented
+
+            //Set<Condition> conditions = this.discountFacade.getStoreConditions(storeID);
             
-            if (conditions == null) {
-                TradingLogger.logEvent(CLASS_NAME, method, "No conditions found for store " + storeID);
-                return new Response<>(new Error("Problem occurred"));
-            }
+            // if (conditions == null) {
+            //     TradingLogger.logEvent(CLASS_NAME, method, "No conditions found for store " + storeID);
+            //     return new Response<>(new Error("Problem occurred"));
+            // }
 
             Set<ConditionDTO> output = new HashSet<>();
 
-            for (Condition condition : conditions) {
-                ConditionDTO dto = ConditionDTO.fromCondition(condition);
-                output.add(dto);
-            }
+            // for (Condition condition : conditions) {
+            //     ConditionDTO dto = ConditionDTO.fromCondition(condition);
+            //     output.add(dto);
+            // }
 
-            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + conditions.size() + " conditions for store " + storeID);
+            //TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + conditions.size() + " conditions for store " + storeID);
             return new Response<>(output);
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error getting conditions for store %s: %s", storeID, ex.getMessage());
