@@ -1,28 +1,6 @@
 package Infrastructure;
 
 import Domain.IRepoManager;
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.IShoppingBasketRepository;
-import Domain.Shopping.IShoppingCartRepository;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.IItemRepository;
-import Domain.Store.IPolicyRepository;
-import Domain.Store.IProductRepository;
-import Domain.Store.IStoreRepository;
-import Domain.User.IUserRepository;
-import Domain.management.IPermissionRepository;
-import Infrastructure.Repositories.MemoryAuctionRepository;
-import Infrastructure.Repositories.MemoryFeedbackRepository;
-import Infrastructure.Repositories.MemoryItemRepository;
-import Infrastructure.Repositories.MemoryPermissionRepository;
-import Infrastructure.Repositories.MemoryPolicyRepository;
-import Infrastructure.Repositories.MemoryProductRepository;
-import Infrastructure.Repositories.MemoryReceiptRepository;
-import Infrastructure.Repositories.MemoryShoppingBasketRepository;
-import Infrastructure.Repositories.MemoryShoppingCartRepository;
-import Infrastructure.Repositories.MemoryStoreRepository;
-import Infrastructure.Repositories.MemoryUserRepository;
 import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
@@ -38,13 +16,13 @@ import Infrastructure.MemoryRepositories.MemoryAuctionRepository;
 import Infrastructure.MemoryRepositories.MemoryFeedbackRepository;
 import Infrastructure.MemoryRepositories.MemoryItemRepository;
 import Infrastructure.MemoryRepositories.MemoryPermissionRepository;
+import Infrastructure.MemoryRepositories.MemoryPolicyRepository;
 import Infrastructure.MemoryRepositories.MemoryProductRepository;
 import Infrastructure.MemoryRepositories.MemoryReceiptRepository;
 import Infrastructure.MemoryRepositories.MemoryShoppingBasketRepository;
 import Infrastructure.MemoryRepositories.MemoryShoppingCartRepository;
 import Infrastructure.MemoryRepositories.MemoryStoreRepository;
 import Infrastructure.MemoryRepositories.MemoryUserRepository;
-import Infrastructure.MemoryRepositories.MemoryPolicyRepository;
 
 public class MemoryRepoManager implements IRepoManager {
     private MemoryItemRepository itemRepository;
@@ -130,14 +108,6 @@ public class MemoryRepoManager implements IRepoManager {
         return userRepository;
     }
 
-    @Override
-    public IPolicyRepository getPolicyRepository() {
-        if (policyRepository == null) {
-            policyRepository = new MemoryPolicyRepository();
-        }
-        return policyRepository;
-    }
-    
     @Override
     public IPolicyRepository getPolicyRepository() {
         if (policyRepository == null) {

@@ -2,14 +2,9 @@ package Application;
 
 
 
-import org.springframework.stereotype.Service;
-
 import Application.utils.Response;
 import Domain.FacadeManager;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
-import Domain.management.PermissionManager;
-import Domain.management.PolicyFacade;
 
 
 
@@ -126,16 +121,7 @@ public class ServiceManager {
         }
         return shoppingService;
     }
-
-    public PolicyService getPolicyService() {
-        if (policyService == null) {
-            policyService = new PolicyService(facadeManager.getPolicyFacade(),
-                                            getTokenService(),
-                                            facadeManager.getPermissionManager());
-        }
-        return policyService;
-    }
-  
+    
     public void injectINotificationService(INotificationService notificationService) {
         this.notificationService = notificationService;
     }

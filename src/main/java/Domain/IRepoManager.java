@@ -1,17 +1,5 @@
 package Domain;
 
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.IShoppingBasketRepository;
-import Domain.Shopping.IShoppingCartRepository;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.IItemRepository;
-import Domain.Store.IPolicyRepository;
-import Domain.Store.IProductRepository;
-import Domain.Store.IStoreRepository;
-import Domain.User.IUserRepository;
-import Domain.management.IPermissionRepository;
-
 import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;

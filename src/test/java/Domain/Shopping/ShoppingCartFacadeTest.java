@@ -1,5 +1,19 @@
 package Domain.Shopping;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,39 +22,26 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import Application.utils.Response;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Pair;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IShoppingCartRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Auction;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.management.PolicyFacade;
 
 /**
  * Tests for the ShoppingCartFacade class.
@@ -75,6 +76,12 @@ public class ShoppingCartFacadeTest {
     
     @Mock
     private ShoppingBasket mockBasket;
+
+    @Mock
+    private IUserRepository mockUserRepository;
+
+    @Mock
+    private PolicyFacade mockPolicyFacade;
     
     // Test constants
     private static final String CLIENT_ID = "client123";
@@ -96,6 +103,8 @@ public class ShoppingCartFacadeTest {
         mockProductRepo = mock(IProductRepository.class);
         mockCart = mock(IShoppingCart.class);
         mockBasket = mock(ShoppingBasket.class);
+        mockPolicyFacade = mock(PolicyFacade.class);
+        mockUserRepository = mock(IUserRepository.class);
         
         facade = new ShoppingCartFacade(
             mockCartRepo, 
@@ -104,7 +113,9 @@ public class ShoppingCartFacadeTest {
             mockItemFacade, 
             mockStoreFacade, 
             mockReceiptRepo, 
-            mockProductRepo
+            mockProductRepo,
+            mockPolicyFacade,
+            mockUserRepository
         );
     }
 

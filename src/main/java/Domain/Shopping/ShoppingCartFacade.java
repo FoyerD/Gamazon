@@ -7,27 +7,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Pair;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IShoppingCartRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Policy;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
-import Domain.User.IUserRepository;
-import Domain.management.PolicyFacade;
-import Domain.Store.IProductRepository;
 import Domain.User.Member;
+import Domain.management.PolicyFacade;
 
 
 /**
