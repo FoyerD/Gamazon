@@ -21,32 +21,33 @@ import java.util.function.Function;
 public class Policy {
 
     /** Supported policy types */
-public enum Type {
-    AND("All of the following"),
-    MIN_QUANTITY_ALL("Minimum quantity for all items"),
-    MAX_QUANTITY_ALL("Maximum quantity for all items"),
-    MIN_QUANTITY_PRODUCT("Minimum quantity for a product"),
-    MAX_QUANTITY_PRODUCT("Maximum quantity for a product"),
-    MIN_QUANTITY_CATEGORY("Minimum quantity for a category"),
-    MAX_QUANTITY_CATEGORY("Maximum quantity for a category"),
-    CATEGORY_DISALLOW("Disallowed category"),
-    CATEGORY_AGE("Age-restricted category");
+    public enum Type {
+        AND("All of the following"),
+        MIN_QUANTITY_ALL("Minimum quantity for all items"),
+        MAX_QUANTITY_ALL("Maximum quantity for all items"),
+        MIN_QUANTITY_PRODUCT("Minimum quantity for a product"),
+        MAX_QUANTITY_PRODUCT("Maximum quantity for a product"),
+        MIN_QUANTITY_CATEGORY("Minimum quantity for a category"),
+        MAX_QUANTITY_CATEGORY("Maximum quantity for a category"),
+        CATEGORY_DISALLOW("Disallowed category"),
+        CATEGORY_AGE("Age-restricted category");
 
-    private final String displayName;
+        private final String displayName;
 
-    Type(String displayName) {
-        this.displayName = displayName;
+        Type(String displayName) {
+            this.displayName = displayName;
+        }
+
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public String toString() {
-        return displayName;
-    }
-}
 
     @Id
     private String policyId;
@@ -271,6 +272,11 @@ public enum Type {
                     .map(productLookup)
                     .flatMap(p -> p.getCategories().stream())
                     .anyMatch(c -> c.getName().equalsIgnoreCase(ageCategory));
+            case OR:
+                for (Policy p : subPolicies) {
+                    if (p.isApplicable(basket, member)) return true;
+                }
+                return false;
 
             default:
                 throw new IllegalStateException("Unhandled policy type: " + type);
@@ -294,6 +300,7 @@ public enum Type {
     public int getMinAge() { return minAge; }
     public String getAgeCategory() { return ageCategory; }
     public Function<String, Product> getProductLookup() { return productLookup; }
+
     public Function<String, Item> getItemLookup() { return itemLookup; }
     
     // Re-inject lookups after loading from JPA

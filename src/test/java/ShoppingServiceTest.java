@@ -166,6 +166,13 @@ public class ShoppingServiceTest {
         clientToken, "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
+        // Verify that the item stock has been reduced by one after successful checkout
+        ItemDTO itemAfter = itemService.getItem(clientToken, store_id, product_id).getValue();
+        assertEquals(
+            "Stock should decrease by 1 after checkout",
+            4,  // originally 5 in setUp, minus the 1 purchased
+            itemAfter.getAmount()
+        );
     }
 
     @Test
@@ -195,6 +202,12 @@ public class ShoppingServiceTest {
                 response.getErrorMessage().toLowerCase().contains("stock") || 
                 response.getErrorMessage().toLowerCase().contains("inventory") ||
                 response.getErrorMessage().toLowerCase().contains("quantity"));
+        ItemDTO itemAfter = itemService.getItem(clientToken, store_id, product_id).getValue();
+        assertEquals(
+            "Stock should remain unchanged after failed checkout",
+            5,  // Still 5 since checkout didn't succeed
+            itemAfter.getAmount()
+        );
     }
 
     @Test
@@ -204,6 +217,12 @@ public class ShoppingServiceTest {
             clientToken, "invalid", new Date(), "123", 12345L, "John Doe", "123 Main St");
         assertTrue("Should have error", response.errorOccurred());
         assertNull("Value should be null", response.getValue());
+        ItemDTO itemAfter = itemService.getItem(clientToken, store_id, product_id).getValue();
+        assertEquals(
+            "Stock should remain unchanged after failed checkout",
+            5,  // Still 5 since checkout didn't succeed
+            itemAfter.getAmount()
+        );
     }
 
 @Test
@@ -355,6 +374,13 @@ public class ShoppingServiceTest {
         Response<Boolean> response = shoppingService.removeProductFromCart(store_id, clientToken, product_id, 1);
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
+        // Verify that the quantity is reduced correctly
+        CartDTO cart = shoppingService.viewCart(clientToken).getValue();
+        assertTrue("Cart should still contain the store", cart.getBaskets().containsKey(store_id));
+        ShoppingBasketDTO basket = cart.getBaskets().get(store_id);
+        assertTrue("Basket should contain the product", basket.getOrders().containsKey(product_id));
+        ItemDTO itemInCart = basket.getOrders().get(product_id);
+        assertEquals("Item quantity should be reduced by 1", 2, itemInCart.getAmount());
     }
 
     @Test
@@ -363,6 +389,12 @@ public class ShoppingServiceTest {
         Response<Boolean> response = shoppingService.removeProductFromCart(store_id, clientToken, product_id);
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
+        // Verify that the product is completely removed from the cart
+        CartDTO cart = shoppingService.viewCart(clientToken).getValue();    
+        assertFalse("Cart should no longer contain the store after removing the last product", cart.getBaskets().containsKey(store_id));
+        // Check that the cart is empty
+        assertTrue("Cart should be empty after removing all products", cart.getBaskets().isEmpty());
+
     }
 
     //
@@ -385,6 +417,7 @@ public class ShoppingServiceTest {
         assertFalse("Should not have error", response.errorOccurred());
         assertEquals("Should return true in the value", Boolean.TRUE, response.getValue());
         assertTrue("Basket should be empty after clearing", shoppingService.viewCart(clientToken).getValue().getBaskets().isEmpty());
+        assertFalse("Cart should not contain the store after clearing", shoppingService.viewCart(clientToken).getValue().getBaskets().containsKey(store_id));
     }
 
     //
@@ -506,10 +539,10 @@ public class ShoppingServiceTest {
             // Verify that the higher bid was accepted
             assertFalse("Higher bid should be accepted", highBidResponse.errorOccurred());
             assertEquals("Value should be true for accepted bid", Boolean.TRUE, highBidResponse.getValue());
-            
         } catch (Exception e) {
             fail("Unexpected exception: " + e.getMessage());
         }
+
     }
 
 
@@ -592,6 +625,8 @@ public class ShoppingServiceTest {
         assertEquals("Item quantity in cart should be unchanged after failed checkout", 
             initialQuantityInCart, 
             finalItemInCart.getAmount());
+        
     }
+
 
 }
