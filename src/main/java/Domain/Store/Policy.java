@@ -22,7 +22,6 @@ public class Policy {
 
     /** Supported policy types */
     public enum Type {
-        AND("All of the following"),
         MIN_QUANTITY_ALL("Minimum quantity for all items"),
         MAX_QUANTITY_ALL("Maximum quantity for all items"),
         MIN_QUANTITY_PRODUCT("Minimum quantity for a product"),
@@ -224,12 +223,6 @@ public class Policy {
     public boolean isApplicable(ShoppingBasket basket, Member member) {
         switch (type) {
 
-            case AND:
-                for (Policy p : subPolicies) {
-                    if (!p.isApplicable(basket, member)) return false;
-                }
-                return true;
-
             case MIN_QUANTITY_ALL:
                 return basket.getOrders().values().stream()
                              .allMatch(q -> q >= minItemsAll);
@@ -272,11 +265,6 @@ public class Policy {
                     .map(productLookup)
                     .flatMap(p -> p.getCategories().stream())
                     .anyMatch(c -> c.getName().equalsIgnoreCase(ageCategory));
-            case OR:
-                for (Policy p : subPolicies) {
-                    if (p.isApplicable(basket, member)) return true;
-                }
-                return false;
 
             default:
                 throw new IllegalStateException("Unhandled policy type: " + type);

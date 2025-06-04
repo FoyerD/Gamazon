@@ -44,10 +44,6 @@ public class PolicyService {
         Item prod = null;
 
         switch (policy.getType()) {
-            // TODO: Deprecated
-            // case AND: 
-            //      return builder.createAND(policy.getSubPolicies().stream().map(this::convertPolicyToDTO).toList()).build();
-
 
             case MIN_QUANTITY_ALL:
                 return builder.createMinQuantityAllPolicy(policy.getMinItemsAll()).build(policy.getPolicyId());

@@ -14,6 +14,7 @@ import Application.PolicyService;
 import Application.TokenService;
 import Application.DTOs.PolicyDTO;
 import Application.utils.Response;
+import Domain.Repos.IItemRepository;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -29,12 +30,14 @@ public class PolicyServiceTest {
     private PolicyFacade       facadeMock;
     private PermissionManager  permMock;
     private TokenService       tokenServiceMock;
+    private IItemRepository itemRepoMock;
 
     @Before
     public void setUp() {
         facadeMock       = mock(PolicyFacade.class);
         permMock         = mock(PermissionManager.class);
         tokenServiceMock = mock(TokenService.class);
+        itemRepoMock = mock(IItemRepository.class);
 
         // “goodToken” → valid
         when(tokenServiceMock.validateToken("goodToken")).thenReturn(true);
@@ -44,7 +47,7 @@ public class PolicyServiceTest {
         when(tokenServiceMock.validateToken("badToken"))
                 .thenThrow(new IllegalArgumentException("Invalid token"));
 
-        service = new PolicyService(facadeMock, tokenServiceMock, permMock);
+        service = new PolicyService(facadeMock, tokenServiceMock, permMock, itemRepoMock);
     }
 
     @Test
@@ -181,16 +184,9 @@ public class PolicyServiceTest {
 
     @Test
     public void createPolicy_maxQuantityAll_valid_succeeds() {
-        // Arrange: build a Domain policy for DTO
-        Policy pDomain = new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                .policyId("storeC")
-                .storeId("storeC")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .maxItemsAll(4)
-                .build();
-
-        PolicyDTO dtoToSend = new PolicyDTO(pDomain);
+        // Arrange: build a policy DTO
+        PolicyDTO dtoToSend = new PolicyDTO.Builder("storeC", Policy.Type.MAX_QUANTITY_ALL)
+                                .createMaxQuantityAllPolicy(4).build();
 
         // When facadeMock.createMaxQuantityAllPolicy("storeC", 4) is called, return a new Domain policy
         Policy created = new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
@@ -226,7 +222,8 @@ public class PolicyServiceTest {
                 .itemLookup(id -> null)
                 .maxItemsAll(1)
                 .build();
-        PolicyDTO dto = new PolicyDTO(pDom);
+        PolicyDTO dto = new PolicyDTO.Builder("storeD", Policy.Type.MAX_QUANTITY_ALL)
+                                .createMaxQuantityAllPolicy(1).build();
 
         doThrow(new SecurityException("Forbidden"))
                 .when(permMock).checkPermission("user1", "storeD", PermissionType.EDIT_STORE_POLICIES);
@@ -242,14 +239,9 @@ public class PolicyServiceTest {
     @Test
     public void createPolicy_invalidToken_returnsErrorResponse() {
         // Arrange: build a DTO (details don’t matter since token is invalid)
-        Policy pDom = new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                .policyId("storeX")
-                .storeId("storeX")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .maxItemsAll(1)
-                .build();
-        PolicyDTO dto = new PolicyDTO(pDom);
+
+        PolicyDTO dto = new PolicyDTO.Builder("storeC", Policy.Type.MAX_QUANTITY_ALL)
+                                .createMaxQuantityAllPolicy(1).build();
 
         // Act
         Response<PolicyDTO> resp = service.createPolicy("badToken", "storeX", dto);
@@ -262,25 +254,12 @@ public class PolicyServiceTest {
     @Test
     public void updatePolicy_valid_succeeds() {
         // Arrange: update an existing policy from maxItemsAll=2 to maxItemsAll=5
-        PolicyDTO dtoOrig = new PolicyDTO(
-                new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                    .policyId("storeU")
-                    .storeId("storeU")
-                    .productLookup(id -> null)
-                    .itemLookup(id -> null)
-                    .maxItemsAll(2)
-                    .build()
-        );
 
-        PolicyDTO dtoNew = new PolicyDTO(
-                new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                    .policyId("storeU")
-                    .storeId("storeU")
-                    .productLookup(id -> null)
-                    .itemLookup(id -> null)
-                    .maxItemsAll(5)
-                    .build()
-        );
+        PolicyDTO dtoOrig = new PolicyDTO.Builder("storeU", Policy.Type.MAX_QUANTITY_ALL)
+                        .createMaxQuantityAllPolicy(2).build();
+
+        PolicyDTO dtoNew = new PolicyDTO.Builder("storeU", Policy.Type.MAX_QUANTITY_ALL)
+                .createMaxQuantityAllPolicy(5).build();
 
         doNothing().when(facadeMock).removePolicy("storeU");
 
@@ -307,15 +286,9 @@ public class PolicyServiceTest {
 
     @Test
     public void updatePolicy_invalidPermission_returnsErrorResponse() {
-        PolicyDTO dtoNew = new PolicyDTO(
-                new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                    .policyId("storeU")
-                    .storeId("storeU")
-                    .productLookup(id -> null)
-                    .itemLookup(id -> null)
-                    .maxItemsAll(5)
-                    .build()
-        );
+        PolicyDTO dtoNew = new PolicyDTO.Builder("storeU", Policy.Type.MAX_QUANTITY_ALL)
+                        .createMaxQuantityAllPolicy(5)
+                        .build();
 
         doThrow(new SecurityException("NoRights"))
                 .when(permMock).checkPermission("user1", "storeU", PermissionType.EDIT_STORE_POLICIES);
@@ -331,15 +304,9 @@ public class PolicyServiceTest {
     @Test
     public void updatePolicy_invalidToken_returnsErrorResponse() {
         // Arrange: build any DTO (token is invalid, so no further behavior matters)
-        PolicyDTO dto = new PolicyDTO(
-                new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                    .policyId("storeX")
-                    .storeId("storeX")
-                    .productLookup(id -> null)
-                    .itemLookup(id -> null)
-                    .maxItemsAll(1)
-                    .build()
-        );
+        PolicyDTO dto = new PolicyDTO.Builder("storeU", Policy.Type.MAX_QUANTITY_ALL)
+                        .createMaxQuantityAllPolicy(5)
+                        .build();
 
         // Act
         Response<PolicyDTO> resp = service.updatePolicy("badToken", "storeX", "storeX", dto);

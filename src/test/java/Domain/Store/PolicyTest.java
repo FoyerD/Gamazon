@@ -3,7 +3,6 @@ package Domain.Store;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -102,67 +101,4 @@ public class PolicyTest {
         assertTrue("MAX_QUANTITY_ALL should apply when all quantities ≤ maxItemsAll", result);
     }
 
-    @Test
-    public void andPolicy_whenOneChildFails_isNotApplicable() {
-        // Arrange: build two simple policies—one always true, one always false
-        Policy alwaysTrue = new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                .policyId("pTrue")
-                .storeId("storeX")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .maxItemsAll(1000) // effectively always true
-                .build();
-
-        Policy alwaysFalse = new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                .policyId("pFalse")
-                .storeId("storeX")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .maxItemsAll(0) // always false
-                .build();
-
-        Policy andPolicy = new Policy.Builder(Policy.Type.AND)
-                .policyId("pAND")
-                .storeId("storeX")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .subPolicies(List.of(alwaysTrue, alwaysFalse))
-                .build();
-
-        when(mockBasket.getOrders()).thenReturn(Map.of("prodA", 1));
-        boolean result = andPolicy.isApplicable(mockBasket, mockMember);
-        assertFalse("AND policy should be false if any child policy is false", result);
-    }
-
-    @Test
-    public void orPolicy_whenOneChildSucceeds_isApplicable() {
-        // Arrange: build two simple policies—one always false, one always true
-        Policy alwaysFalse = new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                .policyId("pFalse2")
-                .storeId("storeX")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .maxItemsAll(0) // always false
-                .build();
-
-        Policy alwaysTrue = new Policy.Builder(Policy.Type.MAX_QUANTITY_ALL)
-                .policyId("pTrue2")
-                .storeId("storeX")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .maxItemsAll(1000) // always true
-                .build();
-
-        Policy orPolicy = new Policy.Builder(Policy.Type.OR)
-                .policyId("pOR")
-                .storeId("storeX")
-                .productLookup(id -> null)
-                .itemLookup(id -> null)
-                .subPolicies(List.of(alwaysFalse, alwaysTrue))
-                .build();
-
-        when(mockBasket.getOrders()).thenReturn(Map.of("prodA", 1));
-        boolean result = orPolicy.isApplicable(mockBasket, mockMember);
-        assertTrue("OR policy should be true if any child policy is true", result);
-    }
 }

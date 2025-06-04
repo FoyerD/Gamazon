@@ -71,6 +71,7 @@ public class PolicyDTO {
 
     }
 
+    public String getPolicyId() { return policyId; }
     public String getStoreId()  { return storeId;  }
     public Policy.Type getType() { return type; }
     // public List<PolicyDTO> getSubPolicies() { return subPolicies; }

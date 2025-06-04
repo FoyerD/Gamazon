@@ -56,7 +56,7 @@ public class PolicyDialog extends Dialog {
 
 
     private void setupForm() {
-        typeCombo.setItems(Arrays.asList(Policy.Type.values()).stream().filter(t -> !t.equals(Policy.Type.AND)).toList());
+        typeCombo.setItems(Arrays.asList(Policy.Type.values()));
         typeCombo.setRequired(true);
         binder.forField(typeCombo)
                 .asRequired("Policy type is required")
@@ -149,7 +149,6 @@ public class PolicyDialog extends Dialog {
                 ageField.setVisible(true);
                 categoryCombo.setVisible(true);
             }
-            case AND -> Notification.show("cannot choose AND type");
         }
     }
 
