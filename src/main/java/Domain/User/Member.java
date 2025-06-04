@@ -1,5 +1,7 @@
 package Domain.User;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -11,33 +13,36 @@ public class Member extends User {
 
     private String password; // encoded
     private String email;
-    private Integer age; // optional
+    private LocalDate birthDate; // optional
 
     protected Member() {
         super(); // JPA requires a no-arg constructor
     // only for JPA
     }
 
-    public Member(UUID id, String username, String password, String email, Integer age) {
+    public Member(UUID id, String username, String password, String email, LocalDate birthDate) {
         super(id, username);
         this.password = password;
         this.email = email;
-        this.age = age;
+        this.birthDate = birthDate;
     }
 
     public Member(UUID id, String username, String password, String email) {
-        this(id, username, password, email, 20);
+        this(id, username, password, email, getDefaultBirthDateFor20YearsOld());
     }
 
-    String getPassword() {
-        return password;
-    }
 
-    public String getEmail() {
-        return email;
-    }
+    String getPassword() { return password; }
+    public String getEmail() { return email; }
+    public LocalDate getBirthDate() { return birthDate; }
 
     public Integer getAge() {
-        return age;
+        if (birthDate == null) return null;
+        return Period.between(birthDate, LocalDate.now()).getYears();
     }
+
+    private static LocalDate getDefaultBirthDateFor20YearsOld() {
+
+    return LocalDate.now().minusYears(20);
+}
 }

@@ -1,5 +1,6 @@
 package UI.presenters;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class LoginPresenter implements ILoginPresenter {
     }
 
     @Override
-    public Response<UserDTO> registerUser(String sessionToken, String username, String password, String email) {
-        return userService.register(sessionToken, username, password, email);
+    public Response<UserDTO> registerUser(String sessionToken, String username, String password, String email, LocalDate birthDate) {
+        return userService.register(sessionToken, username, password, email, birthDate);
     }
 
     @Override

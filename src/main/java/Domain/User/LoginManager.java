@@ -1,5 +1,7 @@
 package Domain.User;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -65,6 +67,59 @@ public class LoginManager {
      * @param username The desired username for the new member.
      * @param password The desired password for the new member.
      * @param email The email address of the new member.
+     * @param birthDate The birth date of the new memebr.
+     * @return The newly registered member user.
+     * @throws IllegalStateException if the registration fails or if the guest cannot be removed from the repository.
+     ***/
+    public synchronized Member register(String id, String username, String password, String email, LocalDate birthDate) throws IllegalStateException {
+
+        Guest guest = userRepository.getGuest(id);
+        if (guest == null) {
+            throw new NoSuchElementException("Guest not found");
+        }
+
+        if (username.equals(Guest.NAME)) {
+            throw new IllegalArgumentException("Cannot register with username " + Guest.NAME);
+        }
+
+        if (userRepository.getMemberByUsername(username) != null) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        PasswordChecker.check(password);
+        
+        if (!EmailValidator.getInstance().isValid(email)) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if (!isAtLeastOneYearsOld(birthDate)) {
+            throw new IllegalArgumentException("Invalid birth date. user must be at least 1-years-old");
+        }
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encoded = passwordEncoder.encode(password);
+
+        Member member = guest.register(username, encoded, email, birthDate);
+        member.login();
+
+        if (userRepository.remove(id) == null) {
+            throw new IllegalStateException("Failed to remove guest from repository");
+        }
+
+        if (!userRepository.add(member.getId(), member)) {
+            throw new IllegalStateException("Failed to add member to repository");
+        }
+        return member;
+    }
+
+    /***
+     * *THIS IS A LEGACY FUNCTIOM*
+     * Registers a new member user based on the provided guest user.
+     * @param id The ID of the guest user to register.
+     * @param username The desired username for the new member.
+     * @param password The desired password for the new member.
+     * @param email The email address of the new member.
+     * @param birthDate The birth date of the new memebr.
      * @return The newly registered member user.
      * @throws IllegalStateException if the registration fails or if the guest cannot be removed from the repository.
      ***/
@@ -89,6 +144,7 @@ public class LoginManager {
             throw new IllegalArgumentException("Invalid email format");
         }
 
+
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encoded = passwordEncoder.encode(password);
 
@@ -105,6 +161,10 @@ public class LoginManager {
         return member;
     }
 
+    private static boolean isAtLeastOneYearsOld(LocalDate birthDate) {
+        if (birthDate == null) return false;
+        return Period.between(birthDate, LocalDate.now()).getYears() >= 1;
+    }
 
     /***
      * Logs in a member user with the given username and password.

@@ -1,5 +1,6 @@
 package UI.views;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -95,16 +96,18 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
         );
 
         // Username and email
-        Span username = new Span("Username: " + userDTO.getUsername());
         Span email = new Span("Email: " + userDTO.getEmail());
-        Stream.of(username, email).forEach(span -> span.getStyle()
+        Span age = new Span("birthday: " 
+                                + userDTO.getBirthDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                +  ". " + userDTO.getAge() + " years old");
+        Stream.of(email, age).forEach(span -> span.getStyle()
                 .set("display", "block")
                 .set("margin", "0.5rem 0")
                 .set("color", "#222")
                 .set("font-size", "1.1rem")
         );
 
-        card.add(username, email);
+        card.add(email, age);
         add(header, card);
 
         // Move the back-to-home button to the top left and make the grid floaty like the others

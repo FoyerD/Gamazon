@@ -1,5 +1,7 @@
 package Domain.User;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
@@ -12,6 +14,10 @@ public class Guest extends User{
     }
     public static synchronized Guest createGuest() {
         return new Guest();
+    }
+
+    public Member register(String username, String password, String email, LocalDate birthDate) {
+        return new Member(this.id, username, password, email, birthDate);
     }
 
     public Member register(String username, String password, String email) {
