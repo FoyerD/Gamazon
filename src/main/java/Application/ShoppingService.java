@@ -239,34 +239,34 @@ public class ShoppingService{
     
 
     // Make Immidiate Purchase Use Case 2.5
-    @Transactional
-    public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress) {
-        String method = "checkout";
-        if (!tokenService.validateToken(sessionToken)) {
-            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-            return Response.error("Invalid token");
-        }
-        String clientId = this.tokenService.extractId(sessionToken);
-        
-        try {
-            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
-            if(permissionManager.isBanned(clientId)){
-                throw new Exception("User is banned from checking out.");
+        @Transactional
+        public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
+            String clientName, String deliveryAddress) {
+            String method = "checkout";
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return Response.error("Invalid token");
             }
-            if(this.cartFacade == null) {
-                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
-                return new Response<>(new Error("cartFacade is not initialized."));
-            }
+            String clientId = this.tokenService.extractId(sessionToken);
+            
+            try {
+                if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+                if(permissionManager.isBanned(clientId)){
+                    throw new Exception("User is banned from checking out.");
+                }
+                if(this.cartFacade == null) {
+                    TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                    return new Response<>(new Error("cartFacade is not initialized."));
+                }
 
-            cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
-            TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
-            return new Response<>(true);
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error during checkout: %s", ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
+                cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+                TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
+                return new Response<>(true);
+            } catch (Exception ex) {
+                TradingLogger.logError(CLASS_NAME, method, "Error during checkout: %s", ex.getMessage());
+                return new Response<>(new Error(ex.getMessage()));
+            }
         }
-    }
 
     @Transactional
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,

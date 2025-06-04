@@ -39,7 +39,7 @@ const connectWebSocket = (userId) => {
     onConnect: () => {
       const destination = '/user/topic/notifications';
       stompClient.subscribe(destination, (message) => {
-        console.log('[WS] 🔔 Notification received:', message.body);
+        console.log('[WS] 🔔 Notification received:', message.body);  
         showNotification(message.body);
       });
     },

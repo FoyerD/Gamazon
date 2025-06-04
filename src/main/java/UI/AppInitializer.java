@@ -19,6 +19,7 @@ import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.MarketService;
 import Application.ProductService;
+import Application.ShoppingService;
 import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
@@ -35,6 +36,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
     private final ItemService itemService;
     private final MarketService marketService;
     private final TokenService tokenService;
+    private final ShoppingService shoppingService;
 
     @Value("${app.init.state:default}")
     private String initState;
@@ -45,13 +47,14 @@ public class AppInitializer implements CommandLineRunner, Ordered {
             ProductService productService,
             ItemService itemService,
             MarketService marketService,
-            TokenService tokenService) {
+            TokenService tokenService, ShoppingService shoppingService) {
         this.userService = userService;
         this.storeService = storeService;
         this.productService = productService;
         this.itemService = itemService;
         this.marketService = marketService;
         this.tokenService = tokenService;
+        this.shoppingService = shoppingService;
     }
 
     private final Map<String, String> sessionTokens = new HashMap<>();
@@ -189,6 +192,47 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             values.get(cmd.get("store").toString()),
                             ((List<String>) cmd.get("permissions")).stream()
                                     .map(PermissionType::valueOf).toList());
+                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                }
+                case "addAuction" -> {
+                    var resp = storeService.addAuction(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            values.get(cmd.get("store").toString()),
+                            values.get(cmd.get("product").toString()),
+                            (String) cmd.get("auctionEndDate"),
+                            ((Number) cmd.get("startPrice")).doubleValue());
+                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                }
+                case "addToCart" -> {
+                    var resp = shoppingService.addProductToCart(
+                            values.get(cmd.get("store").toString()),
+                            sessionTokens.get(cmd.get("session").toString()),
+                            values.get(cmd.get("product").toString()),
+                            ((Number) cmd.get("quantity")).intValue());
+                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                }
+                case "makeBid" -> {
+                    var resp = shoppingService.makeBid(
+                            values.get(cmd.get("auction").toString()),
+                            sessionTokens.get(cmd.get("session").toString()),
+                            ((Number) cmd.get("price")).floatValue(),
+                            (String) cmd.get("cardNumber"),
+                            new java.sql.Date(((Number) cmd.get("expiryDate")).longValue()),
+                            (String) cmd.get("cvv"),
+                            ((Number) cmd.get("andIncrement")).longValue(),
+                            (String) cmd.get("clientName"),
+                            (String) cmd.get("deliveryAddress"));
+                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                }
+                case "checkout" -> {
+                    var resp = shoppingService.checkout(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            (String) cmd.get("cardNumber"),
+                            new java.sql.Date(((Number) cmd.get("expiryDate")).longValue()),
+                            (String) cmd.get("cvv"),
+                            ((Number) cmd.get("andIncrement")).longValue(),
+                            (String) cmd.get("clientName"),
+                            (String) cmd.get("deliveryAddress"));
                     if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
                 }
                 default -> System.err.println("⚠ Unknown command: " + action);
