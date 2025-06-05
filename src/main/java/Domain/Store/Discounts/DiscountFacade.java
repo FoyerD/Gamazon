@@ -9,16 +9,8 @@ import org.springframework.stereotype.Component;
 import Application.DTOs.DiscountDTO;
 import Domain.Store.ItemFacade;
 import Domain.Store.Discounts.Discount.MergeType;
-import Domain.Store.Discounts.Conditions.AndCondition;
 import Domain.Store.Discounts.Conditions.Condition;
 import Domain.Store.Discounts.Conditions.ConditionBuilder;
-import Domain.Store.Discounts.Conditions.IConditionRepository;
-import Domain.Store.Discounts.Conditions.MaxPriceCondition;
-import Domain.Store.Discounts.Conditions.MaxQuantityCondition;
-import Domain.Store.Discounts.Conditions.MinPriceCondition;
-import Domain.Store.Discounts.Conditions.MinQuantityCondition;
-import Domain.Store.Discounts.Conditions.OrCondition;
-import Domain.Store.Discounts.Conditions.TrueCondition;
 import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 
 
@@ -30,18 +22,15 @@ import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
 public class DiscountFacade {
     
     private final IDiscountRepository discountRepository;
-    private final IConditionRepository conditionRepository;
+    // private final IConditionRepository conditionRepository;
     private final ItemFacade itemFacade;
     private final DiscountBuilder discountBuilder;
     private final ConditionBuilder conditionBuilder;
     
     @Autowired
-    public DiscountFacade(IDiscountRepository discountRepository, IConditionRepository conditionRepository, ItemFacade itemFacade) {
+    public DiscountFacade(IDiscountRepository discountRepository, ItemFacade itemFacade) {
         if (discountRepository == null) {
             throw new IllegalArgumentException("DiscountRepository cannot be null");
-        }
-        if (conditionRepository == null) {
-            throw new IllegalArgumentException("ConditionRepository cannot be null");
         }
         if (itemFacade == null) {
             throw new IllegalArgumentException("ItemFacade cannot be null");
@@ -49,7 +38,6 @@ public class DiscountFacade {
 
         this.itemFacade = itemFacade;
         this.discountRepository = discountRepository;
-        this.conditionRepository = conditionRepository;
         this.conditionBuilder = new ConditionBuilder();
         this.discountBuilder = new DiscountBuilder(conditionBuilder);
     }
@@ -58,95 +46,95 @@ public class DiscountFacade {
     // CONDITION CREATION METHODS (STORE-AWARE)
     // ===========================================
     
-    /**
-     * Creates and saves a MinPriceCondition for a specific store.
-     */
-    public MinPriceCondition createMinPriceCondition(String storeId, double minPrice) {
-        validateItemFacade(itemFacade);
-        if (minPrice < 0) {
-            throw new IllegalArgumentException("Min price cannot be negative");
-        }
+    // /**
+    //  * Creates and saves a MinPriceCondition for a specific store.
+    //  */
+    // public MinPriceCondition createMinPriceCondition(String storeId, double minPrice) {
+    //     validateItemFacade(itemFacade);
+    //     if (minPrice < 0) {
+    //         throw new IllegalArgumentException("Min price cannot be negative");
+    //     }
         
-        MinPriceCondition condition = new MinPriceCondition(UUID.randomUUID().toString(), minPrice);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
+    //     MinPriceCondition condition = new MinPriceCondition(UUID.randomUUID().toString(), minPrice);
+    //     conditionRepository.save(storeId, condition);
+    //     return condition;
+    // }
     
-    /**
-     * Creates and saves a MaxPriceCondition for a specific store.
-     */
-    public MaxPriceCondition createMaxPriceCondition(String storeId, double maxPrice) {
-        validateItemFacade(itemFacade);
-        if (maxPrice < 0) {
-            throw new IllegalArgumentException("Max price cannot be negative");
-        }
+    // /**
+    //  * Creates and saves a MaxPriceCondition for a specific store.
+    //  */
+    // public MaxPriceCondition createMaxPriceCondition(String storeId, double maxPrice) {
+    //     validateItemFacade(itemFacade);
+    //     if (maxPrice < 0) {
+    //         throw new IllegalArgumentException("Max price cannot be negative");
+    //     }
         
-        MaxPriceCondition condition = new MaxPriceCondition(UUID.randomUUID().toString(), maxPrice);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
+    //     MaxPriceCondition condition = new MaxPriceCondition(UUID.randomUUID().toString(), maxPrice);
+    //     conditionRepository.save(storeId, condition);
+    //     return condition;
+    // }
     
-    /**
-     * Creates and saves a MinQuantityCondition for a specific store.
-     */
-    public MinQuantityCondition createMinQuantityCondition(String storeId, String productId, int minQuantity) {
-        validateItemFacade(itemFacade);
-        validateProductId(productId);
-        if (minQuantity < 0) {
-            throw new IllegalArgumentException("Min quantity cannot be negative");
-        }
+    // /**
+    //  * Creates and saves a MinQuantityCondition for a specific store.
+    //  */
+    // public MinQuantityCondition createMinQuantityCondition(String storeId, String productId, int minQuantity) {
+    //     validateItemFacade(itemFacade);
+    //     validateProductId(productId);
+    //     if (minQuantity < 0) {
+    //         throw new IllegalArgumentException("Min quantity cannot be negative");
+    //     }
         
-        MinQuantityCondition condition = new MinQuantityCondition(UUID.randomUUID().toString(), productId, minQuantity);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
+    //     MinQuantityCondition condition = new MinQuantityCondition(UUID.randomUUID().toString(), productId, minQuantity);
+    //     conditionRepository.save(storeId, condition);
+    //     return condition;
+    // }
     
-    /**
-     * Creates and saves a MaxQuantityCondition for a specific store.
-     */
-    public MaxQuantityCondition createMaxQuantityCondition(String storeId, String productId, int maxQuantity) {
-        validateItemFacade(itemFacade);
-        validateProductId(productId);
-        if (maxQuantity < 0) {
-            throw new IllegalArgumentException("Max quantity cannot be negative");
-        }
+    // /**
+    //  * Creates and saves a MaxQuantityCondition for a specific store.
+    //  */
+    // public MaxQuantityCondition createMaxQuantityCondition(String storeId, String productId, int maxQuantity) {
+    //     validateItemFacade(itemFacade);
+    //     validateProductId(productId);
+    //     if (maxQuantity < 0) {
+    //         throw new IllegalArgumentException("Max quantity cannot be negative");
+    //     }
         
-        MaxQuantityCondition condition = new MaxQuantityCondition(UUID.randomUUID().toString(), productId, maxQuantity);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
+    //     MaxQuantityCondition condition = new MaxQuantityCondition(UUID.randomUUID().toString(), productId, maxQuantity);
+    //     conditionRepository.save(storeId, condition);
+    //     return condition;
+    // }
     
-    /**
-     * Creates and saves an AndCondition for a specific store.
-     */
-    public AndCondition createAndCondition(String storeId, List<Condition> conditions) {
-        validateConditionSet(conditions);
+    // /**
+    //  * Creates and saves an AndCondition for a specific store.
+    //  */
+    // public AndCondition createAndCondition(String storeId, List<Condition> conditions) {
+    //     validateConditionSet(conditions);
         
-        AndCondition condition = new AndCondition(UUID.randomUUID().toString(), conditions);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
+    //     AndCondition condition = new AndCondition(UUID.randomUUID().toString(), conditions);
+    //     conditionRepository.save(storeId, condition);
+    //     return condition;
+    // }
     
-    /**
-     * Creates and saves an OrCondition for a specific store.
-     */
-    public OrCondition createOrCondition(String storeId, List<Condition> conditions) {
-        validateConditionSet(conditions);
+    // /**
+    //  * Creates and saves an OrCondition for a specific store.
+    //  */
+    // public OrCondition createOrCondition(String storeId, List<Condition> conditions) {
+    //     validateConditionSet(conditions);
         
-        OrCondition condition = new OrCondition(UUID.randomUUID().toString(), conditions);
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
+    //     OrCondition condition = new OrCondition(UUID.randomUUID().toString(), conditions);
+    //     conditionRepository.save(storeId, condition);
+    //     return condition;
+    // }
     
-    /**
-     * Creates and saves a TrueCondition for a specific store.
-     */
-    public TrueCondition createTrueCondition(String storeId) {
+    // /**
+    //  * Creates and saves a TrueCondition for a specific store.
+    //  */
+    // public TrueCondition createTrueCondition(String storeId) {
         
-        TrueCondition condition = new TrueCondition(UUID.randomUUID().toString());
-        conditionRepository.save(storeId, condition);
-        return condition;
-    }
+    //     TrueCondition condition = new TrueCondition(UUID.randomUUID().toString());
+    //     conditionRepository.save(storeId, condition);
+    //     return condition;
+    // }
     
     // ===========================================
     // DISCOUNT CREATION METHODS (STORE-AWARE)
@@ -160,10 +148,9 @@ public class DiscountFacade {
         validateItemFacade(itemFacade);
         validateDiscountPercentage(discountPercentage);
         validateQualifier(qualifier);
-        validateCondition(condition);
         
         SimpleDiscount discount = new SimpleDiscount(UUID.randomUUID().toString(), storeId, discountPercentage, qualifier, condition);
-        discountRepository.save(storeId, discount);
+        discountRepository.add(discount.getId(), discount);
         return discount;
     }
     
@@ -175,7 +162,7 @@ public class DiscountFacade {
         validateDiscountSet(discounts);
         
         AndDiscount discount = new AndDiscount(UUID.randomUUID().toString(), storeId, discounts, condition, mergeType);
-        discountRepository.save(storeId, discount);
+        discountRepository.add(discount.getId(), discount);
         return discount;
     }
     
@@ -185,7 +172,7 @@ public class DiscountFacade {
      */
     public OrDiscount createOrDiscount(String storeId, List<Discount> discounts, Condition condition, MergeType mergeType) {
         OrDiscount orDiscount = new OrDiscount(UUID.randomUUID().toString(), storeId, discounts, condition, mergeType);
-        discountRepository.save(storeId, orDiscount);
+        discountRepository.add(orDiscount.getId(), orDiscount);
         return orDiscount;
     }
     
@@ -198,7 +185,7 @@ public class DiscountFacade {
         validateDiscount(discount2);
         
         XorDiscount discount = new XorDiscount(UUID.randomUUID().toString(), storeId, discount1, discount2, condition, mergeType);
-        discountRepository.save(storeId, discount);
+        discountRepository.add(discount.getId(), discount);
         return discount;
     }
     
@@ -211,7 +198,7 @@ public class DiscountFacade {
      */
     public boolean addDiscount(String storeId, Discount discount) {
         validateDiscount(discount);
-        return discountRepository.save(storeId, discount);
+        return discountRepository.add(discount.getId(), discount);
     }
 
     public Discount addDiscount(String storeId, DiscountDTO discountDTO) throws Exception {
@@ -223,13 +210,13 @@ public class DiscountFacade {
         }
     }
     
-    /**
-     * Adds a condition to a specific store.
-     */
-    public void addCondition(String storeId, Condition condition) {
-        validateCondition(condition);
-        conditionRepository.save(storeId, condition);
-    }
+    // /**
+    //  * Adds a condition to a specific store.
+    //  */
+    // public void addCondition(String storeId, Condition condition) {
+    //     validateCondition(condition);
+    //     conditionRepository.save(storeId, condition);
+    // }
 
 
     /**
@@ -240,12 +227,12 @@ public class DiscountFacade {
     }
     
     
-    /**
-     * Gets all conditions for a specific store (requires casting repository).
-     */
-    public List<Condition> getStoreConditions(String storeId) {
-        return conditionRepository.getStoreConditions(storeId);
-    }
+    // /**
+    //  * Gets all conditions for a specific store (requires casting repository).
+    //  */
+    // public List<Condition> getStoreConditions(String storeId) {
+    //     return conditionRepository.getStoreConditions(storeId);
+    // }
     
     /**
      * Updates a discount for a specific store.
@@ -258,7 +245,7 @@ public class DiscountFacade {
             throw new IllegalArgumentException("Discount with ID " + discount.getId() + " does not exist");
         }
         
-        discountRepository.save(storeId, discount);
+        discountRepository.add(discount.getId(), discount);
     }
     
     /**
@@ -275,25 +262,25 @@ public class DiscountFacade {
             throw new IllegalArgumentException("Discount with ID " + discountId + " not found in store " + storeId);
         }
         
-        discountRepository.delete(discountId);
+        discountRepository.remove(discountId);
         return true;
     }
     
-    /**
-     * Removes a condition from a specific store.
-     */
-    public boolean removeCondition(String storeId, String conditionId) {
-        validateConditionId(conditionId);
+    // /**
+    //  * Removes a condition from a specific store.
+    //  */
+    // public boolean removeCondition(String storeId, String conditionId) {
+    //     validateConditionId(conditionId);
         
-        // Verify the condition belongs to this store
-        List<Condition> storeConditions = getStoreConditions(storeId);
-        if (storeConditions.stream().noneMatch(c -> c.getId().equals(conditionId))) {
-            throw new IllegalArgumentException("Condition with ID " + conditionId + " not found in store " + storeId);
-        }
+    //     // Verify the condition belongs to this store
+    //     List<Condition> storeConditions = getStoreConditions(storeId);
+    //     if (storeConditions.stream().noneMatch(c -> c.getId().equals(conditionId))) {
+    //         throw new IllegalArgumentException("Condition with ID " + conditionId + " not found in store " + storeId);
+    //     }
 
-        conditionRepository.delete(conditionId);
-        return true;
-    }
+    //     conditionRepository.delete(conditionId);
+    //     return true;
+    // }
 
 
 
@@ -315,7 +302,7 @@ public class DiscountFacade {
      */
     public void removeDiscount(String id) {
         validateDiscountId(id);
-        discountRepository.delete(id);
+        discountRepository.remove(id);
     }
 
     /**
@@ -331,45 +318,45 @@ public class DiscountFacade {
     // GLOBAL REPOSITORY OPERATIONS - CONDITIONS
     // ===========================================
     
-    /**
-     * Finds a condition by ID globally.
-     */
-    public Condition geCondition(String id) {
-        validateConditionId(id);
-        return conditionRepository.get(id);
-    }
+    // /**
+    //  * Finds a condition by ID globally.
+    //  */
+    // public Condition geCondition(String id) {
+    //     validateConditionId(id);
+    //     return conditionRepository.get(id);
+    // }
     
     
-    /**
-     * Removes a condition by ID globally.
-     */
-    public void removeCondition(String id) {
-        validateConditionId(id);
-        conditionRepository.delete(id);
-    }
+    // /**
+    //  * Removes a condition by ID globally.
+    //  */
+    // public void removeCondition(String id) {
+    //     validateConditionId(id);
+    //     conditionRepository.delete(id);
+    // }
     
-    /**
-     * Checks if a condition exists globally.
-     */
-    public boolean conditionExists(String id) {
-        validateConditionId(id);
-        return conditionRepository.exists(id);
-    }
+    // /**
+    //  * Checks if a condition exists globally.
+    //  */
+    // public boolean conditionExists(String id) {
+    //     validateConditionId(id);
+    //     return conditionRepository.exists(id);
+    // }
 
-    /**
-     * Gets the global count of conditions.
-     */
-    public int getConditionCount() {
-        return conditionRepository.size();
-    }
+    // /**
+    //  * Gets the global count of conditions.
+    //  */
+    // public int getConditionCount() {
+    //     return conditionRepository.size();
+    // }
     
-    /**
-     * Clears all discounts and conditions globally (for testing).
-     */
-    public void clearAll() {
-        discountRepository.clear();
-        conditionRepository.clear();
-    }
+    // /**
+    //  * Clears all discounts and conditions globally (for testing).
+    //  */
+    // public void clearAll() {
+    //     discountRepository.clear();
+    //     conditionRepository.clear();
+    // }
     
     // ===========================================
     // VALIDATION METHODS
@@ -401,21 +388,21 @@ public class DiscountFacade {
         }
     }
     
-    private void validateCondition(Condition condition) {
-        if (condition == null || conditionRepository.get(condition.getId()) == null) {
-            throw new IllegalArgumentException("Condition cannot be null");
-        }
-    }
+    // private void validateCondition(Condition condition) {
+    //     if (condition == null || conditionRepository.get(condition.getId()) == null) {
+    //         throw new IllegalArgumentException("Condition cannot be null");
+    //     }
+    // }
 
     
-    private void validateConditionSet(List<Condition> conditions) {
-        if (conditions == null || conditions.isEmpty()) {
-            throw new IllegalArgumentException("Conditions set cannot be null or empty");
-        }
-        for (Condition condition : conditions) {
-            validateCondition(condition);
-        }
-    }
+    // private void validateConditionSet(List<Condition> conditions) {
+    //     if (conditions == null || conditions.isEmpty()) {
+    //         throw new IllegalArgumentException("Conditions set cannot be null or empty");
+    //     }
+    //     for (Condition condition : conditions) {
+    //         validateCondition(condition);
+    //     }
+    // }
     
     private void validateDiscount(Discount discount) {
         if (discount == null) {

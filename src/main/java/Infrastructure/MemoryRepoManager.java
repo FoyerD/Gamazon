@@ -10,11 +10,10 @@ import Domain.Store.IItemRepository;
 import Domain.Store.IProductRepository;
 import Domain.Store.IStoreRepository;
 import Domain.Store.Discounts.IDiscountRepository;
-import Domain.Store.Discounts.Conditions.IConditionRepository;
 import Domain.User.IUserRepository;
 import Domain.management.IPermissionRepository;
 import Infrastructure.Repositories.MemoryAuctionRepository;
-import Infrastructure.Repositories.MemoryConditionRepository;
+// import Infrastructure.Repositories.MemoryConditionRepository;
 import Infrastructure.Repositories.MemoryDiscountRepository;
 import Infrastructure.Repositories.MemoryFeedbackRepository;
 import Infrastructure.Repositories.MemoryItemRepository;
@@ -38,7 +37,7 @@ public class MemoryRepoManager implements IRepoManager {
     private MemoryProductRepository productRepository;
     private MemoryUserRepository userRepository;
     private MemoryDiscountRepository discountRepository;
-    private MemoryConditionRepository conditionRepository;
+    // private MemoryConditionRepository conditionRepository;
 
     
     @Override
@@ -120,12 +119,12 @@ public class MemoryRepoManager implements IRepoManager {
         return discountRepository;
     }
 
-    @Override
-    public IConditionRepository getConditionRepository() {
-        if (conditionRepository == null) {
-            conditionRepository = new MemoryConditionRepository();
-        }
-        return conditionRepository;
-    }
+    // @Override
+    // public IConditionRepository getConditionRepository() {
+    //     if (conditionRepository == null) {
+    //         conditionRepository = new MemoryConditionRepository();
+    //     }
+    //     return conditionRepository;
+    // }
     
 }

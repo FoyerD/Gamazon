@@ -1,9 +1,9 @@
 package Domain;
 
 import Application.utils.Response;
-import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
@@ -123,7 +123,6 @@ public class FacadeManager {
     public DiscountFacade getDiscountFacade() {
         if (discountFacade == null) {
             discountFacade = new DiscountFacade(repoManager.getDiscountRepository(),
-                                                repoManager.getConditionRepository(),
                                                 getItemFacade());
         }
         return discountFacade;

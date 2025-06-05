@@ -1,6 +1,6 @@
 package Domain.Store.Discounts.Conditions;
 
-import java.util.UUID;
+// import java.util.UUID;
 
 public abstract class SimpleCondition implements Condition {
 
