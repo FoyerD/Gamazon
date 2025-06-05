@@ -16,7 +16,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -40,7 +39,6 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.UserDTO;
 import Application.MarketService;
 import Application.utils.Response;
-import Application.utils.TradingLogger;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
 import UI.DatabaseRelated.DbHealthStatus;
@@ -53,17 +51,15 @@ import UI.presenters.IUserSessionPresenter;
 
 
 
-@JsModule("./ws-client.js")
+
 @Route("home")
 public class HomePageView extends BaseView implements BeforeEnterObserver {
 
     private final IProductPresenter productPresenter;
     private final IPurchasePresenter purchasePresenter;
     private final ILoginPresenter loginPresenter;
-    private final IUserSessionPresenter sessionPresenter;
     private final MarketService marketService;
     private final PermissionManager permissionManager;
-    private String sessionToken = null;
     private String currentUsername = null;
     private UserDTO user = null;
 
@@ -88,15 +84,13 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
     private final Button cartBtn = new Button("View Cart");
     private final Button goToSearchBtn = new Button("Search Stores");
 
-    private final INotificationPresenter notificationPresenter;
+
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
                         IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
                         MarketService marketService, PermissionManager permissionManager, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
-        this.notificationPresenter = notificationPresenter;
+        super(dbHealthStatus, logoutManager,sessionPresenter, notificationPresenter);
         this.productPresenter = productPresenter;
-        this.sessionPresenter = sessionPresenter;
         this.purchasePresenter = purchasePresenter;
         this.loginPresenter = loginPresenter;
         this.marketService = marketService;
@@ -348,40 +342,6 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         mainContent.setPadding(false);
         mainContent.setSpacing(true);
         add(mainContent);
-
-        this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
-
-
-        if (sessionToken != null) {
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: sessionToken is not null. Attempting to extract userId and inject into JS.");
-
-            String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
-
-            // Inject userId to JavaScript for WebSocket
-            
-            UI.getCurrent().getPage().executeJs("window.currentUserId = $0;", userId);
-            UI.getCurrent().getPage().executeJs("sessionStorage.setItem('currentUserId', $0); window.connectWebSocket && window.connectWebSocket($0);", userId);
-
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: Injected userId to JS: " + userId);
-
-            // Flush pending messages
-            List<String> messages = notificationPresenter.getNotifications(userId);
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: Consumed " + messages.size() + " pending messages for userId=" + userId);
-
-            for (String msg : messages) {
-                Notification.show("🔔 " + msg, 4000, Notification.Position.TOP_CENTER);
-            }
-
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: Displayed all pending messages for userId=" + userId);
-            }
-        else {
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: sessionToken is null. Skipping userId injection and pending message handling.");
-        }
 
         loadAllProducts();
 

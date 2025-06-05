@@ -27,6 +27,8 @@ import com.vaadin.flow.router.Route;
 
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IUserSessionPresenter;
 
 @Route("owner")
 public class OwnerView extends BaseView implements BeforeEnterObserver {
@@ -38,8 +40,9 @@ public class OwnerView extends BaseView implements BeforeEnterObserver {
     private String sessionToken;
 
     @Autowired
-    public OwnerView(@Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
+    public OwnerView(@Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager,
+                     IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         setSizeFull();
         setSpacing(false);
         setPadding(true);

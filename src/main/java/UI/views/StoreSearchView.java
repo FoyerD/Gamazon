@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
@@ -31,13 +30,15 @@ import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IManagementPresenter;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
+import UI.presenters.IUserSessionPresenter;
 import UI.views.components.ItemLayout;
 import UI.views.components.StoreLayout;
 
-@JsModule("./ws-client.js")
+
 @Route("store-search")
 public class StoreSearchView extends BaseView implements BeforeEnterObserver {
 
@@ -55,8 +56,8 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
     @Autowired
     public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter, 
                           IPurchasePresenter purchasePresenter, IProductPresenter productPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, 
-                          @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
+                          @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.storePresenter = storePresenter;
         this.managementPresenter = managementPresenter;
         this.purchasePresenter = purchasePresenter;

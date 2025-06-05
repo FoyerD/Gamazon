@@ -25,8 +25,10 @@ import Application.utils.Response;
 import Domain.Store.FeedbackDTO;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IStorePresenter;
+import UI.presenters.IUserSessionPresenter;
 
 @Route("product-review/:productId")
 public class ProductReviewView extends BaseView implements BeforeEnterObserver {
@@ -43,8 +45,9 @@ public class ProductReviewView extends BaseView implements BeforeEnterObserver {
 
     @Autowired
     public ProductReviewView(IProductPresenter productPresenter, IStorePresenter storePresenter, 
-                             @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
+                             @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager,
+                             IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.productPresenter = productPresenter;
         this.storePresenter = storePresenter;
 

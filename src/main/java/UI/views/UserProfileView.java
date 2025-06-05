@@ -23,8 +23,10 @@ import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
+import UI.presenters.IUserSessionPresenter;
 
 @Route("user-profile")
 public class UserProfileView extends BaseView implements BeforeEnterObserver {
@@ -34,8 +36,8 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
 
-    public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
+    public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
 
         // Set yellow-themed layout styles
