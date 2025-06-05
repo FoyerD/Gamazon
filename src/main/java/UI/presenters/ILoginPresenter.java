@@ -1,5 +1,6 @@
 package UI.presenters;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import Application.DTOs.UserDTO;
@@ -33,9 +34,10 @@ public interface ILoginPresenter {
      * @param username Desired username for the new user.
      * @param password Chosen password for the new user.
      * @param email User's email address.
+     * @param age User's age
      * @return Response containing a {@link UserDTO} for the registered user, or an error.
      */
-    Response<UserDTO> registerUser(String sessionToken, String username, String password, String email);
+    Response<UserDTO> registerUser(String sessionToken, String username, String password, String email, LocalDate birthDate);
 
     /**
      * Authenticates a user using provided credentials.
