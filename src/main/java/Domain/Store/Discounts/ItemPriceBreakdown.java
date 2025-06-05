@@ -94,4 +94,19 @@ public class ItemPriceBreakdown {
         return combined;
     }
 
+    public static double calculateFinalPrice(List<ItemPriceBreakdown> breakdowns) {
+        if (breakdowns == null || breakdowns.isEmpty()) {
+            throw new IllegalArgumentException("Breakdowns cannot be null or empty");
+        }
+        double finalPrice = 0;
+        for (ItemPriceBreakdown breakdown : breakdowns) {
+            finalPrice += breakdown.getFinalPrice();
+        }
+        return finalPrice;
+    }
+
+    public static double calculateFinalPrice(Map<String, ItemPriceBreakdown> breakdowns) {
+        return calculateFinalPrice(new LinkedList<>(breakdowns.values()));
+    }
+
 }

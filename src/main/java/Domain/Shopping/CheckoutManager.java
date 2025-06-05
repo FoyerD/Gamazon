@@ -19,7 +19,6 @@ import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 
 /**
  * Manages the checkout process including inventory updates, payment processing, and rollback operations.

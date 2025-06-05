@@ -1,10 +1,13 @@
 package Domain.Shopping;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
 import Domain.Store.Item;
+import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.ItemPriceBreakdown;
 
 /**
@@ -142,12 +145,40 @@ public class ShoppingBasket {
         return clientId;
     }
 
-    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(BiFunction<String, String, Item> itemGetter) {
-        Map<String, ItemPriceBreakdown> priceBreakdowns = new HashMap<>();
-        for (String productId : orders.keySet()) {
-            ItemPriceBreakdown priceBreakdown = new ItemPriceBreakdown(itemGetter.apply(storeId, productId)); // Placeholder, should be replaced with actual price retrieval logic
-            priceBreakdowns.put(productId, priceBreakdown);
+    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(BiFunction<String, String, Item> itemGetter){
+        return getPriceBreakdowns(itemGetter, new ArrayList<Discount>());
+    }
+
+    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(BiFunction<String, String, Item> itemGetter, List<Discount> discounts) {
+        Map<String, ItemPriceBreakdown> bestPrices = new HashMap<>();
+        Map<String, ItemPriceBreakdown> currPriceBreakdowns = null;
+        
+        double bestPrice = Double.MAX_VALUE;
+        double currPrice = 0;
+
+        if (itemGetter == null) {
+            throw new IllegalArgumentException("Item getter function cannot be null");
         }
-        return priceBreakdowns;
+        if( discounts == null || discounts.isEmpty()) {
+            for (String productId : orders.keySet()) {
+                ItemPriceBreakdown priceBreakdown = new ItemPriceBreakdown(itemGetter.apply(storeId, productId)); // Placeholder, should be replaced with actual price retrieval logic
+                bestPrices.put(productId, priceBreakdown);
+            }
+            return bestPrices; // Return the best prices without any discounts
+        }
+
+        // Iterate through all discounts and calculate the best price breakdowns
+        for (Discount discount : discounts) {
+                currPriceBreakdowns = discount.calculatePrice(this, itemGetter);
+                if (currPriceBreakdowns == null || currPriceBreakdowns.isEmpty()) {
+                    continue; // Skip this discount if it doesn't provide any price breakdowns
+                }
+                currPrice = ItemPriceBreakdown.calculateFinalPrice(currPriceBreakdowns);
+                if( currPrice < bestPrice) {
+                    bestPrice = currPrice;
+                    bestPrices = currPriceBreakdowns; // Update best prices with the current breakdowns
+                }
+            }
+        return bestPrices;
     }
 }
