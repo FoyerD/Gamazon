@@ -28,7 +28,9 @@ import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.ITradingPresenter;
+import UI.presenters.IUserSessionPresenter;
 
 @Route("trading")
 public class TradingView extends BaseView implements BeforeEnterObserver {
@@ -47,8 +49,8 @@ public class TradingView extends BaseView implements BeforeEnterObserver {
     private final Button viewBannedUsersButton;
 
     @Autowired
-    public TradingView(ITradingPresenter tradingPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
+    public TradingView(ITradingPresenter tradingPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.tradingPresenter = tradingPresenter;
         
         H2 title = new H2("Store Trading Operations");

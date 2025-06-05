@@ -29,6 +29,7 @@ import Application.utils.Response;
 import Domain.management.PermissionManager;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
@@ -42,7 +43,6 @@ public class CartView extends BaseView implements BeforeEnterObserver {
     private final IStorePresenter storePresenter;
     private final MarketService marketService;
     private final PermissionManager permissionManager;
-    private final IUserSessionPresenter sessionPresenter;
     private String sessionToken;
     private String currentUsername;
     private boolean isBanned = false;
@@ -59,14 +59,14 @@ public class CartView extends BaseView implements BeforeEnterObserver {
     @Autowired
     public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter,
                     MarketService marketService, PermissionManager permissionManager, IUserSessionPresenter sessionPresenter,
-                    @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager globalLogoutManager) {
-        super(dbHealthStatus, globalLogoutManager);
+                    @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager globalLogoutManager
+                        ,INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, globalLogoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
         this.storePresenter = storePresenter;
         this.marketService = marketService;
         this.permissionManager = permissionManager;
-        this.sessionPresenter = sessionPresenter;
-
+        
         setSizeFull();
         setSpacing(true);
         setPadding(true);

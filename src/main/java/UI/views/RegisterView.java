@@ -3,7 +3,6 @@ package UI.views;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -20,6 +19,8 @@ import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ILoginPresenter;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IUserSessionPresenter;
 
 @Route("register")
 public class RegisterView extends BaseView {
@@ -27,8 +28,8 @@ public class RegisterView extends BaseView {
     private final ILoginPresenter loginPresenter;
 
     public RegisterView(ILoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, 
-                        @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
+                        @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.loginPresenter = loginPresenter;
 
         setSizeFull();

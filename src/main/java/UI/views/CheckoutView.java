@@ -22,7 +22,9 @@ import com.vaadin.flow.router.Route;
 import Application.utils.Response;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.IPurchasePresenter;
+import UI.presenters.IUserSessionPresenter;
 
 
 @Route("checkout")
@@ -44,8 +46,9 @@ public class CheckoutView extends BaseView implements BeforeEnterObserver {
     private final Button backToCartButton = new Button("Return to Cart");
 
     @Autowired
-    public CheckoutView(IPurchasePresenter purchasePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
-        super(dbHealthStatus, logoutManager);
+    public CheckoutView(IPurchasePresenter purchasePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager
+        ,IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
 
         setSizeFull();
