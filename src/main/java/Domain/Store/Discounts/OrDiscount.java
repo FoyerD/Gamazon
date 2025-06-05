@@ -23,28 +23,35 @@ public class OrDiscount extends CompositeDiscount {
             throw new IllegalArgumentException("Basket, Store ID, and Orders cannot be null");
         }
         
-        Map<String, ItemPriceBreakdown> output = new HashMap<>();
-        
-        // condition only applies if all discounts apply
+        // If main condition doesn't apply, return original prices
         if (!conditionApplies(basket, itemGetter)) {
-            output = basket.getPriceBreakdowns(itemGetter);
-            return output;
+            return basket.getPriceBreakdowns(itemGetter);
         }
+        
+        // Check if ANY sub-condition is satisfied (OR logic)
+        boolean anyConditionSatisfied = false;
         for (Condition cond : this.discounts.stream().map(Discount::getCondition).toList()) {
             if (cond.isSatisfied(basket, itemGetter)) {
-                List<Map<String, ItemPriceBreakdown>> allSubDiscounts = calculateAllSubDiscounts(basket, itemGetter);
-                if (mergeType == MergeType.MAX) {
-                    output = ItemPriceBreakdown.combineMaxMap(allSubDiscounts);
-                } else if (mergeType == MergeType.MUL) {
-                    output = ItemPriceBreakdown.combineMultiplicateMaps(allSubDiscounts);
-                } else {
-                    throw new IllegalArgumentException("Unsupported merge type: " + mergeType);
-                }
+                anyConditionSatisfied = true;
+                break; // Found at least one satisfied condition
             }
         }
-
-
-        output = basket.getPriceBreakdowns(itemGetter);
-        return output; // If any condition is not satisfied, return original prices
+        
+        // If no sub-conditions are satisfied, return original prices
+        if (!anyConditionSatisfied) {
+            return basket.getPriceBreakdowns(itemGetter);
+        }
+        
+        // Apply discounts since at least one condition is satisfied
+        List<Map<String, ItemPriceBreakdown>> allSubDiscounts = calculateAllSubDiscounts(basket, itemGetter);
+        
+        if (mergeType == MergeType.MAX) {
+            return ItemPriceBreakdown.combineMaxMap(allSubDiscounts);
+        } else if (mergeType == MergeType.MUL) {
+            return ItemPriceBreakdown.combineMultiplicateMaps(allSubDiscounts);
+        } else {
+            throw new IllegalArgumentException("Unsupported merge type: " + mergeType);
+        }
     }
+    
 }

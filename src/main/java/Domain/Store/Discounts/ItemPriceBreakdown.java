@@ -1,5 +1,6 @@
 package Domain.Store.Discounts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,22 +60,38 @@ public class ItemPriceBreakdown {
     }
 
     public static Map<String, ItemPriceBreakdown> combineMaxMap(List<Map<String, ItemPriceBreakdown>> breakdowns) {
+        if (breakdowns == null || breakdowns.isEmpty()) {
+            return new HashMap<>();
+        }
+        
         Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
-        breakdowns.forEach((m) -> {
-                                m.forEach((id, ipb) -> {
-                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMax);
-                                                });
-                                });
+        
+        // Skip the first map since we already copied it
+        for (int i = 1; i < breakdowns.size(); i++) {
+            Map<String, ItemPriceBreakdown> currentMap = breakdowns.get(i);
+            currentMap.forEach((id, ipb) -> {
+                combined.merge(id, ipb, ItemPriceBreakdown::combineMax);
+            });
+        }
+        
         return combined;
     }
 
     public static Map<String, ItemPriceBreakdown> combineMultiplicateMaps(List<Map<String, ItemPriceBreakdown>> breakdowns) {
+        if (breakdowns == null || breakdowns.isEmpty()) {
+            return new HashMap<>();
+        }
+        
         Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
-        breakdowns.forEach((m) -> {
-                                m.forEach((id, ipb) -> {
-                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMultiplicate);
-                                                });
-                                });
+        
+        // Skip the first map since we already copied it
+        for (int i = 1; i < breakdowns.size(); i++) {
+            Map<String, ItemPriceBreakdown> currentMap = breakdowns.get(i);
+            currentMap.forEach((id, ipb) -> {
+                combined.merge(id, ipb, ItemPriceBreakdown::combineMultiplicate);
+            });
+        }
+        
         return combined;
     }
 
@@ -82,9 +99,12 @@ public class ItemPriceBreakdown {
         assert breakdown1.getOriginalPrice() == breakdown2.getOriginalPrice();
         double currPayPercentage = 1 - breakdown1.getDiscount();
         double newPayPercentage = (1 - breakdown2.getDiscount()) * currPayPercentage;
-        List<String> descriptions = breakdown1.getDescriptions();
+        double combinedDiscount = 1 - newPayPercentage; // Convert pay percentage back to discount percentage
+        
+        List<String> descriptions = new ArrayList<>(breakdown1.getDescriptions()); // Create new list to avoid modifying original
         descriptions.addAll(breakdown2.getDescriptions());
-        ItemPriceBreakdown combined = new ItemPriceBreakdown(breakdown1.getOriginalPrice(), newPayPercentage, descriptions);
+        
+        ItemPriceBreakdown combined = new ItemPriceBreakdown(breakdown1.getOriginalPrice(), combinedDiscount, descriptions);
         return combined;
     }
 

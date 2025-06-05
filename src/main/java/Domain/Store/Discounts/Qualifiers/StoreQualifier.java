@@ -14,6 +14,9 @@ public class StoreQualifier implements DiscountQualifier {
 
     @Override
     public boolean isQualified(Item item) {
+        if (item == null) {
+            return false; // Null items are not qualified
+        }
         return item.getStoreId() == storeId; // all in the store products are qualified
     }
 
