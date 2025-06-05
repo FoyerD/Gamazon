@@ -145,11 +145,11 @@ public class ShoppingBasket {
         return clientId;
     }
 
-    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(BiFunction<String, String, Item> itemGetter){
-        return getPriceBreakdowns(itemGetter, new ArrayList<Discount>());
+    public Map<String, ItemPriceBreakdown> getBestPrice(BiFunction<String, String, Item> itemGetter){
+        return getBestPrice(itemGetter, new ArrayList<Discount>());
     }
 
-    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(BiFunction<String, String, Item> itemGetter, List<Discount> discounts) {
+    public Map<String, ItemPriceBreakdown> getBestPrice(BiFunction<String, String, Item> itemGetter, List<Discount> discounts) {
         Map<String, ItemPriceBreakdown> bestPrices = new HashMap<>();
         Map<String, ItemPriceBreakdown> currPriceBreakdowns = null;
         

@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
-import Application.DTOs.OrderedItemDTO;
 import Application.DTOs.ItemPriceBreakdownDTO;
+import Application.DTOs.OrderedItemDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;
@@ -21,10 +21,8 @@ import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
 import Domain.Shopping.IShoppingCartFacade;
-import Domain.Shopping.PriceCalculator;
-import Domain.Store.Item;
 import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingBasket;
+import Domain.Store.Item;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
@@ -116,7 +114,7 @@ public class ShoppingService{
             }
 
             for(ShoppingBasketDTO basket : baskets.values()) {
-                Map<String, ItemPriceBreakdown> priceBreakDowns = this.cartFacade.getPriceBreakdowns(basket.getClientId(), basket.getStoreId());
+                Map<String, ItemPriceBreakdown> priceBreakDowns = this.cartFacade.getBestPrice(basket.getClientId(), basket.getStoreId());
                 basket.getOrders().forEach((productId, item) -> {
                     if(priceBreakDowns.containsKey(productId)) {
                         ItemPriceBreakdownDTO priceBreakDownDTO = ItemPriceBreakdownDTO.fromPriceBreakDown(priceBreakDowns.get(productId));
@@ -244,8 +242,8 @@ public class ShoppingService{
 
     // Make Immidiate Purchase Use Case 2.5
     @Transactional
-    public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress) {
+    public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode) {
         String method = "checkout";
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
@@ -263,7 +261,7 @@ public class ShoppingService{
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
 
-            cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+            cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
             TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
             return new Response<>(true);
         } catch (Exception ex) {

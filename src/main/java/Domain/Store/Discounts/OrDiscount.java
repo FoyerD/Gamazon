@@ -27,7 +27,7 @@ public class OrDiscount extends CompositeDiscount {
         
         // condition only applies if all discounts apply
         if (!conditionApplies(basket, itemGetter)) {
-            output = basket.getPriceBreakdowns(itemGetter);
+            output = basket.getBestPrice(itemGetter);
             return output;
         }
         for (Condition cond : this.discounts.stream().map(Discount::getCondition).toList()) {
@@ -44,7 +44,7 @@ public class OrDiscount extends CompositeDiscount {
         }
 
 
-        output = basket.getPriceBreakdowns(itemGetter);
+        output = basket.getBestPrice(itemGetter);
         return output; // If any condition is not satisfied, return original prices
     }
 }

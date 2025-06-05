@@ -27,7 +27,7 @@ public class SimpleDiscount extends Discount {
         Map<String, ItemPriceBreakdown> output = new HashMap<>();
         double discountPercentageToApply = 0;
         if(!conditionApplies(basket, itemGetter)) {
-            return basket.getPriceBreakdowns(itemGetter); // If condition does not apply, return original prices
+            return basket.getBestPrice(itemGetter); // If condition does not apply, return original prices
         }
         for (String productId : basket.getOrders().keySet()) {
             discountPercentageToApply = 0;

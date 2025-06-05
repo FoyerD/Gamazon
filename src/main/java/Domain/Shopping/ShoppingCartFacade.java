@@ -1,28 +1,26 @@
 package Domain.Shopping;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import Application.utils.Response;
-import Application.utils.TradingLogger;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
-import Domain.Store.Product;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
-import Domain.Store.IProductRepository;
 
 /**
  * Implementation of the IShoppingCartFacade interface.
@@ -474,12 +472,12 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     }
 
     @Override
-    public Map<String, ItemPriceBreakdown> getPriceBreakdowns(String clientId, String storeId) {
+    public Map<String, ItemPriceBreakdown> getBestPrice(String clientId, String storeId) {
         ShoppingBasket basket = getBasket(clientId, storeId);
         if (basket == null) {
             return new HashMap<>(); // Return empty map if no basket exists
         }
-        PriceCalculator priceCalculator = new PriceCalculator(itemFacade, this.discountFacade);
-        return priceCalculator.calculatePrice(basket);
+        List<Discount> discounts = discountFacade.getStoreDiscounts(storeId);
+        return basket.getBestPrice(itemFacade::getItem, discounts);
     }
 }

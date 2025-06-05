@@ -1,5 +1,6 @@
 package Application;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,28 +12,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.AuctionDTO;
-import Application.DTOs.ConditionDTO;
 import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
-
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
-import Domain.Store.Discounts.DiscountBuilder;
 import Domain.Store.Discounts.DiscountFacade;
-import Domain.Store.Discounts.Conditions.ConditionBuilder;
-import Domain.management.PermissionManager;
-import Domain.management.PermissionType;
-import Domain.management.Permission;
-import Domain.Shopping.IShoppingCartFacade;
-import Domain.Store.Discounts.Conditions.Condition;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -375,7 +367,7 @@ public class StoreService {
         }
     }
 
-    public Response<Set<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeID) {
+    public Response<List<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeID) {
         String method = "getStoreDiscounts";
         try {
             if (!this.isInitialized()) {
@@ -388,9 +380,9 @@ public class StoreService {
                 return new Response<>(new Error("Invalid token"));
             }
 
-            Set<Discount> discounts = this.discountFacade.getStoreDiscounts(storeID);
+            List<Discount> discounts = this.discountFacade.getStoreDiscounts(storeID);
             
-            Set<DiscountDTO> output = new HashSet<>();
+            List<DiscountDTO> output = new ArrayList<>();
 
             for (Discount discount : discounts) {
                 DiscountDTO dto = DiscountDTO.fromDiscount(discount);
@@ -433,40 +425,40 @@ public class StoreService {
         }
     }
 
-    public Response<Set<ConditionDTO>> getStoreConditions(String sessionToken, String storeID) {
-        String method = "getConditionsOfStore";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
+    // public Response<Set<ConditionDTO>> getStoreConditions(String sessionToken, String storeID) {
+    //     String method = "getConditionsOfStore";
+    //     try {
+    //         if (!this.isInitialized()) {
+    //             TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+    //             return new Response<>(new Error("StoreService is not initialized."));
+    //         }
 
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return new Response<>(new Error("Invalid token"));
-            }
+    //         if (!tokenService.validateToken(sessionToken)) {
+    //             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+    //             return new Response<>(new Error("Invalid token"));
+    //         }
 
-            Set<Condition> conditions = this.discountFacade.getStoreConditions(storeID);
+    //         List<Condition> conditions = this.discountFacade.getStoreConditions(storeID);
             
-            if (conditions == null) {
-                TradingLogger.logEvent(CLASS_NAME, method, "No conditions found for store " + storeID);
-                return new Response<>(new Error("Problem occurred"));
-            }
+    //         if (conditions == null) {
+    //             TradingLogger.logEvent(CLASS_NAME, method, "No conditions found for store " + storeID);
+    //             return new Response<>(new Error("Problem occurred"));
+    //         }
 
-            Set<ConditionDTO> output = new HashSet<>();
+    //         Set<ConditionDTO> output = new HashSet<>();
 
-            for (Condition condition : conditions) {
-                ConditionDTO dto = ConditionDTO.fromCondition(condition);
-                output.add(dto);
-            }
+    //         for (Condition condition : conditions) {
+    //             ConditionDTO dto = ConditionDTO.fromCondition(condition);
+    //             output.add(dto);
+    //         }
 
-            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + conditions.size() + " conditions for store " + storeID);
-            return new Response<>(output);
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error getting conditions for store %s: %s", storeID, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
+    //         TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + conditions.size() + " conditions for store " + storeID);
+    //         return new Response<>(output);
+    //     } catch (Exception ex) {
+    //         TradingLogger.logError(CLASS_NAME, method, "Error getting conditions for store %s: %s", storeID, ex.getMessage());
+    //         return new Response<>(new Error(ex.getMessage()));
+    //     }
+    // }
 
 
     public Response<Boolean> removeDiscount(String sessionToken, String storeId, String discountId) {
@@ -498,33 +490,33 @@ public class StoreService {
     }
 
 
-    public Response<Boolean> removeCondition(String sessionToken, String storeId, String conditionId) {
-        String method = "removeCondition";
-        try {
-            if (!this.isInitialized()) {
-                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
-                return new Response<>(new Error("StoreService is not initialized."));
-            }
+    // public Response<Boolean> removeCondition(String sessionToken, String storeId, String conditionId) {
+    //     String method = "removeCondition";
+    //     try {
+    //         if (!this.isInitialized()) {
+    //             TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+    //             return new Response<>(new Error("StoreService is not initialized."));
+    //         }
 
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return new Response<>(new Error("Invalid token"));
-            }
+    //         if (!tokenService.validateToken(sessionToken)) {
+    //             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+    //             return new Response<>(new Error("Invalid token"));
+    //         }
 
-            String userId = this.tokenService.extractId(sessionToken);
-            if (permissionManager.isBanned(userId)) {
-                throw new Exception("User is banned from removing conditions.");
-            }
-            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+    //         String userId = this.tokenService.extractId(sessionToken);
+    //         if (permissionManager.isBanned(userId)) {
+    //             throw new Exception("User is banned from removing conditions.");
+    //         }
+    //         permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
 
-            boolean result = discountFacade.removeCondition(storeId, conditionId);
-            TradingLogger.logEvent(CLASS_NAME, method, "Condition " + conditionId + " removed from store " + storeId);
-            return new Response<>(result);
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error removing condition %s from store %s: %s", conditionId, storeId, ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
-        }
-    }
+    //         boolean result = discountFacade.removeCondition(storeId, conditionId);
+    //         TradingLogger.logEvent(CLASS_NAME, method, "Condition " + conditionId + " removed from store " + storeId);
+    //         return new Response<>(result);
+    //     } catch (Exception ex) {
+    //         TradingLogger.logError(CLASS_NAME, method, "Error removing condition %s from store %s: %s", conditionId, storeId, ex.getMessage());
+    //         return new Response<>(new Error(ex.getMessage()));
+    //     }
+    // }
 
     public Response<StoreDTO> getStoreById(String sessionToken, String storeId) {
         String method = "getStoreById";

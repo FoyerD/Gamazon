@@ -3,6 +3,7 @@ package Domain.Shopping;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import Domain.Store.IProductRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
+import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
 
@@ -32,6 +34,7 @@ public class CheckoutManager {
     private final ItemFacade itemFacade;
     private final IProductRepository productRepo;
     private final ReceiptBuilder receiptBuilder;
+    private final DiscountFacade discountFacade;
 
     @Autowired
     public CheckoutManager(IShoppingBasketRepository basketRepo, 
@@ -46,6 +49,7 @@ public class CheckoutManager {
         this.itemFacade = itemFacade;
         this.productRepo = productRepo;
         this.receiptBuilder = receiptBuilder;
+        this.discountFacade = discountFacade;
     }
 
     /**
@@ -161,11 +165,10 @@ public class CheckoutManager {
         // Calculate discounted prices for all products in the basket
         Map<String, ItemPriceBreakdown> priceBreakdowns = null;
         try {
-            //TODO! Amit make new method to calculate discound for A given basket accross all store disocunts (maby take the best one?)
-            priceBreakdowns = calculateDiscountedPricePrice(basket);
+            List<Discount> discounts = this.discountFacade.getStoreDiscounts(storeId);
+            priceBreakdowns = basket.getBestPrice(itemFacade::getItem, discounts);
         } catch (Exception e) {
-            System.err.println("Error calculating discounted prices, falling back to original prices: " + e.getMessage());
-            priceBreakdowns = new HashMap<>();
+            throw new RuntimeException("Failed to calculate best prices for store " + storeId + ": " + e.getMessage());
         }
         
         Map<String, Integer> orders = basket.getOrders();

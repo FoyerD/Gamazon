@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import Domain.Pair;
 import Domain.Store.Item;
@@ -149,5 +148,5 @@ public interface IShoppingCartFacade {
     Set<String> getUsersWithBaskets(String storeId);
 
     ShoppingBasket getBasket(String clientId, String storeId);
-    Map<String, ItemPriceBreakdown> getPriceBreakdowns(String clientId, String storeId);
+    Map<String, ItemPriceBreakdown> getBestPrice(String clientId, String storeId);
 }
