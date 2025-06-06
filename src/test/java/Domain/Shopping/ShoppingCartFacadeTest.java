@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
@@ -41,12 +42,8 @@ import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
-<<<<<<< HEAD
 import Domain.Store.Discounts.DiscountFacade;
-import Domain.Store.IProductRepository;
-=======
 import Domain.management.PolicyFacade;
->>>>>>> v3
 
 /**
  * Tests for the ShoppingCartFacade class.
@@ -83,14 +80,17 @@ public class ShoppingCartFacadeTest {
     private ShoppingBasket mockBasket;
 
     @Mock
-<<<<<<< HEAD
     private DiscountFacade mockDiscountFacade;
-=======
+    @Mock
     private IUserRepository mockUserRepository;
 
     @Mock
     private PolicyFacade mockPolicyFacade;
->>>>>>> v3
+
+    @Mock
+    private IExternalSupplyService mockSupplyService;
+    @Mock
+    private IReceiptRepository mockReciptRepo;
     
     // Test constants
     private static final String CLIENT_ID = "client123";
@@ -112,14 +112,11 @@ public class ShoppingCartFacadeTest {
         mockProductRepo = mock(IProductRepository.class);
         mockCart = mock(IShoppingCart.class);
         mockBasket = mock(ShoppingBasket.class);
-<<<<<<< HEAD
         mockDiscountFacade = mock(DiscountFacade.class);
 
-=======
         mockPolicyFacade = mock(PolicyFacade.class);
         mockUserRepository = mock(IUserRepository.class);
         
->>>>>>> v3
         facade = new ShoppingCartFacade(
             mockCartRepo, 
             mockBasketRepo, 
@@ -128,12 +125,11 @@ public class ShoppingCartFacadeTest {
             mockStoreFacade, 
             mockReceiptRepo, 
             mockProductRepo,
-<<<<<<< HEAD
-            mockDiscountFacade
-=======
+            mockDiscountFacade,
             mockPolicyFacade,
-            mockUserRepository
->>>>>>> v3
+            mockUserRepository,
+            mockSupplyService,
+            mockReciptRepo
         );
     }
 
