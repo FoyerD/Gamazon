@@ -105,6 +105,38 @@ public class PolicyDTO {
 
     }
 
+@Override
+public String toString() {
+    switch (this.type) {
+        case MIN_QUANTITY_ALL:
+            return "Minimum quantity of " + minItemsAll + " for all items in the store.";
+        case MAX_QUANTITY_ALL:
+            return "Maximum quantity of " + maxItemsAll + " for all items in the store.";
+        case MIN_QUANTITY_PRODUCT:
+            return "Minimum quantity of " + minItemsProduct + " for product: " +
+                   (targetProduct != null ? targetProduct.getProductName() : "Unknown Product");
+        case MAX_QUANTITY_PRODUCT:
+            return "Maximum quantity of " + maxItemsProduct + " for product: " +
+                   (targetProduct != null ? targetProduct.getProductName() : "Unknown Product");
+        case MIN_QUANTITY_CATEGORY:
+            return "Minimum quantity of " + minItemsCategory + " for category: " +
+                   (targetCategory != null ? targetCategory.getName() : "Unknown Category");
+        case MAX_QUANTITY_CATEGORY:
+            return "Maximum quantity of " + maxItemsCategory + " for category: " +
+                   (targetCategory != null ? targetCategory.getName() : "Unknown Category");
+        case CATEGORY_DISALLOW:
+            return "Purchasing from category '" +
+                   (disallowedCategory != null ? disallowedCategory.getName() : "Unknown Category") +
+                   "' is not allowed.";
+        case CATEGORY_AGE:
+            return "Only customers aged " + minAge + " and above can purchase from category: " +
+                   (ageCategory != null ? ageCategory.getName() : "Unknown Category");
+        default:
+            return "Unknown policy type.";
+    }
+}
+
+
     public static class Builder {
         public Builder(String storeId, Policy.Type type) {
             this.storeId = storeId;

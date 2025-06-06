@@ -69,13 +69,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         this.memberLookup = userRepository::getMember;
     }
 
-    /**
-     * Retrieves a shopping cart for a specific client, creating a new one if it doesn't exist.
-     * 
-     * @param clientId The ID of the client
-     * @return The shopping cart for the specified client
-     */
-    private IShoppingCart getCart(String clientId) {
+    @Override
+    public IShoppingCart getCart(String clientId) {
         IShoppingCart cart = cartRepo.get(clientId);
         if (cart == null) {
             cart = new ShoppingCart(clientId);
@@ -84,14 +79,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         return cart;
     }
 
-    /**
-     * Retrieves a shopping basket for a specific client and store, creating a new one if it doesn't exist.
-     * 
-     * @param clientId The ID of the client
-     * @param storeId The ID of the store
-     * @return The shopping basket for the specified client and store
-     */
-    private ShoppingBasket getBasket(String clientId, String storeId) {
+    @Override
+    public ShoppingBasket getBasket(String clientId, String storeId) {
         ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
         if (basket == null) {
             basket = new ShoppingBasket(storeId, clientId);
@@ -699,5 +688,17 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         }
         
         return usersWithBaskets;
+    }
+
+    
+    public List<Policy> getViolatedPolicies(String memberId) {
+        Member member = memberLookup.apply(memberId);
+        return this.getCart(memberId) 
+            .getCart().stream() // get stores ids
+            .flatMap(storeId -> policyFacade.getAllStorePolicies(storeId).stream()) // get all policies for all stores
+            .filter(p -> p.isApplicable( // check if basket is a applicable
+                this.getBasket(memberId, p.getStoreId()), // get basket
+                member)
+            ).toList();
     }
 }

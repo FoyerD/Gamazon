@@ -11,10 +11,8 @@ import org.junit.Test;
 
 import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IUserRepository;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
-import Domain.Store.Policy;
-import Domain.Store.ProductFacade;
 import Domain.User.Member;
 import Domain.management.PolicyFacade;
 
@@ -29,6 +27,7 @@ public class PolicyFacadeTest {
     private IUserRepository    userRepoMock;
     private ItemFacade         itemFacadeMock;
     private ProductFacade      productFacadeMock;
+    private IShoppingCartFacade cartFacadeMock;
 
     @Before
     public void setUp() {
@@ -37,7 +36,7 @@ public class PolicyFacadeTest {
         itemFacadeMock    = mock(ItemFacade.class);
         productFacadeMock = mock(ProductFacade.class);
 
-        facade = new PolicyFacade(repoMock, userRepoMock, itemFacadeMock, productFacadeMock);
+        facade = new PolicyFacade(repoMock, userRepoMock, itemFacadeMock, productFacadeMock, cartFacadeMock);
     }
 
     @Test

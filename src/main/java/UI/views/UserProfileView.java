@@ -178,7 +178,7 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
     
     private void setupReceiptGrid(Grid<ReceiptDTO> receiptGrid, IPurchasePresenter purchasePresenter) {
         // Fetch purchase history using the last method in IPurchasePresenter
-        Response<List<ReceiptDTO>> receipts = purchasePresenter.getPersonalPurcahses(sessionToken);
+        Response<List<ReceiptDTO>> receipts = purchasePresenter.getPersonalPurchases(sessionToken);
         if (receipts.errorOccurred()) {
             Notification.show("Error fetching purchase history: " + receipts.getErrorMessage(), 3000, Notification.Position.BOTTOM_END);
         } else if (receipts.getValue().isEmpty()) {
