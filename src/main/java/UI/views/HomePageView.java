@@ -83,6 +83,8 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
     private final Button refreshBtn = new Button("Refresh");
     private final Button cartBtn = new Button("View Cart");
     private final Button goToSearchBtn = new Button("Search Stores");
+    private final Button registerBtn = new Button("Register");
+    private final Button logoutBtn = new Button("Logout");
 
 
 
@@ -153,10 +155,10 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
             .set("color", "white");
         cartBtn.getElement().setAttribute("data-view-cart", "true");
 
-        Button registerBtn = new Button("Register", e -> UI.getCurrent().navigate("register"));
+        registerBtn.addClickListener(e -> UI.getCurrent().navigate("register"));
         registerBtn.getStyle().set("background-color", " #6b46c1").set("color", "white");
 
-        Button logoutBtn = new Button("Logout", e -> {
+        logoutBtn.addClickListener(e -> {
             Response<Void> response = loginPresenter.logout(sessionToken);
             if (!response.errorOccurred()) {
                 UI.getCurrent().getSession().close();
@@ -558,6 +560,35 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
         } else {
+            // Check ban status first
+            if (currentUsername != null) {
+                String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
+                Response<Boolean> response = marketService.userExists(currentUsername);
+                if (!response.errorOccurred() && response.getValue()) {
+                    isBanned = permissionManager.isBanned(userId);
+                    if (isBanned) {
+                        // Schedule the UI updates to run after the view is fully attached
+                        UI.getCurrent().access(() -> {
+                            // Disable register and logout buttons immediately
+                            getChildren()
+                                .filter(component -> component instanceof Button)
+                                .map(component -> (Button) component)
+                                .forEach(button -> {
+                                    if (button.getElement().hasAttribute("data-register-button") || 
+                                        button.getElement().hasAttribute("data-logout-button")) {
+                                        button.setEnabled(false);
+                                        button.getStyle()
+                                            .set("background-color", "#718096")
+                                            .set("color", "white")
+                                            .set("cursor", "not-allowed")
+                                            .set("opacity", "0.5");
+                                    }
+                                });
+                        });
+                    }
+                }
+            }
+            // Then proceed with regular ban status check which will handle other UI elements
             checkBanStatus();
         }
     }
@@ -599,65 +630,80 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
                 boolean wasBanned = isBanned;  // Store previous state
                 isBanned = permissionManager.isBanned(userId);
                 
-                // If ban status changed, update UI
-                if (wasBanned != isBanned) {
-                    if (isBanned) {
-                        // Remove action columns from product grid
-                        List<Grid.Column<ItemDTO>> columnsToRemove = new ArrayList<>();
-                        productGrid.getColumns().forEach(column -> {
-                            String header = column.getHeaderText();
-                            if (header != null && (
-                                header.equals("Actions") || 
-                                header.equals("Cart") || // Remove "Add to Cart" column
-                                header.equals("Auction") ||
-                                header.toLowerCase().contains("edit") ||
-                                header.toLowerCase().contains("delete"))) {
-                                columnsToRemove.add(column);
-                            }
+                // Always update UI if user is banned, not just on status change
+                if (isBanned) {
+                    // Remove action columns from product grid
+                    List<Grid.Column<ItemDTO>> columnsToRemove = new ArrayList<>();
+                    productGrid.getColumns().forEach(column -> {
+                        String header = column.getHeaderText();
+                        if (header != null && (
+                            header.equals("Actions") || 
+                            header.equals("Cart") || // Remove "Add to Cart" column
+                            header.equals("Auction") ||
+                            header.toLowerCase().contains("edit") ||
+                            header.toLowerCase().contains("delete"))) {
+                            columnsToRemove.add(column);
+                        }
+                    });
+                    columnsToRemove.forEach(column -> productGrid.removeColumn(column));
+                    
+                    // Disable all interactive components except view cart
+                    searchBar.setEnabled(false);
+                    filterBtn.setEnabled(false);
+                    refreshBtn.setEnabled(false);
+                    goToSearchBtn.setEnabled(false);
+                    minPriceField.setEnabled(false);
+                    maxPriceField.setEnabled(false);
+                    minRatingField.setEnabled(false);
+                    maxRatingField.setEnabled(false);
+                    minAmountField.setEnabled(false);
+                    categoryFilter.setEnabled(false);
+                    
+                    // Keep cart button enabled but update its style to indicate read-only
+                    cartBtn.setEnabled(true);
+                    cartBtn.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("border", "2px solid #4a5568");
+                    
+                    // Disable register and logout buttons
+                    registerBtn.setEnabled(false);
+                    registerBtn.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("cursor", "not-allowed")
+                        .set("opacity", "0.5");
+
+                    logoutBtn.setEnabled(false);
+                    logoutBtn.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("cursor", "not-allowed")
+                        .set("opacity", "0.5");
+                    
+                    // Disable trading operations button
+                    getChildren()
+                        .filter(component -> component instanceof Button)
+                        .map(component -> (Button) component)
+                        .filter(button -> "Trading Operations".equals(button.getText()))
+                        .findFirst()
+                        .ifPresent(button -> {
+                            button.setEnabled(false);
+                            button.getStyle()
+                                .set("background-color", "#718096")
+                                .set("color", "white")
+                                .set("cursor", "not-allowed")
+                                .set("opacity", "0.5");
                         });
-                        columnsToRemove.forEach(column -> productGrid.removeColumn(column));
-                        
-                        // Disable all interactive components except view cart
-                        searchBar.setEnabled(false);
-                        filterBtn.setEnabled(false);
-                        refreshBtn.setEnabled(false);
-                        goToSearchBtn.setEnabled(false);
-                        minPriceField.setEnabled(false);
-                        maxPriceField.setEnabled(false);
-                        minRatingField.setEnabled(false);
-                        maxRatingField.setEnabled(false);
-                        minAmountField.setEnabled(false);
-                        categoryFilter.setEnabled(false);
-                        
-                        // Keep cart button enabled but update its style to indicate read-only
-                        cartBtn.setEnabled(true);
-                        cartBtn.getStyle()
-                            .set("background-color", "#718096")
-                            .set("color", "white")
-                            .set("border", "2px solid #4a5568");
-                        
-                        // Disable trading operations button
-                        getChildren()
-                            .filter(component -> component instanceof Button)
-                            .map(component -> (Button) component)
-                            .filter(button -> "Trading Operations".equals(button.getText()))
-                            .findFirst()
-                            .ifPresent(button -> {
-                                button.setEnabled(false);
-                                button.getStyle()
-                                    .set("background-color", "#718096")
-                                    .set("color", "white")
-                                    .set("cursor", "not-allowed")
-                                    .set("opacity", "0.5");
-                            });
-                        
-                        // Call the frontend disableInteractiveElements function
-                        UI.getCurrent().getPage().executeJs(
-                            "if (typeof disableInteractiveElements === 'function') {" +
-                            "  disableInteractiveElements();" +
-                            "}"
-                        );
-                        
+                    
+                    // Call the frontend disableInteractiveElements function
+                    UI.getCurrent().getPage().executeJs(
+                        "if (typeof disableInteractiveElements === 'function') {" +
+                        "  disableInteractiveElements();" +
+                        "}"
+                    );
+                    
+                    if (!wasBanned) {  // Only show notification if newly banned
                         // Show ban notification
                         Notification notification = new Notification(
                             "Your account has been banned. You can still view your cart but other features are disabled.",
