@@ -388,4 +388,16 @@ public class MarketService {
         }
     }
 
+    @Transactional
+    public Response<Boolean> isBanned(String userId) {
+        try {
+            boolean isBanned = permissionManager.isBanned(userId);
+            TradingLogger.logEvent(CLASS_NAME, "isBanned", "Checked ban status for user " + userId);
+            return Response.success(isBanned);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "isBanned", "Failed to check ban status: %s", e.getMessage());
+            return new Response<>(new Error(e.getMessage()));
+        }
+    }
+
 }
