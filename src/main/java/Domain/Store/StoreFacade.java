@@ -1,13 +1,10 @@
 package Domain.Store;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import Domain.Repos.IItemRepository;
 import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
 import Domain.User.User;
-import Domain.management.Permission;
 
 
 
@@ -326,7 +322,7 @@ public class StoreFacade {
         if (currentAmount <= 0) {
             throw new RuntimeException("Insufficient item quantity to fulfill auction sale");
         }
-
+        
         item.setAmount(currentAmount - 1);
         itemRepository.update(itemKey, item);
 
