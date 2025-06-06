@@ -1,21 +1,24 @@
 package Infrastructure;
 
-import Application.utils.Response;
-import Domain.ExternalServices.IExternalSupplyService;
-import org.springframework.http.*;
+import java.util.Map;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import Application.utils.Error;
 
-import java.util.Map;
+import Application.utils.Error;
+import Application.utils.Response;
+import Domain.ExternalServices.IExternalSupplyService;
 
 @Service
 public class ExternalSupplyService implements IExternalSupplyService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private String URL = "https://damp-lynna-wsep-1984852e.koyeb.app/";
+    private String URL;
 
     @Override
     public Response<Void> updateSupplyServiceURL(String url) {
