@@ -93,6 +93,8 @@ public class ShoppingService{
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
+
+            // Get the cart and baskets
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
             Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
 
@@ -126,9 +128,9 @@ public class ShoppingService{
             CartDTO cart = new CartDTO(clientId, baskets);
             TradingLogger.logEvent(CLASS_NAME, method, "Cart viewed for user " + clientId + " with " + itemsMap.size() + " items");
             return new Response<>(cart);
-        } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error viewing cart: %s", ex.getMessage());
-            return new Response<>(new Error(ex.getMessage()));
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, method, "Error viewing cart: " + e.getMessage());
+            return new Response<>(new Error("Error viewing cart: " + e.getMessage()));
         }
     }
 

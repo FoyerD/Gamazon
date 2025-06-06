@@ -2,12 +2,14 @@ package Domain.Store;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Domain.Pair;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IStoreRepository;
 
 
 /**
@@ -90,23 +92,8 @@ public class ItemFacade {
         if (itemRepository.get(id) != null) {
             return null;
         }
-
-        Item item = new Item(storeId, productId, 0, 0, description);
-
-        item.setNameFetcher(() ->
-            itemRepository.getByProductId(productId).stream()
-                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
-                .findFirst()
-                .map(Item::getProductName)
-                .orElse("Unknown Product")
-        );
-
-        item.setCategoryFetcher(() ->
-            itemRepository.getByProductId(productId).stream()
-                .filter(i -> !(i.getStoreId().equals(storeId) && i.getProductId().equals(productId)))
-                .flatMap(i -> i.getCategories().stream())
-                .collect(Collectors.toSet())
-        );
+        Product product = productRepository.get(productId);
+        Item item = new Item(storeId, productId, 0, 0, description, product.getName(), product.getCategories());
 
         if (!itemRepository.add(id, item)) {
             throw new RuntimeException("Item not added");
@@ -121,13 +108,8 @@ public class ItemFacade {
             return null;
         }
 
-        Item item = new Item(storeId, productId, price, amount, description);
-
-        item.setNameFetcher(() ->  productRepository.get(productId).getName());
-
-        item.setCategoryFetcher(() ->
-            productRepository.get(productId).getCategories()
-        );
+        Product product = productRepository.get(productId);
+        Item item = new Item(storeId, productId, price, amount, description, product.getName(), product.getCategories());
 
         if (!itemRepository.add(id, item)) {
             return null;

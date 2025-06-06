@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import Application.DTOs.UserDTO;
 import Application.DTOs.ClientItemDTO;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.EmployeeInfo;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
@@ -156,18 +157,18 @@ public class MarketService {
     }
 
     @Transactional
-    public Response<Void> removeStoreManager(String sessionToken, String removerId, String managerId, String storeId) {
+    public Response<Void> removeStoreOwner(String sessionToken, String ownerId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "removeStoreManager", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            String ownerId = tokenService.extractId(sessionToken);
+            String removerId = tokenService.extractId(sessionToken);
             if(permissionManager.isBanned(ownerId)){
                 TradingLogger.logError(CLASS_NAME, "removeStoreManager", "User is banned from removing store manager.");
                 return new Response<>(new Error("User is banned from removing store manager."));
             }
-            marketFacade.removeStoreManager(removerId, managerId, storeId);
+            marketFacade.removeStoreOwner(removerId, ownerId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "removeStoreManager", "Store manager removed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -177,7 +178,7 @@ public class MarketService {
     }
 
     @Transactional
-    public Response<Void> appointStoreOwner(String sessionToken, String appointerId, String appointeeId, String storeId) {
+    public Response<Void> appointStoreOwner(String sessionToken, String appointeeId, String storeId) {
         if (isInvalid(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "appointStoreOwner", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
@@ -188,7 +189,7 @@ public class MarketService {
                 TradingLogger.logError(CLASS_NAME, "appointStoreOwner", "User is banned from appointing store owner.");
                 return new Response<>(new Error("User is banned from appointing store owner."));
             }
-            marketFacade.appointStoreOwner(appointerId, appointeeId, storeId);
+            marketFacade.appointStoreOwner(ownerId, appointeeId, storeId);
             TradingLogger.logEvent(CLASS_NAME, "appointStoreOwner", "Store owner appointed successfully.");
             return new Response<>(null);
         } catch (Exception e) {
@@ -219,13 +220,14 @@ public class MarketService {
     }
 
     @Transactional
-    public Response<Map<UserDTO, List<PermissionType>>> getManagersPermissions(String sessionToken, String storeId) {
+    public Response<EmployeeInfo> getEmployeeInfo(String sessionToken, String storeId) {
         if (isInvalid(sessionToken)) {
-            TradingLogger.logError(CLASS_NAME, "getManagersPermissions", "Invalid session token");
+            TradingLogger.logError(CLASS_NAME, "getEmployeeInfo", "Invalid session token");
             return new Response<>(new Error("Invalid session token"));
         }
         try {
-            Map<Member, List<PermissionType>> permissions = marketFacade.getManagersPermissions(storeId, tokenService.extractId(sessionToken));
+            String userId = tokenService.extractId(sessionToken);
+            Map<Member, List<PermissionType>> permissions = marketFacade.getManagersPermissions(storeId, userId);
             Map<UserDTO, List<PermissionType>> userPermissions = new HashMap<>();
             for (Map.Entry<Member, List<PermissionType>> entry : permissions.entrySet()) {
                 Member member = entry.getKey();
@@ -233,14 +235,18 @@ public class MarketService {
                 UserDTO user = new UserDTO(member);
                 userPermissions.put(user, permissionTypes);
             }
-            TradingLogger.logEvent(CLASS_NAME, "getManagersPermissions", userPermissions.entrySet().size() + " manager permissions fetched successfully.");
 
-            return Response.success(userPermissions);
+            List<UserDTO> owners = marketFacade.getOwners(storeId, userId).stream().map(UserDTO::new).toList();
+            EmployeeInfo employeeInfo = new EmployeeInfo(owners, userPermissions);
+            TradingLogger.logEvent(CLASS_NAME, "getEmployeeInfo", userPermissions.entrySet().size() + " manager permissions fetched successfully.");
+
+            return Response.success(employeeInfo);
         } catch (Exception e) {
-            TradingLogger.logError(CLASS_NAME, "getManagersPermissions", "Failed to fetch manager permissions: %s", e.getMessage());
+            TradingLogger.logError(CLASS_NAME, "getEmployeeInfo", "Failed to fetch manager permissions: %s", e.getMessage());
             return new Response<>(new Error(e.getMessage()));
         }
     }
+
 
     @Transactional
     public Response<List<ClientOrderDTO>> getStorePurchaseHistory(String sessionToken, String storeId) {

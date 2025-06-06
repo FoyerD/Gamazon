@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,13 +13,19 @@ import org.springframework.stereotype.Component;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Store.IProductRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
+import Domain.management.PolicyFacade;
+
 
 /**
  * Implementation of the IShoppingCartFacade interface.
@@ -48,21 +53,22 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @param storeFacade The facade for store management
      * @param receiptRepo The repository for receipts
      * @param productRepository The repository for products
+     * @param policyFacade The facade for policy management
      */
     @Autowired
     public ShoppingCartFacade(IShoppingCartRepository cartRepo, IShoppingBasketRepository basketRepo,
      IExternalPaymentService paymentService, ItemFacade itemFacade, StoreFacade storeFacade,
-      IReceiptRepository receiptRepo, IProductRepository productRepository, DiscountFacade discountFacade, IExternalSupplyService supplyService) {
+      IReceiptRepository receiptRepo, IProductRepository productRepository, DiscountFacade discountFacade, PolicyFacade policyFacade, IUserRepository userRepository, IExternalSupplyService supplyService, IReceiptRepository receiptRepository) {
         this.supplyService = supplyService;
         this.cartRepo = cartRepo;
         this.basketRepo = basketRepo;
-        this.paymentService = paymentService;
+        this.paymentService = paymentService;   
         this.itemFacade = itemFacade;
         this.storeFacade = storeFacade;
         this.receiptRepo = receiptRepo;
         this.discountFacade = discountFacade;
         this.checkoutManager = new CheckoutManager(basketRepo, paymentService, itemFacade, productRepository,
-         new ReceiptBuilder(receiptRepo, itemFacade), discountFacade, supplyService);
+         new ReceiptBuilder(receiptRepo, itemFacade), discountFacade, supplyService, policyFacade, receiptRepository, userRepository::getMember);
     }
 
     /**
@@ -107,8 +113,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @return true if the product was successfully added, false otherwise
      */
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public boolean addProductToCart(String storeId, String clientId, String productId, int quantity) {
-        
         // Check for valid arguments
         if (clientId == null || storeId == null || productId == null || quantity <= 0) {
             throw new IllegalArgumentException("Invalid arguments for adding product to cart");
@@ -122,20 +128,32 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             throw new IllegalArgumentException("Store not found");
         }
         
-        
-        IShoppingCart cart = getCart(clientId);
-        ShoppingBasket basket = getBasket(clientId, storeId);
-        
-        basket.addOrder(productId, quantity);
-        basketRepo.update(new Pair<>(clientId, storeId), basket);
+        try {
+            // Get or create the cart
+            IShoppingCart cart = getCart(clientId);
+            
+            // Get or create the basket
+            ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+            if (basket == null) {
+                basket = new ShoppingBasket(storeId, clientId);
+                basketRepo.add(new Pair<>(clientId, storeId), basket);
+            }
+            
+            // Add the product to the basket
+            basket.addOrder(productId, quantity);
+            basketRepo.update(new Pair<>(clientId, storeId), basket);
 
-        if (!cart.hasStore(storeId)) {
-            cart.addStore(storeId);
-            // Fix 1: Using update instead of add
-            cartRepo.update(clientId, cart);
+            // Add the store to the cart if it's not already there
+            if (!cart.hasStore(storeId)) {
+                cart.addStore(storeId);
+                cartRepo.update(clientId, cart);
+            }
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error adding product to cart: " + e.getMessage());
+            return false;
         }
-
-        return true;
     }
 
     /**
@@ -216,22 +234,13 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                         String cardNumber, Date expiryDate, String cvv,
                         long andIncrement, String clientName, String deliveryAddress) {
 
-        Supplier<Boolean> chargeSupplier = () -> {
-            if (!isCardNumber(cardNumber)) {
-                throw new IllegalArgumentException("Invalid card number");
-            }
+        
 
-            paymentService.processPayment(
-                clientId, cardNumber, expiryDate, cvv, 
-                clientName, price
-            );
-
-            return true;
-        };
-
-        storeFacade.addBid(auctionId, clientId, price, chargeSupplier);
+        storeFacade.addBid(auctionId, clientId, price, 
+                cardNumber, expiryDate, cvv, clientName, deliveryAddress);
         return true;
     }
+
 
 
     /**
@@ -385,7 +394,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         Set<String> storeIds = userCart.getCart();
         if (storeIds != null) {
             for (String storeId : storeIds) {
-                ShoppingBasket basket = getBasket(clientId, storeId);
+                // Get the basket from the repository
+                ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
                 if (basket == null) {
                     continue;
                 }
@@ -396,9 +406,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
                     for (Map.Entry<String, Integer> entry : orders.entrySet()) {
                         String productId = entry.getKey();
                         int quantity = entry.getValue();
+                        
+                        // Get the item from the store
                         Item item = itemFacade.getItem(storeId, productId);
-                        // Add null check for item
-                        if (item != null) {
+                        if (item != null && quantity > 0) {
                             viewCart.add(new Pair<>(item, quantity));
                         }
                     }

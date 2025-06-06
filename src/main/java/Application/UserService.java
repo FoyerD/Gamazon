@@ -1,4 +1,5 @@
 package Application;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -70,11 +71,52 @@ public class UserService {
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "exit", "Couldn't find user", id);
             return Response.error("User not found");
-        }
+        } catch (IllegalStateException e) {
+            TradingLogger.logError(CLASS_NAME, "exit", "Failed to exit user: " + e.getMessage());
+            return Response.error("Failed to exit user: " + e.getMessage());
+        } 
         return Response.success(null);
     }
 
     /***
+     * Registers a new user with the given username, password, and email.
+     * @param sessionToken The token of the guest user to register.
+     * @param username The desired username for the new user.
+     * @param password The desired password for the new user.
+     * @param email The email address of the new user.
+     * @param birthDate The birth date of the new user.
+     * @return {@link Response} of {@link UserDTO} containing the token and user name.
+     *         If an error occurs, returns an error message.
+     */
+    @Transactional
+    public Response<UserDTO> register(String sessionToken, String username, String password, String email, LocalDate birthDate) {
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, "register", "Received invalid session token", sessionToken);
+            return Response.error("Invalid token");
+        }
+
+        String id = tokenService.extractId(sessionToken);
+
+        try {
+            Member member = loginManager.register(id, username, password, email, birthDate);
+            TradingLogger.logEvent(CLASS_NAME, "register", "Guest has registed as " + username +".");
+            return Response.success(new UserDTO(sessionToken, member));
+        } catch (IllegalStateException e) {
+            TradingLogger.logError(CLASS_NAME, "register", "Failed to register " + username + ": " + e.getMessage());
+            return Response.error("Failed to register " + username + ": " + e.getMessage());
+        }
+        catch (IllegalArgumentException | NoSuchElementException e) {
+            TradingLogger.logError(CLASS_NAME, "register", "Failed to register " + username + ": " + e.getMessage());
+            return Response.error(e.getMessage());
+        }
+        catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "register", "Failed to register " + username + ": " + e.getMessage());
+            return Response.error("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    /***
+     * *THIS IS A LEGACY FUNCTION*
      * Registers a new user with the given username, password, and email.
      * @param sessionToken The token of the guest user to register.
      * @param username The desired username for the new user.
@@ -141,6 +183,7 @@ public class UserService {
      * @return {@link Response} of {@link List} of {@link UserDTO} containing all members' information.
      *         If an error occurs, returns an error message.
      */
+    @Transactional
     public Response<List<UserDTO>> getAllMembers(String sessionToken) {
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, "getAllMembers", "Received invalid session token", sessionToken);
@@ -156,6 +199,17 @@ public class UserService {
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "getAllMembers", "Couldn't find user with id: " + id, e.getMessage());
             return Response.error("User not found");
+        }
+    }
+
+    public Response<Void> logOutAllUsers() {
+        try {
+            loginManager.logOutAllUsers();
+            TradingLogger.logEvent(CLASS_NAME, "logOutAllUsers", "All users have been logged out.");
+            return Response.success(null);
+        } catch (Exception e) {
+            TradingLogger.logError(CLASS_NAME, "logOutAllUsers", "Failed to log out all users: " + e.getMessage());
+            return Response.error("Failed to log out all users: " + e.getMessage());
         }
     }
 }

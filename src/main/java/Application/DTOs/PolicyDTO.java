@@ -1,7 +1,7 @@
 package Application.DTOs;
 
 import Domain.Store.Policy;
-import java.util.List;
+
 
 /**
  * Data Transfer Object for Policy.
@@ -12,80 +12,256 @@ public class PolicyDTO {
     private final String storeId;
     private final Policy.Type type;
 
+    // TODO: Deprecated
     // For AND policies
-    private final List<Policy> subPolicies;
+    // private final List<PolicyDTO> subPolicies;
 
     // For quantity policies on all items
     private final Integer minItemsAll;
     private final Integer maxItemsAll;
 
     // For quantity policies on a specific product
-    private final String targetProductId;
+    private final ItemDTO targetProduct;
     private final Integer minItemsProduct;
     private final Integer maxItemsProduct;
 
     // For quantity policies on a specific category
-    private final String targetCategory;
+    private final CategoryDTO targetCategory;
     private final Integer minItemsCategory;
     private final Integer maxItemsCategory;
 
     // For category disallow policies
-    private final String disallowedCategory;
+    private final CategoryDTO disallowedCategory;
 
     // For age-restriction policies
     private final Integer minAge;
-    private final String ageCategory;
+    private final CategoryDTO ageCategory;
 
-    public PolicyDTO(Policy policy) {
-        this.policyId = policy.getPolicyId();
-        this.storeId  = policy.getStoreId();
-        this.type     = policy.getType();
 
-        // Initialize optionals based on policy type
-        this.subPolicies = (type == Policy.Type.AND)
-            ? policy.getSubPolicies() : null;
+    public PolicyDTO(String policyId, Builder builder) {
+        this.policyId = policyId;
+        this.type = builder.type;
+        this.storeId = builder.storeId;
+        
+        // TODO: Deprecated
+        // For AND policies
+        //this.subPolicies = builder.subPolicies;
 
-        this.minItemsAll = (type == Policy.Type.MIN_QUANTITY_ALL)
-            ? policy.getMinItemsAll() : null;
-        this.maxItemsAll = (type == Policy.Type.MAX_QUANTITY_ALL)
-            ? policy.getMaxItemsAll() : null;
+        // For quantity policies on all items
+        this.minItemsAll = builder.minItemsAll;
+        this.maxItemsAll = builder.maxItemsAll;
 
-        this.targetProductId = (type == Policy.Type.MIN_QUANTITY_PRODUCT || type == Policy.Type.MAX_QUANTITY_PRODUCT)
-            ? policy.getTargetProductId() : null;
-        this.minItemsProduct = (type == Policy.Type.MIN_QUANTITY_PRODUCT)
-            ? policy.getMinItemsProduct() : null;
-        this.maxItemsProduct = (type == Policy.Type.MAX_QUANTITY_PRODUCT)
-            ? policy.getMaxItemsProduct() : null;
+        // For quantity policies on a specific product
+        this.targetProduct = builder.targetProduct;
+        this.minItemsProduct = builder.minItemsProduct;
+        this.maxItemsProduct = builder.maxItemsProduct;
 
-        this.targetCategory = (type == Policy.Type.MIN_QUANTITY_CATEGORY || type == Policy.Type.MAX_QUANTITY_CATEGORY)
-            ? policy.getTargetCategory() : null;
-        this.minItemsCategory = (type == Policy.Type.MIN_QUANTITY_CATEGORY)
-            ? policy.getMinItemsCategory() : null;
-        this.maxItemsCategory = (type == Policy.Type.MAX_QUANTITY_CATEGORY)
-            ? policy.getMaxItemsCategory() : null;
+        // For quantity policies on a specific category
+        this.targetCategory = builder.targetCategory;
+        this.minItemsCategory = builder.minItemsCategory;
+        this.maxItemsCategory = builder.maxItemsCategory;
 
-        this.disallowedCategory = (type == Policy.Type.CATEGORY_DISALLOW)
-            ? policy.getDisallowedCategory() : null;
+        // For category disallow policies
+        this.disallowedCategory = builder.disallowedCategory;
 
-        this.minAge = (type == Policy.Type.CATEGORY_AGE)
-            ? policy.getMinAge() : null;
-        this.ageCategory = (type == Policy.Type.CATEGORY_AGE)
-            ? policy.getAgeCategory() : null;
+        // For age-restriction policies
+        this.minAge = builder.minAge;
+        this.ageCategory = builder.ageCategory;
+
     }
 
     public String getPolicyId() { return policyId; }
     public String getStoreId()  { return storeId;  }
     public Policy.Type getType() { return type; }
-    public List<Policy> getSubPolicies() { return subPolicies; }
+    // public List<PolicyDTO> getSubPolicies() { return subPolicies; }
     public Integer getMinItemsAll() { return minItemsAll; }
     public Integer getMaxItemsAll() { return maxItemsAll; }
-    public String getTargetProductId() { return targetProductId; }
+    public ItemDTO getTargetProduct() { return targetProduct; }
     public Integer getMinItemsProduct() { return minItemsProduct; }
     public Integer getMaxItemsProduct() { return maxItemsProduct; }
-    public String getTargetCategory() { return targetCategory; }
+    public CategoryDTO getTargetCategory() { return targetCategory; }
     public Integer getMinItemsCategory() { return minItemsCategory; }
     public Integer getMaxItemsCategory() { return maxItemsCategory; }
-    public String getDisallowedCategory() { return disallowedCategory; }
+    public CategoryDTO getDisallowedCategory() { return disallowedCategory; }
     public Integer getMinAge() { return minAge; }
-    public String getAgeCategory() { return ageCategory; }
+    public CategoryDTO getAgeCategory() { return ageCategory; }
+
+    public Policy toPolicy() {
+        Policy.Builder policyBuilder = new Policy.Builder(type);
+        return policyBuilder.policyId(policyId)
+        .storeId(storeId)
+        // .subPolicies(this.subPolicies.stream().map(PolicyDTO::toPolicy).toList())
+        .minItemsAll(this.minItemsAll)
+        .maxItemsAll(this.maxItemsAll)
+        .targetProductId(this.targetProduct.getProductId())
+        .minItemsProduct(this.minItemsProduct)
+        .maxItemsProduct(this.maxItemsProduct)
+        .targetCategory(this.targetCategory.getName())
+        .minItemsCategory(this.minItemsCategory)
+        .maxItemsCategory(this.maxItemsCategory)
+        .disallowedCategory(this.disallowedCategory.getName())
+        .ageCategory(this.ageCategory.getName())
+        .minAge(this.minAge).build();
+
+    }
+
+    public static class Builder {
+        public Builder(String storeId, Policy.Type type) {
+            this.storeId = storeId;
+            this.type = type;
+        }
+
+        private String storeId;
+        private Policy.Type type;
+
+        // TODO: Deprecated
+        // For AND policies
+        // private List<PolicyDTO> subPolicies = List.of();
+
+        // For quantity policies on all items
+        private int minItemsAll = -1;
+        private int maxItemsAll = -1;
+
+        // For quantity policies on a specific product
+        private ItemDTO targetProduct = null;
+        private int minItemsProduct = -1;
+        private int maxItemsProduct = -1;
+        
+        // For quantity policies on a specific category
+        private CategoryDTO targetCategory = null;
+        private int minItemsCategory = -1;
+        private int maxItemsCategory = -1;
+
+        // For category disallow policies
+        private CategoryDTO disallowedCategory = null;
+
+        // For age-restriction policies
+        private int minAge = -1;
+        private CategoryDTO ageCategory = null;
+
+        private void commonSetup(Policy.Type target) {
+            if (this.type != target){
+                throw new IllegalStateException("Should be called only with " + target.name());
+            }
+        }
+
+        // TODO: Deprecated
+
+        // public Builder createAND(List<PolicyDTO> policies) {
+        //     commonSetup(Policy.Type.AND);
+        //     this.subPolicies = policies;
+        //     return this;
+        // }
+
+        public Builder createMaxAll(int minQuantity) {
+            commonSetup(Policy.Type.MAX_QUANTITY_ALL);
+            if (minQuantity < 1) {
+                throw new IllegalArgumentException("minimum quantity must be ≥ 1");
+            }
+
+            this.minItemsAll = minQuantity;
+
+            return this;
+        }
+
+        public Builder createMinQuantityAllPolicy(int minQuantity) {
+            commonSetup(Policy.Type.MIN_QUANTITY_ALL);
+            if (minQuantity < 1) {
+                throw new IllegalArgumentException("Minimum Quantity must be ≥ 1");
+            }
+
+            this.minItemsAll = minQuantity;
+            return this;
+        }
+
+        public Builder createMaxQuantityAllPolicy(int maxQuantity) {
+            commonSetup(Policy.Type.MAX_QUANTITY_ALL);
+            if (maxQuantity < 1) {
+                throw new IllegalArgumentException("Maximum Quantity must be ≥ 1");
+            }
+
+            this.maxItemsAll = maxQuantity;
+
+            return this;
+        }
+
+        public Builder createMinQuantityProductPolicy(ItemDTO product, int minQuantity) {
+            commonSetup(Policy.Type.MIN_QUANTITY_PRODUCT);
+
+            if (minQuantity < 1) {
+                throw new IllegalArgumentException("minQuantity must be ≥ 1");
+            }
+
+            this.targetProduct = product;
+            this.minItemsProduct = minQuantity;
+
+
+            return this;
+        }
+
+        public Builder createMaxQuantityProductPolicy(ItemDTO product, int maxQuantity) {
+            commonSetup(Policy.Type.MAX_QUANTITY_PRODUCT);
+            if (maxQuantity < 1) {
+                throw new IllegalArgumentException("Maximum Quantity must be ≥ 1");
+            }
+
+            this.targetProduct = product;
+            this.maxItemsProduct = maxQuantity;
+
+            return this;
+        }
+
+        public Builder createMinQuantityCategoryPolicy(CategoryDTO category, int minQuantity) {
+            commonSetup(Policy.Type.MIN_QUANTITY_CATEGORY);
+
+            if (minQuantity < 1) {
+                throw new IllegalArgumentException("Minimum Quantity must be ≥ 1");
+            }
+
+            this.targetCategory = category;
+            this.minItemsCategory = minQuantity;
+            return this;
+        }
+
+        public Builder createMaxQuantityCategoryPolicy(CategoryDTO category, int maxQuantity) {
+            commonSetup(Policy.Type.MAX_QUANTITY_CATEGORY);
+            if (maxQuantity < 1) {
+                throw new IllegalArgumentException("Maximum Quantity must be ≥ 1");
+            }
+
+            this.targetCategory = category;
+            this.maxItemsCategory = maxQuantity;
+            return this;
+        }
+
+        public Builder createCategoryDisallowPolicy(CategoryDTO category) {
+            commonSetup(Policy.Type.CATEGORY_DISALLOW);
+
+            this.disallowedCategory = category;
+
+            return this;
+        }
+
+        public Builder createCategoryAgePolicy(CategoryDTO category, int minAge) {
+            commonSetup(Policy.Type.CATEGORY_AGE);
+            if (minAge < 0) {
+                throw new IllegalArgumentException("Minimum Age must be ≥ 0");
+            }
+
+            this.ageCategory = category;
+            this.minAge = minAge;
+
+            return this;
+        }
+
+        public PolicyDTO build() {
+            return build(null);
+        }
+
+        public PolicyDTO build(String policyId) {
+            return new PolicyDTO(policyId, this);
+        }
+    }
+
+
 }

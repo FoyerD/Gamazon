@@ -14,6 +14,7 @@ import Domain.User.LoginManager;
 import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionManager;
+import Domain.management.PolicyFacade;
 
 public class FacadeManager {
     private IRepoManager repoManager;
@@ -28,6 +29,7 @@ public class FacadeManager {
     private PermissionManager permissionManager;
     private INotificationService notificationService;
     private DiscountFacade discountFacade;
+    private PolicyFacade policyFacade;
 
     public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService, IExternalSupplyService supplyService) {
         this.repoManager = repoManager;
@@ -95,7 +97,10 @@ public class FacadeManager {
                                                 repoManager.getReceiptRepository(),
                                                 repoManager.getProductRepository(),
                                                 getDiscountFacade(),
-                                                getSupplyService());
+                                                getPolicyFacade(),
+                                                getRepositoryManager().getUserRepository(),
+                                                getSupplyService(),
+                                                getRepositoryManager().getReceiptRepository());
         }
         return CartFacade;
     }
@@ -126,5 +131,20 @@ public class FacadeManager {
                                                 getItemFacade());
         }
         return discountFacade;
+    }
+
+    public PolicyFacade getPolicyFacade() {
+        if (policyFacade == null) {
+            policyFacade = new PolicyFacade(repoManager.getPolicyRepository(),
+                                            repoManager.getUserRepository(),
+                                            getItemFacade(),
+                                            getProductFacade());
+        }
+        return policyFacade;
+    }
+
+    public IRepoManager getRepositoryManager()
+    {
+        return repoManager;
     }
 }

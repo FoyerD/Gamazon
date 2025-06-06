@@ -7,26 +7,51 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
+
 /**
  * Represents a purchase receipt in the system.
  * Contains information about the purchase, including products, client, store,
  * timestamp, and payment details.
  */
+@Entity
+@Table(name = "receipts")
 public class Receipt {
-    private final String receiptId;
-    private final String clientId;
-    private final String storeId;
-    private final Map<Product, Pair<Integer, Double>> products; // Map of Product copies to quantities
-    private final LocalDateTime timestamp;
-    private final double totalPrice;
-    private final String paymentDetails; // Could contain masked card details or payment method
+    @Id
+    private String receiptId;
+    private String clientId;
+    private String storeId;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "receipt_products", 
+        joinColumns = @JoinColumn(name = "receipt_id"))
+    @MapKeyColumn(name = "product_id")
+    private Map<String, ReceiptProduct> products; // Map of productId to quantity and price
+    
+    private LocalDateTime timestamp;
+    private double totalPrice;
+    
+    @Column(length = 1000)
+    private String paymentDetails; // Could contain masked card details or payment method
+    
+    protected Receipt() {
+        // Required by JPA
+    }
     
     /**
      * Creates a new receipt with the given information.
      * 
      * @param clientId The ID of the client making the purchase
      * @param storeId The ID of the store where the purchase was made
-     * @param products Map of products to their quantities
+     * @param products Map of products to their quantities and prices
      * @param totalPrice The total price of the purchase
      * @param paymentDetails Payment method or masked card details
      */
@@ -35,10 +60,13 @@ public class Receipt {
         this.receiptId = UUID.randomUUID().toString();
         this.clientId = clientId;
         this.storeId = storeId;
-        // Create deep copies of all products to make receipt immutable
+        // Convert products map to use productId as key and ReceiptProduct as value
         this.products = new HashMap<>();
         for (Map.Entry<Product, Pair<Integer, Double>> entry : products.entrySet()) {
-            this.products.put(new Product(entry.getKey()), entry.getValue());
+            Product product = entry.getKey();
+            Pair<Integer, Double> qtyPrice = entry.getValue();
+            this.products.put(product.getProductId(), 
+                            new ReceiptProduct(qtyPrice.getFirst(), qtyPrice.getSecond(), product.getName()));
         }
         this.timestamp = LocalDateTime.now();
         this.totalPrice = totalPrice;
@@ -73,13 +101,20 @@ public class Receipt {
     }
     
     /**
-     * Gets the products purchased, as a map of product copies to quantities.
+     * Gets the products purchased, as a map of product copies to quantities and prices.
      * 
-     * @return Map of products to quantities
+     * @return Map of products to quantities and prices
      */
     public Map<Product, Pair<Integer, Double>> getProducts() {
-        // Return a copy to maintain immutability
-        return new HashMap<>(products);
+        // Convert back to the original format
+        Map<Product, Pair<Integer, Double>> result = new HashMap<>();
+        for (Map.Entry<String, ReceiptProduct> entry : products.entrySet()) {
+            String productId = entry.getKey();
+            ReceiptProduct receiptProduct = entry.getValue();
+            Product product = new Product(productId, receiptProduct.getProductName()); // Use stored product name
+            result.put(product, new Pair<>(receiptProduct.getQuantity(), receiptProduct.getPrice()));
+        }
+        return result;
     }
     
     /**
@@ -123,10 +158,12 @@ public class Receipt {
         map.put("totalPrice", totalPrice);
         map.put("paymentDetails", paymentDetails);
         
-        // Convert products to map of productId to quantity
+        // Convert products to map of productId to quantity and price
         Map<String, Pair<Integer, Double>> productQtyPrice = new HashMap<>();
-        for (Map.Entry<Product,  Pair<Integer, Double>> entry : products.entrySet()) {
-            productQtyPrice.put(entry.getKey().getProductId(), entry.getValue());
+        for (Map.Entry<String, ReceiptProduct> entry : products.entrySet()) {
+            ReceiptProduct receiptProduct = entry.getValue();
+            productQtyPrice.put(entry.getKey(), 
+                              new Pair<>(receiptProduct.getQuantity(), receiptProduct.getPrice()));
         }
         map.put("products", productQtyPrice);
         

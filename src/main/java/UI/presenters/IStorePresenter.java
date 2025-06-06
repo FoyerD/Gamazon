@@ -1,8 +1,10 @@
 package UI.presenters;
 
 import java.util.List;
+import java.util.Locale.Category;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.CategoryDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -102,4 +104,13 @@ public interface IStorePresenter {
      * @return Response containing the updated {@link ItemDTO} or an error.
      */
     Response<ItemDTO> acceptBid(String sessionToken, String storeId, String productId, String auctionId);
+
+    /**
+     * Retrieves all categories of products from store
+     * 
+     * @param sessionToken
+     * @param storeId
+     * @return Response with a list of {@link CategoryDTO} or an error.
+     */
+    Response<List<CategoryDTO>> getStoreCategories(String sessionToken, String storeId);
 }

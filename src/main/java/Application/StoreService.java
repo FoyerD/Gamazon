@@ -12,12 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.CategoryDTO;
 import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Store.Item;
@@ -41,6 +43,7 @@ public class StoreService {
     // private final ConditionBuilder conditionBuilder;
 
     private DiscountFacade discountFacade;
+    private IExternalPaymentService externalPaymentService;
 
     public StoreService() {
         this.storeFacade = null;
@@ -51,11 +54,14 @@ public class StoreService {
         this.discountFacade = null;
         // this.discountBuilder = null;
         // this.conditionBuilder = null;
+        this.externalPaymentService = null;
     }
 
     @Autowired
     public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, 
-                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, DiscountFacade discountFacade) {
+                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, DiscountFacade discountFacade,
+                       IExternalPaymentService externalPaymentService) {
+        this.externalPaymentService = externalPaymentService;
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
@@ -325,7 +331,7 @@ public class StoreService {
             permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
 
             // Accept the bid for the given auction and product
-            Item item = storeFacade.acceptBid(storeId, productId, auctionId);
+            Item item = storeFacade.acceptBid(storeId, productId, auctionId, externalPaymentService);
             if (item == null) {
                 TradingLogger.logError(CLASS_NAME, method, "Failed to accept bid for auction %s", auctionId);
                 return new Response<>(new Error("Failed to accept bid. It may not exist or the auction is closed."));
@@ -539,6 +545,27 @@ public class StoreService {
             return new Response<>(new StoreDTO(store));
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error retrieving store by name %s: %s", storeId, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    public Response<List<CategoryDTO>> getAllStoreCategories(String sessionToken, String storeId) {
+                String method = "getAllStoreCategories";
+        try {
+            if(!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+            
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+            List<CategoryDTO> categories = this.storeFacade.getAllStoreCategories(storeId).stream().map(CategoryDTO::fromCategory).collect(Collectors.toList());
+            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + categories.size() + " categories for store " + storeId);
+            return new Response<>(categories);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error retrieving categories for store %s: %s", storeId, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
         }
     }

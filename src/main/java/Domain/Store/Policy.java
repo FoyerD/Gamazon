@@ -3,6 +3,8 @@ package Domain.Store;
 import Domain.Shopping.ShoppingBasket;
 import Domain.User.Member;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,44 +15,71 @@ import java.util.function.Function;
  * A reusable Policy supporting various policy types.
  * Uses Builder pattern for flexible construction.
  */
+
+@Entity
+@Table(name = "policies")
 public class Policy {
 
     /** Supported policy types */
     public enum Type {
-        AND,
-        MIN_QUANTITY_ALL,
-        MAX_QUANTITY_ALL,
-        MIN_QUANTITY_PRODUCT,
-        MAX_QUANTITY_PRODUCT,
-        MIN_QUANTITY_CATEGORY,
-        MAX_QUANTITY_CATEGORY,
-        CATEGORY_DISALLOW,
-        CATEGORY_AGE
+        MIN_QUANTITY_ALL("Minimum quantity for all items"),
+        MAX_QUANTITY_ALL("Maximum quantity for all items"),
+        MIN_QUANTITY_PRODUCT("Minimum quantity for a product"),
+        MAX_QUANTITY_PRODUCT("Maximum quantity for a product"),
+        MIN_QUANTITY_CATEGORY("Minimum quantity for a category"),
+        MAX_QUANTITY_CATEGORY("Maximum quantity for a category"),
+        CATEGORY_DISALLOW("Disallowed category"),
+        CATEGORY_AGE("Age-restricted category");
+
+        private final String displayName;
+
+        Type(String displayName) {
+            this.displayName = displayName;
+        }
+
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 
-    private final String policyId;
-    private final String storeId;
-    private final Function<String, Product> productLookup;
-    private final Function<String, Item> itemLookup;
-    private final Type type;
+    @Id
+    private String policyId;
+    private String storeId;
+
+    @Transient
+    private transient Function<String, Product> productLookup;
+    @Transient
+    private transient Function<String, Item> itemLookup;
+
+    @Enumerated(EnumType.STRING)
+    private Type type;
 
     // Common fields
-    private final List<Policy> subPolicies;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Policy> subPolicies;
 
     // For quantity policies
-    private final int minItemsAll;
-    private final int maxItemsAll;
-    private final String targetProductId;
-    private final int minItemsProduct;
-    private final int maxItemsProduct;
-    private final String targetCategory;
-    private final int minItemsCategory;
-    private final int maxItemsCategory;
+    private int minItemsAll;
+    private int maxItemsAll;
+    private String targetProductId;
+    private int minItemsProduct;
+    private int maxItemsProduct;
+    private String targetCategory;
+    private int minItemsCategory;
+    private int maxItemsCategory;
 
     // For category-based policies
-    private final String disallowedCategory;
-    private final int minAge;
-    private final String ageCategory;
+    private String disallowedCategory;
+    private int minAge;
+    private String ageCategory;
+
+    protected Policy() {} // Required by JPA
 
     private Policy(Builder b) {
         this.policyId            = b.policyId;
@@ -194,12 +223,6 @@ public class Policy {
     public boolean isApplicable(ShoppingBasket basket, Member member) {
         switch (type) {
 
-            case AND:
-                for (Policy p : subPolicies) {
-                    if (!p.isApplicable(basket, member)) return false;
-                }
-                return true;
-
             case MIN_QUANTITY_ALL:
                 return basket.getOrders().values().stream()
                              .allMatch(q -> q >= minItemsAll);
@@ -265,6 +288,16 @@ public class Policy {
     public int getMinAge() { return minAge; }
     public String getAgeCategory() { return ageCategory; }
     public Function<String, Product> getProductLookup() { return productLookup; }
-    public Function<String, Item> getItemLookup() { return itemLookup; }           
+
+    public Function<String, Item> getItemLookup() { return itemLookup; }
+    
+    // Re-inject lookups after loading from JPA
+    public void injectLookups(Function<String, Product> productLookup, Function<String, Item> itemLookup) {
+        this.productLookup = productLookup;
+        this.itemLookup = itemLookup;
+        for (Policy p : subPolicies) {
+            p.injectLookups(productLookup, itemLookup);
+        }
+    }
 }
 

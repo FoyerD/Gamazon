@@ -1,17 +1,20 @@
 package Domain.management;
 
-import Domain.Store.IPolicyRepository;
-import Domain.Store.Policy;
-import Domain.Shopping.ShoppingBasket;
-import Domain.Store.Item;
-import Domain.User.IUserRepository;
-import Domain.User.Member;
-import Domain.Store.ItemFacade;
-import Domain.Store.ProductFacade;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
+
+import org.springframework.stereotype.Component;
+
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IPolicyRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IUserRepository;
+import Domain.Shopping.ShoppingBasket;
+import Domain.Store.ItemFacade;
+import Domain.Store.Policy;
+import Domain.Store.ProductFacade;
+import Domain.User.Member;
 
 @Component
 public class PolicyFacade {
@@ -22,14 +25,15 @@ public class PolicyFacade {
     private final ProductFacade productFacade;
 
     public PolicyFacade(IPolicyRepository policyRepository,
-                        IUserRepository userRepository,
-                        ItemFacade itemFacade,
-                        ProductFacade productFacade) {
+                        IUserRepository userRepoMock,
+                        ItemFacade itemFacadeMock,
+                        ProductFacade productFacadeMock) {
         this.policyRepository = policyRepository;
-        this.userRepository    = userRepository;
-        this.itemFacade        = itemFacade;
-        this.productFacade     = productFacade;
+        this.userRepository    = userRepoMock;
+        this.itemFacade        = itemFacadeMock;
+        this.productFacade     = productFacadeMock;
     }
+    
 
     private void validateIds(String policyId, String storeId) {
         if (policyId == null || policyId.isBlank() ||
@@ -38,31 +42,45 @@ public class PolicyFacade {
         }
     }
 
-    public Policy createAndPolicy(List<Policy> children,
-                                  String policyId,
-                                  String storeId) {
-        validateIds(policyId, storeId);
-        if (children == null || children.isEmpty()) {
-            throw new IllegalArgumentException("Must supply at least one child policy");
+    private void injectLookups(Policy policy, String storeId) {
+        policy.injectLookups(
+            productFacade::getProduct,
+            id -> itemFacade.getItem(storeId, id)
+        );
+    }
+    private void injectLookups(List<Policy> policies, String storeId) {
+        for (Policy p : policies) {
+            injectLookups(p, storeId);
         }
-
-        Policy policy = new Policy.Builder(Policy.Type.AND)
-            .policyId(policyId)
-            .storeId(storeId)
-            .productLookup(productFacade::getProduct)
-            .itemLookup(id -> itemFacade.getItem(storeId, id))
-            .subPolicies(children)
-            .build();
-
-        if (!policyRepository.add(policyId, policy)) {
-            throw new IllegalStateException("Policy already exists: " + policyId);
-        }
-        return policy;
     }
 
-    public Policy createMinQuantityAllPolicy(String policyId,
-                                             String storeId,
-                                             int minQuantity) {
+    // TODO: Deprecated
+
+    // public Policy createAndPolicy(List<Policy> children, String storeId) 
+    //     {
+    //     String policyId = UUID.randomUUID().toString();
+    //     validateIds(policyId, storeId);
+    //     if (children == null || children.isEmpty()) {
+    //         throw new IllegalArgumentException("Must supply at least one child policy");
+    //     }
+
+    //     Policy policy = new Policy.Builder(Policy.Type.AND)
+    //         .policyId(policyId)
+    //         .storeId(storeId)
+    //         .productLookup(productFacade::getProduct)
+    //         .itemLookup(id -> itemFacade.getItem(storeId, id))
+    //         .subPolicies(children)
+    //         .build();
+
+    //     if (!policyRepository.add(policyId, policy)) {
+    //         throw new IllegalStateException("Policy already exists: " + policyId);
+    //     }
+    //     return policy;
+    // }
+
+    public Policy createMinQuantityAllPolicy(String storeId, int minQuantity) 
+    {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (minQuantity < 1) {
             throw new IllegalArgumentException("minQuantity must be ≥ 1");
@@ -82,9 +100,9 @@ public class PolicyFacade {
         return policy;
     }
 
-    public Policy createMaxQuantityAllPolicy(String policyId,
-                                             String storeId,
+    public Policy createMaxQuantityAllPolicy(String storeId,
                                              int maxQuantity) {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (maxQuantity < 1) {
             throw new IllegalArgumentException("maxQuantity must be ≥ 1");
@@ -104,10 +122,10 @@ public class PolicyFacade {
         return policy;
     }
 
-    public Policy createMinQuantityProductPolicy(String policyId,
-                                                 String storeId,
+    public Policy createMinQuantityProductPolicy(String storeId,
                                                  String productId,
                                                  int minQuantity) {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (productId == null || productId.isBlank()) {
             throw new IllegalArgumentException("productId cannot be empty");
@@ -131,10 +149,10 @@ public class PolicyFacade {
         return policy;
     }
 
-    public Policy createMaxQuantityProductPolicy(String policyId,
-                                                 String storeId,
+    public Policy createMaxQuantityProductPolicy(String storeId,
                                                  String productId,
                                                  int maxQuantity) {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (productId == null || productId.isBlank()) {
             throw new IllegalArgumentException("productId cannot be empty");
@@ -158,10 +176,10 @@ public class PolicyFacade {
         return policy;
     }
 
-    public Policy createMinQuantityCategoryPolicy(String policyId,
-                                                  String storeId,
+    public Policy createMinQuantityCategoryPolicy(String storeId,
                                                   String category,
                                                   int minQuantity) {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (category == null || category.isBlank()) {
             throw new IllegalArgumentException("category cannot be empty");
@@ -185,10 +203,10 @@ public class PolicyFacade {
         return policy;
     }
 
-    public Policy createMaxQuantityCategoryPolicy(String policyId,
-                                                  String storeId,
+    public Policy createMaxQuantityCategoryPolicy(String storeId,
                                                   String category,
                                                   int maxQuantity) {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (category == null || category.isBlank()) {
             throw new IllegalArgumentException("category cannot be empty");
@@ -212,9 +230,9 @@ public class PolicyFacade {
         return policy;
     }
 
-    public Policy createCategoryDisallowPolicy(String policyId,
-                                               String storeId,
+    public Policy createCategoryDisallowPolicy(String storeId,
                                                String category) {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (category == null || category.isBlank()) {
             throw new IllegalArgumentException("category cannot be empty");
@@ -234,10 +252,10 @@ public class PolicyFacade {
         return policy;
     }
 
-    public Policy createCategoryAgePolicy(String policyId,
-                                          String storeId,
+    public Policy createCategoryAgePolicy(String storeId,
                                           String category,
                                           int minAge) {
+        String policyId = UUID.randomUUID().toString();
         validateIds(policyId, storeId);
         if (category == null || category.isBlank()) {
             throw new IllegalArgumentException("category cannot be empty");
@@ -270,6 +288,7 @@ public class PolicyFacade {
         if (p == null) {
             throw new NoSuchElementException("No policy for ID: " + policyId);
         }
+        injectLookups(p, p.getStoreId());
         return p;
     }
 
@@ -277,7 +296,9 @@ public class PolicyFacade {
         if (storeId == null || storeId.isBlank()) {
             throw new IllegalArgumentException("storeId cannot be empty");
         }
-        return policyRepository.getAllStorePolicies(storeId);
+        List<Policy> policies = policyRepository.getAllStorePolicies(storeId);
+        injectLookups(policies, storeId);
+        return policies;
     }
 
     public boolean isApplicable(String basketId,

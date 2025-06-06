@@ -1,40 +1,51 @@
 package UI.views;
 
-import UI.presenters.IPurchasePresenter;
-import UI.views.components.BasketLayout;
-import UI.presenters.IProductPresenter;
-import Application.DTOs.CartDTO;
-import Application.DTOs.ItemDTO;
-import Application.DTOs.ShoppingBasketDTO;
-import Application.DTOs.StoreDTO;
-import Application.utils.Response;
-import UI.presenters.IStorePresenter;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.Map;
+import Application.DTOs.CartDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ShoppingBasketDTO;
+import Application.DTOs.StoreDTO;
+import Application.MarketService;
+import Application.utils.Response;
+import Domain.management.PermissionManager;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IPurchasePresenter;
+import UI.presenters.IStorePresenter;
+import UI.presenters.IUserSessionPresenter;
+import UI.views.components.BasketLayout;
 
 @Route("cart")
-public class CartView extends VerticalLayout implements BeforeEnterObserver {
+public class CartView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
     private final IStorePresenter storePresenter;
+    private final MarketService marketService;
+    private final PermissionManager permissionManager;
     private String sessionToken;
     private String currentUsername;
+    private boolean isBanned = false;
 
     private final H1 title = new H1("Your Shopping Cart");
     private final VerticalLayout cartContent = new VerticalLayout();
@@ -46,10 +57,16 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
     private double cartTotal = 0.0;
 
     @Autowired
-    public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter) {
+    public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter,
+                    MarketService marketService, PermissionManager permissionManager, IUserSessionPresenter sessionPresenter,
+                    @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager globalLogoutManager
+                        ,INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, globalLogoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
         this.storePresenter = storePresenter;
-
+        this.marketService = marketService;
+        this.permissionManager = permissionManager;
+        
         setSizeFull();
         setSpacing(true);
         setPadding(true);
@@ -78,6 +95,9 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         checkoutButton.addClickListener(e -> proceedToCheckout());
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
 
+        // Add data attribute to identify checkout button for ban handling
+        checkoutButton.getElement().setAttribute("data-checkout-button", "true");
+
         // Create the bottom layout with total and buttons
         HorizontalLayout bottomLayout = new HorizontalLayout(totalPriceLabel, homeButton, checkoutButton);
         bottomLayout.setWidthFull();
@@ -96,6 +116,33 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         // Update title with username
         this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
         
+        // Check ban status
+        if (sessionToken != null && currentUsername != null) {
+            String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
+            Response<Boolean> response = marketService.userExists(currentUsername);
+            if (!response.errorOccurred() && response.getValue()) {
+                isBanned = permissionManager.isBanned(userId);
+                if (isBanned) {
+                    // Disable checkout button
+                    checkoutButton.setEnabled(false);
+                    checkoutButton.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("cursor", "not-allowed")
+                        .set("opacity", "0.5");
+                    
+                    // Show notification about ban
+                    Notification notification = new Notification(
+                        "You are currently banned. You can view your cart but cannot proceed to checkout.",
+                        5000,
+                        Notification.Position.MIDDLE
+                    );
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    notification.open();
+                }
+            }
+        }
+
         // Create the header with title and cart clear button
         H1 titleElement = new H1("Hello " + (currentUsername != null ? currentUsername : "User"));
         titleElement.getStyle().set("color", "#1890ff").set("margin", "0");
@@ -187,8 +234,6 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         totalPriceLabel.setText(String.format("Total: $%.2f", cartTotal));
     }
 
-
-
     private void decrementAmount(ItemDTO item) {
         Response<Boolean> response = purchasePresenter.removeProductFromCart(
                         sessionToken, item.getProductId(), item.getStoreId(), 1);
@@ -254,6 +299,10 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
     }
 
     private void proceedToCheckout() {
+        if (isBanned) {
+            Notification.show("You cannot checkout while banned", 3000, Notification.Position.MIDDLE);
+            return;
+        }
         if (cartTotal <= 0) {
             Notification.show("Your cart is empty", 3000, Notification.Position.MIDDLE);
             return;

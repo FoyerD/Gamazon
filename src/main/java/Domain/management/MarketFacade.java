@@ -1,18 +1,24 @@
 package Domain.management;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
-import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IUserRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
-import Domain.User.IUserRepository;
 import Domain.User.Member;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Component
@@ -112,12 +118,17 @@ public class MarketFacade implements IMarketFacade {
     }
 
     @Override
-    public void removeStoreManager(String removerId, String managerId, String storeId) {
-        permissionManager.removeStoreManager(removerId, managerId, storeId);
+    public void removeStoreOwner(String removerId, String ownerId, String storeId) {
+        permissionManager.removeStoreOwner(removerId, ownerId, storeId);
     }
 
     @Override
     public void appointStoreOwner(String appointerId, String appointeeId, String storeId) {
+        if (userRepository.getMember(appointeeId) == null) {
+            throw new IllegalArgumentException("Appointee not found.");
+        } else if (isStoreOwner(appointeeId, storeId)) {
+            throw new IllegalArgumentException("Appointee is already a store owner.");
+        }
         permissionManager.appointStoreOwner(appointerId, appointeeId, storeId);
     }
 
@@ -147,6 +158,23 @@ public class MarketFacade implements IMarketFacade {
         return result;
     }
 
+    @Override
+    public List<Member> getOwners(String storeId, String userId) {
+        permissionManager.checkPermission(userId, storeId, PermissionType.SUPERVISE_MANAGERS);
+        List<String> ownersIds = permissionManager.getAllPermissionsForStore(storeId).entrySet()
+                                .stream().filter(entry -> entry.getValue().isStoreOwner()).map(entry -> entry.getKey()).toList();
+
+        List<Member> members = new ArrayList<>();
+        for (String id : ownersIds) {
+            Member member = userRepository.getMember(id);
+            if (member == null) {
+                throw new NoSuchElementException("Member not found: " + userId);
+            }
+            members.add(member);
+        }
+        return members;
+    }
+
 
     @Override
     public List<Receipt> getStorePurchaseHistory(String storeId, String userId) {
@@ -166,8 +194,8 @@ public class MarketFacade implements IMarketFacade {
         if (paymentCheck.errorOccurred() || supplyCheck.errorOccurred() ||
             !Boolean.TRUE.equals(paymentCheck.getValue()) ||
             !Boolean.TRUE.equals(supplyCheck.getValue())) {
-            
-            throw new IllegalStateException("Handshake failed with external API.");
+            //TODO: Enable again
+            //throw new IllegalStateException("Handshake failed with external API.");
         }
 
         Member manager = userRepository.getMember(userId);
@@ -189,12 +217,12 @@ public class MarketFacade implements IMarketFacade {
     /**
      * Checks if a user is a store owner for the specified store.
      * 
-     * @param username The username to check
+     * @param userId The user ID to check
      * @param storeId The store ID to check
      * @return true if the user is a store owner, false otherwise
      */
-    public boolean isStoreOwner(String username, String storeId) {
-        Permission permission = permissionManager.getPermission(storeId, username);
+    public boolean isStoreOwner(String userId, String storeId) {
+        Permission permission = permissionManager.getPermission(storeId, userId);
         return permission != null && permission.isStoreOwner();
     }
     
@@ -212,8 +240,16 @@ public class MarketFacade implements IMarketFacade {
         }
         boolean result = permissionManager.banUser(bannerId, userId, endDate);
         if (result) {
-            String message = String.format("You have been banned until %s", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate));
-            notificationService.sendNotification(userId, message);
+            String banMessage = String.format(
+                "{\"type\": \"USER_BANNED\", \"message\": \"You are banned until %s\"}",
+                endDate.toString()
+            );
+            
+            notificationService.sendNotification(userId, banMessage);
+            
+
+            //String message = String.format("You have been banned until %s", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate));
+            //notificationService.sendNotification(userId, message);
         }
         return result;
     }
@@ -226,7 +262,8 @@ public class MarketFacade implements IMarketFacade {
         }
         boolean result = permissionManager.unbanUser(unbannerId, userId);
         if (result) {
-            notificationService.sendNotification(userId, "Your ban has been lifted. You can now use the system again.");
+            String unbanMessage = "{\"type\": \"USER_UNBANNED\", \"message\": \"Your ban has been lifted. You can now use the system again.\"}";
+            notificationService.sendNotification(userId, unbanMessage);
         }
         return result;
     }

@@ -123,6 +123,15 @@
       <artifactId>commons-validator</artifactId>
       <version>1.7</version>
     </dependency>
+
+    <!-- ✅ Database -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.1</version>
+    </dependency>
+
+
   </dependencies>
 
   <build>

@@ -1,30 +1,27 @@
 package StoreTests;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
-import java.util.List;
-import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
 
 import Application.CustomerServiceService;
+import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.ProductService;
 import Application.ServiceManager;
 import Application.StoreService;
-import Application.TokenService;
 import Application.UserService;
-import Application.DTOs.UserDTO;
+import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
 import Domain.Pair;
 import Domain.Store.FeedbackDTO;
-import Infrastructure.MemoryRepoManager;
 import Infrastructure.ExternalPaymentService;
-import Application.utils.Response;
+import Infrastructure.MemoryRepoManager;
 
 
 public class CustomerServiceServiceTests {

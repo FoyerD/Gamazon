@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Domain.Pair;
+import Domain.Repos.IReceiptRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;

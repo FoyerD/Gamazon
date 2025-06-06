@@ -2,7 +2,8 @@ package Domain.Store.Discounts;
 
 import java.util.List;
 
-import Domain.ILockbasedRepository;
+import Domain.Repos.ILockbasedRepository;
+
 
 
 /**
@@ -48,12 +49,6 @@ public abstract class IDiscountRepository  extends ILockbasedRepository<Discount
      * @throws IllegalArgumentException if id is null
      */
     public abstract boolean exists(String id);
-    
-    /**
-     * Removes all discounts from the repository.
-     * Primarily used for testing purposes.
-     */
-    public abstract void clear();
     
     
     //TODO! Roi or Itay or Almog or anyone adding a DB to this,

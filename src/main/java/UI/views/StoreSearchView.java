@@ -1,43 +1,46 @@
 package UI.views;
 
-import UI.presenters.IStorePresenter;
-import UI.views.components.ItemLayout;
-import UI.views.components.StoreLayout;
-import UI.presenters.IManagementPresenter;
-import UI.presenters.IPurchasePresenter;
-import Application.DTOs.ItemDTO;
-import Application.DTOs.StoreDTO;
-import Application.utils.Response;
-import Application.DTOs.ProductDTO;
-import UI.presenters.IProductPresenter;
-
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.Location;
-import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.dependency.JsModule;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.ArrayList;
 
-@JsModule("./ws-client.js")
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Location;
+import com.vaadin.flow.router.Route;
+
+import Application.DTOs.ItemDTO;
+import Application.DTOs.ProductDTO;
+import Application.DTOs.StoreDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.IManagementPresenter;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IPurchasePresenter;
+import UI.presenters.IStorePresenter;
+import UI.presenters.IUserSessionPresenter;
+import UI.views.components.ItemLayout;
+import UI.views.components.StoreLayout;
+
+
 @Route("store-search")
-public class StoreSearchView extends VerticalLayout implements BeforeEnterObserver {
+public class StoreSearchView extends BaseView implements BeforeEnterObserver {
 
     private final IStorePresenter storePresenter;
     private final IManagementPresenter managementPresenter;
@@ -52,7 +55,9 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
 
     @Autowired
     public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter, 
-                          IPurchasePresenter purchasePresenter, IProductPresenter productPresenter) {
+                          IPurchasePresenter purchasePresenter, IProductPresenter productPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, 
+                          @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.storePresenter = storePresenter;
         this.managementPresenter = managementPresenter;
         this.purchasePresenter = purchasePresenter;
@@ -148,8 +153,8 @@ public class StoreSearchView extends VerticalLayout implements BeforeEnterObserv
 
         StoreLayout storelayout = new StoreLayout(store,
         itemLayout,
-        s -> UI.getCurrent().navigate("owner"),
-        s -> {            
+        null,  // Remove owner action
+        s -> {            // Keep manager action
             UI.getCurrent().getSession().setAttribute("currentStoreId", s.getId());
             UI.getCurrent().navigate("manager");
         });

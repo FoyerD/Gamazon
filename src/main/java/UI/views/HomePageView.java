@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -38,27 +39,27 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.UserDTO;
 import Application.MarketService;
 import Application.utils.Response;
-import Application.utils.TradingLogger;
 import Domain.Store.ItemFilter;
 import Domain.management.PermissionManager;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.ILoginPresenter;
 import UI.presenters.INotificationPresenter;
 import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IUserSessionPresenter;
-import UI.webSocketConfigurations.PendingMessageStore;
 
-@JsModule("./ws-client.js")
+
+
+
 @Route("home")
-public class HomePageView extends VerticalLayout implements BeforeEnterObserver {
+public class HomePageView extends BaseView implements BeforeEnterObserver {
 
     private final IProductPresenter productPresenter;
     private final IPurchasePresenter purchasePresenter;
     private final ILoginPresenter loginPresenter;
-    private final IUserSessionPresenter sessionPresenter;
     private final MarketService marketService;
     private final PermissionManager permissionManager;
-    private String sessionToken = null;
     private String currentUsername = null;
     private UserDTO user = null;
 
@@ -82,15 +83,16 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
     private final Button refreshBtn = new Button("Refresh");
     private final Button cartBtn = new Button("View Cart");
     private final Button goToSearchBtn = new Button("Search Stores");
+    private final Button registerBtn = new Button("Register");
+    private final Button logoutBtn = new Button("Logout");
 
-    private final INotificationPresenter notificationPresenter;
+
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
                         IPurchasePresenter purchasePresenter, ILoginPresenter loginPresenter, INotificationPresenter notificationPresenter,
-                        MarketService marketService, PermissionManager permissionManager) {
-        this.notificationPresenter = notificationPresenter;
+                        MarketService marketService, PermissionManager permissionManager, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager) {
+        super(dbHealthStatus, logoutManager,sessionPresenter, notificationPresenter);
         this.productPresenter = productPresenter;
-        this.sessionPresenter = sessionPresenter;
         this.purchasePresenter = purchasePresenter;
         this.loginPresenter = loginPresenter;
         this.marketService = marketService;
@@ -151,11 +153,12 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         cartBtn.getStyle()
             .set("background-color", "#38a169")
             .set("color", "white");
+        cartBtn.getElement().setAttribute("data-view-cart", "true");
 
-        Button registerBtn = new Button("Register", e -> UI.getCurrent().navigate("register"));
+        registerBtn.addClickListener(e -> UI.getCurrent().navigate("register"));
         registerBtn.getStyle().set("background-color", " #6b46c1").set("color", "white");
 
-        Button logoutBtn = new Button("Logout", e -> {
+        logoutBtn.addClickListener(e -> {
             Response<Void> response = loginPresenter.logout(sessionToken);
             if (!response.errorOccurred()) {
                 UI.getCurrent().getSession().close();
@@ -342,43 +345,10 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         mainContent.setSpacing(true);
         add(mainContent);
 
-        this.sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
-
-        // !TODO: Change
-        if (sessionToken != null) {
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: sessionToken is not null. Attempting to extract userId and inject into JS.");
-
-            String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
-
-            // Inject userId to JavaScript for WebSocket
-            
-            UI.getCurrent().getPage().executeJs("window.currentUserId = $0;", userId);
-            UI.getCurrent().getPage().executeJs("sessionStorage.setItem('currentUserId', $0); window.connectWebSocket && window.connectWebSocket($0);", userId);
-
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: Injected userId to JS: " + userId);
-
-            // Flush pending messages
-            List<String> messages = notificationPresenter.getNotifications(userId);
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: Consumed " + messages.size() + " pending messages for userId=" + userId);
-
-            for (String msg : messages) {
-                Notification.show("🔔 " + msg, 4000, Notification.Position.TOP_CENTER);
-            }
-
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: Displayed all pending messages for userId=" + userId);
-            }
-        else {
-            TradingLogger.logEvent("HomePageView", "constructor",
-                "DEBUG: sessionToken is null. Skipping userId injection and pending message handling.");
-        }
-
         loadAllProducts();
 
         setupNavigation();
+    
     }
 
     private void setupFilterComponents() {
@@ -590,6 +560,35 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
         } else {
+            // Check ban status first
+            if (currentUsername != null) {
+                String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
+                Response<Boolean> response = marketService.userExists(currentUsername);
+                if (!response.errorOccurred() && response.getValue()) {
+                    isBanned = permissionManager.isBanned(userId);
+                    if (isBanned) {
+                        // Schedule the UI updates to run after the view is fully attached
+                        UI.getCurrent().access(() -> {
+                            // Disable register and logout buttons immediately
+                            getChildren()
+                                .filter(component -> component instanceof Button)
+                                .map(component -> (Button) component)
+                                .forEach(button -> {
+                                    if (button.getElement().hasAttribute("data-register-button") || 
+                                        button.getElement().hasAttribute("data-logout-button")) {
+                                        button.setEnabled(false);
+                                        button.getStyle()
+                                            .set("background-color", "#718096")
+                                            .set("color", "white")
+                                            .set("cursor", "not-allowed")
+                                            .set("opacity", "0.5");
+                                    }
+                                });
+                        });
+                    }
+                }
+            }
+            // Then proceed with regular ban status check which will handle other UI elements
             checkBanStatus();
         }
     }
@@ -599,6 +598,10 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
         tradingButton.getStyle()
             .set("background-color", "#4299e1")
             .set("color", "white");
+        
+        // Add data attribute to identify trading button
+        tradingButton.getElement().setAttribute("data-trading-button", "true");
+        
         add(tradingButton);
     }
 
@@ -627,36 +630,91 @@ public class HomePageView extends VerticalLayout implements BeforeEnterObserver 
                 boolean wasBanned = isBanned;  // Store previous state
                 isBanned = permissionManager.isBanned(userId);
                 
-                // If ban status changed, update UI
-                if (wasBanned != isBanned) {
-                    if (isBanned) {
-                        // Remove action columns
-                        List<Grid.Column<ItemDTO>> columnsToRemove = new ArrayList<>();
-                        productGrid.getColumns().forEach(column -> {
-                            String header = column.getHeaderText();
-                            if (header != null && (header.equals("Actions") || header.equals("Cart") || header.equals("Auction"))) {
-                                columnsToRemove.add(column);
-                            }
+                // Always update UI if user is banned, not just on status change
+                if (isBanned) {
+                    // Remove action columns from product grid
+                    List<Grid.Column<ItemDTO>> columnsToRemove = new ArrayList<>();
+                    productGrid.getColumns().forEach(column -> {
+                        String header = column.getHeaderText();
+                        if (header != null && (
+                            header.equals("Actions") || 
+                            header.equals("Cart") || // Remove "Add to Cart" column
+                            header.equals("Auction") ||
+                            header.toLowerCase().contains("edit") ||
+                            header.toLowerCase().contains("delete"))) {
+                            columnsToRemove.add(column);
+                        }
+                    });
+                    columnsToRemove.forEach(column -> productGrid.removeColumn(column));
+                    
+                    // Disable all interactive components except view cart
+                    searchBar.setEnabled(false);
+                    filterBtn.setEnabled(false);
+                    refreshBtn.setEnabled(false);
+                    goToSearchBtn.setEnabled(false);
+                    minPriceField.setEnabled(false);
+                    maxPriceField.setEnabled(false);
+                    minRatingField.setEnabled(false);
+                    maxRatingField.setEnabled(false);
+                    minAmountField.setEnabled(false);
+                    categoryFilter.setEnabled(false);
+                    
+                    // Keep cart button enabled but update its style to indicate read-only
+                    cartBtn.setEnabled(true);
+                    cartBtn.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("border", "2px solid #4a5568");
+                    
+                    // Disable register and logout buttons
+                    registerBtn.setEnabled(false);
+                    registerBtn.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("cursor", "not-allowed")
+                        .set("opacity", "0.5");
+
+                    logoutBtn.setEnabled(false);
+                    logoutBtn.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("cursor", "not-allowed")
+                        .set("opacity", "0.5");
+                    
+                    // Disable trading operations button
+                    getChildren()
+                        .filter(component -> component instanceof Button)
+                        .map(component -> (Button) component)
+                        .filter(button -> "Trading Operations".equals(button.getText()))
+                        .findFirst()
+                        .ifPresent(button -> {
+                            button.setEnabled(false);
+                            button.getStyle()
+                                .set("background-color", "#718096")
+                                .set("color", "white")
+                                .set("cursor", "not-allowed")
+                                .set("opacity", "0.5");
                         });
-                        columnsToRemove.forEach(column -> productGrid.removeColumn(column));
-                        
-                        // Disable interactive components
-                        searchBar.setEnabled(false);
-                        filterBtn.setEnabled(false);
-                        refreshBtn.setEnabled(false);
-                        cartBtn.setEnabled(false);
-                        goToSearchBtn.setEnabled(false);
-                        
+                    
+                    // Call the frontend disableInteractiveElements function
+                    UI.getCurrent().getPage().executeJs(
+                        "if (typeof disableInteractiveElements === 'function') {" +
+                        "  disableInteractiveElements();" +
+                        "}"
+                    );
+                    
+                    if (!wasBanned) {  // Only show notification if newly banned
                         // Show ban notification
-                        Notification.show("Your account has been banned. Some features are disabled.", 
-                                       5000, Notification.Position.MIDDLE);
-                    } else {
-                        // Refresh the page to restore all functionality
-                        UI.getCurrent().getPage().reload();
+                        Notification notification = new Notification(
+                            "Your account has been banned. You can still view your cart but other features are disabled.",
+                            5000,
+                            Notification.Position.MIDDLE
+                        );
+                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                        notification.open();
                     }
                 }
             }
         }
-        this.user =(UserDTO)UI.getCurrent().getSession().getAttribute("user");
     }
 }

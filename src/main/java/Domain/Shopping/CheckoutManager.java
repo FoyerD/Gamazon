@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,13 +15,18 @@ import Application.utils.Response;
 import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Store.IProductRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Policy;
 import Domain.Store.Product;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
+import Domain.User.Member;
+import Domain.management.PolicyFacade;
 
 /**
  * Manages the checkout process including inventory updates, payment processing, and rollback operations.
@@ -35,6 +41,9 @@ public class CheckoutManager {
     private final IProductRepository productRepo;
     private final ReceiptBuilder receiptBuilder;
     private final DiscountFacade discountFacade;
+    private final PolicyFacade policyFacade;
+    private final Function<String, Member> memberLookup;
+    private final IReceiptRepository receiptRepo;
 
     @Autowired
     public CheckoutManager(IShoppingBasketRepository basketRepo, 
@@ -42,7 +51,10 @@ public class CheckoutManager {
                           ItemFacade itemFacade, 
                           IProductRepository productRepo,
                           ReceiptBuilder receiptBuilder,
-                          DiscountFacade discountFacade, IExternalSupplyService supplyService) {
+                          DiscountFacade discountFacade, IExternalSupplyService supplyService,
+                          PolicyFacade policyFacade,
+                          IReceiptRepository receiptRepo,
+                          Function<String, Member> memberLookup) {
         this.supplyService = supplyService;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
@@ -50,6 +62,9 @@ public class CheckoutManager {
         this.productRepo = productRepo;
         this.receiptBuilder = receiptBuilder;
         this.discountFacade = discountFacade;
+        this.policyFacade = policyFacade;
+        this.memberLookup = memberLookup;
+        this.receiptRepo = receiptRepo;
     }
 
     /**
@@ -74,6 +89,7 @@ public class CheckoutManager {
         Set<String> cartRollbackData = new HashSet<>();
         Map<String, Map<Product, Integer>> storeProductsMap = new HashMap<>();
         Map<String, Map<Product, Double>> storeProductPricesMap = new HashMap<>(); // Store discounted prices
+
         Response<Integer> paymentResponse = new Response<>(-1);
         Response<Integer> supplyResponse = new Response<>(-1);
         
@@ -85,9 +101,17 @@ public class CheckoutManager {
             if (storeIds != null) {
                 for (String storeId : storeIds) {
                     ShoppingBasket basket = basketRepo.get(new Pair<>(clientId, storeId));
+
                     if (basket != null && !basket.isEmpty()) {
                         CheckoutStoreResult storeResult = processStoreBasket(storeId, basket, itemsRollbackData, basketsRollbackData);
-                        
+                        // Check if cart abids by policies
+                        List<Policy> policies = policyFacade.getAllStorePolicies(storeId);
+                        Member member = memberLookup.apply(clientId);
+                        for (Policy policy : policies) {
+                            if (!policy.isApplicable(basket, member)) {
+                                throw new RuntimeException("Checkout failed: Basket does not comply with store policies");
+                            }
+                        }
                         if (storeResult.isSuccess()) {
                             purchaseSuccess = true;
                             totalPrice += storeResult.getTotalPrice();
@@ -100,6 +124,9 @@ public class CheckoutManager {
                         basketRepo.update(new Pair<>(clientId, storeId), basket);
                     }
                 }
+            }
+            else{
+                throw new RuntimeException("Checkout failed: Cart is empty");
             }
             // Process payment if there are items to checkout
             if (purchaseSuccess) {
@@ -141,7 +168,32 @@ public class CheckoutManager {
             if(supplyResponse.getValue() == -1) {
                 throw new RuntimeException("Supply failed: Invalid transaction ID");
             }
-        
+
+            for (String storeId : storeIds) {
+                String maskedCardNumber = "xxxx-xxxx-xxxx-" + cardNumber.substring(cardNumber.length() - 4);
+                String paymentDetails = "Card: " + maskedCardNumber;
+                Map<Product, Double> productPrices = storeProductPricesMap.get(storeId);
+                Map<Product, Integer> productQuantities = storeProductsMap.get(storeId);
+                Map<Product, Pair<Integer, Double>> productPricesWithQuantities = new HashMap<>();
+                if (productPrices != null && productQuantities != null) {
+                    for (Map.Entry<Product, Integer> entry : productQuantities.entrySet()) {
+                        Product product = entry.getKey();
+                        Integer quantity = entry.getValue();
+                        if (product != null && quantity != null) {
+                            Double price = productPrices.get(product);
+                            if (price != null) {
+                                productPricesWithQuantities.put(product, new Pair<>(quantity, price));
+                            }
+                        }
+                    }
+                }
+                double storeTotal = storeProductPricesMap.get(storeId).values().stream()
+                        .mapToDouble(price -> price * productQuantities.getOrDefault(price, 0))
+                        .sum();
+
+                receiptRepo.savePurchase(clientId, storeId, productPricesWithQuantities, storeTotal, paymentDetails);
+            }
+            
 
             return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData, paymentResponse.getValue(), supplyResponse.getValue());
             

@@ -1,22 +1,35 @@
 package Domain.User;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import Domain.management.PermissionManager;
+import Domain.Repos.IUserRepository;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginManagerTest {
+
 
     @Mock
     private IUserRepository userRepository;
@@ -176,6 +189,7 @@ public class LoginManagerTest {
     public void testExit_ById_Success() {
         String userId = UUID.randomUUID().toString();
         User user = mock(User.class);
+        when(user.isLoggedIn()).thenReturn(true);
         when(userRepository.get(userId)).thenReturn(user);
 
         loginManager.exit(userId);
@@ -207,4 +221,36 @@ public class LoginManagerTest {
 
         loginManager.exit(guest);
     }
+
+    @Test
+    public void testLogOutAllUsers_AllLoggedOutAndUpdated() {
+        // Arrange
+        Guest guest1 = spy(Guest.createGuest());
+        Guest guest2 = spy(Guest.createGuest());
+        Member member = spy(new Member(UUID.randomUUID(), "zoe", "pass", "z@x.com"));
+
+        // Set them as logged in
+        doReturn(true).when(guest1).isLoggedIn();
+        doReturn(true).when(guest2).isLoggedIn();
+        doReturn(true).when(member).isLoggedIn();
+
+
+        List<User> allUsers = List.of(guest1, guest2, member);
+        when(userRepository.getAllUsers()).thenReturn(allUsers);
+        when(userRepository.update(guest1.getId(), guest1)).thenReturn(guest1);
+        when(userRepository.update(guest2.getId(), guest2)).thenReturn(guest2);
+        when(userRepository.update(member.getId(), member)).thenReturn(member);
+        when(userRepository.remove(guest1.getId())).thenReturn(guest1);
+        when(userRepository.remove(guest2.getId())).thenReturn(guest2);
+
+        // Act
+        loginManager.logOutAllUsers();
+
+        // Assert
+        for (User user : allUsers) {
+            verify(user).logout(loginManager);
+            verify(userRepository).update(user.getId(), user);
+        }
+    }
+
 }

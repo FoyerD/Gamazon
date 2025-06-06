@@ -1,17 +1,17 @@
 package Domain;
 
-import Domain.Shopping.IReceiptRepository;
-import Domain.Shopping.IShoppingBasketRepository;
-import Domain.Shopping.IShoppingCartRepository;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.IItemRepository;
-import Domain.Store.IProductRepository;
-import Domain.Store.IStoreRepository;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IPermissionRepository;
+import Domain.Repos.IPolicyRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IShoppingCartRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Discounts.IDiscountRepository;
-// import Domain.Store.Discounts.Conditions.IConditionRepository;
-import Domain.User.IUserRepository;
-import Domain.management.IPermissionRepository;
 
 public interface IRepoManager {
     public IStoreRepository getStoreRepository();
@@ -26,4 +26,6 @@ public interface IRepoManager {
     public IUserRepository getUserRepository();
     public IDiscountRepository getDiscountRepository();
     // public IConditionRepository getConditionRepository();
+    public IPolicyRepository getPolicyRepository();
 }
+

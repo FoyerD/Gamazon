@@ -1,26 +1,35 @@
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IUserRepository;
+import Domain.Shopping.Receipt;
+import Domain.Shopping.ShoppingCartFacade;
+import Domain.User.Member;
+import Domain.User.User;
 import Domain.management.MarketFacade;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
-import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Shopping.Receipt;
-import Domain.Shopping.ShoppingCartFacade;
-import Domain.User.IUserRepository;
-import Domain.User.Member;
-import Domain.User.User;
-import org.junit.Before;
-import org.junit.Test;
-
-import Application.utils.Response;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 public class MarketFacadeTest {
 
@@ -93,10 +102,10 @@ public class MarketFacadeTest {
         String managerId = "managerUser";
         
         // Execute
-        marketFacade.removeStoreManager(removerId, managerId, storeId);
+        marketFacade.removeStoreOwner(removerId, managerId, storeId);
         
         // Verify that permissionManager.removeStoreManager was called with the correct parameters
-        verify(permissionManager).removeStoreManager(removerId, managerId, storeId);
+        verify(permissionManager).removeStoreOwner(removerId, managerId, storeId);
     }
 
     @Test
@@ -109,6 +118,7 @@ public class MarketFacadeTest {
         
         // Set up the permissionManager mock to use our map
         when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
+        when(userRepository.getMember("newOwner")).thenReturn(mock(Member.class));
         
         // Set up the appointStoreOwner method behavior to modify our map
         doAnswer(invocation -> {

@@ -7,6 +7,7 @@ import Domain.FacadeManager;
 import Domain.ExternalServices.INotificationService;
 
 
+
 public class ServiceManager {
     private ItemService itemService;
     private StoreService storeService;
@@ -18,6 +19,7 @@ public class ServiceManager {
     private ShoppingService shoppingService;
     private FacadeManager facadeManager;
     private INotificationService notificationService;
+    private PolicyService policyService;
 
     public ServiceManager(FacadeManager facadeManager) {
         this.facadeManager = facadeManager;
@@ -37,6 +39,16 @@ public class ServiceManager {
                                         facadeManager.getPermissionManager());
         }
         return itemService;
+    }
+
+    public PolicyService getPolicyService() {
+        if (policyService == null) {
+            policyService = new PolicyService(facadeManager.getPolicyFacade(),
+                                            getTokenService(),
+                                            facadeManager.getPermissionManager(),
+                                            facadeManager.getRepositoryManager().getItemRepository());
+        }
+        return policyService;
     }
 
     public INotificationService getINotificationService() {
@@ -61,7 +73,8 @@ public class ServiceManager {
                                             facadeManager.getPermissionManager(),
                                             getINotificationService(),
                                             facadeManager.getShoppingCartFacade(),
-                                            facadeManager.getDiscountFacade());
+                                            facadeManager.getDiscountFacade(),
+                                            facadeManager.getPaymentService());
         }
         return storeService;
     }
@@ -109,7 +122,7 @@ public class ServiceManager {
         }
         return shoppingService;
     }
-
+    
     public void injectINotificationService(INotificationService notificationService) {
         this.notificationService = notificationService;
     }

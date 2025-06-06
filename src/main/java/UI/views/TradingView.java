@@ -1,33 +1,39 @@
 package UI.views;
 
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.timepicker.TimePicker;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import UI.presenters.ITradingPresenter;
-import Application.DTOs.StoreDTO;
-import Application.utils.Response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Route;
+
+import Application.DTOs.StoreDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.ITradingPresenter;
+import UI.presenters.IUserSessionPresenter;
+
 @Route("trading")
-public class TradingView extends VerticalLayout implements BeforeEnterObserver {
+public class TradingView extends BaseView implements BeforeEnterObserver {
     private final ITradingPresenter tradingPresenter;
     private final TextField storeNameField;
     private final Button closeStoreButton;
@@ -43,7 +49,8 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
     private final Button viewBannedUsersButton;
 
     @Autowired
-    public TradingView(ITradingPresenter tradingPresenter) {
+    public TradingView(ITradingPresenter tradingPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.tradingPresenter = tradingPresenter;
         
         H2 title = new H2("Store Trading Operations");
@@ -201,25 +208,18 @@ public class TradingView extends VerticalLayout implements BeforeEnterObserver {
         if (response.errorOccurred()) {
             Notification.show("Failed to ban user: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
-            // First disable all interactive elements immediately
-            UI.getCurrent().getPage().executeJs(
-                "if (document.querySelector('.user-menu')) {" +
-                "  document.querySelectorAll('button:not(.view-only), input:not(.view-only), select:not(.view-only), a:not(.view-only)').forEach(el => {" +
-                "    el.disabled = true;" +
-                "    el.style.pointerEvents = 'none';" +
-                "    el.style.opacity = '0.5';" +
-                "  });" +
-                "}"
+            // Show notification and clear fields
+            Notification notification = new Notification(
+                "User '" + username + "' banned successfully until " + endDateTime,
+                3000,
+                Notification.Position.MIDDLE
             );
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            notification.open();
             
-            // Then show notification and clear fields
-            Notification.show("User '" + username + "' banned successfully until " + endDateTime, 3000, Notification.Position.MIDDLE);
             usernameToBanField.clear();
             banEndDatePicker.clear();
             banEndTimePicker.clear();
-            
-            // Finally reload the page
-            UI.getCurrent().getPage().executeJs("setTimeout(() => window.location.reload(), 1000);");
         }
     }
 

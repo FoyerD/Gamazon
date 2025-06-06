@@ -13,17 +13,30 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+<<<<<<< HEAD
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+=======
+import com.vaadin.flow.component.textfield.EmailField;
+>>>>>>> v3
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 
 import Application.utils.Response;
+<<<<<<< HEAD
 import UI.presenters.IPurchasePresenter;
+=======
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IPurchasePresenter;
+import UI.presenters.IUserSessionPresenter;
+
+>>>>>>> v3
 
 @Route("checkout")
-public class CheckoutView extends VerticalLayout implements BeforeEnterObserver {
+public class CheckoutView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
     private String sessionToken;
@@ -43,7 +56,9 @@ public class CheckoutView extends VerticalLayout implements BeforeEnterObserver 
     private final Button backToCartButton = new Button("Return to Cart");
 
     @Autowired
-    public CheckoutView(IPurchasePresenter purchasePresenter) {
+    public CheckoutView(IPurchasePresenter purchasePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager
+        ,IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
 
         setSizeFull();

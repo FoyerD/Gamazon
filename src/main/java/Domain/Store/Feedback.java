@@ -1,12 +1,20 @@
 package Domain.Store;
 
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "feedback")
 public class Feedback {
+
+    @Id
+    private String feedbackId;
+
     private String customerId;
     private String storeId;
     private String productId;
-    private String feedbackId;
     private String comment;
+
+    protected Feedback() {} // Required by JPA
 
     public Feedback(String feedbackId, String customerId, String storeId, String productId, String comment) {
         this.feedbackId = feedbackId;
@@ -15,33 +23,58 @@ public class Feedback {
         this.productId = productId;
         this.comment = comment;
     }
+
+    public String getFeedbackId() {
+        return feedbackId;
+    }
+
     public String getCustomerId() {
         return customerId;
     }
+
     public String getStoreId() {
         return storeId;
     }
+
     public String getProductId() {
         return productId;
     }
+
     public String getComment() {
         return comment;
     }
-    public String getFeedbackId() {
-        return feedbackId;
+
+    // Setters for JPA
+    public void setFeedbackId(String feedbackId) {
+        this.feedbackId = feedbackId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Feedback)) return false;
+        Feedback that = (Feedback) o;
+        return feedbackId != null && feedbackId.equals(that.feedbackId);
+    }
 
-        Feedback feedback = (Feedback) o;
-
-        if (!customerId.equals(feedback.customerId)) return false;
-        if (!storeId.equals(feedback.storeId)) return false;
-        if (!productId.equals(feedback.productId)) return false;
-        if (!feedbackId.equals(feedback.feedbackId)) return false;
-        return comment.equals(feedback.comment);
+    @Override
+    public int hashCode() {
+        return feedbackId != null ? feedbackId.hashCode() : 0;
     }
 }

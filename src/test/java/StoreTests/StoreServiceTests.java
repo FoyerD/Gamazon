@@ -1,7 +1,5 @@
 package StoreTests;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -9,22 +7,22 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import Application.ItemService;
-import Application.ProductService;
-import Application.ServiceManager;
-import Application.StoreService;
-import Infrastructure.MemoryRepoManager;
-import Domain.FacadeManager;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
+import Application.ItemService;
+import Application.ProductService;
+import Application.ServiceManager;
+import Application.StoreService;
 import Application.utils.Response;
+import Domain.FacadeManager;
+import Infrastructure.MemoryRepoManager;
 
 
 public class StoreServiceTests {

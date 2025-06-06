@@ -1,37 +1,43 @@
 package UI.views;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 
+import Application.DTOs.ReceiptDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Application.DTOs.ReceiptDTO;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
-
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
+import UI.presenters.IUserSessionPresenter;
 
 @Route("user-profile")
-public class UserProfileView extends VerticalLayout implements BeforeEnterObserver {
+public class UserProfileView extends BaseView implements BeforeEnterObserver {
 
     private String sessionToken = null;
     private UserDTO userDTO = null;
 
     private final IPurchasePresenter purchasePresenter;
 
-    public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter) {
+    public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
 
         // Set yellow-themed layout styles
@@ -92,16 +98,18 @@ public class UserProfileView extends VerticalLayout implements BeforeEnterObserv
         );
 
         // Username and email
-        Span username = new Span("Username: " + userDTO.getUsername());
         Span email = new Span("Email: " + userDTO.getEmail());
-        Stream.of(username, email).forEach(span -> span.getStyle()
+        Span age = new Span("birthday: " 
+                                + userDTO.getBirthDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                +  ". " + userDTO.getAge() + " years old");
+        Stream.of(email, age).forEach(span -> span.getStyle()
                 .set("display", "block")
                 .set("margin", "0.5rem 0")
                 .set("color", "#222")
                 .set("font-size", "1.1rem")
         );
 
-        card.add(username, email);
+        card.add(email, age);
         add(header, card);
 
         // Move the back-to-home button to the top left and make the grid floaty like the others
