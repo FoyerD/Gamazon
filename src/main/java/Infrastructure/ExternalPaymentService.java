@@ -1,16 +1,19 @@
 package Infrastructure;
 
-import Application.utils.Response;
-import Domain.ExternalServices.IExternalPaymentService;
-import org.springframework.http.*;
+import java.util.Date;
+import java.util.Map;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import Application.utils.Error;
 
-import java.util.Date;
-import java.util.Map;
+import Application.utils.Error;
+import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
 
 @Service
 public class ExternalPaymentService implements IExternalPaymentService {
@@ -49,7 +52,7 @@ public class ExternalPaymentService implements IExternalPaymentService {
     }
 
     @Override
-    public Response<Integer> processPayment(String userId, String cardNumber, Date expiryDate, String cvv, String holder, double amount) {
+    public Response<Integer> processPayment(String userSSN, String cardNumber, Date expiryDate, String cvv, String holder, double amount) {
         try {            
             Map<String, String> data = Map.of(
                 "action_type", "pay" ,
@@ -60,7 +63,7 @@ public class ExternalPaymentService implements IExternalPaymentService {
                 "year", String.valueOf(expiryDate.getYear() + 1900),
                 "holder", holder,
                 "cvv", cvv ,
-                "id", userId
+                "id", userSSN
                 );
             String result = post(data);
             int transactionId = Integer.parseInt(result);

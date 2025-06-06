@@ -65,7 +65,7 @@ public class CheckoutManager {
      * @return CheckoutResult containing success status and any error messages
      */
     public CheckoutResult processCheckout(String clientId, IShoppingCart cart, 
-                                        String cardNumber, Date expiryDate, String cvv,
+                                        String userSSN, String cardNumber, Date expiryDate, String cvv,
                                         String clientName, String deliveryAddress, String city, 
                                         String country, String zipCode) {
         
@@ -104,7 +104,7 @@ public class CheckoutManager {
             // Process payment if there are items to checkout
             if (purchaseSuccess) {
                 paymentResponse = paymentService.processPayment(
-                    clientId, cardNumber, expiryDate, cvv, 
+                    userSSN, cardNumber, expiryDate, cvv, 
                     clientName, totalPrice
                 );
                 

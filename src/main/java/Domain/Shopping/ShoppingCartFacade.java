@@ -239,10 +239,10 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * This method has been refactored to use CheckoutManager for better separation of concerns.
      * 
      * @param clientId The ID of the client
+     * @param userSSN The client's social security number
      * @param cardNumber The payment card number
      * @param expiryDate The card expiry date
      * @param cvv The card CVV
-     * @param andIncrement Payment tracking identifier
      * @param clientName The client's name
      * @param deliveryAddress The delivery address
      * @return true if checkout was successful
@@ -250,7 +250,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
      * @throws RuntimeException if checkout fails
      */
     @Override
-    public boolean checkout(String clientId, String cardNumber, Date expiryDate, String cvv,
+    public boolean checkout(String clientId, String userSSN, String cardNumber, Date expiryDate, String cvv,
                            String clientName, String deliveryAddress, String city, String country, String zipCode) {
         
         // Validate arguments
@@ -265,7 +265,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         
         // Process checkout using CheckoutManager
         CheckoutManager.CheckoutResult result = checkoutManager.processCheckout(
-            clientId, cart, cardNumber, expiryDate, cvv, 
+            clientId, cart, userSSN, cardNumber, expiryDate, cvv, 
             clientName, deliveryAddress, city, country, zipCode
         );
         

@@ -100,8 +100,8 @@ public interface IPurchasePresenter {
      * @param deliveryAddress the address where the purchased items will be delivered
      * @return a {@link Response} indicating whether the purchase was successfully completed
      */
-    Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress);
+    Response<Boolean> purchaseCart(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode);
     
 
     /**

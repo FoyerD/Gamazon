@@ -242,7 +242,7 @@ public class ShoppingService{
 
     // Make Immidiate Purchase Use Case 2.5
     @Transactional
-    public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv,
+    public Response<Boolean> checkout(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
                            String clientName, String deliveryAddress, String city, String country, String zipCode) {
         String method = "checkout";
         if (!tokenService.validateToken(sessionToken)) {
@@ -261,7 +261,7 @@ public class ShoppingService{
                 return new Response<>(new Error("cartFacade is not initialized."));
             }
 
-            cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
+            cartFacade.checkout(clientId, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
             TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
             return new Response<>(true);
         } catch (Exception ex) {

@@ -57,11 +57,10 @@ public class PurchasePresenter implements IPurchasePresenter {
     }
 
     @Override
-    //TODO! YALI TOM ALMOG or whoever is in charge of the shopping service, please fix this,
-    //talk to itay about the parameter list REMIND HIM ABOUNT THE ID NOT BEING CLIENT ID
-    public Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress) {
-        return this.shoppingService.checkout(sessionToken, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+    public Response<Boolean> purchaseCart(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode) {
+        return this.shoppingService.checkout(sessionToken, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, 
+                                             city, country, zipCode);
     }
 
     @Override

@@ -48,6 +48,7 @@ public interface IShoppingCartFacade {
      * Processes checkout for all items in the cart
      * 
      * @param clientId The client ID
+     * @param userSSN The user's social security number
      * @param card_number The payment card number
      * @param expiry_date The card expiry date
      * @param cvv The card security code
@@ -55,7 +56,7 @@ public interface IShoppingCartFacade {
      * @param deliveryAddress The delivery address
      * @return true if checkout was successful
      */
-    boolean checkout(String clientId, String card_number, Date expiry_date, String cvv, 
+    boolean checkout(String clientId, String userSSN, String card_number, Date expiry_date, String cvv, 
                     String clientName, String deliveryAddress, String city, 
                                         String country, String zipCode);
     
