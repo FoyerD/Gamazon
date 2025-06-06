@@ -1,6 +1,7 @@
 package UI;
 
 import java.io.InputStream;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
 import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.management.PermissionType;
 
 @Component
@@ -37,6 +40,8 @@ public class AppInitializer implements CommandLineRunner, Ordered {
     private final MarketService marketService;
     private final TokenService tokenService;
     private final ShoppingService shoppingService;
+    private final IExternalPaymentService externalPaymentService;
+    private final IExternalSupplyService externalSupplyService;
 
     @Value("${app.init.state:default}")
     private String initState;
@@ -47,7 +52,10 @@ public class AppInitializer implements CommandLineRunner, Ordered {
             ProductService productService,
             ItemService itemService,
             MarketService marketService,
-            TokenService tokenService, ShoppingService shoppingService) {
+            TokenService tokenService, 
+            ShoppingService shoppingService,
+            IExternalPaymentService externalPaymentService,
+            IExternalSupplyService externalSupplyService) {
         this.userService = userService;
         this.storeService = storeService;
         this.productService = productService;
@@ -55,6 +63,9 @@ public class AppInitializer implements CommandLineRunner, Ordered {
         this.marketService = marketService;
         this.tokenService = tokenService;
         this.shoppingService = shoppingService;
+        this.externalPaymentService = externalPaymentService;
+        this.externalSupplyService = externalSupplyService;
+
     }
 
     private final Map<String, String> sessionTokens = new HashMap<>();
@@ -74,6 +85,12 @@ public class AppInitializer implements CommandLineRunner, Ordered {
             InputStream stream = new ClassPathResource("config/init.json").getInputStream();
             Map<String, List<Map<String, Object>>> states = mapper.readValue(stream, new TypeReference<>() {});
 
+            // Updating external services URLs
+            String URL = (String)(states.get("urlExternalServices").get(0).get("URL"));
+            Response<Void> paymentServiceResponse = externalPaymentService.updatePaymentServiceURL(URL);
+            Response<Void> supplyServiceResponse = externalSupplyService.updateSupplyServiceURL(URL);
+            System.out.println("External services URLs updated successfully. With URL: " + URL);
+
             List<Map<String, Object>> commands = states.get(initState);
             if (commands == null) {
                 System.err.println("❌ No such init state: " + initState);
@@ -84,7 +101,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                 handleCommand(cmd);
             }
         } catch (Exception e) {
-            System.err.println("❌ Error loading init.json: " + e.getMessage());
+            throw new RuntimeException("Failed to initialize application", e);
         }
 
         System.out.println("✅ App Initialization Complete");
@@ -116,11 +133,11 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             (String) cmd.get("password"));
                     if (!resp.errorOccurred()) {
                         sessionTokens.put((String) cmd.get("as"), resp.getValue().getSessionToken());
-                    } else System.err.println(resp.getErrorMessage());
+                    } else throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "openMarket" -> {
                     var resp = marketService.openMarket(sessionTokens.get(cmd.get("session").toString()));
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "addStore" -> {
                     var resp = storeService.addStore(
@@ -129,7 +146,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             (String) cmd.get("category"));
                     if (!resp.errorOccurred()) {
                         values.put((String) cmd.get("as"), resp.getValue().getId());
-                    } else System.err.println(resp.getErrorMessage());
+                    } else throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "addProduct" -> {
                     var resp = productService.addProduct(
@@ -139,7 +156,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             (List<String>) cmd.get("keywords"));
                     if (!resp.errorOccurred()) {
                         values.put((String) cmd.get("as"), resp.getValue().getId());
-                    } else System.err.println(resp.getErrorMessage());
+                    } else throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "addItem" -> {
                     var resp = itemService.add(
@@ -156,7 +173,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             sessionTokens.get(cmd.get("session").toString()),
                             tokenService.extractId(sessionTokens.get(cmd.get("target").toString())),
                             values.get(cmd.get("store").toString()));
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "changePermissions" -> {
                     var resp = marketService.changeManagerPermissions(
@@ -165,25 +182,25 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             values.get(cmd.get("store").toString()),
                             ((List<String>) cmd.get("permissions")).stream()
                                     .map(PermissionType::valueOf).toList());
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "logout" -> {
                     var resp = userService.exit(sessionTokens.get(cmd.get("session").toString()));
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "appointStoreManager" -> {
                     var resp = marketService.appointStoreManager(
                             sessionTokens.get(cmd.get("session").toString()),
                             tokenService.extractId(sessionTokens.get(cmd.get("target").toString())),
                             values.get(cmd.get("store").toString()));
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "appointStoreOwner" -> {
                     var resp = marketService.appointStoreOwner(
                             sessionTokens.get(cmd.get("session").toString()),
                             tokenService.extractId(sessionTokens.get(cmd.get("target").toString())),
                             values.get(cmd.get("store").toString()));
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "changeManagerPermissions" -> {
                     var resp = marketService.changeManagerPermissions(
@@ -192,7 +209,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             values.get(cmd.get("store").toString()),
                             ((List<String>) cmd.get("permissions")).stream()
                                     .map(PermissionType::valueOf).toList());
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "addAuction" -> {
                     var resp = storeService.addAuction(
@@ -201,7 +218,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             values.get(cmd.get("product").toString()),
                             (String) cmd.get("auctionEndDate"),
                             ((Number) cmd.get("startPrice")).doubleValue());
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "addToCart" -> {
                     var resp = shoppingService.addProductToCart(
@@ -209,7 +226,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             sessionTokens.get(cmd.get("session").toString()),
                             values.get(cmd.get("product").toString()),
                             ((Number) cmd.get("quantity")).intValue());
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "makeBid" -> {
                     var resp = shoppingService.makeBid(
@@ -222,7 +239,7 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             ((Number) cmd.get("andIncrement")).longValue(),
                             (String) cmd.get("clientName"),
                             (String) cmd.get("deliveryAddress"));
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "checkout" -> {
                     var resp = shoppingService.checkout(
@@ -233,12 +250,27 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             ((Number) cmd.get("andIncrement")).longValue(),
                             (String) cmd.get("clientName"),
                             (String) cmd.get("deliveryAddress"));
-                    if (resp.errorOccurred()) System.err.println(resp.getErrorMessage());
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
+                }
+                case "ban" -> {
+                    var resp = marketService.banUser(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            tokenService.extractId(sessionTokens.get(cmd.get("target").toString())),
+                            cmd.get("experationDate") != null
+                                    ? new Date(((Number) cmd.get("experationDate")).longValue())
+                                    : null);
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
+                }
+                case "unban" -> {
+                    var resp = marketService.unbanUser(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            tokenService.extractId(sessionTokens.get(cmd.get("target").toString())));
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 default -> System.err.println("⚠ Unknown command: " + action);
             }
         } catch (Exception e) {
-            System.err.println("❌ Exception in command '" + action + "': " + e.getMessage());
+            throw new RuntimeException("Failed to handle command: " + action, e);
         }
     }
 }

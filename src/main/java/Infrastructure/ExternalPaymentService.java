@@ -19,7 +19,7 @@ import Domain.ExternalServices.IExternalPaymentService;
 public class ExternalPaymentService implements IExternalPaymentService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private String URL = "https://damp-lynna-wsep-1984852e.koyeb.app/";
+    private String URL = "";
 
     @Override
     public Response<Void> updatePaymentServiceURL(String newUrl) {
