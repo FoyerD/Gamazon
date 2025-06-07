@@ -1,3 +1,4 @@
+
 package UI.views;
 
 import java.util.HashMap;
@@ -43,8 +44,6 @@ public class CartView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
     private final IStorePresenter storePresenter;
-    private final MarketService marketService;
-    private final PermissionManager permissionManager;
     private String sessionToken;
     private String currentUsername;
     private boolean isBanned = false;
@@ -60,14 +59,12 @@ public class CartView extends BaseView implements BeforeEnterObserver {
 
     @Autowired
     public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter,
-                    MarketService marketService, PermissionManager permissionManager, IUserSessionPresenter sessionPresenter,
+                    IUserSessionPresenter sessionPresenter,
                     @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager globalLogoutManager
                         ,INotificationPresenter notificationPresenter) {
         super(dbHealthStatus, globalLogoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
         this.storePresenter = storePresenter;
-        this.marketService = marketService;
-        this.permissionManager = permissionManager;
         
         setSizeFull();
         setSpacing(true);
@@ -120,10 +117,9 @@ public class CartView extends BaseView implements BeforeEnterObserver {
         
         // Check ban status
         if (sessionToken != null && currentUsername != null) {
-            String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
-            Response<Boolean> response = marketService.userExists(currentUsername);
-            if (!response.errorOccurred() && response.getValue()) {
-                isBanned = permissionManager.isBanned(userId);
+            Response<Boolean> isBannedResponse = sessionPresenter.isUserBanned(sessionToken);
+            if (!isBannedResponse.errorOccurred()) {
+                isBanned = isBannedResponse.getValue();
                 if (isBanned) {
                     // Disable checkout button
                     checkoutButton.setEnabled(false);
