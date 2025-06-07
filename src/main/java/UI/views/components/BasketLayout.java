@@ -243,15 +243,6 @@ public  class BasketLayout extends VerticalLayout{
     violationsLayout.setPadding(false);
     violationsLayout.setMargin(false);
     violationsLayout.setWidthFull();
-        // Add header
-    Span header = new Span("Violated Store Policies:");
-    header.getStyle()
-        .setFontWeight("bold")
-        .setFontSize("16px")
-        .setMarginBottom("10px")
-        .setColor(" #333");
-
-    violationsLayout.add(header);
 
     policies.stream()
         .map(policy -> {

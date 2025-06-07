@@ -696,7 +696,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         return this.getCart(memberId) 
             .getCart().stream() // get stores ids
             .flatMap(storeId -> policyFacade.getAllStorePolicies(storeId).stream()) // get all policies for all stores
-            .filter(p -> p.isApplicable( // check if basket is a applicable
+            .filter(p -> !p.isApplicable( // check if basket is a applicable
                 this.getBasket(memberId, p.getStoreId()), // get basket
                 member)
             ).toList();
