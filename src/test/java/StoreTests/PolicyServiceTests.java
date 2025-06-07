@@ -18,11 +18,8 @@ import Application.utils.Response;
 
 import Domain.FacadeManager;
 import Domain.Repos.IItemRepository;
-import Domain.Repos.IPolicyRepository;
-import Domain.Repos.IProductRepository;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
-import Domain.management.PermissionType;
 import Infrastructure.MemoryRepoManager;
 
 /**
@@ -68,7 +65,8 @@ public class PolicyServiceTests {
             facadeManager.getPolicyFacade(),
             this.tokenService,
             this.permManager,
-            this.itemRepo
+            this.itemRepo,
+            facadeManager.getShoppingCartFacade()
         );
 
         // ----- A) Register a user to get a valid tokenId -----

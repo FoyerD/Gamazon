@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import Application.DTOs.CartDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
 
@@ -110,5 +111,13 @@ public interface IPurchasePresenter {
      * @param sessionToken the token representing the current authenticated user session
      * @return a {@link Response} containing a list of {@link ReceiptDTO} representing the user's purchases
      */
-    public Response<List<ReceiptDTO>> getPersonalPurcahses(String sessionToken);
+    public Response<List<ReceiptDTO>> getPersonalPurchases(String sessionToken);
+
+
+    /**
+     * Gets all of the policies that the user's cart has violated
+     * @param sessionToken the token representing the current authenticated user session
+     * @return a {@link Response} containing a list of {@link PolicyDTO} representing the user's policies
+     */
+    public Response<List<PolicyDTO>> getViolatedPolicies(String sessionToken);
 }

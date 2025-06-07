@@ -46,7 +46,8 @@ public class ServiceManager {
             policyService = new PolicyService(facadeManager.getPolicyFacade(),
                                             getTokenService(),
                                             facadeManager.getPermissionManager(),
-                                            facadeManager.getRepositoryManager().getItemRepository());
+                                            facadeManager.getRepositoryManager().getItemRepository(),
+                                            facadeManager.getShoppingCartFacade());
         }
         return policyService;
     }

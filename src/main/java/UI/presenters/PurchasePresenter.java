@@ -5,17 +5,21 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import Application.PolicyService;
 import Application.ShoppingService;
 import Application.DTOs.CartDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
 
 @Component
 public class PurchasePresenter implements IPurchasePresenter {
     private final ShoppingService shoppingService;
+    private final PolicyService policyService;
 
-    public PurchasePresenter(ShoppingService shoppingService) {
+    public PurchasePresenter(ShoppingService shoppingService, PolicyService policyService) {
         this.shoppingService = shoppingService;
+        this.policyService = policyService;
     }
 
     @Override
@@ -63,8 +67,13 @@ public class PurchasePresenter implements IPurchasePresenter {
     }
 
     @Override
-    public Response<List<ReceiptDTO>> getPersonalPurcahses(String sessionToken) {
+    public Response<List<ReceiptDTO>> getPersonalPurchases(String sessionToken) {
         return this.shoppingService.getUserPurchaseHistory(sessionToken);
+    }
+
+    @Override
+    public Response<List<PolicyDTO>> getViolatedPolicies(String sessionToken) {
+        return this.policyService.getViolatedPolicies(sessionToken);
     }
     
 }

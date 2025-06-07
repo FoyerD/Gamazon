@@ -6,10 +6,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import Domain.Repos.IItemRepository;
 import Domain.Repos.IPolicyRepository;
-import Domain.Repos.IProductRepository;
 import Domain.Repos.IUserRepository;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
 import Domain.Store.Policy;
@@ -29,9 +28,9 @@ public class PolicyFacade {
                         ItemFacade itemFacadeMock,
                         ProductFacade productFacadeMock) {
         this.policyRepository = policyRepository;
-        this.userRepository    = userRepoMock;
-        this.itemFacade        = itemFacadeMock;
-        this.productFacade     = productFacadeMock;
+        this.userRepository   = userRepoMock;
+        this.itemFacade       = itemFacadeMock;
+        this.productFacade    = productFacadeMock;
     }
     
 

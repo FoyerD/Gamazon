@@ -8,6 +8,7 @@ import Application.DTOs.PolicyDTO.Builder;
 import Application.utils.Error;
 import Application.utils.TradingLogger;
 import Domain.Repos.IItemRepository;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.Store.Item;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
@@ -28,15 +29,18 @@ public class PolicyService {
     private final TokenService tokenService;
     private final PermissionManager permissionManager;
     private final IItemRepository itemRepository;
+    private final IShoppingCartFacade cartFacade;
 
     public PolicyService(PolicyFacade policyFacade,
                          TokenService tokenService,
                          PermissionManager permissionManager,
-                         IItemRepository itemRepository) {
+                         IItemRepository itemRepository,
+                         IShoppingCartFacade cartFacade) {
         this.policyFacade      = policyFacade;
         this.tokenService      = tokenService;
         this.permissionManager = permissionManager;
         this.itemRepository = itemRepository;
+        this.cartFacade = cartFacade;
     }
 
     private PolicyDTO convertPolicyToDTO(Policy policy) {
@@ -286,6 +290,31 @@ public class PolicyService {
             TradingLogger.logEvent(CLASS_NAME, method,
                     "Deleted policy " + policyId + " for store " + storeId);
             return new Response<>(true);
+
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+
+    public Response<List<PolicyDTO>> getViolatedPolicies(String sessionToken) {
+        String method = "getViolatedPolicies";
+        try {
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return Response.error("Invalid token");
+            }
+
+            String userId = tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from deleting policies.");
+            }
+
+            List<Policy> policies = cartFacade.getViolatedPolicies(userId);
+            
+            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + policies.size() + " vilolated policies for user " + userId);
+            return Response.success(policies.stream().map(this::convertPolicyToDTO).toList());
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, ex.getMessage());

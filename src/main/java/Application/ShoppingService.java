@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OrderedItemDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.utils.Error;

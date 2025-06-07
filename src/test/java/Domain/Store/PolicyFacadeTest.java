@@ -12,9 +12,6 @@ import org.junit.Test;
 import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IUserRepository;
 import Domain.Shopping.ShoppingBasket;
-import Domain.Store.ItemFacade;
-import Domain.Store.Policy;
-import Domain.Store.ProductFacade;
 import Domain.User.Member;
 import Domain.management.PolicyFacade;
 

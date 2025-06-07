@@ -2,6 +2,7 @@
 package UI.views;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import com.vaadin.flow.router.Route;
 
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.StoreDTO;
 import Application.MarketService;
@@ -191,16 +193,27 @@ public class CartView extends BaseView implements BeforeEnterObserver {
             return;
         }
 
+        Response<List<PolicyDTO>> policiesResponse = purchasePresenter.getViolatedPolicies(sessionToken);
+        if (policiesResponse.errorOccurred()) {
+            Notification.show("Error loading violated polices: " + cartResponse.getErrorMessage(), 
+                3000, Notification.Position.MIDDLE);
+        }
+
+        List<PolicyDTO> policies = policiesResponse.getValue();
+
         // Create a panel for each store basket
-        for (Map.Entry<String, ShoppingBasketDTO> basket : cart.getBaskets().entrySet()) {
+        for (Map.Entry<String, ShoppingBasketDTO> basketEntry : cart.getBaskets().entrySet()) {
+
+            String storeId = basketEntry.getKey();
+            ShoppingBasketDTO basket = basketEntry.getValue();
             // Check if the store is closed
-            Response<StoreDTO> storeResponse = storePresenter.getStoreByName(sessionToken, basket.getValue().getStoreName());
+            Response<StoreDTO> storeResponse = storePresenter.getStoreByName(sessionToken, basket.getStoreName());
             if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen() && storeResponse.getValue().isPermanentlyClosed()) {
                 // Store is permanently closed, remove the basket
-                purchasePresenter.clearBasket(sessionToken, basket.getKey());
+                purchasePresenter.clearBasket(sessionToken, storeId);
                 Notification.show(
                     String.format("Basket from store '%s' has been removed because the store is permanently closed", 
-                    basket.getValue().getStoreName()),
+                    basket.getStoreName()),
                     5000, 
                     Notification.Position.MIDDLE
                 );
@@ -209,19 +222,20 @@ public class CartView extends BaseView implements BeforeEnterObserver {
                 // Store is temporarily closed, show notification but keep basket
                 Notification.show(
                     String.format("Note: Store '%s' is temporarily closed. Your basket is preserved.", 
-                    basket.getValue().getStoreName()),
+                    basket.getStoreName()),
                     5000, 
                     Notification.Position.MIDDLE
                 );
             }
 
             BasketLayout basketLayout = new BasketLayout(
-                basket.getValue(),
+                basket,
+                policies.stream().filter(p -> p.getStoreId().equals(storeId)).toList(),
                 this::removeBasket,
                 this::removeProduct,
                 this::decrementAmount,
                 this::incrementAmount
-                );
+            );
             
             cartTotal += basketLayout.calculateBasketTotal();
             cartContent.add(basketLayout);
