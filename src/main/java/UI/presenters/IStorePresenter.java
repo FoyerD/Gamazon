@@ -5,6 +5,7 @@ import java.util.Locale.Category;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
+import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -113,4 +114,34 @@ public interface IStorePresenter {
      * @return Response with a list of {@link CategoryDTO} or an error.
      */
     Response<List<CategoryDTO>> getStoreCategories(String sessionToken, String storeId);
+
+    /**
+     * Adds a new discount to a store.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store where the discount will be added.
+     * @param discountDTO The discount details to be added.
+     * @return Response containing the created {@link DiscountDTO} or an error.
+     */
+    Response<DiscountDTO> addDiscount(String sessionToken, String storeId, DiscountDTO discountDTO);
+
+
+    /**
+     * Removes a discount from a store.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store from which the discount will be removed.
+     * @param discountId ID of the discount to be removed.
+     * @return Response with true if the discount was successfully removed, or false if it failed.
+     */
+    Response<Boolean> removeDiscount(String sessionToken, String storeId, String discountId);
+
+    /**
+     * Gets all discounts for a store.
+     *
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store to get discounts for.
+     * @return Response containing a list of {@link DiscountDTO} or an error.
+     */
+    Response<List<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeId);
 }

@@ -18,6 +18,7 @@ import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Policy;
@@ -54,7 +55,8 @@ public class CheckoutManager {
                           DiscountFacade discountFacade, IExternalSupplyService supplyService,
                           PolicyFacade policyFacade,
                           IReceiptRepository receiptRepo,
-                          Function<String, Member> memberLookup) {
+                          IUserRepository userRepo) {
+        this.memberLookup = userRepo::getMember; // Assuming IUserRepository has a method to get Member by ID
         this.supplyService = supplyService;
         this.basketRepo = basketRepo;
         this.paymentService = paymentService;
@@ -63,7 +65,6 @@ public class CheckoutManager {
         this.receiptBuilder = receiptBuilder;
         this.discountFacade = discountFacade;
         this.policyFacade = policyFacade;
-        this.memberLookup = memberLookup;
         this.receiptRepo = receiptRepo;
     }
 

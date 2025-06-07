@@ -68,7 +68,7 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         this.receiptRepo = receiptRepo;
         this.discountFacade = discountFacade;
         this.checkoutManager = new CheckoutManager(basketRepo, paymentService, itemFacade, productRepository,
-         new ReceiptBuilder(receiptRepo, itemFacade), discountFacade, supplyService, policyFacade, receiptRepository, userRepository::getMember);
+         new ReceiptBuilder(receiptRepo, itemFacade), discountFacade, supplyService, policyFacade, receiptRepository, userRepository);
     }
 
     /**
