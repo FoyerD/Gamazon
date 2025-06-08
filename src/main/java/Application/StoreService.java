@@ -369,11 +369,11 @@ public class StoreService {
      * accepts the offer and bill the one who made it
      * @param sessionToken session token of the employee accepting the offer
      * @param offerId ID of the offer to be accepted
-     * @return returns the Item
+     * @return returns the offer
      */
     @Transactional
     public Response<OfferDTO> acceptOffer(String sessionToken, String offerId) {
-         String method = "acceptOffer";
+        String method = "acceptOffer";
         try {
             if (!this.isInitialized()) {
                 TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
@@ -396,7 +396,7 @@ public class StoreService {
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(productName);
-            notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer accepted! purchased " + productName + " from " + storeName + " 🎉🔔");
+            notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer rejected! purchased " + productName + " from " + storeName + " 🎉🔔");
 
             TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
             return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
@@ -407,7 +407,47 @@ public class StoreService {
         }
     }
 
+    /**
+     * Requirement 3.9
+     * accepts the offer and bill the one who made it
+     * @param sessionToken session token of the employee accepting the offer
+     * @param offerId ID of the offer to be accepted
+     * @return returns the offer
+     */
+    public Response<OfferDTO> rejectOffer(String sessionToken, String offerId) {
+        String method = "rejectOffer";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
 
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from rejecting offers.");
+            }
+
+            Offer offer = offerManager.rejectOffer(userId, offerId);
+
+            Member member = loginManager.getMember(offer.getMemberId());
+            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
+            String productName = item.getProductName();
+            String storeName = storeFacade.getStoreName(productName);
+            notificationService.sendNotification(offer.getMemberId(), "Offer on " + productName + " for " + offer.getNewPrice() + " was rejected! womp womp :(");
+
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
+            return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
+
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error accepting bid for auction %s: %s", offerId, ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
+    }
 
 
     /**

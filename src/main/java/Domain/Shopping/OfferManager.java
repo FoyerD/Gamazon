@@ -67,9 +67,9 @@ public class OfferManager {
         //     throw new IllegalArgumentException("Supply service is not set");
         // }
 
-        permissionManager.checkPermission(employeeId, offerId, PermissionType.OVERSEE_OFFERS);
-
         Offer offer = getOffer(employeeId, offerId);
+        permissionManager.checkPermission(employeeId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
+
         Pair<String, String> itemId = new Pair<>(offer.getStoreId(), offer.getProductId());
 
         Object itemLock = itemRepository.getLock(itemId);
@@ -97,5 +97,12 @@ public class OfferManager {
 
         offerRepository.remove(offerId);
         return offer;
+    }
+
+
+    public Offer rejectOffer(String employeeId, String offerId) {
+        Offer offer = getOffer(employeeId, offerId);
+        permissionManager.checkPermission(employeeId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
+        return offerRepository.remove(offerId);
     }
 }
