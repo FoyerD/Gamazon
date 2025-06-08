@@ -11,6 +11,7 @@ import Application.StoreService;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -121,6 +122,21 @@ public class ManagementPresenter implements IManagementPresenter {
     @Override
     public Response<List<PolicyDTO>> getStorePolicies(String sessionToken, String storeId) {
         return policyService.getAllStorePolicies(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<List<OfferDTO>> getStoreOffers(String sessionToken, String storeId) {
+        return storeService.getAllOffers(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<OfferDTO> acceptOffer(String sessionToken, String offerId) {
+        return storeService.acceptOffer(sessionToken, offerId);
+    }
+
+    @Override
+    public Response<OfferDTO> rejectOffer(String sessionToken, String offerId) {
+        return storeService.rejectOffer(sessionToken, offerId);
     }
     
 }

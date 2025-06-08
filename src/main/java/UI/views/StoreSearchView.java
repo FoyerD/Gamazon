@@ -24,6 +24,7 @@ import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.Route;
 
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
@@ -36,6 +37,7 @@ import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
 import UI.presenters.IUserSessionPresenter;
 import UI.views.components.ItemLayout;
+import UI.views.components.MakeOfferDialog;
 import UI.views.components.StoreLayout;
 
 
@@ -52,6 +54,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
     private final Button homeButton = new Button("Return to Homepage");
     private final Button createStoreButton;
     private final Button addProductButton;
+
 
     @Autowired
     public StoreSearchView(IStorePresenter storePresenter, IManagementPresenter managementPresenter, 
@@ -148,12 +151,24 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
                                         3000, Notification.Position.MIDDLE);
                     }
             },
-            i -> UI.getCurrent().navigate("product-review/" + i.getProductId())
+            i -> UI.getCurrent().navigate("product-review/" + i.getProductId()),
+            i -> {
+                MakeOfferDialog offerDialog = new MakeOfferDialog(i, (price, details) -> {
+                    Response<OfferDTO> offerResponse = purchasePresenter.makeOffer(sessionToken, i.getStoreId(), i.getProductId(), price, details);
+                    if (offerResponse.errorOccurred()) {
+                        Notification.show("Failed to make offer: " + offerResponse.getErrorMessage(), 5000, Notification.Position.BOTTOM_END);
+                    } else {
+                        OfferDTO offer = offerResponse.getValue();
+                        Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getNewPrice() + " was made successfully");
+                    }
+                });
+
+                offerDialog.open();
+            }
         );
 
         StoreLayout storelayout = new StoreLayout(store,
         itemLayout,
-        null,  // Remove owner action
         s -> {            // Keep manager action
             UI.getCurrent().getSession().setAttribute("currentStoreId", s.getId());
             UI.getCurrent().navigate("manager");

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import Application.PolicyService;
 import Application.ShoppingService;
 import Application.DTOs.CartDTO;
+import Application.DTOs.OfferDTO;
+import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
@@ -74,6 +76,11 @@ public class PurchasePresenter implements IPurchasePresenter {
     @Override
     public Response<List<PolicyDTO>> getViolatedPolicies(String sessionToken) {
         return this.policyService.getViolatedPolicies(sessionToken);
+    }
+
+    @Override
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails) {
+        return this.shoppingService.makeOffer(sessionToken, storeId, productId, newPrice, paymentDetails);
     }
     
 }

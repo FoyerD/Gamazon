@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
 
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.StoreDTO;
@@ -17,6 +18,7 @@ import Application.PolicyService;
 import Application.ServiceManager;
 import Application.TokenService;
 import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.FacadeManager;
 import Domain.Repos.IItemRepository;
 import Domain.Store.Policy;
@@ -47,7 +49,8 @@ public class PolicyServiceTests {
         MemoryRepoManager repoManager = new MemoryRepoManager();
 
         // 2. Initialize FacadeManager (provides PolicyFacade, PermissionManager, etc.)
-        FacadeManager facadeManager = new FacadeManager(repoManager, null);
+        IExternalPaymentService externalPaymentService = mock(IExternalPaymentService.class); 
+        FacadeManager facadeManager = new FacadeManager(repoManager, externalPaymentService);
 
         // 3. Initialize ServiceManager so we can register a user and create a store
         this.serviceManager = new ServiceManager(facadeManager);
@@ -62,13 +65,7 @@ public class PolicyServiceTests {
         this.itemRepo = repoManager.getItemRepository();
 
         // 7. Instantiate PolicyService with its real dependencies
-        this.policyService = new PolicyService(
-            facadeManager.getPolicyFacade(),
-            this.tokenService,
-            this.permManager,
-            this.itemRepo,
-            facadeManager.getShoppingCartFacade()
-        );
+        this.policyService = serviceManager.getPolicyService();
 
         // ----- A) Register a user to get a valid tokenId -----
         Response<UserDTO> guestResp = serviceManager.getUserService().guestEntry();

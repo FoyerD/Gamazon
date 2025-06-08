@@ -10,21 +10,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import Application.DTOs.OfferDTO;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OrderedItemDTO;
-import Application.DTOs.PolicyDTO;
+import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
-import Domain.Shopping.IShoppingCart;
-import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.Offer;
+import Domain.Shopping.OfferManager;
 import Domain.Shopping.Receipt;
 import Domain.Store.Item;
+import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
@@ -37,16 +40,26 @@ public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
     private final LoginManager loginManager;
-    private StoreFacade storeFacade;
-    private PermissionManager permissionManager;
+    private final StoreFacade storeFacade;
+    private final PermissionManager permissionManager;
+    private final OfferManager offerManager;
+    private final ItemFacade itemFacade;
 
     @Autowired
-    public ShoppingService(IShoppingCartFacade cartFacade, TokenService tokenService, StoreFacade storeFacade, PermissionManager permissionManager, LoginManager loginManager) {
+    public ShoppingService(IShoppingCartFacade cartFacade, 
+                            TokenService tokenService, 
+                            StoreFacade storeFacade, 
+                            PermissionManager permissionManager, 
+                            LoginManager loginManager,
+                            OfferManager offerManager,
+                            ItemFacade itemFacade) {
         this.cartFacade = cartFacade;
         this.tokenService = tokenService;
         this.storeFacade = storeFacade;
         this.permissionManager = permissionManager;
         this.loginManager = loginManager;
+        this.offerManager = offerManager;
+        this.itemFacade = itemFacade;
         
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "ShoppingService initialized with cart facade");
     }
@@ -356,5 +369,38 @@ public class ShoppingService{
             purchaseHistoryDTO.add(receiptDTO);
         }
         return purchaseHistoryDTO;
+    }
+
+    /**
+     * Requirement 3.9
+     * Member offers new price for product
+     * @param sessionToken Identifier for user
+     * @param storeId Store identifier from which user wants to bargain
+     * @param productId Identifier of the product that the user wants to bargain about.
+     * @param newPrice The new price that the user offers
+     * @return {@link OfferDTO}
+     */
+    @Transactional
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetailsDTO) {
+        String method = "bargainPrice";
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+            return Response.error("Invalid token");
+        }
+
+        String clientId = this.tokenService.extractId(sessionToken);
+
+        try {
+            UserDTO member = new UserDTO(loginManager.getLoggedInMember(clientId));
+            ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(storeId, productId));
+            Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
+            
+            OfferDTO offerDTO = new OfferDTO(offer.getId(), member, item, newPrice);
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
+            return Response.success(offerDTO);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error making offer: %s", ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
     }
 }

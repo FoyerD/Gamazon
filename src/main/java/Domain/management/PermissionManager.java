@@ -83,7 +83,7 @@ public class PermissionManager {
     public void checkPermission(String userId, String storeId, PermissionType requiredPermission) {
         Permission permission = permissionRepository.get(storeId, userId);
         if (permission == null || !permission.hasPermission(requiredPermission)) {
-            throw new SecurityException("User lacks permission " + requiredPermission + " for store " + storeId);
+            throw new SecurityException("User " + userId + " lacks permission " + requiredPermission + " for store " + storeId);
         }
     }
 

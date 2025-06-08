@@ -13,16 +13,25 @@ import org.springframework.transaction.annotation.Transactional;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.Offer;
+import Domain.Shopping.OfferManager;
 import Domain.Store.Item;
+import Domain.Store.ItemFacade;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.User.LoginManager;
+import Domain.User.Member;
+import Domain.User.User;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -35,6 +44,9 @@ public class StoreService {
     private PermissionManager permissionManager;
     private INotificationService notificationService;
     private IShoppingCartFacade shoppingCartFacade;
+    private final ItemFacade itemFacade;
+    private final OfferManager offerManager;
+    private final LoginManager loginManager;
     private IExternalPaymentService externalPaymentService;
 
     public StoreService() {
@@ -44,23 +56,42 @@ public class StoreService {
         this.notificationService = null;
         this.shoppingCartFacade = null;
         this.externalPaymentService = null;
+        this.loginManager = null;
+        this.offerManager = null;
+        this.itemFacade = null;
     }
 
     @Autowired
-    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, 
-                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, IExternalPaymentService externalPaymentService) {
+    public StoreService(StoreFacade storeFacade, 
+                        TokenService tokenService, 
+                        PermissionManager permissionManager, 
+                        INotificationService notificationService, 
+                        IShoppingCartFacade shoppingCartFacade, 
+                        ItemFacade itemFacade, 
+                        OfferManager offerManager, 
+                        LoginManager loginManager, 
+                        IExternalPaymentService externalPaymentService) {
         this.externalPaymentService = externalPaymentService;
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
         this.permissionManager = permissionManager;
+        this.offerManager = offerManager;
+        this.loginManager = loginManager;
+        this.itemFacade = itemFacade;
         this.shoppingCartFacade = shoppingCartFacade;
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "StoreService initialized with dependencies");
     }
 
     @Transactional
     private boolean isInitialized() {
-        return this.storeFacade != null && this.tokenService != null && this.permissionManager != null;
+        return this.storeFacade != null 
+            && this.tokenService != null
+            && this.permissionManager != null 
+            && this.loginManager != null 
+            && this.offerManager != null
+            && this.externalPaymentService != null;
+            //&& this.externalSupplyService != null;
     }
 
     @Transactional
@@ -334,6 +365,92 @@ public class StoreService {
     }
 
     /**
+     * Requirement 3.9
+     * accepts the offer and bill the one who made it
+     * @param sessionToken session token of the employee accepting the offer
+     * @param offerId ID of the offer to be accepted
+     * @return returns the accepted {@link OfferDTO}
+     */
+    @Transactional
+    public Response<OfferDTO> acceptOffer(String sessionToken, String offerId) {
+        String method = "acceptOffer";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from accepting offers.");
+            }
+
+            Offer offer = offerManager.acceptOffer(userId, offerId, externalPaymentService);
+
+            Member member = loginManager.getMember(offer.getMemberId());
+            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
+            String productName = item.getProductName();
+            String storeName = storeFacade.getStoreName(offer.getStoreId());
+            notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer rejected! purchased " + productName + " from " + storeName + " 🎉🔔");
+
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
+            return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
+
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error accepting offer %s: %s", offerId, ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
+    }
+
+    /**
+     * Requirement 3.9
+     * accepts the offer and bill the one who made it
+     * @param sessionToken session token of the employee accepting the offer
+     * @param offerId ID of the offer to be accepted
+     * @return returns the offer
+     */
+    public Response<OfferDTO> rejectOffer(String sessionToken, String offerId) {
+        String method = "rejectOffer";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from rejecting offers.");
+            }
+
+            Offer offer = offerManager.rejectOffer(userId, offerId);
+
+            Member member = loginManager.getMember(offer.getMemberId());
+            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
+            String productName = item.getProductName();
+            String storeName = storeFacade.getStoreName(offer.getStoreId());
+            notificationService.sendNotification(offer.getMemberId(), "Offer on " + productName + " for " + offer.getNewPrice() + " was rejected! womp womp :(");
+
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
+            return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
+
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error rejecting offer %s: %s", offerId, ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
+    }
+
+
+    /**
      * Gets all users who have shopping baskets in a specific store.
      * 
      * @param storeId The ID of the store
@@ -381,7 +498,7 @@ public class StoreService {
     }
 
     public Response<List<CategoryDTO>> getAllStoreCategories(String sessionToken, String storeId) {
-                String method = "getAllStoreCategories";
+        String method = "getAllStoreCategories";
         try {
             if(!this.isInitialized()) {
                 TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
@@ -398,6 +515,42 @@ public class StoreService {
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error retrieving categories for store %s: %s", storeId, ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+    /**
+     * Retrieves all Offers for a store
+     * @param sessionToken User session token (user must have sufficient Permissions)
+     * @param storeId Store identifier for the offers
+     * @return a list of {@link OfferDTO} 
+     */
+    @Transactional
+    public Response<List<OfferDTO>> getAllOffers(String sessionToken, String storeId) {
+        String method = "getAllOffers";
+        try {
+            if(!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+            Store store = storeFacade.getStore(storeId);
+            String userId = tokenService.extractId(sessionToken);
+            List<OfferDTO> offers = offerManager.getOffersOfStore(userId, storeId).stream().map(o -> {
+                return new OfferDTO(o.getId(),
+                                    new UserDTO(loginManager.getMember(userId)), 
+                                    ItemDTO.fromItem(itemFacade.getItem(storeId, o.getProductId())), 
+                                    o.getNewPrice());
+            }).toList();
+
+            TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + offers.size() + " offers in store " + store.getName());
+            return Response.success(offers);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error retrieving offers for store %s: %s", storeId, ex.getMessage());
+            return Response.error(ex.getMessage());
         }
     }
 }

@@ -74,6 +74,9 @@ public class ServiceManager {
                                             facadeManager.getPermissionManager(),
                                             getINotificationService(),
                                             facadeManager.getShoppingCartFacade(),
+                                            facadeManager.getItemFacade(),
+                                            facadeManager.getOfferManager(),
+                                            facadeManager.getLoginManager(),
                                             facadeManager.getPaymentService());
         }
         return storeService;
@@ -118,7 +121,9 @@ public class ServiceManager {
                                                 getTokenService(),
                                                 facadeManager.getStoreFacade(),
                                                 facadeManager.getPermissionManager(),
-                                                facadeManager.getLoginManager());
+                                                facadeManager.getLoginManager(),
+                                                facadeManager.getOfferManager(),
+                                                facadeManager.getItemFacade());
         }
         return shoppingService;
     }
