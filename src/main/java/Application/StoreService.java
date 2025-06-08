@@ -437,7 +437,7 @@ public class StoreService {
             Member member = loginManager.getMember(offer.getMemberId());
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
-            String storeName = storeFacade.getStoreName(productName);
+            String storeName = storeFacade.getStoreName(offer.getStoreId());
             notificationService.sendNotification(offer.getMemberId(), "Offer on " + productName + " for " + offer.getNewPrice() + " was rejected! womp womp :(");
 
             TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
