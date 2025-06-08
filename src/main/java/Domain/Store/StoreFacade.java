@@ -69,6 +69,10 @@ public class StoreFacade {
         this.getUser = userRepository::get;
     }
 
+    public void setNotificationService(INotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
     public boolean isInitialized() {
         return this.storeRepository != null && this.feedbackRepository != null && this.itemRepository != null && this.getUser != null;
     }
@@ -172,6 +176,7 @@ public class StoreFacade {
             store.setOpen(false);
             store.setPermanentlyClosed(true);
             Store newStore = this.storeRepository.update(storeId, store);
+            notificationService.sendNotification(store.getFounderId(), "Your store " + store.getName() + " has been permanently closed.");
             if(!store.equals(newStore)) throw new RuntimeException("Store not updated");
             return true;
         }
@@ -198,6 +203,7 @@ public class StoreFacade {
             store.setOpen(false);
             store.setPermanentlyClosed(false);
             Store newStore = this.storeRepository.update(storeId, store);
+            notificationService.sendNotification(store.getFounderId(), "Your store " + store.getName() + " has been closed temporarily.");
             if(!store.equals(newStore)) throw new RuntimeException("Store not updated");
             return true;
         }
