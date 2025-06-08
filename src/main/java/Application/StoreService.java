@@ -406,7 +406,10 @@ public class StoreService {
             return Response.error(ex.getMessage());
         }
     }
-    
+
+
+
+
     /**
      * Gets all users who have shopping baskets in a specific store.
      * 
