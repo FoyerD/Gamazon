@@ -11,8 +11,12 @@ import Domain.Store.Discounts.Conditions.Condition;
 public class XorDiscount extends CompositeDiscount {
 
     // Constructor for loading from repository with existing ID
-    public XorDiscount(String id, String storeId, Discount discount1, Discount discount2, Condition condition, MergeType mergeType) {
+    public XorDiscount(String id, String storeId, Discount discount1, Discount discount2, Condition condition, MergeType mergeType, String description) {
         super(id, storeId, List.of(discount1, discount2), condition, mergeType);
+    }
+
+    public XorDiscount(String id, String storeId, Discount discount1, Discount discount2, Condition condition, MergeType mergeType) {
+        this(id, storeId, discount1, discount2, condition, mergeType, "Default Xor Discount Description");
     }
 
     @Override

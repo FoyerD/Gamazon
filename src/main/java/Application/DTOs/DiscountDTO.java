@@ -43,16 +43,37 @@ public class DiscountDTO {
     // Fields for composite discounts
     private List<DiscountDTO> subDiscounts;
     private MergeType mergeType; // Only applicable for composite discounts
+    private String description; // Optional description for the discount
     
     // Default constructor for JSON serialization
     public DiscountDTO() {}
     
     // Constructor for basic initialization
+    public DiscountDTO(String id, String storeId, DiscountType type, ConditionDTO condition, String description) {
+        this.id = id;
+        this.storeId = storeId;
+        this.type = type;
+        this.condition = condition;
+        this.description = description;
+    }
+
     public DiscountDTO(String id, String storeId, DiscountType type, ConditionDTO condition) {
         this.id = id;
         this.storeId = storeId;
         this.type = type;
         this.condition = condition;
+        this.description = "Default Discount Description";
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        if (description == null) {
+            throw new IllegalArgumentException("Description cannot be null");
+        }
+        this.description = description;
     }
 
     public String getStoreId() {
