@@ -13,7 +13,6 @@ public abstract class Discount {
         MUL
     }
 
-
     protected final String id;
     protected Condition condition;
     protected String storeId;

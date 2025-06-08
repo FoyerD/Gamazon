@@ -37,13 +37,13 @@ public class DiscountBuilder {
      * @throws IllegalArgumentException if the DTO is invalid or has unknown type
      */
     public Discount buildDiscount(DiscountDTO discountDTO) {
-        return buildDiscount(discountDTO, UUID.randomUUID().toString());
+        return buildDiscount(discountDTO, UUID.randomUUID().toString(), discountDTO.getStoreId());
     }
     
     /**
      * Builds a Discount with existing ID (for updates).
      */
-    public Discount buildDiscount(DiscountDTO discountDTO, String id) {
+    public Discount buildDiscount(DiscountDTO discountDTO, String id, String storeId) {
         if (discountDTO == null) {
             throw new IllegalArgumentException("DiscountDTO cannot be null");
         }
@@ -51,9 +51,14 @@ public class DiscountBuilder {
         if (id == null) {
             throw new IllegalArgumentException("Existing ID cannot be null");
         }
+
+        if (storeId == null || storeId.isEmpty()) {
+            throw new IllegalArgumentException("Store ID cannot be null or empty");
+        }
+        discountDTO.setStoreId(storeId);
         
         Condition cond = conditionBuilder.buildCondition(discountDTO.getCondition());
-        List<Discount> subDiscounts = discountDTO.getSubDiscounts().stream().map((ddto) -> buildDiscount(ddto)).collect(Collectors.toList());
+        List<Discount> subDiscounts = discountDTO.getSubDiscounts().stream().map((ddto) -> buildDiscount(ddto, UUID.randomUUID().toString(), storeId)).collect(Collectors.toList());
         switch(discountDTO.getType()) {
             case SIMPLE:
                 return new SimpleDiscount(id, discountDTO.getStoreId(), discountDTO.getDiscountPercentage(), makeQualifier(discountDTO.getQualifierType(), discountDTO.getQualifierValue()), cond);

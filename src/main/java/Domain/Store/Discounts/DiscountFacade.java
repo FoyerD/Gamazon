@@ -202,7 +202,7 @@ public class DiscountFacade {
     }
 
     public Discount addDiscount(String storeId, DiscountDTO discountDTO) throws Exception {
-        Discount dis = discountBuilder.buildDiscount(discountDTO);
+        Discount dis = discountBuilder.buildDiscount(discountDTO, UUID.randomUUID().toString(), storeId);
         if (addDiscount(storeId, dis)){
             return dis;
         } else {
