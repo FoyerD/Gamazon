@@ -4,9 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -383,6 +385,16 @@ public class StoreFacade {
         String productName = item.getProductName();
         String storeName = this.getStoreName(storeId);
         notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! purchesed " + productName + " from " + storeName + " 🎉 🔔");
+        
+        Store store = this.storeRepository.get(storeId);
+        Set<String> employees = Stream.concat(store.getManagers().stream(), store.getOwners().stream())
+            .collect(Collectors.toSet());
+        employees.add(store.getFounderId());
+        
+        for (String employeeId : employees) {
+            System.out.println("Notifying manager: " +  employeeId);
+            notificationService.sendNotification(employeeId, "🔔 🎉 Auction for " + productName + " has been fulfilled." + " 🎉 🔔");
+        }
         // Final update: optionally mark buyer (if you have a field), or leave updated amount
         itemRepository.update(itemKey, item);
 
@@ -412,6 +424,7 @@ public class StoreFacade {
             itemRepository.update(itemKey, item);
             throw new RuntimeException("Failed to save receipt: " + e.getMessage(), e);
         }
+
         
         return item;
     }
