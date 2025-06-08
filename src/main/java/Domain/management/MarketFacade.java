@@ -195,8 +195,8 @@ public class MarketFacade implements IMarketFacade {
         if (paymentCheck.errorOccurred() || supplyCheck.errorOccurred() ||
             !Boolean.TRUE.equals(paymentCheck.getValue()) ||
             !Boolean.TRUE.equals(supplyCheck.getValue())) {
-            //TODO: Enable again
-            //throw new IllegalStateException("Handshake failed with external API.");
+
+            throw new IllegalStateException("Handshake failed with external API.");
         }
 
 

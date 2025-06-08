@@ -10,6 +10,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
@@ -19,8 +25,11 @@ import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.ProductService;
 import Application.ServiceManager;
+import Application.ShoppingService;
 import Application.StoreService;
+import Application.UserService;
 import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.FacadeManager;
 import Infrastructure.MemoryRepoManager;
 
@@ -38,9 +47,20 @@ public class StoreServiceTests {
     public void setUp() {
         // Initialize repository manager
         MemoryRepoManager repositoryManager = new MemoryRepoManager();
+            // Create mock payment service
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+
+        // Define mock behavior
+        when(mockPaymentService.processPayment(
+                anyString(), anyString(), any(Date.class), anyString(), anyString(), anyDouble()
+        )).thenReturn(new Response<>(1234)); // fake transaction ID
+
+        when(mockPaymentService.cancelPayment(anyInt())).thenReturn(new Response<>(true));
+        when(mockPaymentService.handshake()).thenReturn(new Response<>(true));
+        when(mockPaymentService.updatePaymentServiceURL(anyString())).thenReturn(new Response<>());
         
         // Initialize facade manager
-        FacadeManager facadeManager = new FacadeManager(repositoryManager, null);
+        FacadeManager facadeManager = new FacadeManager(repositoryManager, mockPaymentService);
         
         // Initialize service manager and store as a field for use across tests
         this.serviceManager = new ServiceManager(facadeManager);
@@ -492,4 +512,84 @@ public class StoreServiceTests {
         Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, nonExistingStoreId);
         assertTrue(auctionsResponse.errorOccurred());
     }
+
+    @Test
+    public void GivenValidAuctionWithRealBid_WhenAcceptBid_ThenReturnUpdatedItem() {
+        // Step 1: Setup Store, Product, and Item
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "BidStore", "Test Store");
+        String storeId = storeRes.getValue().getId();
+
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+        UserService userService = serviceManager.getUserService();
+
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "BidProduct", List.of("cat"), List.of("desc"));
+        String productId = prodRes.getValue().getId();
+
+        Response<ItemDTO> itemRes = itemService.add(tokenId, storeId, productId, 100f, 10, "desc");
+        assertFalse("Item addition should succeed", itemRes.errorOccurred());
+
+        // Step 2: Create Auction
+        String endDate = "2077-01-01 00:00";
+        Response<AuctionDTO> aucRes = storeService.addAuction(tokenId, storeId, productId, endDate, 50.0);
+        assertFalse("Auction creation should succeed", aucRes.errorOccurred());
+        String auctionId = aucRes.getValue().getAuctionId();
+
+        // Step 3: Create a second user and place a bid
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> bidder = userService.register(
+            guest.getValue().getSessionToken(),
+            "Bidder1",
+            "SecurePass123!",
+            "bidder@example.com"
+        );
+        String bidderToken = bidder.getValue().getSessionToken();
+
+        Response<Boolean> bidResponse = shoppingService.makeBid(
+            auctionId,
+            bidderToken,
+            60.0f,
+            "4111111111111111",               // dummy card number
+            new java.sql.Date(System.currentTimeMillis() + 1000000),  // expiry in future
+            "12234242343",                             // dummy cvv
+            0,                                 // andIncrement
+            "Bidder One",
+            "123 Test St."
+        );
+
+        assertFalse("Bid placement should succeed", bidResponse.errorOccurred());
+        assertTrue("Bid should be accepted", bidResponse.getValue());
+
+        // Step 4: Accept the bid by the original store owner
+        Response<ItemDTO> acceptRes = storeService.acceptBid(tokenId, storeId, productId, auctionId);
+
+        assertFalse("Accepting bid should succeed", acceptRes.errorOccurred());
+        assertEquals("Product ID should match", productId, acceptRes.getValue().getProductId());
+    }
+
+    @Test
+    public void GivenInvalidAuction_WhenAcceptBid_ThenReturnError() {
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "InvalidBidStore", "Test");
+        String storeId = storeRes.getValue().getId();
+        String fakeAuctionId = "invalid-id";
+        String fakeProductId = UUID.randomUUID().toString();
+
+        Response<ItemDTO> result = storeService.acceptBid(tokenId, storeId, fakeProductId, fakeAuctionId);
+        assertTrue(result.errorOccurred());
+    }
+
+    @Test
+    public void GivenOpenStore_WhenCloseStoreNotPermanent_ThenReturnTrue() {
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "TempStore", "For testing");
+        String storeId = storeRes.getValue().getId();
+
+        Response<Boolean> closeRes = storeService.closeStoreNotPermanent(tokenId, storeId);
+        assertFalse(closeRes.errorOccurred());
+        assertTrue(closeRes.getValue());
+    }
+
+
+
+
 }

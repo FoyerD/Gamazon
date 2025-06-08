@@ -12,9 +12,6 @@ public class PolicyDTO {
     private final String storeId;
     private final Policy.Type type;
 
-    // TODO: Deprecated
-    // For AND policies
-    // private final List<PolicyDTO> subPolicies;
 
     // For quantity policies on all items
     private final Integer minItemsAll;
@@ -42,10 +39,6 @@ public class PolicyDTO {
         this.policyId = policyId;
         this.type = builder.type;
         this.storeId = builder.storeId;
-        
-        // TODO: Deprecated
-        // For AND policies
-        //this.subPolicies = builder.subPolicies;
 
         // For quantity policies on all items
         this.minItemsAll = builder.minItemsAll;
@@ -146,10 +139,6 @@ public String toString() {
         private String storeId;
         private Policy.Type type;
 
-        // TODO: Deprecated
-        // For AND policies
-        // private List<PolicyDTO> subPolicies = List.of();
-
         // For quantity policies on all items
         private int minItemsAll = -1;
         private int maxItemsAll = -1;
@@ -176,14 +165,6 @@ public String toString() {
                 throw new IllegalStateException("Should be called only with " + target.name());
             }
         }
-
-        // TODO: Deprecated
-
-        // public Builder createAND(List<PolicyDTO> policies) {
-        //     commonSetup(Policy.Type.AND);
-        //     this.subPolicies = policies;
-        //     return this;
-        // }
 
         public Builder createMaxAll(int minQuantity) {
             commonSetup(Policy.Type.MAX_QUANTITY_ALL);

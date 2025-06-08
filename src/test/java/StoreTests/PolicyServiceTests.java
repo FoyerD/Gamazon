@@ -1,10 +1,12 @@
 package StoreTests;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +17,6 @@ import Application.PolicyService;
 import Application.ServiceManager;
 import Application.TokenService;
 import Application.utils.Response;
-
 import Domain.FacadeManager;
 import Domain.Repos.IItemRepository;
 import Domain.Store.Policy;
@@ -333,4 +334,17 @@ public class PolicyServiceTests {
             resp.getErrorMessage().toLowerCase().contains("permission")
         );
     }
+
+
+    // -------------------------------------------------------------
+    // Test 11: getViolatedPolicies for a user with no cart → empty list
+    // -------------------------------------------------------------
+    @Test
+    public void GivenValidUserWithEmptyCart_WhenGetViolatedPolicies_ThenReturnEmptyList() {
+        Response<List<PolicyDTO>> resp = policyService.getViolatedPolicies(this.tokenId);
+        assertFalse(resp.errorOccurred());
+        assertNotNull(resp.getValue());
+        assertEquals(0, resp.getValue().size());
+    }
+
 }

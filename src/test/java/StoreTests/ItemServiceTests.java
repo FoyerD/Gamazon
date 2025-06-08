@@ -1,6 +1,7 @@
 package StoreTests;
 
 import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -8,22 +9,22 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import Application.ItemService;
-import Application.ServiceManager;
-import Application.StoreService;
-import Application.UserService;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
+import Application.ItemService;
+import Application.ServiceManager;
+import Application.StoreService;
+import Application.UserService;
 import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
 import Domain.Pair;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Store.ItemFilter;
-import Infrastructure.MemoryRepoManager;
 import Infrastructure.ExternalPaymentService;
+import Infrastructure.MemoryRepoManager;
 
 
 public class ItemServiceTests {
@@ -262,4 +263,20 @@ public class ItemServiceTests {
         assertEquals(initial1 + 25, final1);
         assertEquals(initial2 + 40, final2);
     }
+
+    @Test
+    public void GivenValidUserStoreAndProduct_WhenAddRating_ThenSuccess() {
+        // Act
+        Response<Void> response = itemService.addRating(tokenId, store1.getId(), product1.getId(), 4);
+
+        // Assert
+        assertFalse(response.errorOccurred());
+    }
+
+    @Test
+    public void GivenInvalidRating_WhenAddRating_ThenReturnError() {
+        Response<Void> response = itemService.addRating(tokenId, store1.getId(), product1.getId(), -1);
+        assertTrue(response.errorOccurred());
+    }
+
 } 
