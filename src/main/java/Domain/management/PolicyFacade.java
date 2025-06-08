@@ -52,29 +52,6 @@ public class PolicyFacade {
         }
     }
 
-    // TODO: Deprecated
-
-    // public Policy createAndPolicy(List<Policy> children, String storeId) 
-    //     {
-    //     String policyId = UUID.randomUUID().toString();
-    //     validateIds(policyId, storeId);
-    //     if (children == null || children.isEmpty()) {
-    //         throw new IllegalArgumentException("Must supply at least one child policy");
-    //     }
-
-    //     Policy policy = new Policy.Builder(Policy.Type.AND)
-    //         .policyId(policyId)
-    //         .storeId(storeId)
-    //         .productLookup(productFacade::getProduct)
-    //         .itemLookup(id -> itemFacade.getItem(storeId, id))
-    //         .subPolicies(children)
-    //         .build();
-
-    //     if (!policyRepository.add(policyId, policy)) {
-    //         throw new IllegalStateException("Policy already exists: " + policyId);
-    //     }
-    //     return policy;
-    // }
 
     public Policy createMinQuantityAllPolicy(String storeId, int minQuantity) 
     {

@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -121,4 +123,22 @@ public class UserServiceTests {
         assertTrue(exit2.getErrorMessage(), exit2.getErrorMessage().contains("User not found"));
     }
 
+    @Test
+    public void GivenGuestSession_WhenRegisterWithBirthDate_ThenUserRegistered() {
+        LocalDate birthDate = LocalDate.of(1995, 5, 15);
+        
+        Response<UserDTO> response = userService.register(
+            guestToken,
+            "frank",
+            "SecurePass123!",
+            "frank@example.com",
+            birthDate
+        );
+
+        assertFalse("Registration with birth date should succeed", response.errorOccurred());
+        assertEquals("frank", response.getValue().getUsername());
+        assertEquals("frank@example.com", response.getValue().getEmail());
+        assertNotNull("Session token should be returned", response.getValue().getSessionToken());
+    }
+    
 }

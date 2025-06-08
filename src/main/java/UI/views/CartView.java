@@ -1,6 +1,6 @@
-
 package UI.views;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,8 +177,8 @@ public class CartView extends BaseView implements BeforeEnterObserver {
         // Get cart items from presenter with proper error handling
         Response<CartDTO> cartResponse = purchasePresenter.viewCart(sessionToken);
         
-        if (cartResponse.errorOccurred()) {
-            Notification.show("Error loading cart: " + cartResponse.getErrorMessage(), 
+        if (cartResponse == null || cartResponse.getValue() == null) {
+            Notification.show("Error loading cart: Unable to retrieve cart data", 
                 3000, Notification.Position.MIDDLE);
             cartContent.add(new Span("Unable to load cart contents"));
             totalPriceLabel.setText("Total: $0.00");
@@ -193,13 +193,14 @@ public class CartView extends BaseView implements BeforeEnterObserver {
             return;
         }
 
-        Response<List<PolicyDTO>> policiesResponse = purchasePresenter.getViolatedPolicies(sessionToken);
-        if (policiesResponse.errorOccurred()) {
-            Notification.show("Error loading violated polices: " + cartResponse.getErrorMessage(), 
-                3000, Notification.Position.MIDDLE);
+        // For banned users or if there's an error, just use an empty policy list without showing an error
+        List<PolicyDTO> policies = Collections.emptyList();
+        if (!isBanned) {
+            Response<List<PolicyDTO>> policiesResponse = purchasePresenter.getViolatedPolicies(sessionToken);
+            if (policiesResponse != null && policiesResponse.getValue() != null) {
+                policies = policiesResponse.getValue();
+            }
         }
-
-        List<PolicyDTO> policies = policiesResponse.getValue();
 
         // Create a panel for each store basket
         for (Map.Entry<String, ShoppingBasketDTO> basketEntry : cart.getBaskets().entrySet()) {

@@ -1,8 +1,8 @@
 package Domain;
 
 import Application.utils.Response;
-import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.OfferManager;
 import Domain.Shopping.ShoppingCartFacade;
@@ -14,6 +14,7 @@ import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PolicyFacade;
+
 public class FacadeManager {
     private IRepoManager repoManager;
     private IMarketFacade marketFacade;
@@ -65,7 +66,10 @@ public class FacadeManager {
                                         repoManager.getFeedbackRepository(),
                                         repoManager.getItemRepository(),
                                         repoManager.getUserRepository(),
-                                        repoManager.getAuctionRepository(), getNotificationService());
+                                        repoManager.getAuctionRepository(),
+                                        getNotificationService(),
+                                        repoManager.getReceiptRepository(),
+                                        repoManager.getProductRepository());
         }
         return storeFacade;
     }
