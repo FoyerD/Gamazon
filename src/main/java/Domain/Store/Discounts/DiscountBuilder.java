@@ -68,14 +68,16 @@ public class DiscountBuilder {
                     discountDTO.getStoreId(),
                     subDiscounts,
                     cond,
-                    discountDTO.getMergeType());
+                    discountDTO.getMergeType(),
+                    discountDTO.getDescription());
                     
             case OR:
                 return new OrDiscount(id,
                     discountDTO.getStoreId(),
                     subDiscounts,
                     cond,
-                    discountDTO.getMergeType());
+                    discountDTO.getMergeType(),
+                    discountDTO.getDescription());
                         
             case XOR:
                 return new XorDiscount(id,
@@ -83,8 +85,9 @@ public class DiscountBuilder {
                     subDiscounts.get(0),
                     subDiscounts.get(1),
                     cond,
-                    discountDTO.getMergeType());
-                    
+                    discountDTO.getMergeType(),
+                    discountDTO.getDescription());
+                      
             default:
                 throw new IllegalArgumentException("Unknown discount type: " + discountDTO.getType());
         }
