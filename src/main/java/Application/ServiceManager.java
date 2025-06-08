@@ -118,7 +118,9 @@ public class ServiceManager {
                                                 getTokenService(),
                                                 facadeManager.getStoreFacade(),
                                                 facadeManager.getPermissionManager(),
-                                                facadeManager.getLoginManager());
+                                                facadeManager.getLoginManager(),
+                                                facadeManager.getOfferManager(),
+                                                facadeManager.getItemFacade());
         }
         return shoppingService;
     }

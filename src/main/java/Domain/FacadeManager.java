@@ -4,6 +4,7 @@ import Application.utils.Response;
 import Domain.ExternalServices.INotificationService;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.OfferManager;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
 import Domain.Store.ProductFacade;
@@ -13,8 +14,6 @@ import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionManager;
 import Domain.management.PolicyFacade;
-import Infrastructure.MemoryRepositories.MemoryItemRepository;
-
 public class FacadeManager {
     private IRepoManager repoManager;
     private IMarketFacade marketFacade;
@@ -25,6 +24,7 @@ public class FacadeManager {
     private IExternalPaymentService paymentService;
     private LoginManager loginManager;
     private PermissionManager permissionManager;
+    private OfferManager offerManager;
     private INotificationService notificationService;
     private PolicyFacade policyFacade;
 
@@ -112,6 +112,13 @@ public class FacadeManager {
             permissionManager = new PermissionManager(repoManager.getPermissionRepository());
         }
         return permissionManager;
+    }
+
+    public OfferManager getOfferManager() {
+        if (offerManager == null) {
+            offerManager = new OfferManager(repoManager.getOfferRepository());
+        }
+        return offerManager;
     }
 
     public PolicyFacade getPolicyFacade() {

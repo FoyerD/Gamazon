@@ -4,6 +4,7 @@ import Domain.IRepoManager;
 import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
+import Domain.Repos.IOfferRepository;
 import Domain.Repos.IPermissionRepository;
 import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IProductRepository;
@@ -15,6 +16,7 @@ import Domain.Repos.IUserRepository;
 import Infrastructure.MemoryRepositories.MemoryAuctionRepository;
 import Infrastructure.MemoryRepositories.MemoryFeedbackRepository;
 import Infrastructure.MemoryRepositories.MemoryItemRepository;
+import Infrastructure.MemoryRepositories.MemoryOfferRepository;
 import Infrastructure.MemoryRepositories.MemoryPermissionRepository;
 import Infrastructure.MemoryRepositories.MemoryPolicyRepository;
 import Infrastructure.MemoryRepositories.MemoryProductRepository;
@@ -36,6 +38,7 @@ public class MemoryRepoManager implements IRepoManager {
     private MemoryProductRepository productRepository;
     private MemoryUserRepository userRepository;
     private MemoryPolicyRepository policyRepository;
+    private MemoryOfferRepository offerRepository;
     
     @Override
     public IStoreRepository getStoreRepository() {
@@ -114,5 +117,12 @@ public class MemoryRepoManager implements IRepoManager {
             policyRepository = new MemoryPolicyRepository();
         }
         return policyRepository;
+    }
+    @Override
+    public IOfferRepository getOfferRepository() {
+        if (offerRepository == null) {
+            offerRepository = new MemoryOfferRepository();
+        }
+        return offerRepository;
     }
 }
