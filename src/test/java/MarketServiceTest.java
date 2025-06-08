@@ -1,11 +1,6 @@
 import Domain.ExternalServices.INotificationService;
-import Domain.Repos.IItemRepository;
-import Domain.Repos.IPermissionRepository;
-import Domain.Repos.IStoreRepository;
-import Domain.Repos.IUserRepository;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
-import Domain.management.IMarketFacade;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.FacadeManager;
@@ -30,7 +25,9 @@ import Application.utils.Response;
 import Application.UserService;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -69,6 +66,9 @@ public class MarketServiceTest {
         mockPaymentService = mock(IExternalPaymentService.class);
         mockSupplyService = mock(IExternalSupplyService.class);
         mockNotificationService = mock(INotificationService.class);
+
+        when(mockPaymentService.handshake()).thenReturn(Response.success(true));
+        when(mockSupplyService.handshake()).thenReturn(Response.success(true));
 
         // Initialize dependency injectors
         repositoryManager = new MemoryRepoManager();
@@ -572,5 +572,108 @@ public class MarketServiceTest {
         assertTrue(notifyResponse.errorOccurred(), "The returned notification service should fail when used");
         assertEquals("Notification service unavailable", notifyResponse.getErrorMessage());
     }   
+
+    @Test
+    public void givenExistingUsername_whenUserExists_thenReturnTrue() {
+        Response<Boolean> result = marketService.userExists(user1.getUsername());
+        assertFalse(result.errorOccurred());
+        assertTrue(result.getValue());
+    }
+
+    @Test
+    public void givenNonExistingUser_whenUserExistsCalled_thenReturnFalse() {
+        Response<Boolean> response = marketService.userExists("nonexistent_user_xyz");
+        assertFalse(response.errorOccurred());
+        assertFalse(response.getValue());
+    }
+
+    @Test
+    public void testMarketManagerCanBanAndUnbanUsers() {
+        // Guest entry and register as market manager
+        Response<UserDTO> guest1 = userService.guestEntry();
+        assertFalse(guest1.errorOccurred());
+        Response<UserDTO> managerRes = userService.register(
+            guest1.getValue().getSessionToken(), "manager", "Pass123!@", "manager@mail.com");
+        assertFalse(managerRes.errorOccurred());
+        String managerToken = managerRes.getValue().getSessionToken();
+
+        // Guest entry and register as target user
+        Response<UserDTO> guest2 = userService.guestEntry();
+        assertFalse(guest2.errorOccurred());
+        Response<UserDTO> targetRes = userService.register(
+            guest2.getValue().getSessionToken(), "target", "Pass456!@", "target@mail.com");
+        assertFalse(targetRes.errorOccurred());
+        String targetId = targetRes.getValue().getId();
+
+        // manager opens the market => becomes Market Manager
+        Response<Void> openMarketRes = marketService.openMarket(managerToken);
+        assertFalse(openMarketRes.errorOccurred());
+
+        // manager bans the target
+        Date endDate = new Date(System.currentTimeMillis() + 60_000); // ban for 1 minute
+        Response<Boolean> banRes = marketService.banUser(managerToken, targetId, endDate);
+        assertFalse(banRes.errorOccurred());
+        assertTrue(banRes.getValue());
+
+        // check that target is banned
+        Response<Boolean> isBanned = marketService.isBanned(targetId);
+        assertFalse(isBanned.errorOccurred());
+        assertTrue(isBanned.getValue());
+
+        // manager unbans the target
+        Response<Boolean> unbanRes = marketService.unbanUser(managerToken, targetId);
+        assertFalse(unbanRes.errorOccurred());
+        assertTrue(unbanRes.getValue());
+
+        // check target is no longer banned
+        Response<Boolean> isBannedAfter = marketService.isBanned(targetId);
+        assertFalse(isBannedAfter.errorOccurred());
+        assertFalse(isBannedAfter.getValue());
+    }
+
+    @Test
+    public void testGuestCannotBanUsers() {
+        Response<UserDTO> guest = userService.guestEntry();
+        assertFalse(guest.errorOccurred());
+
+        Date endDate = new Date(System.currentTimeMillis() + 60_000);
+        Response<Boolean> result = marketService.banUser(guest.getValue().getSessionToken(), "some-user-id", endDate);
+
+        assertTrue(result.errorOccurred());
+    }
+
+    @Test
+    public void testNonMarketManagerCannotBanUsers() {
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> member = userService.register(
+            guest.getValue().getSessionToken(), "user", "Pass789!@", "user@mail.com");
+        String token = member.getValue().getSessionToken();
+
+        // This user did NOT open the market, so they are not MarketManager
+        Date endDate = new Date(System.currentTimeMillis() + 60_000);
+        Response<Boolean> result = marketService.banUser(token, "someone", endDate);
+
+        assertTrue(result.errorOccurred());
+    }
+
+    @Test
+    public void testUnbanNotBannedUserFailsGracefully() {
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> manager = userService.register(
+            guest.getValue().getSessionToken(), "manager3", "Pass123!@", "manager3@mail.com");
+        String managerToken = manager.getValue().getSessionToken();
+
+        Response<UserDTO> guest2 = userService.guestEntry();
+        Response<UserDTO> target = userService.register(
+            guest2.getValue().getSessionToken(), "target3", "Pass456!@", "target3@mail.com");
+        String targetId = target.getValue().getId();
+
+        marketService.openMarket(managerToken);
+
+        Response<Boolean> result = marketService.unbanUser(managerToken, targetId);
+        assertTrue(result.errorOccurred());
+    }
+
+
 
 }

@@ -1,11 +1,18 @@
 package Application;
 
-import Application.utils.Response;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.PolicyDTO.Builder;
 import Application.utils.Error;
+import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Repos.IItemRepository;
 import Domain.Shopping.IShoppingCartFacade;
@@ -14,12 +21,6 @@ import Domain.Store.Policy;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Domain.management.PolicyFacade;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class PolicyService {
@@ -167,15 +168,6 @@ public class PolicyService {
 
             Policy created;
             switch (details.getType()) {
-                // TODO: Deprecated
-                // case AND:
-                //     if (details.getSubPolicies() == null || details.getSubPolicies().isEmpty()) {
-                //         throw new IllegalArgumentException("AND policy needs children");
-                //     }
-                //     created = policyFacade.createAndPolicy(
-                //             details.getSubPolicies().stream().map(PolicyDTO::toPolicy).toList(),
-                //             storeId); // TODO: AND policies willnot work. lookup functions aren't defined. Refctoring needed :(
-                //     break;
                 case MIN_QUANTITY_ALL:
                     created = policyFacade.createMinQuantityAllPolicy(
                             storeId,
