@@ -9,8 +9,9 @@ import Domain.Notification.INotificationRepository;
 import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
-import Domain.Repos.IPolicyRepository;
+import Domain.Repos.IOfferRepository;
 import Domain.Repos.IPermissionRepository;
+import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
@@ -34,6 +35,8 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IFeedbackRepository feedbackRepo;
     private final INotificationRepository notificationRepo;
     private final IAuctionRepository auctionRepo;
+    private final IOfferRepository offerRepo;
+
 
     @Value("${app.clean-on-start:false}")
     private boolean cleanOnStart;
@@ -45,7 +48,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
                             IShoppingBasketRepository shoppingBasketRepo, 
                             IShoppingCartRepository shoppingCartRepo, IPermissionRepository permissionRepo, 
                             IFeedbackRepository feedbackRepo, INotificationRepository notificationRepo, IAuctionRepository auctionRepo,
-                            IPolicyRepository policyRepo) {
+                            IPolicyRepository policyRepo, IOfferRepository offerRepo) {
         this.auctionRepo = auctionRepo;
         this.policyRepo = policyRepo;
         this.permissionRepo = permissionRepo;
@@ -58,6 +61,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         this.shoppingBasketRepo = shoppingBasketRepo;
         this.shoppingCartRepo = shoppingCartRepo;
         this.notificationRepo = notificationRepo;
+        this.offerRepo = offerRepo;
     }
 
     @Override
@@ -82,6 +86,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         feedbackRepo.deleteAll();
         notificationRepo.deleteAll();
         auctionRepo.deleteAll();
+        offerRepo.deleteAll();
 
         System.out.println("🧹 Database wiped clean (before app init)");
     }
