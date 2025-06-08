@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
-import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.Pair;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IOfferRepository;
 import Domain.Store.Item;
@@ -49,11 +49,12 @@ public class OfferManager {
     }
 
     public Offer getOffer(String memberId, String offerId) {
-        permissionManager.checkPermission(memberId, offerId, PermissionType.OVERSEE_OFFERS);
+        
         Offer offer = offerRepository.get(offerId);
         if (offer == null) {
             throw new NoSuchElementException("offer not found");
         }
+        permissionManager.checkPermission(memberId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
         return offer;
     }
     // NOTE: supply service is not used right now
@@ -91,7 +92,7 @@ public class OfferManager {
                 throw new RuntimeException("Payment Service failed to proccess transaction: " + paymentResponse.getErrorMessage());
             }
 
-            item.decreaseAmount(-1);
+            item.decreaseAmount(1);
             itemRepository.update(itemId, item);
         }
 

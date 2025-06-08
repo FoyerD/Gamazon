@@ -1,5 +1,6 @@
 package StoreTests;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -19,13 +20,17 @@ import static org.mockito.Mockito.when;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
+import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.ProductService;
 import Application.ServiceManager;
+import Application.ShoppingService;
 import Application.StoreService;
+import Application.UserService;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.FacadeManager;
@@ -587,6 +592,40 @@ public class StoreServiceTests {
         assertTrue(closeRes.getValue());
     }
 
+
+
+    @Test
+    public void GivenValidOffer_WhenAcceptOffer_ThenReturnAcceptedOffer() {
+        // Setup store, product, item
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "OfferStore", "Accept test");
+        String storeId = storeRes.getValue().getId();
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "OfferProduct", List.of("c"), List.of("d"));
+        String productId = prodRes.getValue().getId();
+        itemService.add(tokenId, storeId, productId, 100f, 10, "desc");
+
+        // Create a second user
+        UserService userService = serviceManager.getUserService();
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> buyer = userService.register(guest.getValue().getSessionToken(), "OfferUser", "StrongPass1!", "user@buy.com");
+        String buyerToken = buyer.getValue().getSessionToken();
+
+        // Create an offer
+        PaymentDetailsDTO payment = new PaymentDetailsDTO(
+            buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer User"
+        );
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 80.0, payment);
+        assertFalse("Making offer should succeed", offerResponse.errorOccurred());
+
+        // Accept the offer
+        String offerId = offerResponse.getValue().getId();
+        Response<OfferDTO> accepted = storeService.acceptOffer(tokenId, offerId);
+        assertFalse("Accepting offer should succeed.\nError: " + (accepted.errorOccurred() ? accepted.getErrorMessage() : ""), accepted.errorOccurred());
+        assertEquals("Offer ID should match", offerId, accepted.getValue().getId());
+    }
 
 
 
