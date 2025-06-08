@@ -813,6 +813,9 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         employeesLayout.refreshUsers();
         // Clear permissions map when entering a new store
         managerPermissionsMap.clear();
+
+        discountsLayout.refreshDiscounts();
+
     }
 
     private void styleButton(Button button, String color) {

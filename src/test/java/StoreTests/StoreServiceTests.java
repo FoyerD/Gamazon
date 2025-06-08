@@ -8,6 +8,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,6 +24,8 @@ import Application.ServiceManager;
 import Application.StoreService;
 import Application.utils.Response;
 import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Infrastructure.MemoryRepoManager;
 
 
@@ -40,8 +44,8 @@ public class StoreServiceTests {
         MemoryRepoManager repositoryManager = new MemoryRepoManager();
         
         // Initialize facade manager
-        FacadeManager facadeManager = new FacadeManager(repositoryManager, null);
-        
+        FacadeManager facadeManager = new FacadeManager(repositoryManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
+
         // Initialize service manager and store as a field for use across tests
         this.serviceManager = new ServiceManager(facadeManager);
         

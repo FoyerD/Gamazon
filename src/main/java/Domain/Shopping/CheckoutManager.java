@@ -189,9 +189,9 @@ public class CheckoutManager {
                     }
                 }
                 double storeTotal = storeProductPricesMap.get(storeId).values().stream()
-                        .mapToDouble(price -> price * productQuantities.getOrDefault(price, 0))
-                        .sum();
-
+                .mapToDouble(price -> price * productQuantities.getOrDefault(price, 0))
+                .sum();
+                
                 receiptRepo.savePurchase(clientId, storeId, productPricesWithQuantities, storeTotal, paymentDetails);
             }
             

@@ -1,6 +1,7 @@
 package StoreTests;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import Application.TokenService;
 import Application.utils.Response;
 
 import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IProductRepository;
@@ -49,7 +52,7 @@ public class PolicyServiceTests {
         MemoryRepoManager repoManager = new MemoryRepoManager();
 
         // 2. Initialize FacadeManager (provides PolicyFacade, PermissionManager, etc.)
-        FacadeManager facadeManager = new FacadeManager(repoManager, null);
+        FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
 
         // 3. Initialize ServiceManager so we can register a user and create a store
         this.serviceManager = new ServiceManager(facadeManager);

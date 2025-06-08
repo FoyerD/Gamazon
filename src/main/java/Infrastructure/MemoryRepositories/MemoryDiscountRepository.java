@@ -60,8 +60,8 @@ public class MemoryDiscountRepository extends IDiscountRepository {
 
     @Override
     public boolean exists(String id) {
-        if (id == null) {
-            return false;
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID cannot be null");
         }
         return get(id) != null;
     }

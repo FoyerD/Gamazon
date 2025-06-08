@@ -23,32 +23,46 @@ public class OrDiscount extends CompositeDiscount {
     @Override
     public Map<String, ItemPriceBreakdown> calculatePrice(ShoppingBasket basket, BiFunction<String, String, Item> itemGetter) {
 
-        if (basket == null || basket.getStoreId() == null || basket.getOrders() == null) {
-            throw new IllegalArgumentException("Basket, Store ID, and Orders cannot be null");
+        if (basket == null || itemGetter == null) {
+            throw new IllegalArgumentException("Basket and itemGetter cannot be null");
         }
         
-        Map<String, ItemPriceBreakdown> output = new HashMap<>();
+        // Get original prices as fallback
+        Map<String, ItemPriceBreakdown> originalPrices = basket.getBestPrice(itemGetter);
         
-        // condition only applies if all discounts apply
+        // If main condition is not satisfied, return original prices
         if (!conditionApplies(basket, itemGetter)) {
-            output = basket.getBestPrice(itemGetter);
-            return output;
+            return originalPrices;
         }
-        for (Condition cond : this.discounts.stream().map(Discount::getCondition).toList()) {
-            if (cond.isSatisfied(basket, itemGetter)) {
-                List<Map<String, ItemPriceBreakdown>> allSubDiscounts = calculateAllSubDiscounts(basket, itemGetter);
-                if (mergeType == MergeType.MAX) {
-                    output = ItemPriceBreakdown.combineMaxMap(allSubDiscounts);
-                } else if (mergeType == MergeType.MUL) {
-                    output = ItemPriceBreakdown.combineMultiplicateMaps(allSubDiscounts);
-                } else {
-                    throw new IllegalArgumentException("Unsupported merge type: " + mergeType);
-                }
+        
+        // Check if any sub-discount condition is satisfied (OR logic)
+        boolean anyConditionSatisfied = false;
+        for (Discount discount : this.discounts) {
+            if (discount.getCondition().isSatisfied(basket, itemGetter)) {
+                anyConditionSatisfied = true;
+                break;
             }
         }
-
-
-        output = basket.getBestPrice(itemGetter);
-        return output; // If any condition is not satisfied, return original prices
+        
+        // If no sub-conditions are satisfied, return original prices
+        if (!anyConditionSatisfied) {
+            return originalPrices;
+        }
+        
+        // Calculate all sub-discounts
+        List<Map<String, ItemPriceBreakdown>> allSubDiscounts = calculateAllSubDiscounts(basket, itemGetter);
+        
+        // Combine the sub-discounts based on merge type
+        Map<String, ItemPriceBreakdown> result;
+        if (mergeType == MergeType.MAX) {
+            result = ItemPriceBreakdown.combineMaxMap(allSubDiscounts);
+        } else if (mergeType == MergeType.MUL) {
+            result = ItemPriceBreakdown.combineMultiplicateMaps(allSubDiscounts);
+        } else {
+            throw new IllegalArgumentException("Unsupported merge type: " + mergeType);
+        }
+        
+        return result;
     }
+
 }

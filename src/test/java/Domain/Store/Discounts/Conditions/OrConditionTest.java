@@ -6,15 +6,21 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
+import Domain.Store.Item;
 
 public class OrConditionTest {
     
     @Mock
     private ShoppingBasket basket;
+    
+    @Mock
+    private BiFunction<String, String, Item> itemGetter;
     
     @Mock
     private Condition condition1;
@@ -26,79 +32,96 @@ public class OrConditionTest {
     private Condition condition3;
     
     private OrCondition orCondition;
+    private String conditionId;
     
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        orCondition = new OrCondition(Set.of(condition1, condition2));
+        conditionId = "test-or-condition-id";
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        orCondition = new OrCondition(conditionId, conditions);
     }
     
     @Test
     public void testIsSatisfiedWhenAllConditionsTrue() {
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(true);
         
-        assertTrue(orCondition.isSatisfied(basket));
+        assertTrue(orCondition.isSatisfied(basket, itemGetter));
     }
     
     @Test
     public void testIsSatisfiedWhenOneConditionTrue() {
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(false);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(false);
         
-        assertTrue(orCondition.isSatisfied(basket));
+        assertTrue(orCondition.isSatisfied(basket, itemGetter));
         
         // Test the other way around
-        when(condition1.isSatisfied(basket)).thenReturn(false);
-        when(condition2.isSatisfied(basket)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(false);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(true);
         
-        assertTrue(orCondition.isSatisfied(basket));
+        assertTrue(orCondition.isSatisfied(basket, itemGetter));
     }
     
     @Test
     public void testIsSatisfiedWhenAllConditionsFalse() {
-        when(condition1.isSatisfied(basket)).thenReturn(false);
-        when(condition2.isSatisfied(basket)).thenReturn(false);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(false);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(false);
         
-        assertFalse(orCondition.isSatisfied(basket));
+        assertFalse(orCondition.isSatisfied(basket, itemGetter));
     }
     
-    @Test
-    public void testConstructorWithTwoConditions() {
-        OrCondition condition = new OrCondition(condition1, condition2);
-        assertNotNull(condition.getId());
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullId() {
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        new OrCondition(null, conditions);
     }
     
-    @Test
-    public void testConstructorWithExistingUUID() {
-        UUID existingId = UUID.randomUUID();
-        OrCondition condition = new OrCondition(existingId, Set.of(condition1, condition2));
-        
-        assertEquals(existingId.toString(), condition.getId());
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() {
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        new OrCondition("", conditions);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullConditions() {
+        new OrCondition("test-id", null);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyConditions() {
+        new OrCondition("test-id", Arrays.asList());
     }
     
     @Test
     public void testWithThreeConditions() {
-        OrCondition threeConditions = new OrCondition(Set.of(condition1, condition2, condition3));
+        List<Condition> threeConditions = Arrays.asList(condition1, condition2, condition3);
+        OrCondition orWithThree = new OrCondition("test-three-conditions", threeConditions);
         
-        when(condition1.isSatisfied(basket)).thenReturn(false);
-        when(condition2.isSatisfied(basket)).thenReturn(false);
-        when(condition3.isSatisfied(basket)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(false);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(false);
+        when(condition3.isSatisfied(basket, itemGetter)).thenReturn(true);
         
-        assertTrue(threeConditions.isSatisfied(basket));
+        assertTrue(orWithThree.isSatisfied(basket, itemGetter));
     }
     
     @Test
-    public void testEmptyConditionSet() {
-        OrCondition emptyCondition = new OrCondition(Set.of());
-        assertFalse(emptyCondition.isSatisfied(basket)); // No conditions to satisfy
+    public void testGetters() {
+        assertEquals(conditionId, orCondition.getId());
+        
+        List<Condition> retrievedConditions = orCondition.getConditions();
+        assertEquals(2, retrievedConditions.size());
+        assertTrue(retrievedConditions.contains(condition1));
+        assertTrue(retrievedConditions.contains(condition2));
     }
     
     @Test
     public void testHasUniqueId() {
         assertNotNull(orCondition.getId());
         
-        OrCondition anotherCondition = new OrCondition(Set.of(condition1, condition2));
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        OrCondition anotherCondition = new OrCondition("different-id", conditions);
         assertNotEquals(orCondition.getId(), anotherCondition.getId());
     }
 }
