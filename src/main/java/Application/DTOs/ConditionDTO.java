@@ -18,8 +18,6 @@ public class ConditionDTO {
         AND,
         OR,
         XOR,
-        MAX,
-        DOUBLE,
         MAX_QUANTITY,
         MIN_QUANTITY,
         MAX_PRICE,
