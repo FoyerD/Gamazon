@@ -18,6 +18,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.ConditionDTO;
@@ -30,12 +31,14 @@ import Application.DTOs.DiscountDTO.QualifierType;
 public class DiscountsLayout extends VerticalLayout {
     private final Supplier<List<DiscountDTO>> discountsSupplier;
     private final Consumer<DiscountDTO> onRemoveDiscount;
+    private final Consumer<DiscountDTO> onAddDiscount;
 
     private Supplier<List<ItemDTO>> itemSupplier;
     private Supplier<List<CategoryDTO>> categorySupplier;
 
     private List<DiscountDTO> discounts;
     private List<ConditionDTO> conditions;
+    private List<DiscountDTO> savedDiscounts;
     private Dialog addConditionDialog;
     private Dialog addDiscountDialog;
 
@@ -43,16 +46,20 @@ public class DiscountsLayout extends VerticalLayout {
         Supplier<List<DiscountDTO>> discountsSupplier,
         Consumer<DiscountDTO> onRemoveDiscount,
         Supplier<List<ItemDTO>> itemSupplier,
-        Supplier<List<CategoryDTO>> categorySupplier
+        Supplier<List<CategoryDTO>> categorySupplier,
+        Consumer<DiscountDTO> onAddDiscount
     ) {
         this.discountsSupplier = discountsSupplier;
         this.onRemoveDiscount = onRemoveDiscount;
+        this.onAddDiscount = onAddDiscount;
 
         this.discounts = new ArrayList<>();
         this.conditions = new ArrayList<>();
+        this.savedDiscounts = new ArrayList<>();
 
         this.itemSupplier = itemSupplier;
         this.categorySupplier = categorySupplier;
+        
 
         // Create header
         H3 title = new H3("Store Discounts");
@@ -73,8 +80,18 @@ public class DiscountsLayout extends VerticalLayout {
         
         HorizontalLayout buttons = new HorizontalLayout(addConditionButton, addDiscountButton);
         buttons.setSpacing(true);
+
+        // Add save discounts button
+        Button saveDiscountsButton = new Button("Save All Discounts", VaadinIcon.CHECK.create());
+        styleButton(saveDiscountsButton, "#ff9800");
+        saveDiscountsButton.addClickListener(e -> saveDiscounts());
         
-        add(title, buttons);
+        add(title, buttons, saveDiscountsButton);
+        
+        // Set alignment and spacing
+        setAlignItems(Alignment.CENTER);
+        setSpacing(true);
+        setPadding(true);
     }
 
     private void setupAddConditionDialog() {
@@ -381,5 +398,15 @@ public class DiscountsLayout extends VerticalLayout {
         button.getStyle()
             .set("background-color", color)
             .set("color", "white");
+    }
+
+    private void saveDiscounts() {
+        for (DiscountDTO discount : discounts) {
+            onAddDiscount.accept(discount);
+        }
+        
+        savedDiscounts.addAll(discounts);
+        discounts.clear();
+        Notification.show("Discounts saved successfully");
     }
 } 

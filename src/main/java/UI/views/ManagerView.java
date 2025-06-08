@@ -228,11 +228,20 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 } else {
                     Notification.show("Discount removed successfully", 
                         3000, Notification.Position.MIDDLE);
-                    // discountsLayout.refreshDiscounts();
                 }
             },
             itemSupplier,
-            categorySupplier
+            categorySupplier,
+            d -> {
+                Response<DiscountDTO> response = storePresenter.addDiscount(sessionToken, currentStoreId, d);
+                if (response.errorOccurred()) {
+                    Notification.show("Failed to add discount: " + response.getErrorMessage(), 
+                        3000, Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Discount added successfully", 
+                        3000, Notification.Position.MIDDLE);
+                }
+            }
         );
 
         // Tab change listener
