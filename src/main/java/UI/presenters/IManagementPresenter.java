@@ -5,6 +5,7 @@ import java.util.List;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
@@ -177,7 +178,7 @@ public interface IManagementPresenter {
      * 
      * @param sessionToken Session identifier for authentication.
      * @param storeId ID of the store whose purchase history is requested.
-     * @return Response with a list of {@link PolicyDTO} representing the purchase history, or error.
+     * @return Response with a list of {@link PolicyDTO}, or error.
      */
     public Response<List<PolicyDTO>> getStorePolicies(String sessionToken, String storeId);
 
@@ -188,4 +189,32 @@ public interface IManagementPresenter {
      * @return Response of void, or error
      */
     public Response<PolicyDTO> savePolicy(String sessionToken, PolicyDTO policy);
+
+    /**
+     * Gets the items offers of a store.
+     * 
+     * @param sessionToken Session identifier for authentication.
+     * @param storeId ID of the store whose items offers is requested.
+     * @return Response with a list of {@link OfferDTO}, or error.
+     */
+    public Response<List<OfferDTO>> getStoreOffers(String sessionToken, String storeId);
+
+    /**
+     * Accept an offer from a user
+     * 
+     * @param sessionToken Session identifier for authentication.
+     * @param offerId ID of the offer to be accepted
+     * @return Response with the accepted {@link OfferDTO}, or error.
+     */
+    public Response<OfferDTO> acceptOffer(String sessionToken, String offerId);
+
+        /**
+     * Accept an offer from a user
+     * 
+     * @param sessionToken Session identifier for authentication.
+     * @param offerId ID of the offer to be accepted
+     * @return Response with the accepted {@link OfferDTO}, or error.
+     */
+    public Response<OfferDTO> rejectOffer(String sessionToken, String offerId);
+        
 }

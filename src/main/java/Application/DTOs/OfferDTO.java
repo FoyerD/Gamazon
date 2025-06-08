@@ -18,7 +18,7 @@ public class OfferDTO {
 
 
     public String getId() { return offerId.toString(); }
-    public UserDTO getMemberId() { return member; }
+    public UserDTO getMember() { return member; }
     public ItemDTO getItem() { return item; }
     public double getNewPrice() { return newPrice; }
 }

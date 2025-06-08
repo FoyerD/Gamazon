@@ -369,7 +369,7 @@ public class StoreService {
      * accepts the offer and bill the one who made it
      * @param sessionToken session token of the employee accepting the offer
      * @param offerId ID of the offer to be accepted
-     * @return returns the offer
+     * @return returns the accepted {@link OfferDTO}
      */
     @Transactional
     public Response<OfferDTO> acceptOffer(String sessionToken, String offerId) {
@@ -402,7 +402,7 @@ public class StoreService {
             return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
 
         } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error accepting bid for auction %s: %s", offerId, ex.getMessage());
+            TradingLogger.logError(CLASS_NAME, method, "Error accepting offer %s: %s", offerId, ex.getMessage());
             return Response.error(ex.getMessage());
         }
     }
@@ -444,7 +444,7 @@ public class StoreService {
             return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
 
         } catch (Exception ex) {
-            TradingLogger.logError(CLASS_NAME, method, "Error accepting bid for auction %s: %s", offerId, ex.getMessage());
+            TradingLogger.logError(CLASS_NAME, method, "Error rejecting offer %s: %s", offerId, ex.getMessage());
             return Response.error(ex.getMessage());
         }
     }
@@ -539,7 +539,7 @@ public class StoreService {
             }
             Store store = storeFacade.getStore(storeId);
             String userId = tokenService.extractId(sessionToken);
-            List<OfferDTO> offers = offerManager.getOffersOfStore(method, storeId).stream().map(o -> {
+            List<OfferDTO> offers = offerManager.getOffersOfStore(userId, storeId).stream().map(o -> {
                 return new OfferDTO(o.getId(),
                                     new UserDTO(loginManager.getMember(userId)), 
                                     ItemDTO.fromItem(itemFacade.getItem(storeId, o.getProductId())), 

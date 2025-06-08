@@ -492,4 +492,6 @@ public class StoreServiceTests {
         Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, nonExistingStoreId);
         assertTrue(auctionsResponse.errorOccurred());
     }
+
+    
 }

@@ -47,6 +47,7 @@ import Application.DTOs.CategoryDTO;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
@@ -66,6 +67,7 @@ import UI.views.components.AddItemForm;
 import UI.views.components.AddUserRoleDialog;
 import UI.views.components.ChangeUserRoleDialog;
 import UI.views.components.EmployeesLayout;
+import UI.views.components.OfferLayout;
 import UI.views.components.PoliciesLayout;
 import UI.views.components.PolicyDialog;
 import UI.views.dataobjects.UserPermission;
@@ -85,6 +87,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
     private final EmployeesLayout employeesLayout;
     private final PoliciesLayout policiesLayout;
+    private final OfferLayout offersLayout;
     private final VerticalLayout mainContent = new VerticalLayout();
 
 
@@ -133,10 +136,11 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
         Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
+        Tab offersTab = new Tab(VaadinIcon.TAG.create(), new Span("Offers"));
         
 
         // Style all tabs to have white text and icons
-        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, historyTab}) {
+        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, historyTab}) {
             tab.getStyle().set("color", " #ffffff");
             // Get the icon and span components from the tab
             tab.getChildren().forEach(component -> {
@@ -144,7 +148,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             });
         }
         
-        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, historyTab);
+        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, historyTab);
         tabs.getStyle()
             .set("margin", "1rem 0")
             .set("--lumo-contrast-60pct", " #ffffff"); 
@@ -187,6 +191,34 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             p -> {}
         );
 
+
+        offersLayout = new OfferLayout(
+            () -> { 
+                Response<List<OfferDTO>> offersResponse = managementPresenter.getStoreOffers(sessionToken, currentStoreId);
+                if (offersResponse.errorOccurred()) {
+                    Notification.show("Failed to fetch offers: " + offersResponse.getErrorMessage(), 5000,  Notification.Position.MIDDLE);
+                    return null;
+                }
+                return offersResponse.getValue();
+            },
+            o -> {
+                Response<OfferDTO> acceptResponse = managementPresenter.acceptOffer(sessionToken, o.getId());
+                if (acceptResponse.errorOccurred()) {
+                    Notification.show("Faild to accept offer " + acceptResponse.getErrorMessage(), 5000,  Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Offer accepted successfully!", 3000,  Notification.Position.BOTTOM_END);
+                }
+            },
+            o -> {
+                Response<OfferDTO> rejectResponse = managementPresenter.rejectOffer(sessionToken, o.getId());
+                if (rejectResponse.errorOccurred()) {
+                    Notification.show("Faild to reject offer " + rejectResponse.getErrorMessage(), 5000,  Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Offer rejected successfully!", 3000,  Notification.Position.BOTTOM_END);
+                }
+            }
+        );
+
         // Tab change listener
         tabs.addSelectedChangeListener(event -> {
             mainContent.removeAll();
@@ -198,6 +230,8 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 showItemsView();
             } else if (event.getSelectedTab().equals(auctionsTab)) {
                 showAuctionsView();
+            } else if (event.getSelectedTab().equals(offersTab)) {
+                showOffersView();
             } else if (event.getSelectedTab().equals(historyTab)) {
                 showHistoryView();
             }
@@ -583,6 +617,10 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         auctionsGrid.setHeight("300px");
     }
 
+    private void showOffersView() {
+        mainContent.add(offersLayout);
+        offersLayout.refreshOffers();
+    }
     private void showHistoryView() {
         mainContent.removeAll();
         
