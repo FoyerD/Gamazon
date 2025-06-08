@@ -116,7 +116,7 @@ public class FacadeManager {
 
     public OfferManager getOfferManager() {
         if (offerManager == null) {
-            offerManager = new OfferManager(repoManager.getOfferRepository());
+            offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager());
         }
         return offerManager;
     }

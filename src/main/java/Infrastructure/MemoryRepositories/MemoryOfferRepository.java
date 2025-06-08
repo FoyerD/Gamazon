@@ -1,5 +1,6 @@
 package Infrastructure.MemoryRepositories;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,5 +70,10 @@ public class MemoryOfferRepository extends IOfferRepository {
     public void deleteAll() {
         this.offers.clear();
         this.deleteAllLocks();
+    }
+
+    @Override
+    public List<Offer> getOffersOfStore(String storeId) {
+        return this.offers.values().stream().filter(offer -> offer.getStoreId().equals(storeId)).toList();
     }
 }

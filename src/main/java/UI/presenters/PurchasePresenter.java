@@ -79,7 +79,7 @@ public class PurchasePresenter implements IPurchasePresenter {
 
     @Override
     public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice) {
-        return this.shoppingService.bargainPrice(sessionToken, storeId, productId, newPrice);
+        return this.shoppingService.makeOffer(sessionToken, storeId, productId, newPrice);
     }
     
 }

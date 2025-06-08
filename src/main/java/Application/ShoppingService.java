@@ -380,7 +380,7 @@ public class ShoppingService{
      * @return {@link OfferDTO}
      */
     @Transactional
-    public Response<OfferDTO> bargainPrice(String sessionToken, String storeId, String productId, double newPrice) {
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice) {
         String method = "bargainPrice";
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
@@ -395,8 +395,10 @@ public class ShoppingService{
             Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice);
             
             OfferDTO offerDTO = new OfferDTO(offer.getId(), member, item, newPrice);
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
             return Response.success(offerDTO);
         } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error making offer: %s", ex.getMessage());
             return Response.error(ex.getMessage());
         }
     }
