@@ -627,6 +627,47 @@ public class StoreServiceTests {
         assertEquals("Offer ID should match", offerId, accepted.getValue().getId());
     }
 
+    @Test
+    public void GivenValidOffer_WhenRejectOffer_ThenReturnRejectedOffer() {
+        // Setup store, product, item
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "RejectStore", "Reject test");
+        String storeId = storeRes.getValue().getId();
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "RejectProduct", List.of("c"), List.of("d"));
+        String productId = prodRes.getValue().getId();
+        itemService.add(tokenId, storeId, productId, 120f, 5, "desc");
+
+        // Create a second user
+        UserService userService = serviceManager.getUserService();
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> buyer = userService.register(
+            guest.getValue().getSessionToken(),
+            "RejectUser",
+            "AnotherPass1!",
+            "reject@buy.com"
+        );
+        String buyerToken = buyer.getValue().getSessionToken();
+
+        // Create an offer
+        PaymentDetailsDTO payment = new PaymentDetailsDTO(
+            buyer.getValue().getId(),
+            "4111111111111111",
+            LocalDate.now().plusYears(1),
+            "321",
+            "Reject User"
+        );
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 90.0, payment);
+        assertFalse("Making offer should succeed", offerResponse.errorOccurred());
+
+        // Reject the offer
+        String offerId = offerResponse.getValue().getId();
+        Response<OfferDTO> rejected = storeService.rejectOffer(tokenId, offerId);
+        assertFalse("Rejecting offer should succeed.\nError: " + (rejected.errorOccurred() ? rejected.getErrorMessage() : ""), rejected.errorOccurred());
+        assertEquals("Offer ID should match", offerId, rejected.getValue().getId());
+    }
 
 
 }
