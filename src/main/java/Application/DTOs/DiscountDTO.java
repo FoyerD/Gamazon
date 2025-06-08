@@ -181,7 +181,7 @@ public class DiscountDTO {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(Float discountPercentage) {
+    public void setDiscountPercentage(double discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
     

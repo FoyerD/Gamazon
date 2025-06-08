@@ -221,15 +221,29 @@ public class DiscountFacade {
 
     /**
      * Gets all discounts for a specific store.
+     * @param storeId The ID of the store to get discounts for
+     * @return List of discounts for the store
+     * @throws IllegalArgumentException if storeId is null or empty
+     * @throws RuntimeException if unable to retrieve discounts from repository
      */
     public List<Discount> getStoreDiscounts(String storeId) {
-        return discountRepository.getStoreDiscounts(storeId);
+        if (storeId == null || storeId.isEmpty()) {
+            throw new IllegalArgumentException("Store ID cannot be null or empty");
+        }
+        
+        List<Discount> discounts = discountRepository.getStoreDiscounts(storeId);
+        
+        if (discounts == null) {
+            throw new RuntimeException("Failed to retrieve discounts for store: " + storeId);
+        }
+        
+        return discounts;
     }
-    
-    
-    // /**
-    //  * Gets all conditions for a specific store (requires casting repository).
-    //  */
+
+
+/**
+ * Gets all conditions for a specific store (requires casting repository).
+ */
     // public List<Condition> getStoreConditions(String storeId) {
     //     return conditionRepository.getStoreConditions(storeId);
     // }
