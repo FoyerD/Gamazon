@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -41,6 +42,7 @@ public class DiscountsLayout extends VerticalLayout {
     private List<ConditionDTO> conditions;
     private Dialog addConditionDialog;
     private Dialog addDiscountDialog;
+    private Grid<DiscountDTO> discountGrid;
 
     public DiscountsLayout(
         String storeId,
@@ -69,6 +71,7 @@ public class DiscountsLayout extends VerticalLayout {
 
         setupAddConditionDialog();
         setupAddDiscountDialog();
+        setupDiscountGrid();
         
         // Add buttons
         Button addConditionButton = new Button("Add Condition", VaadinIcon.PLUS.create());
@@ -88,12 +91,15 @@ public class DiscountsLayout extends VerticalLayout {
         styleButton(saveDiscountsButton, "#ff9800");
         saveDiscountsButton.addClickListener(e -> saveDiscounts());
         
-        add(title, buttons, saveDiscountsButton);
+        add(title, buttons, discountGrid, saveDiscountsButton);
         
         // Set alignment and spacing
         setAlignItems(Alignment.CENTER);
         setSpacing(true);
         setPadding(true);
+
+        // Load initial discounts
+        // refreshDiscounts();
     }
 
     private void setupAddConditionDialog() {
@@ -346,6 +352,7 @@ public class DiscountsLayout extends VerticalLayout {
             Notification.show("Discount added successfully");
             addDiscountDialog.close();
             clearDiscountFields(idField, percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
+            refreshDiscounts();
         });
 
         Button cancelButton = new Button("Cancel", e -> {
@@ -370,6 +377,49 @@ public class DiscountsLayout extends VerticalLayout {
         dialogLayout.setPadding(true);
 
         addDiscountDialog.add(dialogLayout);
+    }
+
+    private void setupDiscountGrid() {
+        discountGrid = new Grid<>();
+        
+        // Add columns
+        discountGrid.addColumn(d -> d.getType().toString()).setHeader("Type");
+        discountGrid.addColumn(d -> String.format("%.0f%%", d.getDiscountPercentage() * 100))
+            .setHeader("Discount");
+        discountGrid.addColumn(d -> d.getQualifierType().toString()).setHeader("Qualifier Type");
+        discountGrid.addColumn(DiscountDTO::getQualifierValue).setHeader("Qualifier Value");
+        discountGrid.addColumn(d -> d.getCondition() != null ? 
+            d.getCondition().getType().toString() + " (ID: " + d.getCondition().getId() + ")" : 
+            "None"
+        ).setHeader("Condition");
+
+        // Add remove button column
+        discountGrid.addComponentColumn(discount -> {
+            Button removeButton = new Button("Remove", VaadinIcon.TRASH.create());
+            styleButton(removeButton, "#f44336");
+            removeButton.addClickListener(e -> {
+                onRemoveDiscount.accept(discount);
+                refreshDiscounts();
+            });
+            return removeButton;
+        }).setHeader("Actions");
+
+        // Style the grid
+        discountGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        discountGrid.setWidthFull();
+        discountGrid.setHeight("400px");
+    }
+
+    public void refreshDiscounts() {
+        List<DiscountDTO> currentDiscounts = discountsSupplier.get();
+        if (currentDiscounts != null) {
+            if (currentDiscounts.isEmpty()) {
+                Notification.show("No discounts available");
+            } else {
+                Notification.show("Discounts loaded successfully");
+            }
+            discountGrid.setItems(currentDiscounts);
+        }
     }
 
     private void clearFields(TextField idField, ComboBox<ConditionType> typeComboBox,
@@ -412,8 +462,10 @@ public class DiscountsLayout extends VerticalLayout {
         for (DiscountDTO discount : discounts) {
             onAddDiscount.accept(discount);
         }
-
         discounts.clear();
         Notification.show("Discounts saved successfully");
+        refreshDiscounts();
     }
+
+    
 } 
