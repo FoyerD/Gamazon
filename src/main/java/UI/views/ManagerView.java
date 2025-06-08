@@ -70,7 +70,6 @@ import UI.views.components.EmployeesLayout;
 import UI.views.components.PoliciesLayout;
 import UI.views.components.PolicyDialog;
 import UI.views.components.DiscountsLayout;
-import UI.views.components.DiscountDialog;
 import UI.views.dataobjects.UserPermission;
 
 @Route("manager")
@@ -202,7 +201,6 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 }
                 return response.getValue();
             },
-            v -> showAddDiscount(),
             d -> {
                 Response<Boolean> response = storePresenter.removeDiscount(sessionToken, currentStoreId, d.getId());
                 if (response.errorOccurred()) {
@@ -649,47 +647,8 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
     private void showDiscountsView() {
         mainContent.add(discountsLayout);
-        discountsLayout.refreshDiscounts();
     }
 
-    private void showAddDiscount() {
-        Supplier<List<ItemDTO>> itemSupplier = () -> {
-            Response<List<ItemDTO>> res = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
-            if (res.errorOccurred()) {
-                Notification.show("Failed fetching items for store: " + res.getErrorMessage());
-                return null;
-            }
-            return res.getValue();
-        };
-
-        Supplier<List<CategoryDTO>> categorySupplier = () -> {
-            Response<List<CategoryDTO>> res = storePresenter.getStoreCategories(sessionToken, currentStoreId);
-            if (res.errorOccurred()) {
-                Notification.show("Failed fetching categories for store: " + res.getErrorMessage(), 3000, Position.BOTTOM_END);
-                return null;
-            }
-            return res.getValue();
-        };
-
-        Function<DiscountDTO, Boolean> onSave = d -> {
-            Response<DiscountDTO> res = storePresenter.addDiscount(sessionToken, currentStoreId, d);
-            if (res.errorOccurred()) {
-                Notification.show("Failed to save discount: " + res.getErrorMessage());
-                return false;
-            }
-            discountsLayout.refreshDiscounts();
-            return true;
-        };
-
-        DiscountDialog dialog = new DiscountDialog(
-            currentStoreId,
-            itemSupplier,
-            categorySupplier,
-            onSave
-        );
-
-        dialog.open();
-    }
 
     private void loadItems(Grid<ItemDTO> itemsGrid) {
         Response<List<ItemDTO>> itemsResponse = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
