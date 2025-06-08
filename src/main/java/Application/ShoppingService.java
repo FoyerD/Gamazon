@@ -39,10 +39,10 @@ public class ShoppingService{
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
     private final LoginManager loginManager;
-    private StoreFacade storeFacade;
-    private PermissionManager permissionManager;
-    private OfferManager offerManager;
-    private ItemFacade itemFacade;
+    private final StoreFacade storeFacade;
+    private final PermissionManager permissionManager;
+    private final OfferManager offerManager;
+    private final ItemFacade itemFacade;
 
     @Autowired
     public ShoppingService(IShoppingCartFacade cartFacade, 
@@ -58,6 +58,7 @@ public class ShoppingService{
         this.permissionManager = permissionManager;
         this.loginManager = loginManager;
         this.offerManager = offerManager;
+        this.itemFacade = itemFacade;
         
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "ShoppingService initialized with cart facade");
     }
