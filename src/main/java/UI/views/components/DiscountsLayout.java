@@ -39,7 +39,6 @@ public class DiscountsLayout extends VerticalLayout {
 
     private List<DiscountDTO> discounts;
     private List<ConditionDTO> conditions;
-    private List<DiscountDTO> savedDiscounts;
     private Dialog addConditionDialog;
     private Dialog addDiscountDialog;
 
@@ -59,7 +58,6 @@ public class DiscountsLayout extends VerticalLayout {
 
         this.discounts = new ArrayList<>();
         this.conditions = new ArrayList<>();
-        this.savedDiscounts = new ArrayList<>();
 
         this.itemSupplier = itemSupplier;
         this.categorySupplier = categorySupplier;
@@ -415,7 +413,6 @@ public class DiscountsLayout extends VerticalLayout {
             onAddDiscount.accept(discount);
         }
 
-        savedDiscounts.addAll(discounts);
         discounts.clear();
         Notification.show("Discounts saved successfully");
     }
