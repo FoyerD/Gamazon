@@ -169,8 +169,12 @@ public  class BasketLayout extends VerticalLayout{
         }).setHeader("Quantity").setKey("quantity").setAutoWidth(true);
         
 
-        basketGrid.addColumn(item -> String.valueOf(item.getPrice())).setHeader("Price").setKey("price");
+        basketGrid.addColumn(item -> String.valueOf(String.format("$%.2f",item.getPrice()))).setHeader("Price").setKey("price");
         
+        basketGrid.addColumn(item -> {
+            double originalPrice = item.getOriginalPrice(); // Placeholder original price
+            return String.format("$%.2f", originalPrice);
+        }).setHeader("Original Price").setKey("originalPrice");
 
         basketGrid.addColumn(item -> {
             double unitPrice = item.getPrice(); // Placeholder price

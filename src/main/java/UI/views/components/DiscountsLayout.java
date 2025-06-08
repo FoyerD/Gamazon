@@ -383,7 +383,6 @@ public class DiscountsLayout extends VerticalLayout {
         discountGrid = new Grid<>();
         
         // Add columns
-        discountGrid.addColumn(DiscountDTO::getId).setHeader("ID");
         discountGrid.addColumn(d -> d.getType().toString()).setHeader("Type");
         discountGrid.addColumn(d -> String.format("%.0f%%", d.getDiscountPercentage() * 100))
             .setHeader("Discount");
@@ -411,7 +410,7 @@ public class DiscountsLayout extends VerticalLayout {
         discountGrid.setHeight("400px");
     }
 
-    private void refreshDiscounts() {
+    public void refreshDiscounts() {
         List<DiscountDTO> currentDiscounts = discountsSupplier.get();
         if (currentDiscounts != null) {
             if (currentDiscounts.isEmpty()) {
