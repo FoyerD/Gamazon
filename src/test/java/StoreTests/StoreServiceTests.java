@@ -23,58 +23,113 @@ import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.ProductService;
 import Application.ServiceManager;
+import Application.ShoppingService;
 import Application.StoreService;
+import Application.UserService;
 import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
 import Infrastructure.MemoryRepoManager;
 
 
 public class StoreServiceTests {
     // Existing fields
-    private StoreService storeService;
+        // Use concrete implementations for services and facades
+    private ShoppingService shoppingService;
+    private UserService userService;
     
-    // Add ServiceManager as a field
+    // Dependency injectors
+    private MemoryRepoManager repositoryManager;
+    private FacadeManager facadeManager;
     private ServiceManager serviceManager;
+    private ProductService productService;
+    private StoreService storeService;
+    private ItemService itemService;
+    private INotificationService notificationService;
+    private IExternalSupplyService mockSupplyService;
 
-    private String tokenId = null;
-
+    // Mock service for testing
+    private IExternalPaymentService mockPaymentService;
+    
+    // Test user data
+    private UserDTO guest;
+    private UserDTO user;
+    private String clientToken;
+    
+    // Common test constants
+    private static String store_id;
+    private static String product_id;
+    private static String product_id_2;
+    private static final float VALID_BID_PRICE = 100.0f;
+    private static final double DELTA = 0.01; // For floating point comparisons
+    
     @Before
     public void setUp() {
-        // Initialize repository manager
-        MemoryRepoManager repositoryManager = new MemoryRepoManager();
+        // Create mock payment service
+        mockPaymentService = mock(IExternalPaymentService.class);
+        notificationService = mock(INotificationService.class);
+        mockSupplyService = mock(IExternalSupplyService.class);
         
-        // Initialize facade manager
-        FacadeManager facadeManager = new FacadeManager(repositoryManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
 
-        // Initialize service manager and store as a field for use across tests
-        this.serviceManager = new ServiceManager(facadeManager);
+        repositoryManager = new MemoryRepoManager();
+        facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
+        serviceManager = new ServiceManager(facadeManager);
+        serviceManager.injectINotificationService(notificationService);
+
+
+        // Initialize services
+        userService = serviceManager.getUserService();
+        productService = serviceManager.getProductService();
+        storeService = serviceManager.getStoreService();
+        itemService = serviceManager.getItemService();
+        productService = serviceManager.getProductService();
+        shoppingService = serviceManager.getShoppingService();
         
-        // Get needed services directly from the service manager
-        this.storeService = serviceManager.getStoreService();
+        // Register a test user using UserService
+        Response<UserDTO> guestResponse = userService.guestEntry();
+        guest = guestResponse.getValue();
         
-        // Create a guest user
-        Response<UserDTO> guestResponse = serviceManager.getUserService().guestEntry();
-        assertFalse("Guest creation should succeed", guestResponse.errorOccurred());
-        
-        // Register a test user
-        Response<UserDTO> userResponse = serviceManager.getUserService().register(
-            guestResponse.getValue().getSessionToken(),
-            "Member1",
-            "WhyWontWork1!",
+        Response<UserDTO> userResponse = userService.register(
+            guest.getSessionToken(), 
+            "Member1", 
+            "WhyWontWork1!", // Using consistent password format
             "email@email.com"
         );
-        assertFalse("User registration should succeed", userResponse.errorOccurred());
         
-        // Get the token for the registered user
-        this.tokenId = userResponse.getValue().getSessionToken();
+        user = userResponse.getValue();
+        clientToken = user.getSessionToken();
+        
+        // Create sample products and store
+        product_id = productService.addProduct(
+            clientToken, 
+            "Test Product", 
+            List.of("Test Cat"), 
+            List.of("Test Cat Description")
+        ).getValue().getId();
+
+        product_id_2 = productService.addProduct(
+            clientToken, 
+            "Test Product 2", 
+            List.of("Test Cat"), 
+            List.of("Test Cat Description")
+        ).getValue().getId();
+
+        store_id = storeService.addStore(
+            clientToken, 
+            "Test Store", 
+            "Test Store Description"
+        ).getValue().getId();        
+        
+        itemService.add(clientToken, store_id, product_id, 10.0, 5, "Test Item Description");
+        itemService.add(clientToken, store_id, product_id_2, 20.0, 5, "Test Item 2 Description");
     }
 
     @Test
     public void GivenExistingMemberAndNewStore_WhenAddStore_ThenReturnStore() {
         String storeName = "NewStore";
-        Response<StoreDTO> result = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> result = storeService.addStore(this.clientToken, storeName, "A new store");
         assertTrue(result.getValue() != null);
 
     }
@@ -82,44 +137,44 @@ public class StoreServiceTests {
     @Test
     public void GivenExistingMemberExistingStoreName_WhenAddStore_ThenReturnError() {
         String storeName = "ExistingStore";
-        storeService.addStore(this.tokenId, storeName, "A new store");
-        Response<StoreDTO> result = storeService.addStore(this.tokenId, storeName,"I should not exist");
+        storeService.addStore(this.clientToken, storeName, "A new store");
+        Response<StoreDTO> result = storeService.addStore(this.clientToken, storeName,"I should not exist");
         assertTrue(result.errorOccurred());
     }
 
     @Test
     public void GivenExistingMemberClosedStore_WhenOpenStore_ThenReturnTrue() {
         String storeName = "ExistingStore";
-        Response<StoreDTO> response = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> response = storeService.addStore(this.clientToken, storeName, "A new store");
         String storeId = response.getValue().getId();
-        this.storeService.closeStore(this.tokenId, storeId);
-        Response<Boolean> resultOpen = storeService.openStore(this.tokenId, storeId);
+        this.storeService.closeStore(this.clientToken, storeId);
+        Response<Boolean> resultOpen = storeService.openStore(this.clientToken, storeId);
         assertTrue(resultOpen.getValue());
     }
 
     @Test
     public void GivenExistingMemberOpenStore_WhenOpenStore_ThenReturnError() {
         String storeName = "ExistingStore";
-        Response<StoreDTO> storeRes = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> storeRes = storeService.addStore(this.clientToken, storeName, "A new store");
         String storeId = storeRes.getValue().getId();
-        Response<Boolean> result = storeService.openStore(this.tokenId, storeId);
+        Response<Boolean> result = storeService.openStore(this.clientToken, storeId);
         assertTrue(result.errorOccurred());
     }
     @Test
     public void GivenExistingMemberOpenStore_WhenCloseStore_ThenReturnTrue() {
         String storeName = "StoreToClose";
-        Response<StoreDTO> storeRes = storeService.addStore(this.tokenId, storeName, "Temporary store");
+        Response<StoreDTO> storeRes = storeService.addStore(this.clientToken, storeName, "Temporary store");
         String storeId = storeRes.getValue().getId();
-        Response<Boolean> result = storeService.closeStore(this.tokenId, storeId.toString());
+        Response<Boolean> result = storeService.closeStore(this.clientToken, storeId.toString());
         assertTrue(result.getValue());
     }
     @Test
     public void GivenExistingMemberClosedStore_WhenCloseStore_ThenReturnFalse() {
         String storeName = "ExistingStore";
-        Response<StoreDTO> response = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> response = storeService.addStore(this.clientToken, storeName, "A new store");
         String storeId = response.getValue().getId();
-        this.storeService.closeStore(this.tokenId, storeId);
-        Response<Boolean> result = storeService.closeStore(this.tokenId, storeId);
+        this.storeService.closeStore(this.clientToken, storeId);
+        Response<Boolean> result = storeService.closeStore(this.clientToken, storeId);
         assertTrue(result.errorOccurred());
     }
 
@@ -127,16 +182,16 @@ public class StoreServiceTests {
     @Test
     public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNewStore_ThenReturnStore() {
         String storeName = "NewStore";
-        storeService.addStore(this.tokenId, storeName, "A new store");
-        Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, storeName);
+        storeService.addStore(this.clientToken, storeName, "A new store");
+        Response<StoreDTO> getResult = storeService.getStoreByName(this.clientToken, storeName);
         assertTrue(getResult.getValue().getName().equals(storeName));
     }
 
     @Test
     public void GivenExistingMemberAndNewStore_WhenGetStoreByNameNoneExist_ThenReturnError() {
         String storeName = "NewStore";
-        storeService.addStore(this.tokenId, storeName, "A new store");
-        Response<StoreDTO> getResult = storeService.getStoreByName(this.tokenId, "NoneExist");
+        storeService.addStore(this.clientToken, storeName, "A new store");
+        Response<StoreDTO> getResult = storeService.getStoreByName(this.clientToken, "NoneExist");
         assertTrue(getResult.errorOccurred());
     }
 
@@ -144,14 +199,14 @@ public class StoreServiceTests {
     public void GivenExistingMemberAndNewStoreAndNewProduct_WhenAddAuction_ThenReturnAuction() {
         // Create a store
         String storeName = "NewStore";
-        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> addResult = storeService.addStore(this.clientToken, storeName, "A new store");
         assertFalse("Store creation should succeed", addResult.errorOccurred());
         String storeId = addResult.getValue().getId();
         
         // Create a product using ProductService from the shared service manager
         ProductService productService = serviceManager.getProductService();
         Response<ProductDTO> productResponse = productService.addProduct(
-            tokenId,
+            clientToken,
             "Test Product",
             List.of("category1"),
             List.of("A test product description")
@@ -162,7 +217,7 @@ public class StoreServiceTests {
         // Add the product to the store using ItemService from the shared service manager
         ItemService itemService = serviceManager.getItemService();
         Response<ItemDTO> itemResponse = itemService.add(
-            tokenId,
+            clientToken,
             storeId,
             productId,
             10.0f,
@@ -173,7 +228,7 @@ public class StoreServiceTests {
 
         // Create an auction for the product
         String endDate = "2077-01-01 00:00";
-        Response<AuctionDTO> auctionResult = storeService.addAuction(this.tokenId, storeId, productId, endDate, 5.0);
+        Response<AuctionDTO> auctionResult = storeService.addAuction(this.clientToken, storeId, productId, endDate, 5.0);
         
         // Verify the auction was created successfully with correct details
         assertFalse("Auction creation should succeed", auctionResult.errorOccurred());
@@ -188,7 +243,7 @@ public class StoreServiceTests {
         
         // Create a product using ProductService
         Response<ProductDTO> productResponse = productService.addProduct(
-            tokenId,
+            clientToken,
             "Test Product",
             List.of("category1"),
             List.of("A test product description")
@@ -202,7 +257,7 @@ public class StoreServiceTests {
         // Try to create an auction for the item in the non-existent store
         Date endDate = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
         Response<AuctionDTO> auctionResult = storeService.addAuction(
-            this.tokenId, 
+            this.clientToken, 
             nonExistentStoreId, 
             productId, 
             endDate.toString(), 
@@ -217,7 +272,7 @@ public class StoreServiceTests {
     public void GivenExistingMemberAndNewStore_WhenAddAuctionForNonExistingItem_ThenReturnError() {
         // Create a store
         String storeName = "NewStore";
-        Response<StoreDTO> addResult = storeService.addStore(this.tokenId, storeName, "A new store");
+        Response<StoreDTO> addResult = storeService.addStore(this.clientToken, storeName, "A new store");
         assertFalse("Store creation should succeed", addResult.errorOccurred());
         String storeId = addResult.getValue().getId();
         
@@ -227,7 +282,7 @@ public class StoreServiceTests {
         // Try to create an auction for a non-existent product
         Date endDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
         Response<AuctionDTO> auctionResult = storeService.addAuction(
-            this.tokenId, 
+            this.clientToken, 
             storeId, 
             nonExistingProductId, 
             endDate.toString(), 
@@ -242,7 +297,7 @@ public class StoreServiceTests {
     public void GivenExistingStoreWithAuctions_WhenGetAllAuctions_ThenReturnAllAuctions() {
         // Create a store through the service
         String storeName = "AuctionStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store with auctions");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
@@ -252,19 +307,19 @@ public class StoreServiceTests {
         
         // Create 3 products
         Response<ProductDTO> product1Response = productService.addProduct(
-            tokenId, 
+            clientToken, 
             "Product 1", 
             List.of("category1"), 
             List.of("Description for product 1")
         );
         Response<ProductDTO> product2Response = productService.addProduct(
-            tokenId, 
+            clientToken, 
             "Product 2", 
             List.of("category2"), 
             List.of("Description for product 2")
         );
         Response<ProductDTO> product3Response = productService.addProduct(
-            tokenId, 
+            clientToken, 
             "Product 3", 
             List.of("category3"), 
             List.of("Description for product 3")
@@ -280,7 +335,7 @@ public class StoreServiceTests {
         
         // Add items to the store using ItemService
         Response<ItemDTO> item1Response = itemService.add(
-            tokenId, 
+            clientToken, 
             storeId, 
             productId1, 
             10.0f, 
@@ -288,7 +343,7 @@ public class StoreServiceTests {
             "Product 1 in store"
         );
         Response<ItemDTO> item2Response = itemService.add(
-            tokenId, 
+            clientToken, 
             storeId, 
             productId2, 
             20.0f, 
@@ -296,7 +351,7 @@ public class StoreServiceTests {
             "Product 2 in store"
         );
         Response<ItemDTO> item3Response = itemService.add(
-            tokenId, 
+            clientToken, 
             storeId, 
             productId3, 
             30.0f, 
@@ -311,21 +366,21 @@ public class StoreServiceTests {
         // Add auctions for the products using StoreService
         String endDate = "2077-01-01 00:00";
         Response<AuctionDTO> auction1Response = storeService.addAuction(
-            tokenId, 
+            clientToken, 
             storeId, 
             productId1, 
             endDate, 
             5.0
         );
         Response<AuctionDTO> auction2Response = storeService.addAuction(
-            tokenId, 
+            clientToken, 
             storeId, 
             productId2, 
             endDate, 
             10.0
         );
         Response<AuctionDTO> auction3Response = storeService.addAuction(
-            tokenId, 
+            clientToken, 
             storeId, 
             productId3, 
             endDate, 
@@ -337,7 +392,7 @@ public class StoreServiceTests {
         assertFalse("Auction 3 creation should succeed", auction3Response.errorOccurred());
 
         // Get all auctions for the store using StoreService
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(tokenId, storeId);
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(clientToken, storeId);
         
         // Verify results
         assertFalse("Getting auctions should succeed", auctionsResponse.errorOccurred());
@@ -364,10 +419,10 @@ public class StoreServiceTests {
     @Test
     public void GivenStoreWithNoAuctions_WhenGetAllAuctions_ThenReturnEmptyList() {
         String storeName = "EmptyAuctionStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with no auctions");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store with no auctions");
         String storeId = storeResponse.getValue().getId();
 
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.clientToken, storeId);
         assertTrue(auctionsResponse.getValue() != null);
         assertEquals(0, auctionsResponse.getValue().size());
     }
@@ -376,7 +431,7 @@ public class StoreServiceTests {
     public void GivenNonExistingStore_WhenGetAllAuctions_ThenReturnError() {
         String nonExistingStoreId = UUID.randomUUID().toString();
 
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, nonExistingStoreId);
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.clientToken, nonExistingStoreId);
         assertTrue(auctionsResponse.errorOccurred());
     }
 
@@ -388,7 +443,7 @@ public class StoreServiceTests {
         
         // Create a product
         Response<ProductDTO> productResponse = productService.addProduct(
-            tokenId, 
+            clientToken, 
             "Shared Product", 
             List.of("category1"), 
             List.of("A product sold in multiple stores")
@@ -398,12 +453,12 @@ public class StoreServiceTests {
         
         // Create two stores through the service
         Response<StoreDTO> storeRes1 = storeService.addStore(
-            tokenId, 
+            clientToken, 
             "storestore", 
             "Store with auctions"
         );
         Response<StoreDTO> storeRes2 = storeService.addStore(
-            tokenId, 
+            clientToken, 
             "storestore2", 
             "Store with auctions"
         );
@@ -416,7 +471,7 @@ public class StoreServiceTests {
         
         // Add the product to both stores using ItemService
         Response<ItemDTO> item1Response = itemService.add(
-            tokenId, 
+            clientToken, 
             storeId1, 
             productId, 
             10.0f, 
@@ -424,7 +479,7 @@ public class StoreServiceTests {
             "Product in first store"
         );
         Response<ItemDTO> item2Response = itemService.add(
-            tokenId, 
+            clientToken, 
             storeId2, 
             productId, 
             20.0f, 
@@ -438,14 +493,14 @@ public class StoreServiceTests {
         // Add auctions for the product in both stores using StoreService
         String endDate = "2077-01-01 00:00";
         Response<AuctionDTO> aucRes1 = storeService.addAuction(
-            tokenId, 
+            clientToken, 
             storeId1, 
             productId, 
             endDate, 
             5.0
         );
         Response<AuctionDTO> aucRes2 = storeService.addAuction(
-            tokenId, 
+            clientToken, 
             storeId2, 
             productId, 
             endDate, 
@@ -457,7 +512,7 @@ public class StoreServiceTests {
 
         // Get all auctions for the product using StoreService
         Response<List<AuctionDTO>> auctionsResponse = storeService.getAllProductAuctions(
-            tokenId, 
+            clientToken, 
             productId
         );
         
@@ -483,10 +538,10 @@ public class StoreServiceTests {
     @Test
     public void GivenStoreWithNoAuctions_WhenGetAllProductAuctions_ThenReturnEmptyList() {
         String storeName = "EmptyAuctionStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with no auctions");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store with no auctions");
         String storeId = storeResponse.getValue().getId();
 
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, storeId);
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.clientToken, storeId);
         assertTrue(auctionsResponse.getValue() != null);
         assertEquals(0, auctionsResponse.getValue().size());
     }
@@ -495,7 +550,7 @@ public class StoreServiceTests {
     public void GivenNonExistingStore_WhenGetAllProductAuctions_ThenReturnError() {
         String nonExistingStoreId = UUID.randomUUID().toString();
 
-        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.tokenId, nonExistingStoreId);
+        Response<List<AuctionDTO>> auctionsResponse = storeService.getAllStoreAuctions(this.clientToken, nonExistingStoreId);
         assertTrue(auctionsResponse.errorOccurred());
     }
 
@@ -548,12 +603,12 @@ public class StoreServiceTests {
     public void GivenExistingStoreWithNoDiscounts_WhenGetStoreDiscounts_ThenReturnEmptyList() {
         // Create a store
         String storeName = "NoDiscountStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with no discounts");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store with no discounts");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
         // Get discounts for the store
-        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         
         // Verify results
         assertFalse("Getting discounts should succeed", discountsResponse.errorOccurred());
@@ -568,7 +623,7 @@ public class StoreServiceTests {
     public void GivenNonExistentStore_WhenGetStoreDiscounts_ThenReturnError() {
         String nonExistentStoreId = "non-existent-store-id";
         
-        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.tokenId, nonExistentStoreId);
+        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.clientToken, nonExistentStoreId);
         
         // Verify error occurs
         assertTrue("Getting discounts for non-existent store should fail", discountsResponse.errorOccurred());
@@ -581,7 +636,7 @@ public class StoreServiceTests {
     public void GivenInvalidToken_WhenGetStoreDiscounts_ThenReturnError() {
         // Create a store with valid token first
         String storeName = "ValidStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Valid store");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Valid store");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
@@ -600,7 +655,7 @@ public class StoreServiceTests {
     public void GivenExistingStoreAndValidDiscount_WhenAddDiscount_ThenReturnDiscountAndStoreHasDiscount() {
         // Create a store
         String storeName = "DiscountStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for discount testing");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for discount testing");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
@@ -608,7 +663,7 @@ public class StoreServiceTests {
         DiscountDTO discountDTO = createValidSimpleDiscountDTO();
 
         // Add the discount
-        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.tokenId, storeId, discountDTO);
+        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.clientToken, storeId, discountDTO);
         
         // Debug: Print error if it occurs
         if (addDiscountResponse.errorOccurred()) {
@@ -621,7 +676,7 @@ public class StoreServiceTests {
         assertNotNull("Discount should have an ID", addDiscountResponse.getValue().getId());
 
         // Verify the discount exists in the store
-        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", discountsResponse.errorOccurred());
         assertEquals("Store should have 1 discount", 1, discountsResponse.getValue().size());
         
@@ -642,7 +697,7 @@ public class StoreServiceTests {
         
         DiscountDTO discountDTO = createValidSimpleDiscountDTO();
 
-        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.tokenId, nonExistentStoreId, discountDTO);
+        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.clientToken, nonExistentStoreId, discountDTO);
         
         // Verify error occurs
         assertTrue("Adding discount to non-existent store should fail", addDiscountResponse.errorOccurred());
@@ -655,7 +710,7 @@ public class StoreServiceTests {
     public void GivenInvalidToken_WhenAddDiscount_ThenReturnError() {
         // Create a store with valid token first
         String storeName = "ValidStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Valid store");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Valid store");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
@@ -669,7 +724,7 @@ public class StoreServiceTests {
         assertTrue("Adding discount with invalid token should fail", addDiscountResponse.errorOccurred());
         
         // Verify store still has no discounts
-        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", discountsResponse.errorOccurred());
         assertEquals("Store should have 0 discounts", 0, discountsResponse.getValue().size());
         
@@ -681,7 +736,7 @@ public class StoreServiceTests {
     public void GivenInvalidDiscountData_WhenAddDiscount_ThenReturnError() {
         // Create a store
         String storeName = "ValidationStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for validation testing");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for validation testing");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
@@ -692,13 +747,13 @@ public class StoreServiceTests {
         invalidDiscountDTO.setQualifierType(DiscountDTO.QualifierType.STORE);
         invalidDiscountDTO.setQualifierValue("store-qualifier");
         
-        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.tokenId, storeId, invalidDiscountDTO);
+        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.clientToken, storeId, invalidDiscountDTO);
         
         // Verify error occurs
         assertTrue("Adding invalid discount should fail", addDiscountResponse.errorOccurred());
         
         // Verify store still has no discounts
-        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", discountsResponse.errorOccurred());
         assertEquals("Store should have 0 discounts", 0, discountsResponse.getValue().size());
         
@@ -710,24 +765,24 @@ public class StoreServiceTests {
     public void GivenStoreWithMultipleDiscounts_WhenAddDiscount_ThenReturnDiscountAndIncreaseCount() {
         // Create a store
         String storeName = "MultiDiscountStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for multiple discounts");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for multiple discounts");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
         // Add first discount
         DiscountDTO discount1 = createValidSimpleDiscountDTO(0.10, "First discount");
         
-        Response<DiscountDTO> addDiscount1Response = storeService.addDiscount(this.tokenId, storeId, discount1);
+        Response<DiscountDTO> addDiscount1Response = storeService.addDiscount(this.clientToken, storeId, discount1);
         assertFalse("Adding first discount should succeed", addDiscount1Response.errorOccurred());
 
         // Add second discount
         DiscountDTO discount2 = createValidSimpleDiscountDTO(0.15, "Second discount");
         
-        Response<DiscountDTO> addDiscount2Response = storeService.addDiscount(this.tokenId, storeId, discount2);
+        Response<DiscountDTO> addDiscount2Response = storeService.addDiscount(this.clientToken, storeId, discount2);
         assertFalse("Adding second discount should succeed", addDiscount2Response.errorOccurred());
 
         // Verify both discounts exist in the store
-        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", discountsResponse.errorOccurred());
         assertEquals("Store should have 2 discounts", 2, discountsResponse.getValue().size());
         
@@ -748,31 +803,31 @@ public class StoreServiceTests {
     public void GivenStoreWithExistingDiscount_WhenRemoveDiscount_ThenReturnTrueAndDiscountRemoved() {
         // Create a store
         String storeName = "RemoveDiscountStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for discount removal");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for discount removal");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
         // Add a discount
         DiscountDTO discountDTO = createValidSimpleDiscountDTO(0.25, "Discount to be removed");
         
-        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.tokenId, storeId, discountDTO);
+        Response<DiscountDTO> addDiscountResponse = storeService.addDiscount(this.clientToken, storeId, discountDTO);
         assertFalse("Adding discount should succeed", addDiscountResponse.errorOccurred());
         String discountId = addDiscountResponse.getValue().getId();
 
         // Verify discount exists before removal
-        Response<List<DiscountDTO>> beforeRemovalResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> beforeRemovalResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", beforeRemovalResponse.errorOccurred());
         assertEquals("Store should have 1 discount before removal", 1, beforeRemovalResponse.getValue().size());
 
         // Remove the discount
-        Response<Boolean> removeDiscountResponse = storeService.removeDiscount(this.tokenId, storeId, discountId);
+        Response<Boolean> removeDiscountResponse = storeService.removeDiscount(this.clientToken, storeId, discountId);
         
         // Verify removal was successful
         assertFalse("Removing discount should succeed", removeDiscountResponse.errorOccurred());
         assertTrue("Remove operation should return true", removeDiscountResponse.getValue());
 
         // Verify discount no longer exists in the store
-        Response<List<DiscountDTO>> afterRemovalResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> afterRemovalResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", afterRemovalResponse.errorOccurred());
         assertEquals("Store should have 0 discounts after removal", 0, afterRemovalResponse.getValue().size());
         
@@ -789,7 +844,7 @@ public class StoreServiceTests {
     public void GivenStoreWithMultipleDiscounts_WhenRemoveOneDiscount_ThenReturnTrueAndOnlySpecificDiscountRemoved() {
         // Create a store
         String storeName = "MultiRemoveStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for selective removal");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for selective removal");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
@@ -798,9 +853,9 @@ public class StoreServiceTests {
         DiscountDTO discount2 = createValidSimpleDiscountDTO(0.15, "Second discount");
         DiscountDTO discount3 = createValidSimpleDiscountDTO(0.20, "Third discount");
         
-        Response<DiscountDTO> add1Response = storeService.addDiscount(this.tokenId, storeId, discount1);
-        Response<DiscountDTO> add2Response = storeService.addDiscount(this.tokenId, storeId, discount2);
-        Response<DiscountDTO> add3Response = storeService.addDiscount(this.tokenId, storeId, discount3);
+        Response<DiscountDTO> add1Response = storeService.addDiscount(this.clientToken, storeId, discount1);
+        Response<DiscountDTO> add2Response = storeService.addDiscount(this.clientToken, storeId, discount2);
+        Response<DiscountDTO> add3Response = storeService.addDiscount(this.clientToken, storeId, discount3);
         
         assertFalse("Adding first discount should succeed", add1Response.errorOccurred());
         assertFalse("Adding second discount should succeed", add2Response.errorOccurred());
@@ -809,16 +864,16 @@ public class StoreServiceTests {
         String discountToRemoveId = add2Response.getValue().getId();
 
         // Verify initial state
-        Response<List<DiscountDTO>> beforeRemovalResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> beforeRemovalResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertEquals("Store should have 3 discounts before removal", 3, beforeRemovalResponse.getValue().size());
 
         // Remove the middle discount
-        Response<Boolean> removeResponse = storeService.removeDiscount(this.tokenId, storeId, discountToRemoveId);
+        Response<Boolean> removeResponse = storeService.removeDiscount(this.clientToken, storeId, discountToRemoveId);
         assertFalse("Removing discount should succeed", removeResponse.errorOccurred());
         assertTrue("Remove operation should return true", removeResponse.getValue());
 
         // Verify final state
-        Response<List<DiscountDTO>> afterRemovalResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> afterRemovalResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", afterRemovalResponse.errorOccurred());
         assertEquals("Store should have 2 discounts after removal", 2, afterRemovalResponse.getValue().size());
         
@@ -842,13 +897,13 @@ public class StoreServiceTests {
     public void GivenNonExistentDiscount_WhenRemoveDiscount_ThenReturnErrorOrFalse() {
         // Create a store
         String storeName = "ErrorRemoveStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for error testing");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for error testing");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
         String nonExistentDiscountId = "non-existent-discount-id";
         
-        Response<Boolean> removeResponse = storeService.removeDiscount(this.tokenId, storeId, nonExistentDiscountId);
+        Response<Boolean> removeResponse = storeService.removeDiscount(this.clientToken, storeId, nonExistentDiscountId);
         
         // Verify error occurs or returns false
         assertTrue("Removing non-existent discount should fail or return false", 
@@ -862,7 +917,7 @@ public class StoreServiceTests {
         String nonExistentStoreId = "non-existent-store-id";
         String discountId = "some-discount-id";
         
-        Response<Boolean> removeResponse = storeService.removeDiscount(this.tokenId, nonExistentStoreId, discountId);
+        Response<Boolean> removeResponse = storeService.removeDiscount(this.clientToken, nonExistentStoreId, discountId);
         
         // Verify error occurs
         assertTrue("Removing discount from non-existent store should fail", removeResponse.errorOccurred());
@@ -875,13 +930,13 @@ public class StoreServiceTests {
     public void GivenInvalidToken_WhenRemoveDiscount_ThenReturnError() {
         // Create a store and add a discount with valid token
         String storeName = "ValidTokenStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for token testing");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for token testing");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
         DiscountDTO discountDTO = createValidSimpleDiscountDTO(0.30, "Protected discount");
         
-        Response<DiscountDTO> addResponse = storeService.addDiscount(this.tokenId, storeId, discountDTO);
+        Response<DiscountDTO> addResponse = storeService.addDiscount(this.clientToken, storeId, discountDTO);
         if (addResponse.errorOccurred()) {
             assertEquals("some string", addResponse.getErrorMessage());
         }
@@ -897,7 +952,7 @@ public class StoreServiceTests {
         assertTrue("Removing discount with invalid token should fail", removeResponse.errorOccurred());
 
         // Verify discount still exists
-        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> discountsResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertFalse("Getting discounts should succeed", discountsResponse.errorOccurred());
         assertEquals("Store should still have 1 discount", 1, discountsResponse.getValue().size());
         
@@ -913,12 +968,12 @@ public class StoreServiceTests {
     public void GivenStoreWithDiscounts_WhenAddAndRemoveDiscountsSequentially_ThenMaintainConsistentState() {
         // Integration test to verify consistent state management
         String storeName = "ConsistencyStore";
-        Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store for consistency testing");
+        Response<StoreDTO> storeResponse = storeService.addStore(this.clientToken, storeName, "Store for consistency testing");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
 
         // Initial state: 0 discounts
-        Response<List<DiscountDTO>> initialResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> initialResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertEquals("Initial discount count should be 0", 0, initialResponse.getValue().size());
 
         // Add 3 discounts
@@ -928,18 +983,18 @@ public class StoreServiceTests {
         for (int i = 0; i < 3; i++) {
             discounts[i] = createValidSimpleDiscountDTO(0.05 * (i + 1), "Discount " + (i + 1));
             
-            Response<DiscountDTO> addResponse = storeService.addDiscount(this.tokenId, storeId, discounts[i]);
+            Response<DiscountDTO> addResponse = storeService.addDiscount(this.clientToken, storeId, discounts[i]);
             assertFalse("Adding discount " + (i + 1) + " should succeed", addResponse.errorOccurred());
             discountIds[i] = addResponse.getValue().getId();
         }
 
         // Verify 3 discounts exist
-        Response<List<DiscountDTO>> afterAddResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> afterAddResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertEquals("Should have 3 discounts after adding", 3, afterAddResponse.getValue().size());
 
         // Remove 2 discounts
-        Response<Boolean> remove1 = storeService.removeDiscount(this.tokenId, storeId, discountIds[0]);
-        Response<Boolean> remove2 = storeService.removeDiscount(this.tokenId, storeId, discountIds[2]);
+        Response<Boolean> remove1 = storeService.removeDiscount(this.clientToken, storeId, discountIds[0]);
+        Response<Boolean> remove2 = storeService.removeDiscount(this.clientToken, storeId, discountIds[2]);
         
         assertFalse("First removal should succeed", remove1.errorOccurred());
         assertFalse("Second removal should succeed", remove2.errorOccurred());
@@ -947,7 +1002,7 @@ public class StoreServiceTests {
         assertTrue("Second removal should return true", remove2.getValue());
 
         // Verify final state: 1 discount remaining
-        Response<List<DiscountDTO>> finalResponse = storeService.getStoreDiscounts(this.tokenId, storeId);
+        Response<List<DiscountDTO>> finalResponse = storeService.getStoreDiscounts(this.clientToken, storeId);
         assertEquals("Should have 1 discount after removals", 1, finalResponse.getValue().size());
         
         // Verify the correct discount remains
