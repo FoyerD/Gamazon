@@ -57,13 +57,14 @@ public class OfferLayout extends VerticalLayout {
 
     private Div buildOfferTile(OfferDTO offer) {
         Div tile = new Div();
+        boolean offeredPriceGreater = offer.getNewPrice() > offer.getItem().getPrice();
         tile.getStyle()
             .set("width", "280px")
             .set("min-height", "160px")
-            .set("border", "5px solid rgb(165, 240, 190)")
+            .set("border", "5px solid " + (offeredPriceGreater ? "rgb(133, 192, 175)" : "rgb(192, 163, 133)"))
             .set("border-radius", "10px")
             .set("padding", "16px")
-            .set("background-color", "rgb(220, 255, 234)")
+            .set("background-color", (offeredPriceGreater ? "rgb(196, 228, 221)" : "rgb(228, 209, 196)"))
             .set("display", "flex")
             .set("flex-direction", "column")
             .set("justify-content", "space-between")
