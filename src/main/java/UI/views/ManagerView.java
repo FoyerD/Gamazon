@@ -191,6 +191,25 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             p -> {}
         );
 
+        Supplier<List<ItemDTO>> itemSupplier = () -> {
+            Response<List<ItemDTO>> res = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+            if (res.errorOccurred()) {
+                Notification.show("Failed fetching items for store: " + res.getErrorMessage());
+                return null;
+            }
+            return res.getValue();
+        };
+
+
+        Supplier<List<CategoryDTO>> categorySupplier = () -> {
+            Response<List<CategoryDTO>> res = storePresenter.getStoreCategories(sessionToken, currentStoreId);
+            if (res.errorOccurred()) {
+                Notification.show("Failed fetching categories for store: " + res.getErrorMessage(), 3000, Position.BOTTOM_END);
+                return null;
+            }
+            return res.getValue();
+        };
+
         discountsLayout = new DiscountsLayout(
             () -> {
                 Response<List<DiscountDTO>> response = storePresenter.getStoreDiscounts(sessionToken, currentStoreId);
@@ -211,7 +230,9 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                         3000, Notification.Position.MIDDLE);
                     // discountsLayout.refreshDiscounts();
                 }
-            }
+            },
+            itemSupplier,
+            categorySupplier
         );
 
         // Tab change listener

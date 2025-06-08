@@ -19,21 +19,31 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 
+import Application.DTOs.CategoryDTO;
 import Application.DTOs.ConditionDTO;
 import Application.DTOs.DiscountDTO;
+import Application.DTOs.ItemDTO;
 import Application.DTOs.ConditionDTO.ConditionType;
+import Application.DTOs.DiscountDTO.DiscountType;
+import Application.DTOs.DiscountDTO.QualifierType;
 
 public class DiscountsLayout extends VerticalLayout {
     private final Supplier<List<DiscountDTO>> discountsSupplier;
     private final Consumer<DiscountDTO> onRemoveDiscount;
 
+    private Supplier<List<ItemDTO>> itemSupplier;
+    private Supplier<List<CategoryDTO>> categorySupplier;
+
     private List<DiscountDTO> discounts;
     private List<ConditionDTO> conditions;
     private Dialog addConditionDialog;
+    private Dialog addDiscountDialog;
 
     public DiscountsLayout(
         Supplier<List<DiscountDTO>> discountsSupplier,
-        Consumer<DiscountDTO> onRemoveDiscount
+        Consumer<DiscountDTO> onRemoveDiscount,
+        Supplier<List<ItemDTO>> itemSupplier,
+        Supplier<List<CategoryDTO>> categorySupplier
     ) {
         this.discountsSupplier = discountsSupplier;
         this.onRemoveDiscount = onRemoveDiscount;
@@ -41,18 +51,30 @@ public class DiscountsLayout extends VerticalLayout {
         this.discounts = new ArrayList<>();
         this.conditions = new ArrayList<>();
 
+        this.itemSupplier = itemSupplier;
+        this.categorySupplier = categorySupplier;
+
         // Create header
         H3 title = new H3("Store Discounts");
         title.getStyle().set("color", "#ffffff");
 
         setupAddConditionDialog();
+        setupAddDiscountDialog();
         
-        // Add condition button
+        // Add buttons
         Button addConditionButton = new Button("Add Condition", VaadinIcon.PLUS.create());
-        styleButton(addConditionButton, "#4caf50");
-        addConditionButton.addClickListener(e -> addConditionDialog.open());
+        Button addDiscountButton = new Button("Add Discount", VaadinIcon.PLUS.create());
         
-        add(title, addConditionButton);
+        styleButton(addConditionButton, "#4caf50");
+        styleButton(addDiscountButton, "#2196f3");
+        
+        addConditionButton.addClickListener(e -> addConditionDialog.open());
+        addDiscountButton.addClickListener(e -> addDiscountDialog.open());
+        
+        HorizontalLayout buttons = new HorizontalLayout(addConditionButton, addDiscountButton);
+        buttons.setSpacing(true);
+        
+        add(title, buttons);
     }
 
     private void setupAddConditionDialog() {
@@ -66,14 +88,22 @@ public class DiscountsLayout extends VerticalLayout {
 
         NumberField minPriceField = new NumberField("Minimum Price");
         NumberField maxPriceField = new NumberField("Maximum Price");
-        TextField productIdField = new TextField("Product ID");
+        
+        // Create ComboBoxes but don't populate them yet
+        ComboBox<ItemDTO> productComboBox = new ComboBox<>("Product");
+        productComboBox.setItemLabelGenerator(ItemDTO::getProductName);
+
+        ComboBox<CategoryDTO> categoryComboBox = new ComboBox<>("Category");
+        categoryComboBox.setItemLabelGenerator(CategoryDTO::getName);
+
         NumberField minQuantityField = new NumberField("Minimum Quantity");
         NumberField maxQuantityField = new NumberField("Maximum Quantity");
 
         // Initially hide optional fields
         minPriceField.setVisible(false);
         maxPriceField.setVisible(false);
-        productIdField.setVisible(false);
+        productComboBox.setVisible(false);
+        categoryComboBox.setVisible(false);
         minQuantityField.setVisible(false);
         maxQuantityField.setVisible(false);
 
@@ -84,9 +114,24 @@ public class DiscountsLayout extends VerticalLayout {
 
             minPriceField.setVisible(selectedType == ConditionType.MIN_PRICE);
             maxPriceField.setVisible(selectedType == ConditionType.MAX_PRICE);
-            productIdField.setVisible(selectedType == ConditionType.MIN_QUANTITY || selectedType == ConditionType.MAX_QUANTITY);
+            productComboBox.setVisible(selectedType == ConditionType.MIN_QUANTITY || selectedType == ConditionType.MAX_QUANTITY);
             minQuantityField.setVisible(selectedType == ConditionType.MIN_QUANTITY);
             maxQuantityField.setVisible(selectedType == ConditionType.MAX_QUANTITY);
+        });
+
+        // Add dialog open listener to populate ComboBoxes
+        addConditionDialog.addOpenedChangeListener(event -> {
+            if (event.isOpened()) {
+                List<ItemDTO> products = itemSupplier.get();
+                if (products != null) {
+                    productComboBox.setItems(products);
+                }
+                
+                List<CategoryDTO> categories = categorySupplier.get();
+                if (categories != null) {
+                    categoryComboBox.setItems(categories);
+                }
+            }
         });
 
         // Create buttons
@@ -120,19 +165,19 @@ public class DiscountsLayout extends VerticalLayout {
                     newCondition.setMaxPrice(maxPriceField.getValue());
                     break;
                 case MIN_QUANTITY:
-                    if (productIdField.isEmpty() || minQuantityField.isEmpty()) {
-                        Notification.show("Product ID and Minimum Quantity are required");
+                    if (productComboBox.isEmpty() || minQuantityField.isEmpty()) {
+                        Notification.show("Product and Minimum Quantity are required");
                         return;
                     }
-                    newCondition.setProductId(productIdField.getValue());
+                    newCondition.setProductId(productComboBox.getValue().getProductId());
                     newCondition.setMinQuantity(minQuantityField.getValue().intValue());
                     break;
                 case MAX_QUANTITY:
-                    if (productIdField.isEmpty() || maxQuantityField.isEmpty()) {
-                        Notification.show("Product ID and Maximum Quantity are required");
+                    if (productComboBox.isEmpty() || maxQuantityField.isEmpty()) {
+                        Notification.show("Product and Maximum Quantity are required");
                         return;
                     }
-                    newCondition.setProductId(productIdField.getValue());
+                    newCondition.setProductId(productComboBox.getValue().getProductId());
                     newCondition.setMaxQuantity(maxQuantityField.getValue().intValue());
                     break;
             }
@@ -140,11 +185,11 @@ public class DiscountsLayout extends VerticalLayout {
             conditions.add(newCondition);
             Notification.show("Condition added successfully");
             addConditionDialog.close();
-            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productIdField, minQuantityField, maxQuantityField);
+            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
         });
 
         Button cancelButton = new Button("Cancel", e -> {
-            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productIdField, minQuantityField, maxQuantityField);
+            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
             addConditionDialog.close();
         });
 
@@ -157,7 +202,8 @@ public class DiscountsLayout extends VerticalLayout {
             typeComboBox,
             minPriceField,
             maxPriceField,
-            productIdField,
+            productComboBox,
+            categoryComboBox,
             minQuantityField,
             maxQuantityField,
             new HorizontalLayout(saveButton, cancelButton)
@@ -168,17 +214,167 @@ public class DiscountsLayout extends VerticalLayout {
         addConditionDialog.add(dialogLayout);
     }
 
+    private void setupAddDiscountDialog() {
+        addDiscountDialog = new Dialog();
+        addDiscountDialog.setHeaderTitle("Add New Simple Discount");
+
+        // Create form fields
+        TextField idField = new TextField("Discount ID");
+        
+        NumberField percentageField = new NumberField("Discount Percentage");
+        percentageField.setMin(0);
+        percentageField.setMax(100);
+        percentageField.setStep(1);
+        percentageField.setValue(0.0);
+        percentageField.setHelperText("Enter a value between 0 and 100");
+        
+        ComboBox<QualifierType> qualifierTypeComboBox = new ComboBox<>("Qualifier Type");
+        qualifierTypeComboBox.setItems(QualifierType.values());
+        
+        ComboBox<ItemDTO> productComboBox = new ComboBox<>("Product");
+        productComboBox.setItemLabelGenerator(ItemDTO::getProductName);
+        productComboBox.setVisible(false);
+        
+        ComboBox<CategoryDTO> categoryComboBox = new ComboBox<>("Category");
+        categoryComboBox.setItemLabelGenerator(CategoryDTO::getName);
+        categoryComboBox.setVisible(false);
+        
+        ComboBox<ConditionDTO> conditionComboBox = new ComboBox<>("Condition");
+        conditionComboBox.setItemLabelGenerator(condition -> 
+            condition.getType().toString() + " (ID: " + condition.getId() + ")");
+        
+        // Add dialog open listener to populate ComboBoxes
+        addDiscountDialog.addOpenedChangeListener(event -> {
+            if (event.isOpened()) {
+                List<ItemDTO> products = itemSupplier.get();
+                if (products != null) {
+                    productComboBox.setItems(products);
+                }
+                
+                List<CategoryDTO> categories = categorySupplier.get();
+                if (categories != null) {
+                    categoryComboBox.setItems(categories);
+                }
+                
+                if (!conditions.isEmpty()) {
+                    conditionComboBox.setItems(conditions);
+                }
+            }
+        });
+
+        // Show/hide fields based on qualifier type
+        qualifierTypeComboBox.addValueChangeListener(event -> {
+            QualifierType selectedType = event.getValue();
+            if (selectedType == null) return;
+
+            productComboBox.setVisible(selectedType == QualifierType.PRODUCT);
+            categoryComboBox.setVisible(selectedType == QualifierType.CATEGORY);
+        });
+
+        // Create buttons
+        Button saveButton = new Button("Save", e -> {
+            if (idField.isEmpty()) {
+                Notification.show("Discount ID is required");
+                return;
+            }
+            if (qualifierTypeComboBox.isEmpty()) {
+                Notification.show("Qualifier Type is required");
+                return;
+            }
+            if (percentageField.isEmpty()) {
+                Notification.show("Discount Percentage is required");
+                return;
+            }
+
+            DiscountDTO newDiscount = new DiscountDTO();
+            newDiscount.setId(idField.getValue());
+            newDiscount.setType(DiscountType.SIMPLE);
+            Float precentage = percentageField.getValue().floatValue();
+            newDiscount.setDiscountPercentage(precentage / 100);
+            newDiscount.setQualifierType(qualifierTypeComboBox.getValue());
+
+            switch (qualifierTypeComboBox.getValue()) {
+                case PRODUCT:
+                    if (productComboBox.isEmpty()) {
+                        Notification.show("Product selection is required");
+                        return;
+                    }
+                    newDiscount.setQualifierValue(productComboBox.getValue().getProductId());
+                    break;
+                case CATEGORY:
+                    if (categoryComboBox.isEmpty()) {
+                        Notification.show("Category selection is required");
+                        return;
+                    }
+                    newDiscount.setQualifierValue(categoryComboBox.getValue().getName());
+                    break;
+                case STORE:
+                    // Store qualifier doesn't need additional value
+                    break;
+            }
+
+            if (!conditionComboBox.isEmpty()) {
+                newDiscount.setCondition(conditionComboBox.getValue());
+            }
+
+            discounts.add(newDiscount);
+            Notification.show("Discount added successfully");
+            addDiscountDialog.close();
+            clearDiscountFields(idField, percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
+        });
+
+        Button cancelButton = new Button("Cancel", e -> {
+            clearDiscountFields(idField, percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
+            addDiscountDialog.close();
+        });
+
+        styleButton(saveButton, "var(--lumo-primary-color)");
+        styleButton(cancelButton, "#9e9e9e");
+
+        // Layout for the dialog
+        VerticalLayout dialogLayout = new VerticalLayout(
+            idField,
+            percentageField,
+            qualifierTypeComboBox,
+            productComboBox,
+            categoryComboBox,
+            conditionComboBox,
+            new HorizontalLayout(saveButton, cancelButton)
+        );
+        dialogLayout.setSpacing(true);
+        dialogLayout.setPadding(true);
+
+        addDiscountDialog.add(dialogLayout);
+    }
+
     private void clearFields(TextField idField, ComboBox<ConditionType> typeComboBox,
                            NumberField minPriceField, NumberField maxPriceField,
-                           TextField productIdField, NumberField minQuantityField,
-                           NumberField maxQuantityField) {
+                           ComboBox<ItemDTO> productComboBox, ComboBox<CategoryDTO> categoryComboBox,
+                           NumberField minQuantityField, NumberField maxQuantityField) {
         idField.clear();
         typeComboBox.clear();
         minPriceField.clear();
         maxPriceField.clear();
-        productIdField.clear();
+        productComboBox.clear();
+        categoryComboBox.clear();
         minQuantityField.clear();
         maxQuantityField.clear();
+    }
+
+    private void clearDiscountFields(
+        TextField idField,
+        NumberField percentageField,
+        ComboBox<QualifierType> qualifierTypeComboBox,
+        ComboBox<ItemDTO> productComboBox,
+        ComboBox<CategoryDTO> categoryComboBox,
+        ComboBox<ConditionDTO> conditionComboBox
+    ) {
+        idField.clear();
+        percentageField.setValue(0.0);
+        qualifierTypeComboBox.clear();
+        productComboBox.clear();
+        categoryComboBox.clear();
+        conditionComboBox.clear();
     }
 
     private void styleButton(Button button, String color) {
