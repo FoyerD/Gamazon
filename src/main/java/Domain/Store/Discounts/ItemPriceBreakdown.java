@@ -60,7 +60,8 @@ public class ItemPriceBreakdown {
 
     public static Map<String, ItemPriceBreakdown> combineMaxMap(List<Map<String, ItemPriceBreakdown>> breakdowns) {
         Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
-        breakdowns.forEach((m) -> {
+        List<Map<String, ItemPriceBreakdown>> subBreakdowns = breakdowns.subList(1, breakdowns.size());
+        subBreakdowns.forEach((m) -> {
                                 m.forEach((id, ipb) -> {
                                                     combined.merge(id, ipb, ItemPriceBreakdown::combineMax);
                                                 });
@@ -70,7 +71,8 @@ public class ItemPriceBreakdown {
 
     public static Map<String, ItemPriceBreakdown> combineMultiplicateMaps(List<Map<String, ItemPriceBreakdown>> breakdowns) {
         Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
-        breakdowns.forEach((m) -> {
+        List<Map<String, ItemPriceBreakdown>> subBreakdowns = breakdowns.subList(1, breakdowns.size());
+        subBreakdowns.forEach((m) -> {
                                 m.forEach((id, ipb) -> {
                                                     combined.merge(id, ipb, ItemPriceBreakdown::combineMultiplicate);
                                                 });
@@ -84,7 +86,7 @@ public class ItemPriceBreakdown {
         double newPayPercentage = (1 - breakdown2.getDiscount()) * currPayPercentage;
         List<String> descriptions = breakdown1.getDescriptions();
         descriptions.addAll(breakdown2.getDescriptions());
-        ItemPriceBreakdown combined = new ItemPriceBreakdown(breakdown1.getOriginalPrice(), newPayPercentage, descriptions);
+        ItemPriceBreakdown combined = new ItemPriceBreakdown(breakdown1.getOriginalPrice(), 1-newPayPercentage, descriptions);
         return combined;
     }
 
