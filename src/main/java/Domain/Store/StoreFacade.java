@@ -3,6 +3,7 @@ package Domain.Store;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -17,6 +18,8 @@ import Domain.Pair;
 import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
 import Domain.User.User;
@@ -31,15 +34,20 @@ public class StoreFacade {
     private IAuctionRepository auctionRepository;
     private Function<String, User> getUser;
     private INotificationService notificationService;
+    private IReceiptRepository receiptRepository;
+    private IProductRepository productRepository;
 
     @Autowired
-    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, INotificationService notificationService) {
+    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, INotificationService notificationService, IReceiptRepository receiptRepository,
+                        IProductRepository productRepository) {
         this.itemRepository = itemRepository;
         this.storeRepository = storeRepository;
         this.feedbackRepository = feedbackRepository;
         this.auctionRepository = auctionRepository;
         this.getUser = userRepository::get;
         this.notificationService = notificationService;
+        this.receiptRepository = receiptRepository;
+        this.productRepository = productRepository;
     }
 
     public StoreFacade() {
@@ -378,8 +386,32 @@ public class StoreFacade {
         // Final update: optionally mark buyer (if you have a field), or leave updated amount
         itemRepository.update(itemKey, item);
 
+        Product product = this.productRepository.get(productId);
         // Remove the auction as it's now fulfilled
         this.auctionRepository.remove(auctionId);
+    
+        // Save the receipt with masked card number
+        String cardNumber = auction.getCardNumber();
+        String last4 = cardNumber != null && cardNumber.length() >= 4
+            ? cardNumber.substring(cardNumber.length() - 4)
+            : cardNumber != null ? cardNumber : "????";
+
+        String maskedCardNumber = "xxxx-xxxx-xxxx-" + last4;
+        String paymentDetails = "Card: " + maskedCardNumber;
+        try{
+        this.receiptRepository.savePurchase(
+            auction.getCurrentBidderId(),
+            storeId,
+            Map.of(product, new Pair<>(1, auction.getCurrentPrice())),
+            auction.getCurrentPrice(),
+            paymentDetails  
+        );
+        } catch (Exception e) {
+            // Rollback item amount
+            item.setAmount(currentAmount);
+            itemRepository.update(itemKey, item);
+            throw new RuntimeException("Failed to save receipt: " + e.getMessage(), e);
+        }
         
         return item;
     }
