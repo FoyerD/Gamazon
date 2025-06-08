@@ -3,10 +3,10 @@ package UI.presenters;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.CartDTO;
 import Application.DTOs.OfferDTO;
+import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
@@ -131,7 +131,8 @@ public interface IPurchasePresenter {
      * @param storeId Store identifier from which user wants to bargain
      * @param productId Identifier of the product that the user wants to bargain about.
      * @param newPrice The new price that the user offers
+     * @param paymentDetails payment details of the user
      * @return {@link OfferDTO}
      */
-    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice);
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails);
 }

@@ -153,13 +153,13 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
             },
             i -> UI.getCurrent().navigate("product-review/" + i.getProductId()),
             i -> {
-                MakeOfferDialog offerDialog = new MakeOfferDialog(i, price -> {
-                    Response<OfferDTO> offerResponse = purchasePresenter.makeOffer(sessionToken, i.getStoreId(), i.getProductId(), price);
+                MakeOfferDialog offerDialog = new MakeOfferDialog(i, (price, details) -> {
+                    Response<OfferDTO> offerResponse = purchasePresenter.makeOffer(sessionToken, i.getStoreId(), i.getProductId(), price, details);
                     if (offerResponse.errorOccurred()) {
                         Notification.show("Failed to make offer: " + offerResponse.getErrorMessage(), 5000, Notification.Position.BOTTOM_END);
                     } else {
                         OfferDTO offer = offerResponse.getValue();
-                        Notification.show("Offer on " + offer.getItem().getProductName() + " for " + offer.getNewPrice() + "$ was made successfully");
+                        Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getNewPrice() + " was made successfully");
                     }
                 });
 

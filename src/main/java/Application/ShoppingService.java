@@ -14,6 +14,7 @@ import Application.DTOs.OfferDTO;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OrderedItemDTO;
+import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.UserDTO;
@@ -380,7 +381,7 @@ public class ShoppingService{
      * @return {@link OfferDTO}
      */
     @Transactional
-    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice) {
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetailsDTO) {
         String method = "bargainPrice";
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
@@ -392,7 +393,7 @@ public class ShoppingService{
         try {
             UserDTO member = new UserDTO(loginManager.getLoggedInMember(clientId));
             ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(storeId, productId));
-            Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice);
+            Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
             
             OfferDTO offerDTO = new OfferDTO(offer.getId(), member, item, newPrice);
             TradingLogger.logEvent(CLASS_NAME, method, "Offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
