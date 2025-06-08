@@ -13,8 +13,9 @@ public class OfferDTO {
         this.member = member;
         this.item = item;
         this.newPrice = newPrice;
-        
     }
+
+
 
     public String getId() { return offerId.toString(); }
     public UserDTO getMemberId() { return member; }

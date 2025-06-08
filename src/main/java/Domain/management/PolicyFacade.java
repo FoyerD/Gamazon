@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IUserRepository;
-import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.ItemFacade;
 import Domain.Store.Policy;

@@ -20,14 +20,18 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.Offer;
 import Domain.Shopping.OfferManager;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
+import Domain.User.Member;
+import Domain.User.User;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -58,8 +62,15 @@ public class StoreService {
     }
 
     @Autowired
-    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, 
-                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, ItemFacade itemFacade, OfferManager offerManager, LoginManager loginManager, IExternalPaymentService externalPaymentService) {
+    public StoreService(StoreFacade storeFacade, 
+                        TokenService tokenService, 
+                        PermissionManager permissionManager, 
+                        INotificationService notificationService, 
+                        IShoppingCartFacade shoppingCartFacade, 
+                        ItemFacade itemFacade, 
+                        OfferManager offerManager, 
+                        LoginManager loginManager, 
+                        IExternalPaymentService externalPaymentService) {
         this.externalPaymentService = externalPaymentService;
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
@@ -74,7 +85,13 @@ public class StoreService {
 
     @Transactional
     private boolean isInitialized() {
-        return this.storeFacade != null && this.tokenService != null && this.permissionManager != null && this.loginManager != null && this.offerManager != null;
+        return this.storeFacade != null 
+            && this.tokenService != null
+            && this.permissionManager != null 
+            && this.loginManager != null 
+            && this.offerManager != null
+            && this.externalPaymentService != null;
+            //&& this.externalSupplyService != null;
     }
 
     @Transactional
@@ -348,6 +365,49 @@ public class StoreService {
     }
 
     /**
+     * Requirement 3.9
+     * accepts the offer and bill the one who made it
+     * @param sessionToken session token of the employee accepting the offer
+     * @param offerId ID of the offer to be accepted
+     * @return returns the Item
+     */
+    @Transactional
+    public Response<OfferDTO> acceptOffer(String sessionToken, String offerId) {
+         String method = "acceptOffer";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from accepting offers.");
+            }
+
+            Offer offer = offerManager.acceptOffer(userId, offerId, externalPaymentService);
+
+            Member member = loginManager.getMember(offer.getMemberId());
+            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
+            String productName = item.getProductName();
+            String storeName = storeFacade.getStoreName(productName);
+            notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer accepted! purchased " + productName + " from " + storeName + " 🎉🔔");
+
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
+            return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
+
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error accepting bid for auction %s: %s", offerId, ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
+    }
+    
+    /**
      * Gets all users who have shopping baskets in a specific store.
      * 
      * @param storeId The ID of the store
@@ -421,6 +481,7 @@ public class StoreService {
      * @param storeId Store identifier for the offers
      * @return a list of {@link OfferDTO} 
      */
+    @Transactional
     public Response<List<OfferDTO>> getAllOffers(String sessionToken, String storeId) {
         String method = "getAllOffers";
         try {

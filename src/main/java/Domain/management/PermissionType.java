@@ -19,8 +19,7 @@ public enum PermissionType {
     RESPOND_TO_INQUIRIES,
     ADMINISTER_STORE,
     OVERSEE_OFFERS,
-    CONTROL_CONTRACTS,
-    ACCEPT_OFFERS;
+    CONTROL_CONTRACTS;
 
     @Override
     public String toString() {

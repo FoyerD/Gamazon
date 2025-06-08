@@ -3,8 +3,6 @@ package Application.DTOs;
 import java.time.LocalDate;
 import java.time.Period;
 
-import org.springframework.cglib.core.Local;
-
 import Domain.User.Member;
 
 public class UserDTO {
@@ -29,6 +27,11 @@ public class UserDTO {
         this.username = member.getName();
         this.email = member.getEmail();
         this.birthDate = member.getBirthDate();
+    }
+
+
+    public static UserDTO from(Member member) {
+        return new UserDTO(member);
     }
 
     public UserDTO(String sessionToken, Member member) {
