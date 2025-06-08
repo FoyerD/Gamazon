@@ -61,22 +61,18 @@ public class ItemPriceBreakdown {
     public static Map<String, ItemPriceBreakdown> combineMaxMap(List<Map<String, ItemPriceBreakdown>> breakdowns) {
         Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
         List<Map<String, ItemPriceBreakdown>> subBreakdowns = breakdowns.subList(1, breakdowns.size());
-        subBreakdowns.forEach((m) -> {
-                                m.forEach((id, ipb) -> {
-                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMax);
-                                                });
-                                });
+        subBreakdowns.forEach((m) -> 
+                                m.forEach((id, ipb) ->
+                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMax)));
         return combined;
     }
 
     public static Map<String, ItemPriceBreakdown> combineMultiplicateMaps(List<Map<String, ItemPriceBreakdown>> breakdowns) {
         Map<String, ItemPriceBreakdown> combined = new HashMap<>(breakdowns.get(0));
         List<Map<String, ItemPriceBreakdown>> subBreakdowns = breakdowns.subList(1, breakdowns.size());
-        subBreakdowns.forEach((m) -> {
-                                m.forEach((id, ipb) -> {
-                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMultiplicate);
-                                                });
-                                });
+        subBreakdowns.forEach((m) ->
+                                m.forEach((id, ipb) ->
+                                                    combined.merge(id, ipb, ItemPriceBreakdown::combineMultiplicate)));
         return combined;
     }
 
