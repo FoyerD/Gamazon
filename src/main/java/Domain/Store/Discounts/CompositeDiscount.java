@@ -42,8 +42,13 @@ public abstract class CompositeDiscount extends Discount {
 
     // Getter for repository serialization
     public List<Discount> getDiscounts() {
-        return discounts == null ? new ArrayList<>() : new ArrayList<>(discounts);
+        if (discounts == null) {
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<>(discounts);
+        }
     }
+
 
     public MergeType getMergeType() {
         return mergeType;
