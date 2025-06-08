@@ -211,6 +211,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         };
 
         discountsLayout = new DiscountsLayout(
+            currentStoreId,
             () -> {
                 Response<List<DiscountDTO>> response = storePresenter.getStoreDiscounts(sessionToken, currentStoreId);
                 if (response.errorOccurred()) {

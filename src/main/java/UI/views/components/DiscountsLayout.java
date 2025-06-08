@@ -29,6 +29,7 @@ import Application.DTOs.DiscountDTO.DiscountType;
 import Application.DTOs.DiscountDTO.QualifierType;
 
 public class DiscountsLayout extends VerticalLayout {
+    private String storeId;
     private final Supplier<List<DiscountDTO>> discountsSupplier;
     private final Consumer<DiscountDTO> onRemoveDiscount;
     private final Consumer<DiscountDTO> onAddDiscount;
@@ -43,12 +44,15 @@ public class DiscountsLayout extends VerticalLayout {
     private Dialog addDiscountDialog;
 
     public DiscountsLayout(
+        String storeId,
         Supplier<List<DiscountDTO>> discountsSupplier,
         Consumer<DiscountDTO> onRemoveDiscount,
         Supplier<List<ItemDTO>> itemSupplier,
         Supplier<List<CategoryDTO>> categorySupplier,
         Consumer<DiscountDTO> onAddDiscount
     ) {
+        this.storeId = storeId;
+
         this.discountsSupplier = discountsSupplier;
         this.onRemoveDiscount = onRemoveDiscount;
         this.onAddDiscount = onAddDiscount;
@@ -309,30 +313,36 @@ public class DiscountsLayout extends VerticalLayout {
             Float precentage = percentageField.getValue().floatValue();
             newDiscount.setDiscountPercentage(precentage / 100);
             newDiscount.setQualifierType(qualifierTypeComboBox.getValue());
-
+            
+            String qualifierValue = null;
             switch (qualifierTypeComboBox.getValue()) {
                 case PRODUCT:
                     if (productComboBox.isEmpty()) {
                         Notification.show("Product selection is required");
                         return;
                     }
-                    newDiscount.setQualifierValue(productComboBox.getValue().getProductId());
+                    qualifierValue = productComboBox.getValue().getProductId();
                     break;
                 case CATEGORY:
                     if (categoryComboBox.isEmpty()) {
                         Notification.show("Category selection is required");
                         return;
                     }
-                    newDiscount.setQualifierValue(categoryComboBox.getValue().getName());
+                    qualifierValue = categoryComboBox.getValue().getName();
                     break;
                 case STORE:
-                    // Store qualifier doesn't need additional value
+                    qualifierValue = storeId;
                     break;
             }
+
+            newDiscount.setQualifierValue(qualifierValue);
 
             if (!conditionComboBox.isEmpty()) {
                 newDiscount.setCondition(conditionComboBox.getValue());
             }
+            
+            newDiscount.setStoreId(storeId);
+            newDiscount.setSubDiscounts(new ArrayList<>());
 
             discounts.add(newDiscount);
             Notification.show("Discount added successfully");
@@ -404,7 +414,7 @@ public class DiscountsLayout extends VerticalLayout {
         for (DiscountDTO discount : discounts) {
             onAddDiscount.accept(discount);
         }
-        
+
         savedDiscounts.addAll(discounts);
         discounts.clear();
         Notification.show("Discounts saved successfully");
