@@ -8,11 +8,13 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import Domain.Store.Category;
-import Domain.Store.Product;
+import Domain.Store.Item;
 
 public class CategoryQualifierTest {
 
@@ -23,7 +25,7 @@ public class CategoryQualifierTest {
     private Category otherCategory;
     
     @Mock
-    private Product mockProduct;
+    private Item mockItem;
     
     private CategoryQualifier categoryQualifier;
     
@@ -34,78 +36,52 @@ public class CategoryQualifierTest {
     }
     
     @Test
-    public void testIsQualifiedWhenProductHasCategory() {
-        // Setup: Product contains the qualifier's category
-        Set<Category> productCategories = new HashSet<>();
-        productCategories.add(mockCategory);
-        productCategories.add(otherCategory);
+    public void testIsQualifiedWhenItemHasCategory() {
+        Set<Category> itemCategories = new HashSet<>(Arrays.asList(mockCategory, otherCategory));
+        when(mockItem.getCategories()).thenReturn(itemCategories);
         
-        when(mockProduct.getCategories()).thenReturn(productCategories);
-        
-        // Test
-        assertTrue("Product with matching category should be qualified", 
-                  categoryQualifier.isQualified(mockProduct));
+        assertTrue("Item with matching category should be qualified", 
+                  categoryQualifier.isQualified(mockItem));
     }
     
     @Test
-    public void testIsQualifiedWhenProductDoesNotHaveCategory() {
-        // Setup: Product does not contain the qualifier's category
-        Set<Category> productCategories = new HashSet<>();
-        productCategories.add(otherCategory); // Only has other category
+    public void testIsQualifiedWhenItemDoesNotHaveCategory() {
+        Set<Category> itemCategories = new HashSet<>(Arrays.asList(otherCategory));
+        when(mockItem.getCategories()).thenReturn(itemCategories);
         
-        when(mockProduct.getCategories()).thenReturn(productCategories);
-        
-        // Test
-        assertFalse("Product without matching category should not be qualified", 
-                   categoryQualifier.isQualified(mockProduct));
+        assertFalse("Item without matching category should not be qualified", 
+                   categoryQualifier.isQualified(mockItem));
     }
     
     @Test
-    public void testIsQualifiedWithEmptyProductCategories() {
-        // Setup: Product has no categories
+    public void testIsQualifiedWithEmptyItemCategories() {
         Set<Category> emptyCategories = new HashSet<>();
+        when(mockItem.getCategories()).thenReturn(emptyCategories);
         
-        when(mockProduct.getCategories()).thenReturn(emptyCategories);
-        
-        // Test
-        assertFalse("Product with no categories should not be qualified", 
-                   categoryQualifier.isQualified(mockProduct));
+        assertFalse("Item with no categories should not be qualified", 
+                   categoryQualifier.isQualified(mockItem));
     }
     
     @Test
     public void testIsQualifiedWithOnlyMatchingCategory() {
-        // Setup: Product has only the matching category
-        Set<Category> productCategories = new HashSet<>();
-        productCategories.add(mockCategory);
+        Set<Category> itemCategories = new HashSet<>(Arrays.asList(mockCategory));
+        when(mockItem.getCategories()).thenReturn(itemCategories);
         
-        when(mockProduct.getCategories()).thenReturn(productCategories);
-        
-        // Test
-        assertTrue("Product with only matching category should be qualified", 
-                  categoryQualifier.isQualified(mockProduct));
+        assertTrue("Item with only matching category should be qualified", 
+                  categoryQualifier.isQualified(mockItem));
     }
     
-    @Test(expected = NullPointerException.class)
-    public void testIsQualifiedWithNullProductCategories() {
-        // Setup: Product returns null for categories
-        when(mockProduct.getCategories()).thenReturn(null);
-        
-        // Test: Should throw NullPointerException
-        categoryQualifier.isQualified(mockProduct);
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullCategory() {
+        new CategoryQualifier(null);
     }
     
     @Test
-    public void testConstructorWithNullCategory() {
-        // Test that constructor accepts null category
-        CategoryQualifier nullCategoryQualifier = new CategoryQualifier(null);
+    public void testGetCategory() {
+        String categoryName = "Electronics";
+        when(mockCategory.getName()).thenReturn(categoryName);
         
-        Set<Category> productCategories = new HashSet<>();
-        productCategories.add(mockCategory);
-        
-        when(mockProduct.getCategories()).thenReturn(productCategories);
-        
-        // Test: Should return false since null is not in the set
-        assertFalse("Qualifier with null category should not match any product", 
-                   nullCategoryQualifier.isQualified(mockProduct));
+        assertEquals("getCategory should return category name", 
+                    categoryName, categoryQualifier.getCategory());
     }
 }

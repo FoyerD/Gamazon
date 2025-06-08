@@ -58,30 +58,48 @@ public class DiscountBuilder {
         discountDTO.setStoreId(storeId);
         
         Condition cond = conditionBuilder.buildCondition(discountDTO.getCondition());
-        List<Discount> subDiscounts = discountDTO.getSubDiscounts().stream().map((ddto) -> buildDiscount(ddto, UUID.randomUUID().toString(), storeId)).collect(Collectors.toList());
+        
         switch(discountDTO.getType()) {
             case SIMPLE:
                 return new SimpleDiscount(id, discountDTO.getStoreId(), discountDTO.getDiscountPercentage(), makeQualifier(discountDTO.getQualifierType(), discountDTO.getQualifierValue()), cond);
                 
             case AND:
+                if (discountDTO.getSubDiscounts() == null) {
+                    throw new IllegalArgumentException("Sub-discounts cannot be null for composite discount");
+                }
+                List<Discount> andSubDiscounts = discountDTO.getSubDiscounts().stream()
+                    .map((ddto) -> buildDiscount(ddto, UUID.randomUUID().toString(), storeId))
+                    .collect(Collectors.toList());
                 return new AndDiscount(id,
                     discountDTO.getStoreId(),
-                    subDiscounts,
+                    andSubDiscounts,
                     cond,
                     discountDTO.getMergeType());
                     
             case OR:
+                if (discountDTO.getSubDiscounts() == null) {
+                    throw new IllegalArgumentException("Sub-discounts cannot be null for composite discount");
+                }
+                List<Discount> orSubDiscounts = discountDTO.getSubDiscounts().stream()
+                    .map((ddto) -> buildDiscount(ddto, UUID.randomUUID().toString(), storeId))
+                    .collect(Collectors.toList());
                 return new OrDiscount(id,
                     discountDTO.getStoreId(),
-                    subDiscounts,
+                    orSubDiscounts,
                     cond,
                     discountDTO.getMergeType());
                         
             case XOR:
+                if (discountDTO.getSubDiscounts() == null || discountDTO.getSubDiscounts().size() < 2) {
+                    throw new IllegalArgumentException("XOR discount requires exactly 2 sub-discounts");
+                }
+                List<Discount> xorSubDiscounts = discountDTO.getSubDiscounts().stream()
+                    .map((ddto) -> buildDiscount(ddto, UUID.randomUUID().toString(), storeId))
+                    .collect(Collectors.toList());
                 return new XorDiscount(id,
                     discountDTO.getStoreId(),
-                    subDiscounts.get(0),
-                    subDiscounts.get(1),
+                    xorSubDiscounts.get(0),
+                    xorSubDiscounts.get(1),
                     cond,
                     discountDTO.getMergeType());
                     
@@ -89,6 +107,7 @@ public class DiscountBuilder {
                 throw new IllegalArgumentException("Unknown discount type: " + discountDTO.getType());
         }
     }
+
     
 
     public DiscountQualifier makeQualifier(QualifierType type, String value) {

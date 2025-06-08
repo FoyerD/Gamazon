@@ -201,12 +201,12 @@ public class DiscountFacade {
         return discountRepository.add(discount.getId(), discount);
     }
 
-    public Discount addDiscount(String storeId, DiscountDTO discountDTO) throws Exception {
+    public Discount addDiscount(String storeId, DiscountDTO discountDTO) throws IllegalArgumentException {
         Discount dis = discountBuilder.buildDiscount(discountDTO, UUID.randomUUID().toString(), storeId);
         if (addDiscount(storeId, dis)){
             return dis;
         } else {
-            throw new Exception("Failed to add discount to store " + storeId);
+            throw new IllegalArgumentException("Failed to add discount to store " + storeId);
         }
     }
     

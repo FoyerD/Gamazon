@@ -6,15 +6,21 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
+import Domain.Store.Item;
 
 public class AndConditionTest {
     
     @Mock
     private ShoppingBasket basket;
+    
+    @Mock
+    private BiFunction<String, String, Item> itemGetter;
     
     @Mock
     private Condition condition1;
@@ -26,77 +32,101 @@ public class AndConditionTest {
     private Condition condition3;
     
     private AndCondition andCondition;
+    private String conditionId;
     
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        andCondition = new AndCondition(Set.of(condition1, condition2));
+        conditionId = "test-and-condition-id";
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        andCondition = new AndCondition(conditionId, conditions);
     }
     
     @Test
     public void testIsSatisfiedWhenAllConditionsTrue() {
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(true);
         
-        assertTrue(andCondition.isSatisfied(basket));
+        assertTrue(andCondition.isSatisfied(basket, itemGetter));
     }
     
     @Test
     public void testIsSatisfiedWhenOneConditionFalse() {
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(false);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(false);
         
-        assertFalse(andCondition.isSatisfied(basket));
+        assertFalse(andCondition.isSatisfied(basket, itemGetter));
+        
+        // Test the other way around
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(false);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(true);
+        
+        assertFalse(andCondition.isSatisfied(basket, itemGetter));
     }
     
     @Test
     public void testIsSatisfiedWhenAllConditionsFalse() {
-        when(condition1.isSatisfied(basket)).thenReturn(false);
-        when(condition2.isSatisfied(basket)).thenReturn(false);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(false);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(false);
         
-        assertFalse(andCondition.isSatisfied(basket));
+        assertFalse(andCondition.isSatisfied(basket, itemGetter));
     }
     
-    @Test
-    public void testConstructorWithTwoConditions() {
-        AndCondition condition = new AndCondition(condition1, condition2);
-        assertNotNull(condition.getId());
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullId() {
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        new AndCondition(null, conditions);
     }
     
-    @Test
-    public void testConstructorWithExistingUUID() {
-        UUID existingId = UUID.randomUUID();
-        AndCondition condition = new AndCondition(existingId, Set.of(condition1, condition2));
-        
-        assertEquals(existingId.toString().toString(), condition.getId());
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() {
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        new AndCondition("", conditions);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullConditions() {
+        new AndCondition("test-id", null);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyConditions() {
+        new AndCondition("test-id", Arrays.asList());
     }
     
     @Test
     public void testWithThreeConditions() {
-        AndCondition threeConditions = new AndCondition(Set.of(condition1, condition2, condition3));
+        List<Condition> threeConditions = Arrays.asList(condition1, condition2, condition3);
+        AndCondition andWithThree = new AndCondition("test-three-conditions", threeConditions);
         
-        when(condition1.isSatisfied(basket)).thenReturn(true);
-        when(condition2.isSatisfied(basket)).thenReturn(true);
-        when(condition3.isSatisfied(basket)).thenReturn(true);
+        when(condition1.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(true);
+        when(condition3.isSatisfied(basket, itemGetter)).thenReturn(true);
         
-        assertTrue(threeConditions.isSatisfied(basket));
+        assertTrue(andWithThree.isSatisfied(basket, itemGetter));
         
         // If any one is false, result should be false
-        when(condition2.isSatisfied(basket)).thenReturn(false);
-        assertFalse(threeConditions.isSatisfied(basket));
+        when(condition2.isSatisfied(basket, itemGetter)).thenReturn(false);
+        assertFalse(andWithThree.isSatisfied(basket, itemGetter));
     }
     
     @Test
-    public void testEmptyConditionSet() {
-        AndCondition emptyCondition = new AndCondition(Set.of());
-        assertTrue(emptyCondition.isSatisfied(basket)); // Vacuous truth
+    public void testGetters() {
+        assertEquals(conditionId, andCondition.getId());
+        
+        List<Condition> retrievedConditions = andCondition.getConditions();
+        assertEquals(2, retrievedConditions.size());
+        assertTrue(retrievedConditions.contains(condition1));
+        assertTrue(retrievedConditions.contains(condition2));
     }
     
     @Test
     public void testHasUniqueId() {
         assertNotNull(andCondition.getId());
         
-        AndCondition anotherCondition = new AndCondition(Set.of(condition1, condition2));
+        List<Condition> conditions = Arrays.asList(condition1, condition2);
+        AndCondition anotherCondition = new AndCondition("different-id", conditions);
         assertNotEquals(andCondition.getId(), anotherCondition.getId());
     }
+
 }

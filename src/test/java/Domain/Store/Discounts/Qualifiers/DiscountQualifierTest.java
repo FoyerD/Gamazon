@@ -7,12 +7,13 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import Domain.Store.Product;
+import Domain.Store.Item;
+import Domain.Store.Category;
 
 public class DiscountQualifierTest {
 
     @Mock
-    private Product mockProduct;
+    private Item mockItem;
     
     /**
      * Test class to verify the DiscountQualifier interface contract.
@@ -26,7 +27,7 @@ public class DiscountQualifierTest {
         }
         
         @Override
-        public boolean isQualified(Product product) {
+        public boolean isQualified(Item item) {
             return returnValue;
         }
     }
@@ -37,8 +38,8 @@ public class DiscountQualifierTest {
         
         DiscountQualifier qualifier = new TestDiscountQualifier(true);
         
-        assertTrue("Implementation that returns true should qualify product", 
-                  qualifier.isQualified(mockProduct));
+        assertTrue("Implementation that returns true should qualify item", 
+                  qualifier.isQualified(mockItem));
     }
     
     @Test
@@ -47,16 +48,16 @@ public class DiscountQualifierTest {
         
         DiscountQualifier qualifier = new TestDiscountQualifier(false);
         
-        assertFalse("Implementation that returns false should not qualify product", 
-                   qualifier.isQualified(mockProduct));
+        assertFalse("Implementation that returns false should not qualify item", 
+                   qualifier.isQualified(mockItem));
     }
     
     @Test
     public void testPolymorphismWithCategoryQualifier() {
         MockitoAnnotations.initMocks(this);
         
-        // Test that CategoryQualifier can be used as DiscountQualifier
-        DiscountQualifier qualifier = new CategoryQualifier(null);
+        Category mockCategory = mock(Category.class);
+        DiscountQualifier qualifier = new CategoryQualifier(mockCategory);
         
         assertTrue("CategoryQualifier should implement DiscountQualifier", 
                   qualifier instanceof DiscountQualifier);
@@ -66,7 +67,6 @@ public class DiscountQualifierTest {
     public void testPolymorphismWithProductQualifier() {
         MockitoAnnotations.initMocks(this);
         
-        // Test that ProductQualifier can be used as DiscountQualifier  
         DiscountQualifier qualifier = new ProductQualifier("test");
         
         assertTrue("ProductQualifier should implement DiscountQualifier", 
@@ -77,8 +77,7 @@ public class DiscountQualifierTest {
     public void testPolymorphismWithStoreQualifier() {
         MockitoAnnotations.initMocks(this);
         
-        // Test that StoreQualifier can be used as DiscountQualifier
-        DiscountQualifier qualifier = new StoreQualifier();
+        DiscountQualifier qualifier = new StoreQualifier("testStore");
         
         assertTrue("StoreQualifier should implement DiscountQualifier", 
                   qualifier instanceof DiscountQualifier);
@@ -88,11 +87,9 @@ public class DiscountQualifierTest {
     public void testMethodSignature() {
         MockitoAnnotations.initMocks(this);
         
-        // Verify the method signature through reflection (compile-time check)
         DiscountQualifier qualifier = new TestDiscountQualifier(true);
         
-        // This will compile only if the method signature is correct
-        boolean result = qualifier.isQualified(mockProduct);
+        boolean result = qualifier.isQualified(mockItem);
         
         assertTrue("Method should execute without compilation errors", true);
     }
