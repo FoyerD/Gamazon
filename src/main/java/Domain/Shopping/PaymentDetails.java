@@ -2,13 +2,18 @@ package Domain.Shopping;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class PaymentDetails {
 
-    private final String userId;
-    private final String cardNumber;
-    private final LocalDate expiryDate;
-    private final String cvv;
-    private final String holder;
+    private String userId;
+    private String cardNumber;
+    private LocalDate expiryDate;
+    private String cvv;
+    private String holder;
+
+    protected PaymentDetails() {} // Required by JPA
 
     public PaymentDetails(String userId, String cardNumber, LocalDate expiryDate, String cvv, String holder) {
         this.userId = userId;
