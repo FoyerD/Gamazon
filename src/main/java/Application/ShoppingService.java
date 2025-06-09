@@ -403,4 +403,37 @@ public class ShoppingService{
             return Response.error(ex.getMessage());
         }
     }
+
+    /**
+     * Requirement that you forgot to implement
+     * Member accepts an offer made by him or by an employee
+     * @param sessionToken Identifier for user
+     * @param offerId Identifier of the offer that the user wants to accept
+     * @return {@link OfferDTO} with updated information
+     */
+    @Transactional
+    public Response<OfferDTO> acceptOfferByMember(String sessionToken, String offerId){
+        String method = "acceptOfferByMember";
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+            return Response.error("Invalid token");
+        }
+
+        String userId = this.tokenService.extractId(sessionToken);
+
+        try {
+            Offer offer = offerManager.getOffer(userId, offerId);
+            if (offer == null) {
+                TradingLogger.logError(CLASS_NAME, method, "Offer not found: " + offerId);
+                return Response.error("Offer not found");
+            }
+            Offer acceptedOffer = offerManager.acceptOfferByMember(userId, offerId);
+            OfferDTO offerDTO = OfferDTO.fromOffer(acceptedOffer);
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer accepted by " + userId + ": " + offerId);
+            return Response.success(offerDTO);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error accepting offer: %s", ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
+    }
 }

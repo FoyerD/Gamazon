@@ -27,15 +27,17 @@ public class OfferManager {
     private final IOfferRepository offerRepository;
     private final PermissionManager permissionManager;
     private final IItemRepository itemRepository;
-    
+    private final IExternalPaymentService paymentService;
     @Autowired
     public OfferManager(IOfferRepository offerRepository, 
     PermissionManager permissionManager, 
     IItemRepository itemRepository,
-    StoreFacade storeFacade) {
+    StoreFacade storeFacade,
+    IExternalPaymentService paymentService) {
         this.offerRepository = offerRepository;
         this.permissionManager = permissionManager;
         this.itemRepository = itemRepository;
+        this.paymentService = paymentService;
     }
 
     
@@ -60,7 +62,7 @@ public class OfferManager {
     }
 
     // NOTE: supply service is not used right now
-    public Offer acceptOffer(String userId, Offer offer, IExternalPaymentService paymentService) {
+    public Offer acceptOffer(String userId, Offer offer) {
 
         if(paymentService == null) {
             throw new RuntimeException("Payment service is not set");
@@ -77,7 +79,7 @@ public class OfferManager {
             offerApprovers.add(offer.getMemberId()); // Include the member who made the offer
             if (offer.getApprovedBy().equals(offerApprovers)) {
                 // Process payment
-                processPayment(offer, paymentService);
+                processPayment(offer);
                 offerRepository.remove(offer.getId());
             }
             else {
@@ -88,20 +90,20 @@ public class OfferManager {
         return offer;
     }
 
-    public Offer acceptOfferByMember(String userId, String offerId, IExternalPaymentService paymentService){
+    public Offer acceptOfferByMember(String userId, String offerId){
         Offer offer = getOffer(userId, offerId);
         if (userId != offer.getMemberId()) {
             throw new IllegalArgumentException("Only the member who made the offer can accept it by this methd.");
         }
 
-        return acceptOffer(userId, offer, paymentService);        
+        return acceptOffer(userId, offer);        
     }
 
-    public Offer acceptOfferByEmployee(String userId, String offerId, IExternalPaymentService paymentService){
+    public Offer acceptOfferByEmployee(String userId, String offerId){
         Offer offer = getOffer(userId, offerId);
         permissionManager.checkPermission(userId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
 
-        return acceptOffer(userId, offer, paymentService);
+        return acceptOffer(userId, offer);
     }
 
 
@@ -111,7 +113,7 @@ public class OfferManager {
         return offerRepository.remove(offerId);
     }
 
-    private void processPayment(Offer offer, IExternalPaymentService paymentService) {
+    private void processPayment(Offer offer) {
         
         
         Pair<String, String> itemId = new Pair<>(offer.getStoreId(), offer.getProductId());

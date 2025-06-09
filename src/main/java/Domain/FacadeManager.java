@@ -120,7 +120,7 @@ public class FacadeManager {
 
     public OfferManager getOfferManager() {
         if (offerManager == null) {
-            offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager(), repoManager.getItemRepository(), getStoreFacade());
+            offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager(), repoManager.getItemRepository(), getStoreFacade(), getPaymentService());
         }
         return offerManager;
     }

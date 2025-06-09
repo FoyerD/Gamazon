@@ -390,7 +390,7 @@ public class StoreService {
                 throw new Exception("User is banned from accepting offers.");
             }
 
-            Offer offer = offerManager.acceptOffer(userId, offerId, externalPaymentService);
+            Offer offer = offerManager.acceptOfferByEmployee(userId, offerId);
 
             Member member = loginManager.getMember(offer.getMemberId());
             List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
