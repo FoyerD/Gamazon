@@ -400,7 +400,7 @@ public class ShoppingService{
           
             List<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
             List<UserDTO> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList();
-            OfferDTO offerDTO = new OfferDTO(offer.getId(), member, approvedBy, approvers, item, offer.getPrices(), offer.counterOffer(clientId, newPrice));
+            OfferDTO offerDTO = new OfferDTO(offer.getId(), member, approvedBy, approvers, item, offer.getPrices(), offer.isCounterOffer());
 
             TradingLogger.logEvent(CLASS_NAME, method, "Offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
             return Response.success(offerDTO);
@@ -418,8 +418,8 @@ public class ShoppingService{
      * @return {@link OfferDTO} with updated information
      */
     @Transactional
-    public Response<OfferDTO> acceptOfferByMember(String sessionToken, String offerId){
-        String method = "acceptOfferByMember";
+    public Response<OfferDTO> acceptOffer(String sessionToken, String offerId){
+        String method = "acceptOffer";
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
@@ -428,13 +428,14 @@ public class ShoppingService{
         String userId = this.tokenService.extractId(sessionToken);
 
         try {
-            Offer offer = offerManager.getOffer(userId, offerId);
-            if (offer == null) {
-                TradingLogger.logError(CLASS_NAME, method, "Offer not found: " + offerId);
-                return Response.error("Offer not found");
-            }
             Offer acceptedOffer = offerManager.acceptOfferByMember(userId, offerId);
-            OfferDTO offerDTO = OfferDTO.fromOffer(acceptedOffer);
+            
+            UserDTO member = new UserDTO(loginManager.getLoggedInMember(userId));
+            ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(acceptedOffer.getStoreId(), acceptedOffer.getProductId()));
+            List<UserDTO> approvedBy = acceptedOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
+            List<UserDTO> approvers = permissionManager.getUsersWithPermission(acceptedOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList();
+            OfferDTO offerDTO = new OfferDTO(acceptedOffer.getId(), member, approvedBy, approvers, item, acceptedOffer.getPrices(), acceptedOffer.isCounterOffer());
+
             TradingLogger.logEvent(CLASS_NAME, method, "Offer accepted by " + userId + ": " + offerId);
             return Response.success(offerDTO);
         } catch (Exception ex) {
