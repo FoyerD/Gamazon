@@ -2,11 +2,14 @@ package Application.DTOs;
 
 import java.util.List;
 
-import ch.qos.logback.core.joran.sanity.Pair;
+import Domain.Pair;
+
 
 public class OfferDTO {
     private final String offerId;
     private final UserDTO member;
+    private final List<UserDTO> approvedBy;
+    private final List<UserDTO> approvers;
     private final ItemDTO item;
 
     // offered prices, from old to new
@@ -14,9 +17,11 @@ public class OfferDTO {
     private final boolean counterOffer; // true if the offer is a counter offer from store employees
 
 
-    public OfferDTO(String offerId, UserDTO member, ItemDTO item, List<Pair<String, Double>> prices, boolean counterOffer) {
+    public OfferDTO(String offerId, UserDTO member, List<UserDTO> approvedBy, List<UserDTO> approvers, ItemDTO item, List<Pair<String, Double>> prices, boolean counterOffer) {
         this.offerId = offerId;
         this.member = member;
+        this.approvedBy = approvedBy;
+        this.approvers = approvers;
         this.item = item;
         this.offeredPrices = prices;
         this.counterOffer = counterOffer;

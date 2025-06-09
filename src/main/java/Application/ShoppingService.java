@@ -33,6 +33,7 @@ import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
 import Domain.User.User;
 import Domain.management.PermissionManager;
+import Domain.management.PermissionType;
 
 @Service
 public class ShoppingService{
@@ -393,9 +394,14 @@ public class ShoppingService{
         try {
             UserDTO member = new UserDTO(loginManager.getLoggedInMember(clientId));
             ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(storeId, productId));
-            Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
+
             
-            OfferDTO offerDTO = new OfferDTO(offer.getId(), member, item, newPrice);
+            Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
+          
+            List<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
+            List<UserDTO> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList();
+            OfferDTO offerDTO = new OfferDTO(offer.getId(), member, approvedBy, approvers, item, offer.getPrices(), offer.counterOffer(clientId, newPrice));
+
             TradingLogger.logEvent(CLASS_NAME, method, "Offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
             return Response.success(offerDTO);
         } catch (Exception ex) {

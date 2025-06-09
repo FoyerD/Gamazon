@@ -66,6 +66,8 @@ public class Offer {
     public String getStoreId() { return storeId; }
     public String getProductId() { return productId; }
     public PaymentDetails getPaymentDetails() { return this.paymentDetails; }
+    public List<Pair<String, Double>> getPrices() { return prices;}
+
     public void approveOffer(String userId) {
         if (!approvedBy.contains(userId)) {
             approvedBy.add(userId);
