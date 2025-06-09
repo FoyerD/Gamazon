@@ -27,6 +27,7 @@ public class Offer {
     private boolean counterOffer;
     private List<Pair<String, Double>> prices;
     private Set<String> approvedBy; // includes member and employees who approved the offer
+    private boolean isAccepted; // true if the offer is accepted by the member
 
     @Embedded
     private PaymentDetails paymentDetails;
@@ -42,6 +43,7 @@ public class Offer {
         this.paymentDetails = paymentDetails;
         this.counterOffer = false;
         this.approvedBy = new HashSet<>(Arrays.asList(memberId)); 
+        this.isAccepted = false; // Initially, the offer is not accepted
     }
 
     public boolean counterOffer(String userId, double newPrice) {
@@ -67,6 +69,10 @@ public class Offer {
     public String getProductId() { return productId; }
     public PaymentDetails getPaymentDetails() { return this.paymentDetails; }
     public List<Pair<String, Double>> getPrices() { return prices;}
+    public boolean isAccepted() { return isAccepted; }
+    public void setAccepted(boolean accepted) {
+        this.isAccepted = accepted;
+    }
 
     public void approveOffer(String userId) {
         if (!approvedBy.contains(userId)) {

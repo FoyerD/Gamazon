@@ -11,13 +11,13 @@ public class OfferDTO {
     private final List<UserDTO> approvedBy;
     private final List<UserDTO> approvers;
     private final ItemDTO item;
-
+    private final boolean isAccepted;
     // offered prices, from old to new
     private final List<Pair<String, Double>> offeredPrices; 
     private final boolean counterOffer; // true if the offer is a counter offer from store employees
 
 
-    public OfferDTO(String offerId, UserDTO member, List<UserDTO> approvedBy, List<UserDTO> approvers, ItemDTO item, List<Pair<String, Double>> prices, boolean counterOffer) {
+    public OfferDTO(String offerId, UserDTO member, List<UserDTO> approvedBy, List<UserDTO> approvers, ItemDTO item, List<Pair<String, Double>> prices, boolean counterOffer, boolean isAccepted) {
         this.offerId = offerId;
         this.member = member;
         this.approvedBy = approvedBy;
@@ -25,9 +25,8 @@ public class OfferDTO {
         this.item = item;
         this.offeredPrices = prices;
         this.counterOffer = counterOffer;
+        this.isAccepted = isAccepted;
     }
-
-
 
     public String getId() { return offerId.toString(); }
     public UserDTO getMember() { return member; }
@@ -38,6 +37,7 @@ public class OfferDTO {
     public List<UserDTO> getRemainingEmployeesToApprove() { return getEmployeeApprovers().stream().filter(u -> !approvedBy.contains(u)).toList(); }
     public ItemDTO getItem() { return item; }
     public List<Pair<String, Double>> getOfferedPrices() { return offeredPrices; }
+    public boolean isAccepted() { return isAccepted; }
     public double getLastPrice() { return offeredPrices.get(offeredPrices.size() - 1).getSecond(); }
     public boolean isCounterOffer() { return counterOffer; }
 

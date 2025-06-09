@@ -143,6 +143,7 @@ public class OfferManager {
 
             item.decreaseAmount(1);
             itemRepository.update(itemId, item);
+            offer.setAccepted(true);
         }
     }
 
