@@ -31,6 +31,14 @@ public class OfferDTO {
 
     public String getId() { return offerId.toString(); }
     public UserDTO getMember() { return member; }
+    public List<UserDTO> getApprovedBy() { return approvedBy; }
+    public List<UserDTO> getEmployeesApprovedBy() { return approvedBy.stream().filter(u -> !u.getId().equals(member.getId())).toList(); }
+    public List<UserDTO> getApprovers() { return approvers; }
+    public List<UserDTO> getEmployeeApprovers() { return approvers.stream().filter(u -> !u.getId().equals(member.getId())).toList(); }
+    public List<UserDTO> getRemainingEmployeesToApprove() { return getEmployeeApprovers().stream().filter(u -> !approvedBy.contains(u)).toList(); }
     public ItemDTO getItem() { return item; }
     public List<Pair<String, Double>> getOfferedPrices() { return offeredPrices; }
+    public boolean isCounterOffer() { return counterOffer; }
+
+    public boolean hasMemberApproved() { return approvedBy.stream().anyMatch(u -> u.getId().equals(member.getId())); }
 }
