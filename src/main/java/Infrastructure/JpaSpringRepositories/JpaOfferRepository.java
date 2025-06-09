@@ -55,4 +55,9 @@ public class JpaOfferRepository extends IOfferRepository {
     public List<Offer> getOffersOfStore(String storeId) {
         return jpaOfferRepository.getOffersOfStore(storeId);
     }
+
+    @Override
+    public List<Offer> getOffersOfMember(String memberId) {
+        return jpaOfferRepository.getOffersOfMember(memberId);
+    }
 }

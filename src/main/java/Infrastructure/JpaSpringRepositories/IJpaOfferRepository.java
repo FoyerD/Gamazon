@@ -18,5 +18,14 @@ public interface IJpaOfferRepository extends JpaRepository<Offer, String> {
      */
     @Query("SELECT o FROM Offer o WHERE o.storeId = :storeId")
     public List<Offer> getOffersOfStore(@Param("storeId") String storeId);
+
+    /**
+     * Retrieves all offers made by a specific member.
+     * 
+     * @param memberId the ID of the member
+     * @return a list of offers made by the specified member
+     */
+    @Query("SELECT o FROM Offer o WHERE o.memberId = :memberId")
+    public List<Offer> getOffersOfMember(@Param("memberId") String memberId);
     
 }

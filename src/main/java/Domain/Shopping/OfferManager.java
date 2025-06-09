@@ -52,6 +52,10 @@ public class OfferManager {
         return offerRepository.getOffersOfStore(storeId);
     }
 
+    public List<Offer> getOffersOfMember(String memberId) {
+        return offerRepository.getOffersOfMember(memberId);
+    }
+
     public Offer getOffer(String memberId, String offerId) {
         
         Offer offer = offerRepository.get(offerId);
@@ -140,5 +144,29 @@ public class OfferManager {
             item.decreaseAmount(1);
             itemRepository.update(itemId, item);
         }
+    }
+
+
+    public Offer counterOfferByMember(String userId, String offerId, double newPrice) {
+        Offer offer = getOffer(userId, offerId);
+        if (userId != offer.getMemberId()) {
+            throw new IllegalArgumentException("Only the member who made the offer can counter it by this method.");
+        }
+
+        return counterOffer(userId, offer, newPrice);
+    }
+
+    
+    public Offer counterOfferByEmployee(String userId, String offerId, double newPrice) {
+        Offer offer = getOffer(userId, offerId);
+        permissionManager.checkPermission(userId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
+
+        return counterOffer(userId, offer, newPrice);
+    }
+
+    private Offer counterOffer(String userId, Offer offer, double newPrice) {
+        offer.counterOffer(userId, newPrice);
+        offerRepository.update(offer.getId(), offer);
+        return offer;
     }
 }

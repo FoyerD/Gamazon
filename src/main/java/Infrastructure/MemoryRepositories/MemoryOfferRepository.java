@@ -76,4 +76,9 @@ public class MemoryOfferRepository extends IOfferRepository {
     public List<Offer> getOffersOfStore(String storeId) {
         return this.offers.values().stream().filter(offer -> offer.getStoreId().equals(storeId)).toList();
     }
+
+    @Override
+    public List<Offer> getOffersOfMember(String memberId) {
+        return this.offers.values().stream().filter(offer -> offer.getMemberId().equals(memberId)).toList();
+    }
 }
