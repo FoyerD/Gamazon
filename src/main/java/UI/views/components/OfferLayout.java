@@ -100,7 +100,7 @@ public class OfferLayout extends VerticalLayout {
 
 
 
-                // Price history
+        // Price history
         List<Pair<String, Double>> prices = offer.getOfferedPrices();
         if (!prices.isEmpty()) {
             VerticalLayout priceHistory = new VerticalLayout();

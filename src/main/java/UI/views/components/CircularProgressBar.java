@@ -8,7 +8,7 @@ import com.vaadin.flow.dom.Element;
 public class CircularProgressBar extends Component {
 
     public CircularProgressBar(int approved, int total) {
-        double percent = total == 0 ? 0 : (100.0 * approved / total);
+        double percent = total == 0 ? 0 : ((100.0 * approved) / total);
         String percentText = String.format("%.0f%%", percent);
 
         String svg = """
