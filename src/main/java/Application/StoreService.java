@@ -1,5 +1,6 @@
 package Application;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -394,7 +395,8 @@ public class StoreService {
 
             Member member = loginManager.getMember(offer.getMemberId());
             List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-            List<Member> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
+            List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+            approvers.add(member);
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
@@ -444,7 +446,8 @@ public class StoreService {
 
             Member member = loginManager.getMember(offer.getMemberId());
             List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-            List<Member> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
+            List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+            approvers.add(member);
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
@@ -560,7 +563,8 @@ public class StoreService {
                 String offerId = o.getId();
                 Member member = loginManager.getMember(o.getMemberId());
                 List<Member> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-                List<Member> approvers = permissionManager.getUsersWithPermission(storeId, PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
+                List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(storeId, PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+                approvers.add(member);
                 Item item = itemFacade.getItem(o.getStoreId(), o.getProductId());
 
                 return new OfferDTO(offerId, 
@@ -601,7 +605,8 @@ public class StoreService {
             Offer offer = offerManager.counterOfferByEmployee(userId, offerId, newPrice);
             Member member = loginManager.getMember(offer.getMemberId());
             List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-            List<Member> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
+            List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+            approvers.add(member);
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
