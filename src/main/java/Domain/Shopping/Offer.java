@@ -1,7 +1,11 @@
 package Domain.Shopping;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import Domain.Pair;
@@ -22,7 +26,7 @@ public class Offer {
     
     private boolean counterOffer;
     private List<Pair<String, Double>> prices;
-    private List<String> approvedBy; // includes member and employees who approved the offer
+    private Set<String> approvedBy; // includes member and employees who approved the offer
 
     @Embedded
     private PaymentDetails paymentDetails;
@@ -37,15 +41,15 @@ public class Offer {
         this.prices = new ArrayList<>(List.of(new Pair<>(memberId, newPrice)));
         this.paymentDetails = paymentDetails;
         this.counterOffer = false;
-        this.approvedBy = new ArrayList<>(List.of(memberId));
+        this.approvedBy = new HashSet<>(Arrays.asList(memberId)); 
     }
 
     public boolean counterOffer(String userId, double newPrice) {
-        this.approvedBy = new ArrayList<>(); // Reset approved employees for a new counter offer
+        this.approvedBy = new HashSet<>(Arrays.asList(userId)); // Reset approved employees for a new counter offer
         this.prices.add(new Pair<>(userId, newPrice));
         // Check if employee makes a counter offer or the member
         this.counterOffer = userId != memberId;
-        this.approvedBy.add(userId);
+        
         return counterOffer;
     }
 
@@ -58,9 +62,18 @@ public class Offer {
     }
     public String getId() { return offerId; }
     public String getMemberId() { return memberId; }
-    public List<String> getApprovedBy() { return approvedBy; }
+    public Set<String> getApprovedBy() { return approvedBy; }
     public String getStoreId() { return storeId; }
     public String getProductId() { return productId; }
     public PaymentDetails getPaymentDetails() { return this.paymentDetails; }
     public List<Pair<String, Double>> getPrices() { return prices;}
+
+    public void approveOffer(String userId) {
+        if (!approvedBy.contains(userId)) {
+            approvedBy.add(userId);
+        }
+        else {
+            throw new IllegalStateException("User " + userId + " has already approved this offer.");
+        }
+    }
 }

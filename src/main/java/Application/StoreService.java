@@ -390,10 +390,11 @@ public class StoreService {
                 throw new Exception("User is banned from accepting offers.");
             }
 
-            Offer offer = offerManager.acceptOffer(userId, offerId, externalPaymentService);
+            Offer offer = offerManager.acceptOfferByEmployee(userId, offerId, externalPaymentService);
 
             Member member = loginManager.getMember(offer.getMemberId());
             List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
+            List<Member> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
@@ -402,6 +403,7 @@ public class StoreService {
             return Response.success(new OfferDTO(offerId, 
                                                 UserDTO.from(member), 
                                                 approvedBy.stream().map(UserDTO::from).toList(),
+                                                approvers.stream().map(UserDTO::from).toList(),
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
                                                 offer.isCounterOffer()));
@@ -441,6 +443,7 @@ public class StoreService {
 
             Member member = loginManager.getMember(offer.getMemberId());
             List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
+            List<Member> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
@@ -450,6 +453,7 @@ public class StoreService {
             return Response.success(new OfferDTO(offerId, 
                                                 UserDTO.from(member), 
                                                 approvedBy.stream().map(UserDTO::from).toList(),
+                                                approvers.stream().map(UserDTO::from).toList(),
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
                                                 offer.isCounterOffer()));
@@ -554,11 +558,13 @@ public class StoreService {
                 String offerId = o.getId();
                 Member member = loginManager.getMember(o.getMemberId());
                 List<Member> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).toList();
+                List<Member> approvers = permissionManager.getUsersWithPermission(storeId, PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
                 Item item = itemFacade.getItem(o.getStoreId(), o.getProductId());
-                
-                return new OfferDTO(o.getId(), 
+
+                return new OfferDTO(offerId, 
                             UserDTO.from(member),
                             approvedBy.stream().map(UserDTO::from).toList(),
+                            approvers.stream().map(UserDTO::from).toList(),
                             ItemDTO.fromItem(item),
                             o.getPrices(), 
                             o.isCounterOffer());

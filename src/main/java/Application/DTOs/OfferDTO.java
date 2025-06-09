@@ -9,7 +9,7 @@ public class OfferDTO {
     private final String offerId;
     private final UserDTO member;
     private final List<UserDTO> approvedBy;
-    private final List<UserDTO> approveres;
+    private final List<UserDTO> approvers;
     private final ItemDTO item;
 
     // offered prices, from old to new
@@ -21,6 +21,7 @@ public class OfferDTO {
         this.offerId = offerId;
         this.member = member;
         this.approvedBy = approvedBy;
+        this.approvers = approvers;
         this.item = item;
         this.offeredPrices = prices;
         this.counterOffer = counterOffer;

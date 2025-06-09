@@ -3,8 +3,10 @@ package Domain.Shopping;
 
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,13 +54,13 @@ public class OfferManager {
         
         Offer offer = offerRepository.get(offerId);
         if (offer == null) {
-            throw new NoSuchElementException("offer not found");
+            throw new NoSuchElementException("Offer not found");
         }
-        permissionManager.checkPermission(memberId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
         return offer;
     }
+
     // NOTE: supply service is not used right now
-    public Offer acceptOffer(String employeeId, String offerId, IExternalPaymentService paymentService) {
+    public Offer acceptOffer(String userId, Offer offer, IExternalPaymentService paymentService) {
 
         if(paymentService == null) {
             throw new RuntimeException("Payment service is not set");
@@ -68,14 +70,38 @@ public class OfferManager {
         //     throw new IllegalArgumentException("Supply service is not set");
         // }
 
-        Offer offer = getOffer(employeeId, offerId);
-        permissionManager.checkPermission(employeeId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
+        synchronized (offerRepository.getLock(offer.getId())) {        
+            offer.approveOffer(userId); 
 
-        // Process payment
-        processPayment(offer, paymentService);
+            Set<String> offerApprovers  = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS));
+            offerApprovers.add(offer.getMemberId()); // Include the member who made the offer
+            if (offer.getApprovedBy().equals(offerApprovers)) {
+                // Process payment
+                processPayment(offer, paymentService);
+                offerRepository.remove(offer.getId());
+            }
+            else {
+                offerRepository.update(offer.getId(), offer);
+            }
+        }
 
-        offerRepository.remove(offerId);
         return offer;
+    }
+
+    public Offer acceptOfferByMember(String userId, String offerId, IExternalPaymentService paymentService){
+        Offer offer = getOffer(userId, offerId);
+        if (userId != offer.getMemberId()) {
+            throw new IllegalArgumentException("Only the member who made the offer can accept it by this methd.");
+        }
+
+        return acceptOffer(userId, offer, paymentService);        
+    }
+
+    public Offer acceptOfferByEmployee(String userId, String offerId, IExternalPaymentService paymentService){
+        Offer offer = getOffer(userId, offerId);
+        permissionManager.checkPermission(userId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
+
+        return acceptOffer(userId, offer, paymentService);
     }
 
 
