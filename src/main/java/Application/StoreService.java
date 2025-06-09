@@ -397,10 +397,14 @@ public class StoreService {
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
-            notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer rejected! purchased " + productName + " from " + storeName + " 🎉🔔");
-
+            notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer accepted! purchased " + productName + " from " + storeName + " 🎉🔔");
             TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
-            return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
+            return Response.success(new OfferDTO(offerId, 
+                                                UserDTO.from(member), 
+                                                approvedBy.stream().map(UserDTO::from).toList(),
+                                                ItemDTO.fromItem(item),
+                                                offer.getPrices(), 
+                                                offer.isCounterOffer()));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error accepting offer %s: %s", offerId, ex.getMessage());
@@ -436,13 +440,19 @@ public class StoreService {
             Offer offer = offerManager.rejectOffer(userId, offerId);
 
             Member member = loginManager.getMember(offer.getMemberId());
+            List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
-            notificationService.sendNotification(offer.getMemberId(), "Offer on " + productName + " for " + offer.getNewPrice() + " was rejected! womp womp :(");
+            notificationService.sendNotification(offer.getMemberId(), "Offer on " + productName + " for " + offer.getLastPrice() + " was rejected! womp womp :(");
 
             TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
-            return Response.success(new OfferDTO(offerId, UserDTO.from(member), ItemDTO.fromItem(item), offer.getNewPrice()));
+            return Response.success(new OfferDTO(offerId, 
+                                                UserDTO.from(member), 
+                                                approvedBy.stream().map(UserDTO::from).toList(),
+                                                ItemDTO.fromItem(item),
+                                                offer.getPrices(), 
+                                                offer.isCounterOffer()));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error rejecting offer %s: %s", offerId, ex.getMessage());
@@ -541,10 +551,17 @@ public class StoreService {
             Store store = storeFacade.getStore(storeId);
             String userId = tokenService.extractId(sessionToken);
             List<OfferDTO> offers = offerManager.getOffersOfStore(userId, storeId).stream().map(o -> {
-                return new OfferDTO(o.getId(),
-                                    new UserDTO(loginManager.getMember(userId)), 
-                                    ItemDTO.fromItem(itemFacade.getItem(storeId, o.getProductId())), 
-                                    o.getNewPrice());
+                String offerId = o.getId();
+                Member member = loginManager.getMember(o.getMemberId());
+                List<Member> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).toList();
+                Item item = itemFacade.getItem(o.getStoreId(), o.getProductId());
+                
+                return new OfferDTO(o.getId(), 
+                            UserDTO.from(member),
+                            approvedBy.stream().map(UserDTO::from).toList(),
+                            ItemDTO.fromItem(item),
+                            o.getPrices(), 
+                            o.isCounterOffer());
             }).toList();
 
             TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + offers.size() + " offers in store " + store.getName());

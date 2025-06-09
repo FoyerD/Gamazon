@@ -62,4 +62,5 @@ public class Offer {
     public String getStoreId() { return storeId; }
     public String getProductId() { return productId; }
     public PaymentDetails getPaymentDetails() { return this.paymentDetails; }
+    public List<Pair<String, Double>> getPrices() { return prices;}
 }
