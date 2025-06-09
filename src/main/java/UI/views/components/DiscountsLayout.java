@@ -514,8 +514,6 @@ public class DiscountsLayout extends VerticalLayout {
         
         // Add columns
         discountGrid.addColumn(d -> d.getType().toString()).setHeader("Type");
-        discountGrid.addColumn(d -> String.format("%.0f%%", d.getDiscountPercentage() * 100))
-            .setHeader("Discount");
         discountGrid.addColumn(DiscountDTO::getDescription).setHeader("Description");
 
         // Add remove button column
