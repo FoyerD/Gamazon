@@ -1,6 +1,8 @@
 package Application.DTOs;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import Domain.Pair;
 
@@ -8,8 +10,8 @@ import Domain.Pair;
 public class OfferDTO {
     private final String offerId;
     private final UserDTO member;
-    private final List<UserDTO> approvedBy;
-    private final List<UserDTO> approvers;
+    private final Set<UserDTO> approvedBy;
+    private final Set<UserDTO> approvers;
     private final ItemDTO item;
     private final boolean isAccepted;
     // offered prices, from old to new
@@ -17,7 +19,7 @@ public class OfferDTO {
     private final boolean counterOffer; // true if the offer is a counter offer from store employees
 
 
-    public OfferDTO(String offerId, UserDTO member, List<UserDTO> approvedBy, List<UserDTO> approvers, ItemDTO item, List<Pair<String, Double>> prices, boolean counterOffer, boolean isAccepted) {
+    public OfferDTO(String offerId, UserDTO member, Set<UserDTO> approvedBy, Set<UserDTO> approvers, ItemDTO item, List<Pair<String, Double>> prices, boolean counterOffer, boolean isAccepted) {
         this.offerId = offerId;
         this.member = member;
         this.approvedBy = approvedBy;
@@ -30,11 +32,11 @@ public class OfferDTO {
 
     public String getId() { return offerId.toString(); }
     public UserDTO getMember() { return member; }
-    public List<UserDTO> getApprovedBy() { return approvedBy; }
-    public List<UserDTO> getEmployeesApprovedBy() { return approvedBy.stream().filter(u -> !u.getId().equals(member.getId())).toList(); }
-    public List<UserDTO> getApprovers() { return approvers; }
+    public Set<UserDTO> getApprovedBy() { return approvedBy; }
+    public Set<UserDTO> getEmployeesApprovedBy() { return approvedBy.stream().filter(u -> !u.getId().equals(member.getId())).collect(Collectors.toSet()); }
+    public Set<UserDTO> getApprovers() { return approvers; }
     public List<UserDTO> getEmployeeApprovers() { return approvers.stream().filter(u -> !u.getId().equals(member.getId())).toList(); }
-    public List<UserDTO> getRemainingEmployeesToApprove() { return getEmployeeApprovers().stream().filter(u -> !approvedBy.contains(u)).toList(); }
+    public Set<UserDTO> getRemainingEmployeesToApprove() { return getEmployeeApprovers().stream().filter(u -> !approvedBy.contains(u)).collect(Collectors.toSet()); }
     public ItemDTO getItem() { return item; }
     public List<Pair<String, Double>> getOfferedPrices() { return offeredPrices; }
     public boolean isAccepted() { return isAccepted; }

@@ -2,9 +2,12 @@ package Application;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +32,6 @@ import Domain.Shopping.Receipt;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
-import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
 import Domain.User.Member;
@@ -400,9 +402,8 @@ public class ShoppingService{
             
             Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
           
-            List<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
-            
-            List<UserDTO> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList());
+            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
             approvers.add(member); // Add the member who made the offer to the approvers list
             
             OfferDTO offerDTO = new OfferDTO(offer.getId(), member, approvedBy, approvers, item, offer.getPrices(), offer.isCounterOffer(), offer.isAccepted());
@@ -437,8 +438,8 @@ public class ShoppingService{
             
             UserDTO member = new UserDTO(loginManager.getLoggedInMember(userId));
             ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(acceptedOffer.getStoreId(), acceptedOffer.getProductId()));
-            List<UserDTO> approvedBy = acceptedOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
-            List<UserDTO> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(acceptedOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList());
+            Set<UserDTO> approvedBy = acceptedOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(acceptedOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
             approvers.add(member); // Add the member who accepted the offer to the approvers list
             OfferDTO offerDTO = new OfferDTO(acceptedOffer.getId(), member, approvedBy, approvers, item, acceptedOffer.getPrices(), acceptedOffer.isCounterOffer(), acceptedOffer.isAccepted());
 
@@ -465,15 +466,15 @@ public class ShoppingService{
             List<OfferDTO> offers = offerManager.getOffersOfMember(userId).stream().map(o -> {
                 String offerId = o.getId();
                 Member member = loginManager.getMember(o.getMemberId());
-                List<Member> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-                List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(o.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+                Set<UserDTO> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+                Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(o.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
 
                 Item item = itemFacade.getItem(o.getStoreId(), o.getProductId());
 
                 return new OfferDTO(offerId, 
                             UserDTO.from(member),
-                            approvedBy.stream().map(UserDTO::from).toList(),
-                            approvers.stream().map(UserDTO::from).toList(),
+                            approvedBy,
+                            approvers,
                             ItemDTO.fromItem(item),
                             o.getPrices(), 
                             o.isCounterOffer(),
@@ -514,8 +515,8 @@ public class ShoppingService{
             Offer counteredOffer = offerManager.counterOfferByMember(userId, offerId, newPrice);
             UserDTO member = new UserDTO(loginManager.getLoggedInMember(userId));
             ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(counteredOffer.getStoreId(), counteredOffer.getProductId()));
-            List<UserDTO> approvedBy = counteredOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
-            List<UserDTO> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(counteredOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList());
+            Set<UserDTO> approvedBy = counteredOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(counteredOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
             approvers.add(member); // Add the member who made the counter offer to the approvers list
             OfferDTO offerDTO = new OfferDTO(counteredOffer.getId(), member, approvedBy, approvers, item, counteredOffer.getPrices(), false, counteredOffer.isAccepted());
 
