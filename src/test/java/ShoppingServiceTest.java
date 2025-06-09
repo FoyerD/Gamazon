@@ -157,8 +157,8 @@ public class ShoppingServiceTest {
                 condition.setMaxPrice(100.0); // Default max price
                 condition.setProductId(qualifierValue); // Required for MAX_PRICE
                 break;
-            case MIN_CART_VALUE:
-                condition.setMinCartValue(50.0); // Default min cart value
+            case MIN_PRICE:
+                condition.setMinPrice(50.0); // Default min cart value
                 break;
             case TRUE:
                 // No additional properties needed
@@ -168,7 +168,7 @@ public class ShoppingServiceTest {
         }
         
         // Create discount with validated percentage (0-1 range)
-        DiscountDTO discount = new DiscountDTO(null, DiscountType.SIMPLE, condition);
+        DiscountDTO discount = new DiscountDTO(null, store_id, DiscountType.SIMPLE, condition);
         
         // Validate discount percentage is in range [0, 1]
         if (discountPercentage < 0 || discountPercentage > 1) {
@@ -202,7 +202,7 @@ public class ShoppingServiceTest {
         // Create TRUE condition for composite discount
         ConditionDTO trueCondition = new ConditionDTO(null, ConditionType.TRUE);
         
-        DiscountDTO compositeDiscount = new DiscountDTO(null, DiscountType.AND, trueCondition);
+        DiscountDTO compositeDiscount = new DiscountDTO(null, store_id,DiscountType.AND, trueCondition);
         compositeDiscount.setSubDiscounts(subDiscounts);
         compositeDiscount.setStoreId(store_id);
         compositeDiscount.setDescription("AND composite discount");
@@ -221,7 +221,7 @@ public class ShoppingServiceTest {
         // Create TRUE condition for composite discount
         ConditionDTO trueCondition = new ConditionDTO(null, ConditionType.TRUE);
         
-        DiscountDTO compositeDiscount = new DiscountDTO(null, DiscountType.OR, trueCondition);
+        DiscountDTO compositeDiscount = new DiscountDTO(null, store_id,DiscountType.OR, trueCondition);
         compositeDiscount.setSubDiscounts(subDiscounts);
         compositeDiscount.setStoreId(store_id);
         compositeDiscount.setDescription("OR composite discount");
@@ -240,7 +240,7 @@ public class ShoppingServiceTest {
         // Create TRUE condition for composite discount
         ConditionDTO trueCondition = new ConditionDTO(null, ConditionType.TRUE);
         
-        DiscountDTO compositeDiscount = new DiscountDTO(null, DiscountType.XOR, trueCondition);
+        DiscountDTO compositeDiscount = new DiscountDTO(null, store_id,DiscountType.XOR, trueCondition);
         compositeDiscount.setSubDiscounts(List.of(discount1, discount2));
         compositeDiscount.setStoreId(store_id);
         compositeDiscount.setDescription("XOR composite discount");
@@ -677,10 +677,10 @@ public class ShoppingServiceTest {
         storeService.addDiscount(clientToken, store_id, discount1);
         
         // Create discount 2: 10% off store-wide when total cart value > 50
-        ConditionDTO condition2 = new ConditionDTO(null, ConditionType.MIN_CART_VALUE);
-        condition2.setMinCartValue(50.0);
+        ConditionDTO condition2 = new ConditionDTO(null, ConditionType.MIN_PRICE);
+        condition2.setMinPrice(50.0);
         
-        DiscountDTO discount2 = new DiscountDTO(null, DiscountType.SIMPLE, condition2);
+        DiscountDTO discount2 = new DiscountDTO(null, store_id,DiscountType.SIMPLE, condition2);
         discount2.setDiscountPercentage(0.1f);
         discount2.setQualifierType(QualifierType.STORE);
         discount2.setQualifierValue(store_id);
@@ -854,7 +854,7 @@ public class ShoppingServiceTest {
         condition.setMinQuantity(1);
         condition.setProductId(product_id);
         
-        DiscountDTO categoryDiscount = new DiscountDTO(null, DiscountType.SIMPLE, condition);
+        DiscountDTO categoryDiscount = new DiscountDTO(null, store_id,DiscountType.SIMPLE, condition);
         categoryDiscount.setDiscountPercentage(0.1f); // 10% discount
         categoryDiscount.setQualifierType(QualifierType.CATEGORY);
         categoryDiscount.setQualifierValue("Test Cat");
@@ -884,10 +884,10 @@ public class ShoppingServiceTest {
     @Test
     public void testStoreWideDiscount_Application() {
         // Create store-wide discount
-        ConditionDTO condition = new ConditionDTO(null, ConditionType.MIN_CART_VALUE);
-        condition.setMinCartValue(30.0);
+        ConditionDTO condition = new ConditionDTO(null, ConditionType.MIN_PRICE);
+        condition.setMinPrice(30.0);
         
-        DiscountDTO storeDiscount = new DiscountDTO(null, DiscountType.SIMPLE, condition);
+        DiscountDTO storeDiscount = new DiscountDTO(null, store_id,DiscountType.SIMPLE, condition);
         storeDiscount.setDiscountPercentage(0.05f); // 5% discount
         storeDiscount.setQualifierType(QualifierType.STORE);
         storeDiscount.setQualifierValue(store_id);
@@ -1254,8 +1254,7 @@ public class ShoppingServiceTest {
         
         checkInventoryInvariants();
     }
-}variants(cart);
-    }
+
 
     @Test
     public void testViewCart_WithSimpleDiscount() {
@@ -1299,7 +1298,7 @@ public class ShoppingServiceTest {
         condition.setMinQuantity(3);
         condition.setProductId(product_id);
         
-        DiscountDTO discount = new DiscountDTO(null, DiscountType.SIMPLE, condition);
+        DiscountDTO discount = new DiscountDTO(null, store_id,DiscountType.SIMPLE, condition);
         discount.setDiscountPercentage(0.3f); // 30% discount
         discount.setQualifierType(QualifierType.PRODUCT);
         discount.setQualifierValue(product_id);
@@ -1493,7 +1492,7 @@ public class ShoppingServiceTest {
         condition2.setMinQuantity(1);
         condition2.setProductId(product_id_2);
         
-        DiscountDTO discount2 = new DiscountDTO(null, DiscountType.SIMPLE, condition2);
+        DiscountDTO discount2 = new DiscountDTO(null, store_id,DiscountType.SIMPLE, condition2);
         discount2.setDiscountPercentage(0.15f);
         discount2.setQualifierType(QualifierType.PRODUCT);
         discount2.setQualifierValue(product_id_2);
@@ -1607,3 +1606,4 @@ public class ShoppingServiceTest {
             checkPriceInvariants(cart);
         }
     }
+}
