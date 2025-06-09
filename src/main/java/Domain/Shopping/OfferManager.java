@@ -87,7 +87,7 @@ public class OfferManager {
                                                     Date.from(paymentDetails.getExpiryDate().atStartOfDay(ZoneId.systemDefault()).toInstant()),
                                                     paymentDetails.getCvv(),
                                                     paymentDetails.getHolder(),
-                                                    offer.getNewPrice());
+                                                    offer.getLastPrice());
             if (paymentResponse.errorOccurred()) {
                 throw new RuntimeException("Payment Service failed to proccess transaction: " + paymentResponse.getErrorMessage());
             }
