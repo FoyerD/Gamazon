@@ -92,6 +92,7 @@ public class DiscountDTO {
         DiscountDTO dto = new DiscountDTO();
         dto.id = discount.getId();
         dto.condition = ConditionDTO.fromCondition(discount.getCondition());
+        dto.description = discount.getDescription();
         
         if (discount instanceof SimpleDiscount) {
             SimpleDiscount simpleDiscount = (SimpleDiscount) discount;
