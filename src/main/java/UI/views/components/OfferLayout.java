@@ -2,6 +2,7 @@ package UI.views.components;
 
 import Application.DTOs.OfferDTO;
 import Application.DTOs.UserDTO;
+import Domain.Pair;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -97,8 +98,32 @@ public class OfferLayout extends VerticalLayout {
         List<UserDTO> remaining = offer.getRemainingEmployeesToApprove();
         int approvedCount = approved.size();
 
+
+
+                // Price history
+        List<Pair<String, Double>> prices = offer.getOfferedPrices();
+        if (!prices.isEmpty()) {
+            VerticalLayout priceHistory = new VerticalLayout();
+            priceHistory.setPadding(false);
+            priceHistory.setSpacing(false);
+
+            for (int i = 0; i < prices.size(); i++) {
+                Pair<String, Double> p = prices.get(i);
+                Span priceSpan = new Span(" (" + p.getFirst() + "): $" + p.getSecond());
+                if (i == prices.size() - 1) {
+                    priceSpan.getStyle().set("font-weight", "bold");
+                } else {
+                    priceSpan.getStyle().set("color", "gray");
+                }
+                priceHistory.add(priceSpan);
+            }
+
+            content.add(priceHistory);
+        }
+
         // Approval summary
         CircularProgressBar approvalProgress = new CircularProgressBar(approvedCount, offer.getApprovers().size());
+
         content.add(approvalProgress);
 
         // List of approvers

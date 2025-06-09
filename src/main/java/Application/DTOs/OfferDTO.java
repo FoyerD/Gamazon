@@ -38,6 +38,7 @@ public class OfferDTO {
     public List<UserDTO> getRemainingEmployeesToApprove() { return getEmployeeApprovers().stream().filter(u -> !approvedBy.contains(u)).toList(); }
     public ItemDTO getItem() { return item; }
     public List<Pair<String, Double>> getOfferedPrices() { return offeredPrices; }
+    public double getLastPrice() { return offeredPrices.get(offeredPrices.size() - 1).getSecond(); }
     public boolean isCounterOffer() { return counterOffer; }
 
     public boolean hasMemberApproved() { return approvedBy.stream().anyMatch(u -> u.getId().equals(member.getId())); }

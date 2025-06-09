@@ -159,7 +159,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
                         Notification.show("Failed to make offer: " + offerResponse.getErrorMessage(), 5000, Notification.Position.BOTTOM_END);
                     } else {
                         OfferDTO offer = offerResponse.getValue();
-                        Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getNewPrice() + " was made successfully");
+                        Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getLastPrice() + " was made successfully");
                     }
                 });
 
