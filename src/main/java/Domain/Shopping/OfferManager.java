@@ -71,6 +71,23 @@ public class OfferManager {
         Offer offer = getOffer(employeeId, offerId);
         permissionManager.checkPermission(employeeId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
 
+        // Process payment
+        processPayment(offer, paymentService);
+
+        offerRepository.remove(offerId);
+        return offer;
+    }
+
+
+    public Offer rejectOffer(String employeeId, String offerId) {
+        Offer offer = getOffer(employeeId, offerId);
+        permissionManager.checkPermission(employeeId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
+        return offerRepository.remove(offerId);
+    }
+
+    private void processPayment(Offer offer, IExternalPaymentService paymentService) {
+        
+        
         Pair<String, String> itemId = new Pair<>(offer.getStoreId(), offer.getProductId());
 
         Object itemLock = itemRepository.getLock(itemId);
@@ -95,15 +112,5 @@ public class OfferManager {
             item.decreaseAmount(1);
             itemRepository.update(itemId, item);
         }
-
-        offerRepository.remove(offerId);
-        return offer;
-    }
-
-
-    public Offer rejectOffer(String employeeId, String offerId) {
-        Offer offer = getOffer(employeeId, offerId);
-        permissionManager.checkPermission(employeeId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
-        return offerRepository.remove(offerId);
     }
 }
