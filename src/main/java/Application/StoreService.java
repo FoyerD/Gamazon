@@ -393,6 +393,7 @@ public class StoreService {
             Offer offer = offerManager.acceptOffer(userId, offerId, externalPaymentService);
 
             Member member = loginManager.getMember(offer.getMemberId());
+            List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
