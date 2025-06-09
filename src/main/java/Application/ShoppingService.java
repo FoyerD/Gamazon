@@ -385,7 +385,7 @@ public class ShoppingService{
      */
     @Transactional
     public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetailsDTO) {
-        String method = "bargainPrice";
+        String method = "makeOffer";
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
             return Response.error("Invalid token");
@@ -401,7 +401,10 @@ public class ShoppingService{
             Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
           
             List<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
-            List<UserDTO> approvers = permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList();
+            
+            List<UserDTO> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList());
+            approvers.add(member); // Add the member who made the offer to the approvers list
+            
             OfferDTO offerDTO = new OfferDTO(offer.getId(), member, approvedBy, approvers, item, offer.getPrices(), offer.isCounterOffer(), offer.isAccepted());
 
             TradingLogger.logEvent(CLASS_NAME, method, "Offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
@@ -435,7 +438,8 @@ public class ShoppingService{
             UserDTO member = new UserDTO(loginManager.getLoggedInMember(userId));
             ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(acceptedOffer.getStoreId(), acceptedOffer.getProductId()));
             List<UserDTO> approvedBy = acceptedOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
-            List<UserDTO> approvers = permissionManager.getUsersWithPermission(acceptedOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList();
+            List<UserDTO> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(acceptedOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList());
+            approvers.add(member); // Add the member who accepted the offer to the approvers list
             OfferDTO offerDTO = new OfferDTO(acceptedOffer.getId(), member, approvedBy, approvers, item, acceptedOffer.getPrices(), acceptedOffer.isCounterOffer(), acceptedOffer.isAccepted());
 
             TradingLogger.logEvent(CLASS_NAME, method, "Offer accepted by " + userId + ": " + offerId);
@@ -462,7 +466,8 @@ public class ShoppingService{
                 String offerId = o.getId();
                 Member member = loginManager.getMember(o.getMemberId());
                 List<Member> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-                List<Member> approvers = permissionManager.getUsersWithPermission(o.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList();
+                List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(o.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+
                 Item item = itemFacade.getItem(o.getStoreId(), o.getProductId());
 
                 return new OfferDTO(offerId, 
@@ -510,7 +515,8 @@ public class ShoppingService{
             UserDTO member = new UserDTO(loginManager.getLoggedInMember(userId));
             ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(counteredOffer.getStoreId(), counteredOffer.getProductId()));
             List<UserDTO> approvedBy = counteredOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).toList();
-            List<UserDTO> approvers = permissionManager.getUsersWithPermission(counteredOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList();
+            List<UserDTO> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(counteredOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).toList());
+            approvers.add(member); // Add the member who made the counter offer to the approvers list
             OfferDTO offerDTO = new OfferDTO(counteredOffer.getId(), member, approvedBy, approvers, item, counteredOffer.getPrices(), false, counteredOffer.isAccepted());
 
             TradingLogger.logEvent(CLASS_NAME, method, "Counter offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");

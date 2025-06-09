@@ -10,6 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.checkerframework.checker.units.qual.s;
 import org.junit.Before;
 import org.junit.Test;
 import org.yaml.snakeyaml.error.Mark;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import Application.DTOs.AuctionDTO;
+import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
@@ -689,6 +692,7 @@ public class StoreServiceTests {
         Response<ProductDTO> prodRes = productService.addProduct(tokenId, "OfferProduct", List.of("cat"), List.of("desc"));
         String productId = prodRes.getValue().getId();
         itemService.add(tokenId, storeId, productId, 150f, 3, "desc");
+        
 
         // Add second manager
         Response<UserDTO> guest = userService.guestEntry();
