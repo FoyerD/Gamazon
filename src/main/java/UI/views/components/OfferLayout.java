@@ -101,7 +101,7 @@ public class OfferLayout extends VerticalLayout {
 
 
         // Price history
-        List<Pair<String, Double>> prices = offer.getOfferedPrices();
+        List<Pair<String, Double>> prices = offer.getUsernamesPrice();
         if (!prices.isEmpty()) {
             VerticalLayout priceHistory = new VerticalLayout();
             priceHistory.setPadding(false);
@@ -109,7 +109,7 @@ public class OfferLayout extends VerticalLayout {
 
             for (int i = 0; i < prices.size(); i++) {
                 Pair<String, Double> p = prices.get(i);
-                Span priceSpan = new Span(" (" + p.getFirst() + "): $" + p.getSecond());
+                Span priceSpan = new Span(p.getFirst() + ": $" + p.getSecond());
                 if (i == prices.size() - 1) {
                     priceSpan.getStyle().set("font-weight", "bold");
                 } else {

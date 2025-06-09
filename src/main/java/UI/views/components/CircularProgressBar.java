@@ -12,7 +12,7 @@ public class CircularProgressBar extends Component {
         String percentText = String.format("%.0f%%", percent);
 
         String svg = """
-            <svg width="80" height="80" viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+            <svg width="80" height="80" viewBox="0 0 36 36">
                 <style>
                     .circle-bg {
                         fill: none;
