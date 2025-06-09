@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.UserDTO;
 import Application.ItemService;
+import Application.MarketService;
 import Application.ProductService;
 import Application.ServiceManager;
 import Application.ShoppingService;
@@ -33,6 +35,7 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
+import Domain.management.PermissionType;
 import Domain.FacadeManager;
 import Domain.Pair;
 import Infrastructure.MemoryRepoManager;
@@ -658,6 +661,128 @@ public class ShoppingServiceTest {
         assertEquals("Offered price should match", 8.99, offer.getLastPrice(), 0.001);
         assertEquals("Product ID should match", product_id, offer.getItem().getProductId());
         assertEquals("Store ID should match", store_id, offer.getItem().getStoreId());
+    }
+
+    @Test
+    public void testMakeOffer_ValidInput_ReturnsOfferDTO() {
+        PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
+        Response<OfferDTO> response = shoppingService.makeOffer(clientToken, store_id, product_id, 7.77, paymentDetails);
+
+        assertFalse(response.errorOccurred());
+        assertNotNull(response.getValue());
+        assertEquals(7.77, response.getValue().getLastPrice(), 0.01);
+        assertEquals(product_id, response.getValue().getItem().getProductId());
+    }
+
+    @Test
+    public void testMakeOffer_InvalidToken_ReturnsError() {
+        PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
+        Response<OfferDTO> response = shoppingService.makeOffer("invalidToken", store_id, product_id, 9.99, paymentDetails);
+
+        assertTrue(response.errorOccurred());
+        assertEquals("Invalid token", response.getErrorMessage());
+    }
+
+    @Test
+    public void testAcceptOffer_FullApprovalFlow_WithDifferentManager() {
+        when(mockPaymentService.processPayment(
+        anyString(),  // userId
+        anyString(),  // cardNumber
+        any(Date.class),  // expiryDate
+        anyString(),  // cvv
+        anyString(),  // holder
+        anyDouble()   // amount
+        )).thenReturn(new Response<>(10000));  // Replace 10000 with the desired mocked value
+
+        MarketService marketService = serviceManager.getMarketService();
+        // Step 1: Member makes offer
+        PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(
+            user.getId(),
+            "4111111111111111",
+            LocalDate.now().plusYears(1),
+            "123",
+            "Offer Tester"
+        );
+
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(
+            clientToken, store_id, product_id, 5.55, paymentDetails
+        );
+
+        assertFalse("Offer creation should succeed", offerResponse.errorOccurred());
+        OfferDTO offer = offerResponse.getValue();
+        assertNotNull("OfferDTO should not be null", offer);
+
+        // Step 2: Create and appoint a second manager
+        Response<UserDTO> guestResp = userService.guestEntry();
+        Response<UserDTO> managerResp = userService.register(
+            guestResp.getValue().getSessionToken(),
+            "manager1",
+            "WhyWontWork2!",
+            "manager1@e.com"
+        );
+        String managerToken = managerResp.getValue().getSessionToken();
+
+        // Appoint the second user as store manager
+        marketService.appointStoreManager(clientToken, managerResp.getValue().getId(), store_id);
+        marketService.changeManagerPermissions(clientToken, managerResp.getValue().getId(), store_id, List.of(PermissionType.OVERSEE_OFFERS));
+
+        // Step 3: Manager counters the offer
+        Response<OfferDTO> counterResp = storeSerivce.counterOffer(managerToken, offer.getId(), 5.55);
+        assertFalse("Counter offer should succeed", counterResp.errorOccurred());
+        assertEquals("Countered price should match", 5.55, counterResp.getValue().getLastPrice(), 0.01);
+
+        // Step 4: Member accepts the offer
+        Response<OfferDTO> acceptResp = shoppingService.acceptOffer(clientToken, offer.getId());
+        assertFalse("Accepting offer should succeed\n ", acceptResp.errorOccurred());
+        assertTrue("Offer should be marked as accepted", acceptResp.getValue().isAccepted());
+        assertEquals("Offer ID should match", offer.getId(), acceptResp.getValue().getId());
+    }
+
+
+    @Test
+    public void testAcceptOffer_InvalidToken_ReturnsError() {
+        Response<OfferDTO> response = shoppingService.acceptOffer("invalidToken", "someOfferId");
+
+        assertTrue(response.errorOccurred());
+        assertEquals("Invalid token", response.getErrorMessage());
+    }
+
+    @Test
+    public void testGetAllOffersOfUser_Success() {
+        PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
+        shoppingService.makeOffer(clientToken, store_id, product_id, 11.11, paymentDetails);
+
+        Response<List<OfferDTO>> response = shoppingService.getAllOffersOfUser(clientToken);
+        assertFalse(response.errorOccurred());
+        assertNotNull(response.getValue());
+        assertFalse(response.getValue().isEmpty());
+    }
+
+    @Test
+    public void testGetAllOffersOfUser_InvalidToken_ReturnsError() {
+        Response<List<OfferDTO>> response = shoppingService.getAllOffersOfUser("invalidToken");
+
+        assertTrue(response.errorOccurred());
+        assertEquals("Invalid token", response.getErrorMessage());
+    }
+
+    @Test
+    public void testCounterOffer_ValidInput_ReturnsUpdatedOffer() {
+        PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
+        OfferDTO offer = shoppingService.makeOffer(clientToken, store_id, product_id, 6.66, paymentDetails).getValue();
+        Response<OfferDTO> counterResponse = shoppingService.counterOffer(clientToken, offer.getId(), 7.77);
+
+        assertFalse(counterResponse.errorOccurred());
+        assertNotNull(counterResponse.getValue());
+        assertEquals(7.77, counterResponse.getValue().getLastPrice(), 0.01);
+    }
+
+    @Test
+    public void testCounterOffer_InvalidToken_ReturnsError() {
+        Response<OfferDTO> response = shoppingService.counterOffer("invalidToken", "offer123", 6.99);
+
+        assertTrue(response.errorOccurred());
+        assertEquals("Invalid token", response.getErrorMessage());
     }
 
 }

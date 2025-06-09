@@ -11,10 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.checkerframework.checker.units.qual.s;
 import org.junit.Before;
 import org.junit.Test;
-import org.yaml.snakeyaml.error.Mark;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -24,7 +22,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import Application.DTOs.AuctionDTO;
-import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
@@ -688,6 +685,7 @@ public class StoreServiceTests {
         ShoppingService shoppingService = serviceManager.getShoppingService();
         UserService userService = serviceManager.getUserService();
         MarketService marketService = serviceManager.getMarketService();
+
         // Add product and item
         Response<ProductDTO> prodRes = productService.addProduct(tokenId, "OfferProduct", List.of("cat"), List.of("desc"));
         String productId = prodRes.getValue().getId();
@@ -698,8 +696,8 @@ public class StoreServiceTests {
         Response<UserDTO> guest = userService.guestEntry();
         Response<UserDTO> secondManager = userService.register(guest.getValue().getSessionToken(), "Manager2", "Passw0rd!", "m2@store.com");
         String secondToken = secondManager.getValue().getSessionToken();
-        marketService.appointStoreManager(tokenId, storeId, secondManager.getValue().getId());
-        marketService.changeManagerPermissions(tokenId, secondToken, storeId, List.of(PermissionType.OVERSEE_OFFERS));
+        marketService.appointStoreManager(tokenId, secondManager.getValue().getId(), storeId);
+        marketService.changeManagerPermissions(tokenId, secondManager.getValue().getId(), storeId, List.of(PermissionType.OVERSEE_OFFERS));
 
         // Create buyer and offer
         Response<UserDTO> guestBuyer = userService.guestEntry();
@@ -714,6 +712,122 @@ public class StoreServiceTests {
         assertFalse(partial.errorOccurred());
         assertNotNull(partial.getValue());
         assertFalse("Offer should not be accepted yet", partial.getValue().isAccepted());
+    }
+
+    @Test
+    public void GivenTwoManagers_WhenBothApproveOffer_ThenOfferIsAccepted() {
+        // Setup store and services
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "DualManagerStoreAccepted", "Approval Test");
+        String storeId = storeRes.getValue().getId();
+
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+        UserService userService = serviceManager.getUserService();
+        MarketService marketService = serviceManager.getMarketService();
+
+        // Add product and item
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "OfferProduct", List.of("cat"), List.of("desc"));
+        String productId = prodRes.getValue().getId();
+        itemService.add(tokenId, storeId, productId, 150f, 3, "desc");
+
+        // Add second manager
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> secondManager = userService.register(
+            guest.getValue().getSessionToken(), "Manager2", "Passw0rd!", "m2@store.com");
+        String secondToken = secondManager.getValue().getSessionToken();
+
+        marketService.appointStoreManager(tokenId, secondManager.getValue().getId(), storeId);
+        marketService.changeManagerPermissions(tokenId, secondManager.getValue().getId(), storeId,
+            List.of(PermissionType.OVERSEE_OFFERS));
+
+        // Create buyer and offer
+        Response<UserDTO> guestBuyer = userService.guestEntry();
+        Response<UserDTO> buyer = userService.register(
+            guestBuyer.getValue().getSessionToken(), "Buyer1", "Pass1!word", "buyer@store.com");
+        String buyerToken = buyer.getValue().getSessionToken();
+
+        PaymentDetailsDTO payment = new PaymentDetailsDTO(
+            buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Buyer");
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 100.0, payment);
+        String offerId = offerResponse.getValue().getId();
+
+        // First manager approves
+        Response<OfferDTO> partial = storeService.acceptOffer(tokenId, offerId);
+        assertFalse(partial.errorOccurred());
+        assertNotNull(partial.getValue());
+        assertFalse("Offer should not be accepted yet", partial.getValue().isAccepted());
+
+        // Second manager approves
+        Response<OfferDTO> full = storeService.acceptOffer(secondToken, offerId);
+        assertFalse(full.errorOccurred());
+        assertTrue("Offer should now be accepted", full.getValue().isAccepted());
+    }
+
+    @Test
+    public void GivenValidOffer_WhenRejectOffer_ThenOfferIsRejected() {
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "RejectableStore", "Rejection test");
+        String storeId = storeRes.getValue().getId();
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "RejectProduct", List.of("cat"), List.of("desc"));
+        String productId = prodRes.getValue().getId();
+        itemService.add(tokenId, storeId, productId, 200f, 5, "desc");
+
+        UserService userService = serviceManager.getUserService();
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> buyer = userService.register(guest.getValue().getSessionToken(), "RejectUser", "Pass1234!", "reject@store.com");
+        String buyerToken = buyer.getValue().getSessionToken();
+
+        PaymentDetailsDTO payment = new PaymentDetailsDTO(buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Reject User");
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 180.0, payment);
+        String offerId = offerResponse.getValue().getId();
+
+        Response<OfferDTO> result = storeService.rejectOffer(tokenId, offerId);
+        assertFalse(result.errorOccurred());
+        assertEquals(offerId, result.getValue().getId());
+        assertFalse("Offer should not be accepted", result.getValue().isAccepted());
+    }
+
+    @Test
+    public void GivenInvalidToken_WhenRejectOffer_ThenErrorReturned() {
+        Response<OfferDTO> result = storeService.rejectOffer("invalid_token", "some_offer_id");
+        assertTrue(result.errorOccurred());
+    }
+    
+    @Test
+    public void GivenValidOffer_WhenCounterOfferByManager_ThenCounterOfferReturned() {
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "CounterStore", "Counter test");
+        String storeId = storeRes.getValue().getId();
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "CounterProduct", List.of("cat"), List.of("desc"));
+        String productId = prodRes.getValue().getId();
+        itemService.add(tokenId, storeId, productId, 250f, 2, "desc");
+
+        UserService userService = serviceManager.getUserService();
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> buyer = userService.register(guest.getValue().getSessionToken(), "CounterBuyer", "Pass5678!", "counter@store.com");
+        String buyerToken = buyer.getValue().getSessionToken();
+
+        PaymentDetailsDTO payment = new PaymentDetailsDTO(buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "321", "Counter Buyer");
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 190.0, payment);
+        String offerId = offerResponse.getValue().getId();
+
+        Response<OfferDTO> result = storeService.counterOffer(tokenId, offerId, 220.0);
+        assertFalse(result.errorOccurred());
+        assertEquals(offerId, result.getValue().getId());
+        assertTrue("Offer should be a counter offer", result.getValue().isCounterOffer());
+    }
+
+    @Test
+    public void GivenInvalidToken_WhenCounterOffer_ThenErrorReturned() {
+        Response<OfferDTO> result = storeService.counterOffer("invalid_token", "some_offer_id", 100.0);
+        assertTrue(result.errorOccurred());
     }
 
 }

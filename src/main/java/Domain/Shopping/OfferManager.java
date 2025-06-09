@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -13,9 +14,12 @@ import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
 import Domain.Repos.IItemRepository;
 import Domain.Repos.IOfferRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
 import Domain.Store.Item;
 import Domain.Store.StoreFacade;
 import Domain.management.PermissionManager;
@@ -28,16 +32,24 @@ public class OfferManager {
     private final PermissionManager permissionManager;
     private final IItemRepository itemRepository;
     private final IExternalPaymentService paymentService;
+    private final IReceiptRepository receiptRepository;
+    private final IProductRepository productRepository;
+
+
     @Autowired
     public OfferManager(IOfferRepository offerRepository, 
     PermissionManager permissionManager, 
     IItemRepository itemRepository,
     StoreFacade storeFacade,
-    IExternalPaymentService paymentService) {
+    IExternalPaymentService paymentService,
+    IReceiptRepository receiptRepository,
+    IProductRepository productRepository) {
         this.offerRepository = offerRepository;
         this.permissionManager = permissionManager;
         this.itemRepository = itemRepository;
         this.paymentService = paymentService;
+        this.receiptRepository = receiptRepository;
+        this.productRepository = productRepository;
     }
 
     
@@ -83,20 +95,22 @@ public class OfferManager {
             offerApprovers.add(offer.getMemberId()); // Include the member who made the offer
             if (offer.getApprovedBy().equals(offerApprovers)) {
                 // Process payment
-                processPayment(offer);
+                Offer acceptedOffer = processPayment(offer);
                 offerRepository.remove(offer.getId());
+                return acceptedOffer;
             }
             else {
                 offerRepository.update(offer.getId(), offer);
+                return offer;
             }
         }
 
-        return offer;
+        
     }
 
     public Offer acceptOfferByMember(String userId, String offerId){
         Offer offer = getOffer(userId, offerId);
-        if (userId != offer.getMemberId()) {
+        if (!userId.equals(offer.getMemberId())) {
             throw new IllegalArgumentException("Only the member who made the offer can accept it by this methd.");
         }
 
@@ -117,7 +131,7 @@ public class OfferManager {
         return offerRepository.remove(offerId);
     }
 
-    private void processPayment(Offer offer) {
+    private Offer processPayment(Offer offer) {
         
         
         Pair<String, String> itemId = new Pair<>(offer.getStoreId(), offer.getProductId());
@@ -145,12 +159,33 @@ public class OfferManager {
             itemRepository.update(itemId, item);
             offer.setAccepted(true);
         }
+        
+        try{
+        this.receiptRepository.savePurchase(
+            offer.getMemberId(),
+            offer.getStoreId(),
+            Map.of(productRepository.get(offer.getProductId()), new Pair<>(1, offer.getLastPrice())),
+            offer.getLastPrice(),
+            //TODO change this
+            offer.getPaymentDetails().toString()
+        );
+        } catch (Exception e) {
+            // dont know what to do surely not rollback!!!
+        }
+
+        for(String managerId : offer.getApprovedBy()){
+            if(!managerId.equals(offer.getMemberId())){
+                
+            }
+        }
+
+        return offer;
     }
 
 
     public Offer counterOfferByMember(String userId, String offerId, double newPrice) {
         Offer offer = getOffer(userId, offerId);
-        if (userId != offer.getMemberId()) {
+        if (!userId.equals(offer.getMemberId())) {
             throw new IllegalArgumentException("Only the member who made the offer can counter it by this method.");
         }
 

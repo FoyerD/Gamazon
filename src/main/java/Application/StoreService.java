@@ -400,7 +400,17 @@ public class StoreService {
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
             String storeName = storeFacade.getStoreName(offer.getStoreId());
-            notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer accepted! purchased " + productName + " from " + storeName + " 🎉🔔");
+            if(offer.isAccepted()){
+                approvers.stream().forEach(m -> {
+                    String message = String.format(
+                        "The offer for product '%s' in store '%s' by member '%s' has been accepted and processed successfully. A unit has been deducted from inventory.",
+                        productName,
+                        storeName,
+                        member.getName()
+                    );
+                    notificationService.sendNotification(m.getId(), message);
+                });
+            }
             TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
             return Response.success(new OfferDTO(offerId, 
                                                 UserDTO.from(member), 
