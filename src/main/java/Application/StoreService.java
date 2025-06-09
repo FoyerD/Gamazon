@@ -404,7 +404,7 @@ public class StoreService {
                         "The offer for product '%s' in store '%s' by member '%s' has been accepted and processed successfully. A unit has been deducted from inventory.",
                         productName,
                         storeName,
-                        member.getName()
+                        member.getUsername()
                     );
                     notificationService.sendNotification(m.getId(), message);
                 });
