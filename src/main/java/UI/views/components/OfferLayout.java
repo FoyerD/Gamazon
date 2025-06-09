@@ -14,6 +14,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -94,8 +95,8 @@ public class OfferLayout extends VerticalLayout {
         content.add(new Span("Item: " + offer.getItem().getProductName()));
 
         // Approvals
-        List<UserDTO> approved = offer.getApprovedBy();
-        List<UserDTO> remaining = offer.getRemainingEmployeesToApprove();
+        Set<UserDTO> approved = offer.getApprovedBy();
+        Set<UserDTO> remaining = offer.getRemainingEmployeesToApprove();
         int approvedCount = approved.size();
 
 
@@ -124,7 +125,7 @@ public class OfferLayout extends VerticalLayout {
         // Approval summary
         //CircularProgressBar approvalProgress = new CircularProgressBar(approvedCount, offer.getApprovers().size());
 
-        content.add(new Span("progress: " + approvedCount + " / " + offer.getApprovers().size()));
+        // content.add(new Span("progress: " + approvedCount + " / " + offer.getApprovers().size()));
 
         // List of approvers
         if (!approved.isEmpty()) {

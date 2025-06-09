@@ -31,8 +31,6 @@ import Domain.Store.ItemFacade;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
-import Domain.User.Member;
-import Domain.User.User;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -393,9 +391,9 @@ public class StoreService {
 
             Offer offer = offerManager.acceptOfferByEmployee(userId, offerId);
 
-            Member member = loginManager.getMember(offer.getMemberId());
-            List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-            List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+            UserDTO member = UserDTO.from(loginManager.getMember(offer.getMemberId()));
+            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
             approvers.add(member);
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
@@ -403,9 +401,9 @@ public class StoreService {
             notificationService.sendNotification(offer.getMemberId(), "🔔🎉 Offer accepted! purchased " + productName + " from " + storeName + " 🎉🔔");
             TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
             return Response.success(new OfferDTO(offerId, 
-                                                UserDTO.from(member), 
-                                                approvedBy.stream().map(UserDTO::from).toList(),
-                                                approvers.stream().map(UserDTO::from).toList(),
+                                                member, 
+                                                approvedBy,
+                                                approvers,
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
                                                 offer.isCounterOffer(),
@@ -444,9 +442,9 @@ public class StoreService {
 
             Offer offer = offerManager.rejectOffer(userId, offerId);
 
-            Member member = loginManager.getMember(offer.getMemberId());
-            List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-            List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+            UserDTO member = UserDTO.from(loginManager.getMember(offer.getMemberId()));
+            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
             approvers.add(member);
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
@@ -455,9 +453,9 @@ public class StoreService {
 
             TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
             return Response.success(new OfferDTO(offerId, 
-                                                UserDTO.from(member), 
-                                                approvedBy.stream().map(UserDTO::from).toList(),
-                                                approvers.stream().map(UserDTO::from).toList(),
+                                                member, 
+                                                approvedBy,
+                                                approvers,
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
                                                 offer.isCounterOffer(),
@@ -561,16 +559,16 @@ public class StoreService {
             String userId = tokenService.extractId(sessionToken);
             List<OfferDTO> offers = offerManager.getOffersOfStore(userId, storeId).stream().map(o -> {
                 String offerId = o.getId();
-                Member member = loginManager.getMember(o.getMemberId());
-                List<Member> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-                List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(storeId, PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+                UserDTO member = UserDTO.from(loginManager.getMember(o.getMemberId()));
+                Set<UserDTO> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+                Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(o.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
                 approvers.add(member);
                 Item item = itemFacade.getItem(o.getStoreId(), o.getProductId());
 
                 return new OfferDTO(offerId, 
-                            UserDTO.from(member),
-                            approvedBy.stream().map(UserDTO::from).toList(),
-                            approvers.stream().map(UserDTO::from).toList(),
+                            member,
+                            approvedBy,
+                            approvers,
                             ItemDTO.fromItem(item),
                             o.getPrices(), 
                             o.isCounterOffer(),
@@ -603,9 +601,9 @@ public class StoreService {
                 throw new Exception("User is banned.");
             }
             Offer offer = offerManager.counterOfferByEmployee(userId, offerId, newPrice);
-            Member member = loginManager.getMember(offer.getMemberId());
-            List<Member> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).toList();
-            List<Member> approvers = new ArrayList<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).toList());
+            UserDTO member = UserDTO.from(loginManager.getMember(offer.getMemberId()));
+            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
             approvers.add(member);
             Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
             String productName = item.getProductName();
@@ -614,9 +612,9 @@ public class StoreService {
 
             TradingLogger.logEvent(CLASS_NAME, method, "Counter offer made for offer " + offerId + " on product " + productName + " in store " + storeName);
             return Response.success(new OfferDTO(offerId, 
-                                                UserDTO.from(member), 
-                                                approvedBy.stream().map(UserDTO::from).toList(),
-                                                approvers.stream().map(UserDTO::from).toList(),
+                                                member, 
+                                                approvedBy,
+                                                approvers,
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
                                                 true, offer.isAccepted()));
