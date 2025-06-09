@@ -150,4 +150,12 @@ public class PermissionManager {
         }
         return true;
     }
+
+    public List<String> getUseresWithPermission(String storeId, PermissionType permissionType) {
+        Map<String, Permission> allUsers = getAllPermissionsForStore(storeId);
+        return allUsers.entrySet().stream()
+                .filter(entry -> entry.getValue().hasPermission(permissionType))
+                .map(Map.Entry::getKey)
+                .toList();
+    }
 }
