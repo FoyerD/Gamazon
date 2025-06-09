@@ -61,7 +61,7 @@ public class DiscountBuilder {
         
         switch(discountDTO.getType()) {
             case SIMPLE:
-                return new SimpleDiscount(id, discountDTO.getStoreId(), discountDTO.getDiscountPercentage(), makeQualifier(discountDTO.getQualifierType(), discountDTO.getQualifierValue()), cond);
+                return new SimpleDiscount(id, discountDTO.getStoreId(), discountDTO.getDiscountPercentage(), makeQualifier(discountDTO.getQualifierType(), discountDTO.getQualifierValue()), cond, discountDTO.getDescription());
                 
             case AND:
                 if (discountDTO.getSubDiscounts() == null) {
