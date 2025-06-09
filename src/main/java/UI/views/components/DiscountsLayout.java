@@ -92,15 +92,34 @@ public class DiscountsLayout extends VerticalLayout {
         addDiscountButton.addClickListener(e -> addDiscountDialog.open());
         composeDiscountButton.addClickListener(e -> composeDiscountDialog.open());
         
-        HorizontalLayout buttons = new HorizontalLayout(addConditionButton, addDiscountButton, composeDiscountButton);
-        buttons.setSpacing(true);
+        // Create buttons layout
+        HorizontalLayout buttonsLayout = new HorizontalLayout(
+            addConditionButton,
+            addDiscountButton,
+            composeDiscountButton
+        );
+        buttonsLayout.setSpacing(true);
+        buttonsLayout.setAlignItems(Alignment.CENTER);
+
+        // Create left side with title above buttons
+        VerticalLayout leftSide = new VerticalLayout(title, buttonsLayout);
+        leftSide.setSpacing(true);
+        leftSide.setPadding(false);
+        leftSide.setAlignItems(Alignment.START);
 
         // Add save discounts button
         Button saveDiscountsButton = new Button("Save All Discounts", VaadinIcon.CHECK.create());
         styleButton(saveDiscountsButton, "#ff9800");
         saveDiscountsButton.addClickListener(e -> saveDiscounts());
         
-        add(title, buttons, discountGrid, saveDiscountsButton);
+        // Create top bar layout
+        HorizontalLayout topBar = new HorizontalLayout(leftSide, saveDiscountsButton);
+        topBar.setWidthFull();
+        topBar.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        topBar.setAlignItems(Alignment.END);
+        topBar.setPadding(false);
+        
+        add(topBar, discountGrid);
         
         // Set alignment and spacing
         setAlignItems(Alignment.CENTER);
