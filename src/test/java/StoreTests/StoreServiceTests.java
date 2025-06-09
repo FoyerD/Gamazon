@@ -1,5 +1,6 @@
 package StoreTests;
 
+import java.security.Permission;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.yaml.snakeyaml.error.Mark;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -26,6 +29,7 @@ import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.ItemService;
+import Application.MarketService;
 import Application.ProductService;
 import Application.ServiceManager;
 import Application.ShoppingService;
@@ -33,6 +37,7 @@ import Application.StoreService;
 import Application.UserService;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.management.PermissionType;
 import Domain.FacadeManager;
 import Infrastructure.MemoryRepoManager;
 
@@ -669,5 +674,42 @@ public class StoreServiceTests {
         assertEquals("Offer ID should match", offerId, rejected.getValue().getId());
     }
 
+    @Test
+    public void GivenTwoManagers_WhenOnlyOneApprovesOffer_ThenOfferNotAccepted() {
+        // Setup store and services
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "DualManagerStore", "Approval Test");
+        String storeId = storeRes.getValue().getId();
+
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+        UserService userService = serviceManager.getUserService();
+        MarketService marketService = serviceManager.getMarketService();
+        // Add product and item
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "OfferProduct", List.of("cat"), List.of("desc"));
+        String productId = prodRes.getValue().getId();
+        itemService.add(tokenId, storeId, productId, 150f, 3, "desc");
+
+        // Add second manager
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> secondManager = userService.register(guest.getValue().getSessionToken(), "Manager2", "Passw0rd!", "m2@store.com");
+        String secondToken = secondManager.getValue().getSessionToken();
+        marketService.appointStoreManager(tokenId, storeId, secondManager.getValue().getId());
+        marketService.changeManagerPermissions(tokenId, secondToken, storeId, List.of(PermissionType.OVERSEE_OFFERS));
+
+        // Create buyer and offer
+        Response<UserDTO> guestBuyer = userService.guestEntry();
+        Response<UserDTO> buyer = userService.register(guestBuyer.getValue().getSessionToken(), "Buyer1", "Pass1!word", "buyer@store.com");
+        String buyerToken = buyer.getValue().getSessionToken();
+        PaymentDetailsDTO payment = new PaymentDetailsDTO(buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Buyer");
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 100.0, payment);
+        String offerId = offerResponse.getValue().getId();
+
+        // First manager approves
+        Response<OfferDTO> partial = storeService.acceptOffer(tokenId, offerId);
+        assertFalse(partial.errorOccurred());
+        assertNotNull(partial.getValue());
+        assertFalse("Offer should not be accepted yet", partial.getValue().isAccepted());
+    }
 
 }

@@ -655,7 +655,7 @@ public class ShoppingServiceTest {
         assertFalse("Offer creation should not error", response.errorOccurred());
         OfferDTO offer = response.getValue();
         assertNotNull("OfferDTO should not be null", offer);
-        assertEquals("Offered price should match", 8.99, offer.getNewPrice(), 0.001);
+        assertEquals("Offered price should match", 8.99, offer.getLastPrice(), 0.001);
         assertEquals("Product ID should match", product_id, offer.getItem().getProductId());
         assertEquals("Store ID should match", store_id, offer.getItem().getStoreId());
     }

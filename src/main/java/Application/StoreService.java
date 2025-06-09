@@ -406,7 +406,8 @@ public class StoreService {
                                                 approvers.stream().map(UserDTO::from).toList(),
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
-                                                offer.isCounterOffer()));
+                                                offer.isCounterOffer(),
+                                                offer.isAccepted()));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error accepting offer %s: %s", offerId, ex.getMessage());
@@ -456,7 +457,8 @@ public class StoreService {
                                                 approvers.stream().map(UserDTO::from).toList(),
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
-                                                offer.isCounterOffer()));
+                                                offer.isCounterOffer(),
+                                                offer.isAccepted()));
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error rejecting offer %s: %s", offerId, ex.getMessage());
@@ -567,7 +569,8 @@ public class StoreService {
                             approvers.stream().map(UserDTO::from).toList(),
                             ItemDTO.fromItem(item),
                             o.getPrices(), 
-                            o.isCounterOffer());
+                            o.isCounterOffer(),
+                            o.isAccepted());
             }).toList();
 
             TradingLogger.logEvent(CLASS_NAME, method, "Retrieved " + offers.size() + " offers in store " + store.getName());
@@ -611,7 +614,7 @@ public class StoreService {
                                                 approvers.stream().map(UserDTO::from).toList(),
                                                 ItemDTO.fromItem(item),
                                                 offer.getPrices(), 
-                                                true));
+                                                true, offer.isAccepted()));
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error making counter offer %s: %s", offerId, ex.getMessage());
             return Response.error(ex.getMessage());
