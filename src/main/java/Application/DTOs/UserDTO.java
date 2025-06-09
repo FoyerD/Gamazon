@@ -64,4 +64,12 @@ public class UserDTO {
         return Period.between(birthDate, LocalDate.now()).getYears();
     }
 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        UserDTO other = (UserDTO) obj;
+        return id != null && id.equals(other.id);
+    }
 }

@@ -1,6 +1,8 @@
 package UI.views.components;
 
 import Application.DTOs.OfferDTO;
+import Application.DTOs.UserDTO;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
@@ -13,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class OfferLayout extends VerticalLayout {
 
@@ -57,14 +60,13 @@ public class OfferLayout extends VerticalLayout {
 
     private Div buildOfferTile(OfferDTO offer) {
         Div tile = new Div();
-        boolean offeredPriceGreater = offer.getNewPrice() > offer.getItem().getPrice();
         tile.getStyle()
             .set("width", "280px")
-            .set("min-height", "160px")
-            .set("border", "5px solid " + (offeredPriceGreater ? "rgb(133, 192, 175)" : "rgb(192, 163, 133)"))
+            .set("min-height", "180px")
+            .set("border", "5px solid " + (offer.isCounterOffer() ? "rgb(133, 192, 175)" : "rgb(192, 163, 133)"))
             .set("border-radius", "10px")
             .set("padding", "16px")
-            .set("background-color", (offeredPriceGreater ? "rgb(196, 228, 221)" : "rgb(228, 209, 196)"))
+            .set("background-color", (offer.isCounterOffer() ? "rgb(196, 228, 221)" : "rgb(228, 209, 196)"))
             .set("display", "flex")
             .set("flex-direction", "column")
             .set("justify-content", "space-between")
@@ -86,30 +88,54 @@ public class OfferLayout extends VerticalLayout {
         content.setSpacing(false);
         content.setWidthFull();
 
-        content.add(new Span("Item: " + offer.getItem().getProductName()));
+        // Member and product info
         content.add(new Span("Offered by: " + offer.getMember().getUsername()));
-        content.add(new Span("New Price: $" + offer.getNewPrice()));
+        content.add(new Span("Item: " + offer.getItem().getProductName()));
 
-        Button acceptBtn = new Button("Accept", VaadinIcon.CHECK.create(), e -> {
-            offerAccepter.accept(offer);
+        // Approvals
+        List<UserDTO> approved = offer.getEmployeesApprovedBy();
+        List<UserDTO> remaining = offer.getRemainingEmployeesToApprove();
+        int approvedCount = approved.size();
+
+        // Approval summary
+        CircularProgressBar approvalProgress = new CircularProgressBar(approvedCount, offer.getApprovers().size());
+        content.add(approvalProgress);
+
+        // List of approvers
+        if (!approved.isEmpty()) {
+            Span approvedList = new Span("✔ Approved by: " + approved.stream().map(UserDTO::getUsername).collect(Collectors.joining(", ")));
+            approvedList.getStyle().set("color", "green");
+            content.add(approvedList);
+        }
+
+        if (!remaining.isEmpty()) {
+            Span pendingList = new Span("⏳ Pending: " + remaining.stream().map(UserDTO::getUsername).collect(Collectors.joining(", ")));
+            pendingList.getStyle().set("color", "darkorange");
+            content.add(pendingList);
+        }
+
+        // Buttons
+        Button approveBtn = new Button("Approve", VaadinIcon.CHECK.create(), e -> {
+            offerAccepter.accept(offer); // Assuming still valid
             refreshOffers();
         });
 
         Button rejectBtn = new Button("Reject", VaadinIcon.CLOSE.create(), e -> {
-            offerRejecter.accept(offer);
+            offerRejecter.accept(offer); // Assuming still valid
             refreshOffers();
         });
 
-        styleButton(acceptBtn, "green");
+        styleButton(approveBtn, "green");
         styleButton(rejectBtn, "red");
 
-        HorizontalLayout actions = new HorizontalLayout(acceptBtn, rejectBtn);
+        HorizontalLayout actions = new HorizontalLayout(approveBtn, rejectBtn);
         actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
         actions.setWidthFull();
 
         tile.add(content, actions);
         return tile;
     }
+
 
     private void styleButton(Button button, String color) {
         button.getStyle()
