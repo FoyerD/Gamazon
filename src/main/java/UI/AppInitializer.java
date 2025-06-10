@@ -26,6 +26,7 @@ import Application.ShoppingService;
 import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
@@ -246,12 +247,15 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                 case "checkout" -> {
                     var resp = shoppingService.checkout(
                             sessionTokens.get(cmd.get("session").toString()),
+                            (String) cmd.get("userSSN"),
                             (String) cmd.get("cardNumber"),
                             new java.sql.Date(((Number) cmd.get("expiryDate")).longValue()),
                             (String) cmd.get("cvv"),
-                            ((Number) cmd.get("andIncrement")).longValue(),
                             (String) cmd.get("clientName"),
-                            (String) cmd.get("deliveryAddress"));
+                            (String) cmd.get("deliveryAddress"),
+                            (String) cmd.get("city"),
+                            (String) cmd.get("country"),
+                            (String) cmd.get("zip"));
                     if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "ban" -> {

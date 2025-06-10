@@ -19,10 +19,10 @@ import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.IRepoManager;
 import Domain.Pair;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Store.FeedbackDTO;
 import Infrastructure.ExternalPaymentService;
 import Infrastructure.MemoryRepoManager;
-
 
 public class CustomerServiceServiceTests {
     private CustomerServiceService customerServiceService;
@@ -42,11 +42,9 @@ public class CustomerServiceServiceTests {
 
     @Before
     public void setUp() {
-
         this.repoManager = new MemoryRepoManager();
-        this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class));
+        this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class), mock(IExternalSupplyService.class));
         this.serviceManager = new ServiceManager(facadeManager);
-        
         
         customerServiceService = serviceManager.getCustomerService();
         storeService = serviceManager.getStoreService();
@@ -58,12 +56,10 @@ public class CustomerServiceServiceTests {
         tokenId = guest.getSessionToken();
         userId = userService.register(tokenId, "testUser", "Password123!", "a@a.com").getValue().getId();
         
-        
         storeId = this.storeService.addStore(tokenId, "TheAwsomStore", "creepy ahhh store").getValue().getId();
         productId = productService.addProduct(tokenId, "Cool Product", List.of("Prod Cat"), List.of("Cat desc")).getValue().getId();
         itemId = new Pair<>(storeId, productId);
         itemService.add(tokenId, storeId, productId, 10.0, 5, "Cool Item");
-        
     }
 
     @Test
@@ -72,7 +68,6 @@ public class CustomerServiceServiceTests {
         Response<Boolean> result = customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
         assertTrue(result.getValue());
     }
-
 
     @Test
     public void GivenExistingMemberAndExistingStoreAndExistingItem_WhenSendingEmptyFeedback_ThenReturnError() {
@@ -91,14 +86,6 @@ public class CustomerServiceServiceTests {
         assertEquals(getResult.getValue().size(), 2);
     }
 
-
-
-
-
-
-
-
-
     @Test
     public void GivenExistingMemberAndExistingStoreAndExistingItemAndNonemptyFeedbacks_WhenGettingFeedbackByProduct_ThenReturnFeedbacks() {
         String feedback = "Ayo those test cases are fire";
@@ -115,7 +102,7 @@ public class CustomerServiceServiceTests {
         customerServiceService.addFeedback(tokenId, storeId, productId, feedback);
         customerServiceService.addFeedback(tokenId, storeId, productId, feedback+"2");
 
-        Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByUserId(this.tokenId, userId.toString());
+        Response<List<FeedbackDTO>> getResult = customerServiceService.getAllFeedbacksByUserId(this.tokenId, userId);
         assertEquals(getResult.getValue().size(), 2);
     }
 

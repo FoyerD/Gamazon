@@ -104,8 +104,8 @@ public interface IPurchasePresenter {
      * @param deliveryAddress the address where the purchased items will be delivered
      * @return a {@link Response} indicating whether the purchase was successfully completed
      */
-    Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress);
+    Response<Boolean> purchaseCart(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode);
     
 
     /**
@@ -135,4 +135,37 @@ public interface IPurchasePresenter {
      * @return {@link OfferDTO}
      */
     public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails);
+
+    /**
+     * Retrieves all offers of a user
+     * @param sessionToken Identifier for user
+     * @return List of {@link OfferDTO}
+     */
+    public Response<List<OfferDTO>> getAllOffersOfUser(String sessionToken);
+
+    /**
+     * Member approves a counter offer
+     * @param sessionToken Identifier for user
+     * @param offerId id of offer to approve
+     * @return approved {@link OfferDTO}
+     */
+    public Response<OfferDTO> approveCounterOffer(String sessionToken, String offerId);
+
+
+    /**
+     * Memeber rejects a counter offer
+     * @param sessionToken Identifier for user
+     * @param offerId id of offer to approve
+     * @return rejected {@link OfferDTO}
+     */
+    public Response<OfferDTO> rejectCounterOffer(String sessionToken, String offerId);
+
+    /**
+     * Member counters a counter offer from store
+     * @param sessionToken Identifier for user
+     * @param offerId id of counter offer to counter (yet again)
+     * @param newPrice new price
+     * @return counterd counter {@link OfferDTO}
+     */
+    public Response<OfferDTO> counterCounterOffer(String sessionToken, String offerId, double newPrice);
 }

@@ -138,6 +138,11 @@ public class ManagementPresenter implements IManagementPresenter {
     public Response<OfferDTO> rejectOffer(String sessionToken, String offerId) {
         return storeService.rejectOffer(sessionToken, offerId);
     }
+
+    @Override
+    public Response<OfferDTO> counterOffer(String sessionToken, String offerId, double newPrice) {
+        return storeService.counterOffer(sessionToken, offerId, newPrice);
+    }
     
 }
  

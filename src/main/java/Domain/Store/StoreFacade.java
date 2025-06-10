@@ -27,7 +27,6 @@ import Domain.Repos.IUserRepository;
 import Domain.User.User;
 
 
-
 @Component
 public class StoreFacade {
     private IStoreRepository storeRepository;
@@ -38,6 +37,8 @@ public class StoreFacade {
     private INotificationService notificationService;
     private IReceiptRepository receiptRepository;
     private IProductRepository productRepository;
+
+
 
     @Autowired
     public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, INotificationService notificationService, IReceiptRepository receiptRepository,
@@ -442,7 +443,6 @@ public class StoreFacade {
             .flatMap(item -> item.getCategories().stream())
             .collect(Collectors.toSet()).stream().toList();
     }
-
 
 
 }

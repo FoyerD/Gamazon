@@ -1,8 +1,8 @@
 package Application.DTOs;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.HashSet;
+import java.util.Map;
 
 import Domain.Shopping.ShoppingBasket;
 
@@ -41,7 +41,7 @@ public class ShoppingBasketDTO {
                     ItemDTO itemDTO = new ItemDTO(
                         basket.getStoreId(),  // storeId
                         productId,            // productId
-                        0.0,                  // price (will be updated when viewing)
+                        new ItemPriceBreakdownDTO(0, 0),                  // price (will be updated when viewing)
                         quantity,             // amount
                         "",                   // description
                         new HashSet<>(),      // categories
@@ -68,5 +68,21 @@ public class ShoppingBasketDTO {
 
     public String getStoreName(){
         return storeName;
+    }
+
+    public float getTotalPrice() {
+        float total = 0;
+        for (ItemDTO item : orders.values()) {
+            total += item.getTotalPrice();
+        }
+        return total;
+    }
+
+    public float getTotalOriginalPrice() {
+        float total = 0;
+        for (ItemDTO item : orders.values()) {
+            total += item.getTotalOriginalPrice();
+        }
+        return total;
     }
 }

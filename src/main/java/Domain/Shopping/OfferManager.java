@@ -78,7 +78,7 @@ public class OfferManager {
     }
 
     // NOTE: supply service is not used right now
-    public Offer acceptOffer(String userId, Offer offer) {
+    private Offer acceptOffer(String userId, Offer offer) {
 
         if(paymentService == null) {
             throw new RuntimeException("Payment service is not set");
@@ -125,10 +125,22 @@ public class OfferManager {
     }
 
 
-    public Offer rejectOffer(String employeeId, String offerId) {
+    private Offer rejectOffer(String userId, String offerId) {
+        return offerRepository.remove(offerId);
+    }
+
+    public Offer rejectOfferByMember(String memberId, String offerId) {
+        Offer offer = getOffer(memberId, offerId);
+        if (!memberId.equals(offer.getMemberId())) {
+            throw new IllegalArgumentException("Only the member who made the offer can accept it by this methd.");
+        }
+        return rejectOffer(memberId, offerId);
+    }
+
+    public Offer rejectOfferByEmplee(String employeeId, String offerId) {
         Offer offer = getOffer(employeeId, offerId);
         permissionManager.checkPermission(employeeId, offer.getStoreId(), PermissionType.OVERSEE_OFFERS);
-        return offerRepository.remove(offerId);
+        return rejectOffer(employeeId, offerId);
     }
 
     private Offer processPayment(Offer offer) {

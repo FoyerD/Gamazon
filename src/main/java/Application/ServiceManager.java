@@ -77,6 +77,7 @@ public class ServiceManager {
                                             facadeManager.getItemFacade(),
                                             facadeManager.getOfferManager(),
                                             facadeManager.getLoginManager(),
+                                            facadeManager.getDiscountFacade(),
                                             facadeManager.getPaymentService());
         }
         return storeService;
@@ -119,6 +120,7 @@ public class ServiceManager {
         if (shoppingService == null) {
             shoppingService = new ShoppingService(facadeManager.getShoppingCartFacade(),
                                                 getTokenService(),
+                                                getINotificationService(),
                                                 facadeManager.getStoreFacade(),
                                                 facadeManager.getPermissionManager(),
                                                 facadeManager.getLoginManager(),

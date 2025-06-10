@@ -1,5 +1,6 @@
 package Application;
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
+import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.StoreDTO;
@@ -21,7 +23,6 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Offer;
@@ -30,7 +31,11 @@ import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.User.LoginManager;
+import Domain.User.Member;
+
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -43,6 +48,11 @@ public class StoreService {
     private PermissionManager permissionManager;
     private INotificationService notificationService;
     private IShoppingCartFacade shoppingCartFacade;
+    // private final DiscountBuilder discountBuilder;
+    // private final ConditionBuilder conditionBuilder;
+
+    private DiscountFacade discountFacade;
+
     private final ItemFacade itemFacade;
     private final OfferManager offerManager;
     private final LoginManager loginManager;
@@ -54,6 +64,9 @@ public class StoreService {
         this.permissionManager = null;
         this.notificationService = null;
         this.shoppingCartFacade = null;
+        this.discountFacade = null;
+        // this.discountBuilder = null;
+        // this.conditionBuilder = null;
         this.externalPaymentService = null;
         this.loginManager = null;
         this.offerManager = null;
@@ -61,15 +74,12 @@ public class StoreService {
     }
 
     @Autowired
-    public StoreService(StoreFacade storeFacade, 
-                        TokenService tokenService, 
-                        PermissionManager permissionManager, 
-                        INotificationService notificationService, 
-                        IShoppingCartFacade shoppingCartFacade, 
-                        ItemFacade itemFacade, 
-                        OfferManager offerManager, 
-                        LoginManager loginManager, 
-                        IExternalPaymentService externalPaymentService) {
+    public StoreService(StoreFacade storeFacade, TokenService tokenService, PermissionManager permissionManager, 
+                       INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, ItemFacade itemFacade, 
+                       OfferManager offerManager, 
+                       LoginManager loginManager, DiscountFacade discountFacade,
+                       IExternalPaymentService externalPaymentService) {
+
         this.externalPaymentService = externalPaymentService;
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
@@ -79,6 +89,8 @@ public class StoreService {
         this.loginManager = loginManager;
         this.itemFacade = itemFacade;
         this.shoppingCartFacade = shoppingCartFacade;
+        this.discountFacade = discountFacade;
+        
         TradingLogger.logEvent(CLASS_NAME, "Constructor", "StoreService initialized with dependencies");
     }
 
@@ -390,34 +402,24 @@ public class StoreService {
             }
 
             Offer offer = offerManager.acceptOfferByEmployee(userId, offerId);
+            OfferDTO offerDTO = convertOfferToDTO(offer);
+            String storeName = storeFacade.getStoreName(offerDTO.getItem().getStoreId());
 
-            UserDTO member = UserDTO.from(loginManager.getMember(offer.getMemberId()));
-            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
-            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
-            approvers.add(member);
-            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
-            String productName = item.getProductName();
-            String storeName = storeFacade.getStoreName(offer.getStoreId());
+            String employeeName = loginManager.getUser(userId).getName();
             if(offer.isAccepted()){
-                approvers.stream().forEach(m -> {
-                    String message = String.format(
-                        "The offer for product '%s' in store '%s' by member '%s' has been accepted and processed successfully. A unit has been deducted from inventory.",
-                        productName,
-                        storeName,
-                        member.getUsername()
-                    );
-                    notificationService.sendNotification(m.getId(), message);
-                });
+
+                String message = 
+                        "🎉 Your offer to " + storeName + " been accepted!\n" + 
+                        "💳 You’ve been successfully billed $" + offerDTO.getLastPrice() + " for your purchase.\n" + //
+                        "🛍️ Get ready to enjoy your new " + offerDTO.getItem().getProductName() + "!";
+                notificationService.sendNotification(offerDTO.getMember().getId(), message);
+                            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + offerDTO.getItem().getProductName() + " in store " + storeName + " was accepted by " + employeeName);
             }
-            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
-            return Response.success(new OfferDTO(offerId, 
-                                                member, 
-                                                approvedBy,
-                                                approvers,
-                                                ItemDTO.fromItem(item),
-                                                offer.getPrices(), 
-                                                offer.isCounterOffer(),
-                                                offer.isAccepted()));
+            else {
+                TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + offerDTO.getItem().getProductName() + " in store " + storeName + " was approved by " + employeeName);
+            }
+            
+            return Response.success(offerDTO);
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error accepting offer %s: %s", offerId, ex.getMessage());
@@ -450,26 +452,17 @@ public class StoreService {
                 throw new Exception("User is banned from rejecting offers.");
             }
 
-            Offer offer = offerManager.rejectOffer(userId, offerId);
+            Offer offer = offerManager.rejectOfferByEmplee(userId, offerId);
+            OfferDTO offerDTO = convertOfferToDTO(offer);
+            String storeName = storeFacade.getStoreName(offerDTO.getItem().getStoreId());
 
-            UserDTO member = UserDTO.from(loginManager.getMember(offer.getMemberId()));
-            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
-            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
-            approvers.add(member);
-            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
-            String productName = item.getProductName();
-            String storeName = storeFacade.getStoreName(offer.getStoreId());
-            notificationService.sendNotification(offer.getMemberId(), "Offer on " + productName + " for " + offer.getLastPrice() + " was rejected! womp womp :(");
 
-            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
-            return Response.success(new OfferDTO(offerId, 
-                                                member, 
-                                                approvedBy,
-                                                approvers,
-                                                ItemDTO.fromItem(item),
-                                                offer.getPrices(), 
-                                                offer.isCounterOffer(),
-                                                offer.isAccepted()));
+            String message = "❌ Your offer to " + storeName + " has been rejected. womp womp :(";
+            notificationService.sendNotification(offerDTO.getMember().getId(), message);
+
+            String employeeName = loginManager.getUser(userId).getName();
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + offerDTO.getItem().getProductName() + " in store " + storeName + " was rejected by " + employeeName);
+            return Response.success(offerDTO);
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error rejecting offer %s: %s", offerId, ex.getMessage());
@@ -478,6 +471,15 @@ public class StoreService {
     }
 
 
+    private OfferDTO convertOfferToDTO(Offer counteredOffer) {
+        UserDTO member = new UserDTO(loginManager.getLoggedInMember(counteredOffer.getMemberId()));
+        ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(counteredOffer.getStoreId(), counteredOffer.getProductId()));
+        Set<UserDTO> approvedBy = counteredOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+        Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(counteredOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
+        approvers.add(member); // Add the member who made the counter offer to the approvers list
+        return new OfferDTO(counteredOffer.getId(), member, approvedBy, approvers, item, counteredOffer.getPrices(), counteredOffer.isCounterOffer(), counteredOffer.isAccepted());
+    }
+
     /**
      * Gets all users who have shopping baskets in a specific store.
      * 
@@ -485,20 +487,120 @@ public class StoreService {
      * @return A set of user IDs who have baskets in the store
      */
     @Transactional
-    public Set<String> getUsersWithBaskets(String storeId) {
+    public Set<String> getUsersWithBaskets(String sessionToken, String storeId) {
         String method = "getUsersWithBaskets";
         try {
             if(!this.isInitialized()) {
                 TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
                 throw new RuntimeException("StoreService is not initialized.");
             }
-            
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                throw new RuntimeException("Invalid token.");
+            }
+
             return shoppingCartFacade.getUsersWithBaskets(storeId);
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error getting users with baskets for store %s: %s", storeId, ex.getMessage());
             return new HashSet<>(); // Return empty set in case of error
         }
     }
+
+    public Response<List<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeID) {
+        String method = "getStoreDiscounts";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            // Check if store exists
+            Store store = this.storeFacade.getStore(storeID);
+            if (store == null) {
+                TradingLogger.logError(CLASS_NAME, method, "Store not found with id %s", storeID);
+                return new Response<>(new Error("Store not found."));
+            }
+
+            List<Discount> discounts = this.discountFacade.getStoreDiscounts(storeID);
+            
+            List<DiscountDTO> output = new ArrayList<>();
+
+            for (Discount discount : discounts) {
+                DiscountDTO dto = DiscountDTO.fromDiscount(discount);
+                output.add(dto);
+            }
+
+            return new Response<>(output);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error getting discounts for store %s: %s", storeID, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+    
+
+    public Response<DiscountDTO> addDiscount(String sessionToken, String storeId, DiscountDTO discountDTO) {
+        String method = "addDiscount";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = this.tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from adding discounts.");
+            }
+            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+
+            Discount discount = discountFacade.addDiscount(storeId, discountDTO);
+            TradingLogger.logEvent(CLASS_NAME, method, "Discount added to store " + storeId + ": " + discount.getId());
+            return new Response<>(DiscountDTO.fromDiscount(discount));
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error adding discount to store %s: %s", storeId, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
+
+    public Response<Boolean> removeDiscount(String sessionToken, String storeId, String discountId) {
+        String method = "removeDiscount";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return new Response<>(new Error("StoreService is not initialized."));
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return new Response<>(new Error("Invalid token"));
+            }
+
+            String userId = this.tokenService.extractId(sessionToken);
+            if (permissionManager.isBanned(userId)) {
+                throw new Exception("User is banned from removing discounts.");
+            }
+            permissionManager.checkPermission(userId, storeId, PermissionType.EDIT_STORE_POLICIES);
+
+            boolean result = discountFacade.removeDiscount(storeId, discountId);
+            TradingLogger.logEvent(CLASS_NAME, method, "Discount " + discountId + " removed from store " + storeId);
+            return new Response<>(result);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error removing discount %s from store %s: %s", discountId, storeId, ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
+
 
     public Response<StoreDTO> getStoreById(String sessionToken, String storeId) {
         String method = "getStoreById";

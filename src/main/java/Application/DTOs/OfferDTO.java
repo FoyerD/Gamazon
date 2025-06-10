@@ -44,6 +44,7 @@ public class OfferDTO {
     public boolean isCounterOffer() { return counterOffer; }
 
     public boolean hasMemberApproved() { return approvedBy.stream().anyMatch(u -> u.getId().equals(member.getId())); }
+    
     public List<Pair<String, Double>> getUsernamesPrice() {
         return offeredPrices.stream().map(p -> {
             String user = approvers.stream().filter(u -> u.getId().equals(p.getFirst())).map(UserDTO::getUsername).findAny().orElse("Unknown");
@@ -51,4 +52,8 @@ public class OfferDTO {
         }).toList();
 
     }
+
+    public boolean hasUserApproved(String userId) {
+        return this.approvedBy.stream().anyMatch(u -> u.getId().equals(userId));
+    } 
 }

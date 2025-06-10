@@ -63,9 +63,10 @@ public class PurchasePresenter implements IPurchasePresenter {
     }
 
     @Override
-    public Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress) {
-        return this.shoppingService.checkout(sessionToken, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+    public Response<Boolean> purchaseCart(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode) {
+        return this.shoppingService.checkout(sessionToken, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, 
+                                             city, country, zipCode);
     }
 
     @Override
@@ -81,6 +82,26 @@ public class PurchasePresenter implements IPurchasePresenter {
     @Override
     public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails) {
         return this.shoppingService.makeOffer(sessionToken, storeId, productId, newPrice, paymentDetails);
+    }
+
+    @Override
+    public Response<List<OfferDTO>> getAllOffersOfUser(String sessionToken) {
+        return this.shoppingService.getAllOffersOfUser(sessionToken);
+    }
+
+    @Override
+    public Response<OfferDTO> approveCounterOffer(String sessionToken, String offerId) {
+        return this.shoppingService.acceptOffer(sessionToken, offerId);
+    }
+
+    @Override
+    public Response<OfferDTO> rejectCounterOffer(String sessionToken, String offerId) {
+        return Response.error("Unimplemented in shopping service");
+    }
+
+    @Override
+    public Response<OfferDTO> counterCounterOffer(String sessionToken, String offerId, double newPrice) {
+        return this.shoppingService.counterOffer(sessionToken, offerId, newPrice);
     }
     
 }
