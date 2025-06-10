@@ -46,7 +46,7 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
 
-    private final Div contentArea = new Div(); // dynamic content container
+    private final VerticalLayout contentArea = new VerticalLayout(); // dynamic content container
     private final OfferLayout offersLayout;
 
     public UserProfileView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter,
@@ -113,6 +113,8 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
                 } 
                 return storeResponse.getValue().getName();
             });
+
+            contentArea.setSizeFull();
     }
 
     private void showCounterOffer(OfferDTO offer) {
@@ -262,6 +264,7 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
         Grid<ReceiptDTO> receiptGrid = new Grid<>(ReceiptDTO.class, false);
         setupReceiptGrid(receiptGrid, purchasePresenter);
 
+        
         receiptGrid.getStyle()
                 .set("margin", "2rem auto 0 auto")
                 .set("background-color", "#fff")
