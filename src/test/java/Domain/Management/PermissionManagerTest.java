@@ -1,4 +1,4 @@
-package Domain.Management;
+package Domain.management;
 
 import Domain.Repos.IPermissionRepository;
 

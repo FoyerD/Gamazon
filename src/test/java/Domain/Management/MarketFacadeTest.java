@@ -1,4 +1,4 @@
-package Domain.Management;
+package Domain.management;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
