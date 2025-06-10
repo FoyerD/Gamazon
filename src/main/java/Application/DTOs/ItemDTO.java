@@ -24,7 +24,7 @@ public class ItemDTO {
         this.categories = categories;
         this.productName = productName;
         this.rating = rating;
-        this.priceBreakDown = null; // Only needed for discounts when viewing the cart
+        this.priceBreakDown = priceBreakdown; // Only needed for discounts when viewing the cart
     }
 
     // Factory method
