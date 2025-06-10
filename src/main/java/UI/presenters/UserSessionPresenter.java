@@ -18,7 +18,7 @@ public class UserSessionPresenter implements IUserSessionPresenter {
 
     @Override
     public String extractUserIdFromToken(String sessionToken) {
-        return tokenService.extractId(sessionToken); // your real method
+        return tokenService.extractId(sessionToken);
     }
 
     @Override

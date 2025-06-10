@@ -53,6 +53,7 @@ import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
+import Domain.Pair;
 import Domain.management.PermissionType;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
@@ -201,6 +202,12 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 }
                 return offersResponse.getValue();
             },
+            () -> {
+                if (sessionToken != null) {
+                    return sessionPresenter.extractUserIdFromToken(sessionToken);
+                }
+                return null;
+            },
             o -> {
                 Response<OfferDTO> acceptResponse = managementPresenter.acceptOffer(sessionToken, o.getId());
                 if (acceptResponse.errorOccurred()) {
@@ -216,7 +223,8 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 } else {
                     Notification.show("Offer rejected successfully!", 3000,  Notification.Position.BOTTOM_END);
                 }
-            }
+            },
+            this::showCounterOffer
         );
 
         // Tab change listener
@@ -621,6 +629,57 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         mainContent.add(offersLayout);
         offersLayout.refreshOffers();
     }
+
+    private void showCounterOffer(OfferDTO offer) {
+        Dialog counterOfferDialog = new Dialog();
+        counterOfferDialog.setHeaderTitle("Submit Counter Offer");
+
+        NumberField newPriceField = new NumberField("New Price");
+        newPriceField.setPlaceholder("Enter new price");
+        newPriceField.setWidthFull();
+        newPriceField.setMin(0.01);
+        newPriceField.setStep(0.01);
+
+        VerticalLayout historyLayout = new VerticalLayout();
+        historyLayout.setSpacing(false);
+        historyLayout.setPadding(false);
+
+        List<Pair<String, Double>> prices = offer.getUsernamesPrice();
+        for (int i = 0; i < prices.size(); i++) {
+            Pair<String, Double> p = prices.get(i);
+            Span entry = new Span(p.getFirst() + ": $" + p.getSecond());
+            if (i == prices.size() - 1) {
+                entry.getStyle().set("font-weight", "bold");
+            } else {
+                entry.getStyle().set("color", "gray");
+            }
+            historyLayout.add(entry);
+        }
+        Button submitBtn = new Button("Submit", event -> {
+            Double price = newPriceField.getValue();
+            if (price != null && price > 0) {
+                Response<OfferDTO> counterResponse = managementPresenter.counterOffer(sessionToken, offer.getId(), price);
+                if (counterResponse.errorOccurred()) {
+                    Notification.show("Failed to counter offer: " + counterResponse.getErrorMessage(), 5000, Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Offer countered successfully!", 3000, Notification.Position.BOTTOM_END);
+                }
+                counterOfferDialog.close();
+            }
+        });
+
+        Button cancelBtn = new Button("Cancel", event -> counterOfferDialog.close());
+
+        HorizontalLayout buttons = new HorizontalLayout(submitBtn, cancelBtn);
+        VerticalLayout dialogLayout = new VerticalLayout(newPriceField, buttons);
+        dialogLayout.setSpacing(true);
+        dialogLayout.setPadding(false);
+
+        counterOfferDialog.add(dialogLayout);
+        counterOfferDialog.open();
+
+    }
+
     private void showHistoryView() {
         mainContent.removeAll();
         

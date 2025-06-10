@@ -51,4 +51,8 @@ public class OfferDTO {
         }).toList();
 
     }
+
+    public boolean hasUserApproved(String userId) {
+        return this.approvedBy.stream().anyMatch(u -> u.getId().equals(userId));
+    } 
 }
