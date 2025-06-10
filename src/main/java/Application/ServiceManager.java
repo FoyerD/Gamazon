@@ -119,6 +119,7 @@ public class ServiceManager {
         if (shoppingService == null) {
             shoppingService = new ShoppingService(facadeManager.getShoppingCartFacade(),
                                                 getTokenService(),
+                                                getINotificationService(),
                                                 facadeManager.getStoreFacade(),
                                                 facadeManager.getPermissionManager(),
                                                 facadeManager.getLoginManager(),

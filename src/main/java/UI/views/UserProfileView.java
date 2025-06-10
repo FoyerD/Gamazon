@@ -202,31 +202,8 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
             "});"
         );
 
-        // Tabs
-        Tab historyTab = new Tab("Purchase History");
-        Tab offersTab = new Tab("Offers");
-
-        Tabs tabs = new Tabs(historyTab, offersTab);
-        tabs.setSelectedTab(historyTab);
-
-        tabs.addSelectedChangeListener(e -> {
-            contentArea.removeAll();
-            if (e.getSelectedTab().equals(historyTab)) {
-                showHistory();
-            } else if (e.getSelectedTab().equals(offersTab)) {
-                showOffers();
-            }
-        });
-
-        add(header, tabs, contentArea);
-        showHistory(); // default
-    }
-
-    private void showHistory() {
-        contentArea.removeAll();
-
-        Div card = new Div();
-        card.getStyle()
+        Div personalInfo = new Div();
+        personalInfo.getStyle()
             .set("background-color", "#fff")
             .set("border-radius", "10px")
             .set("box-shadow", "0 4px 8px rgba(0,0,0,0.10)")
@@ -235,7 +212,7 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
             .set("max-width", "400px")
             .set("transition", "transform 0.2s, box-shadow 0.2s");
 
-        card.getElement().executeJs(
+        personalInfo.getElement().executeJs(
             "this.addEventListener('mouseenter', () => {" +
             "  this.style.boxShadow = '0 8px 16px rgba(0,0,0,0.1)';" +
             "  this.style.transform = 'scale(1.02)';" +
@@ -257,8 +234,30 @@ public class UserProfileView extends BaseView implements BeforeEnterObserver {
                 .set("color", "#222")
                 .set("font-size", "1.1rem"));
 
-        card.add(email, age);
-        contentArea.add(card);
+        personalInfo.add(email, age);
+
+        // Tabs
+        Tab historyTab = new Tab("Purchase History");
+        Tab offersTab = new Tab("Offers");
+
+        Tabs tabs = new Tabs(historyTab, offersTab);
+        tabs.setSelectedTab(historyTab);
+
+        tabs.addSelectedChangeListener(e -> {
+            contentArea.removeAll();
+            if (e.getSelectedTab().equals(historyTab)) {
+                showHistory();
+            } else if (e.getSelectedTab().equals(offersTab)) {
+                showOffers();
+            }
+        });
+
+        add(header, personalInfo, tabs, contentArea);
+        showHistory(); // default
+    }
+
+    private void showHistory() {
+        contentArea.removeAll();
 
         Grid<ReceiptDTO> receiptGrid = new Grid<>(ReceiptDTO.class, false);
         setupReceiptGrid(receiptGrid, purchasePresenter);

@@ -24,6 +24,7 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.Pair;
+import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Offer;
 import Domain.Shopping.OfferManager;
@@ -33,7 +34,6 @@ import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
 import Domain.User.LoginManager;
-import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -43,6 +43,7 @@ public class ShoppingService{
     private static final String CLASS_NAME = ShoppingService.class.getSimpleName();
     private final IShoppingCartFacade cartFacade;
     private final TokenService tokenService;
+    private final INotificationService notificationService;
     private final LoginManager loginManager;
     private final StoreFacade storeFacade;
     private final PermissionManager permissionManager;
@@ -51,7 +52,8 @@ public class ShoppingService{
 
     @Autowired
     public ShoppingService(IShoppingCartFacade cartFacade, 
-                            TokenService tokenService, 
+                            TokenService tokenService,
+                            INotificationService notificationService, 
                             StoreFacade storeFacade, 
                             PermissionManager permissionManager, 
                             LoginManager loginManager,
@@ -59,6 +61,7 @@ public class ShoppingService{
                             ItemFacade itemFacade) {
         this.cartFacade = cartFacade;
         this.tokenService = tokenService;
+        this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.permissionManager = permissionManager;
         this.loginManager = loginManager;
@@ -395,18 +398,15 @@ public class ShoppingService{
         String clientId = this.tokenService.extractId(sessionToken);
 
         try {
-            UserDTO member = new UserDTO(loginManager.getLoggedInMember(clientId));
-            ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(storeId, productId));
+            UserDTO member = new UserDTO(loginManager.getLoggedInMember(clientId)); // assure real member exists
+            ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(storeId, productId)); // assure real item exists
 
             
             Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
-          
-            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
-            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
-            approvers.add(member); // Add the member who made the offer to the approvers list
-            
-            OfferDTO offerDTO = new OfferDTO(offer.getId(), member, approvedBy, approvers, item, offer.getPrices(), offer.isCounterOffer(), offer.isAccepted());
-
+            OfferDTO offerDTO = convertOfferToDTO(offer);
+            offerDTO.getEmployeeApprovers().stream().forEach(e -> {
+                notificationService.sendNotification(e.getId(), "🔔 You've received a new offer from " + offerDTO.getMember().getUsername() + " for a " + offerDTO.getItem().getProductName() + " in store " + storeFacade.getStoreName(storeId) + "!");
+            });
             TradingLogger.logEvent(CLASS_NAME, method, "Offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
             return Response.success(offerDTO);
         } catch (Exception ex) {
@@ -435,17 +435,34 @@ public class ShoppingService{
         try {
             Offer acceptedOffer = offerManager.acceptOfferByMember(userId, offerId);
             
-            UserDTO member = new UserDTO(loginManager.getLoggedInMember(userId));
-            ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(acceptedOffer.getStoreId(), acceptedOffer.getProductId()));
-            Set<UserDTO> approvedBy = acceptedOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
-            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(acceptedOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
-            approvers.add(member); // Add the member who accepted the offer to the approvers list
-            OfferDTO offerDTO = new OfferDTO(acceptedOffer.getId(), member, approvedBy, approvers, item, acceptedOffer.getPrices(), acceptedOffer.isCounterOffer(), acceptedOffer.isAccepted());
-
+            OfferDTO offerDTO = convertOfferToDTO(acceptedOffer);
             TradingLogger.logEvent(CLASS_NAME, method, "Offer accepted by " + userId + ": " + offerId);
             return Response.success(offerDTO);
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error accepting offer: %s", ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
+    }
+
+
+    @Transactional
+    public Response<OfferDTO> rejectCounterOffer(String sessionToken, String offerId) {
+        String method = "rejectCounterOffer";
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+            return Response.error("Invalid token");
+        }
+
+        String userId = this.tokenService.extractId(sessionToken);
+
+        try {
+            Offer rejectedOffer = offerManager.rejectOfferByMember(userId, offerId);
+
+            OfferDTO offerDTO = convertOfferToDTO(rejectedOffer);
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer rejected by " + offerDTO.getMember().getUsername() + ": " + offerId);
+            return Response.success(offerDTO);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error rejecting offer: %s", ex.getMessage());
             return Response.error(ex.getMessage());
         }
     }
@@ -513,19 +530,26 @@ public class ShoppingService{
         try {
 
             Offer counteredOffer = offerManager.counterOfferByMember(userId, offerId, newPrice);
-            UserDTO member = new UserDTO(loginManager.getLoggedInMember(userId));
-            ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(counteredOffer.getStoreId(), counteredOffer.getProductId()));
-            Set<UserDTO> approvedBy = counteredOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
-            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(counteredOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
-            approvers.add(member); // Add the member who made the counter offer to the approvers list
-            OfferDTO offerDTO = new OfferDTO(counteredOffer.getId(), member, approvedBy, approvers, item, counteredOffer.getPrices(), false, counteredOffer.isAccepted());
+            OfferDTO offerDTO = convertOfferToDTO(counteredOffer);
+            offerDTO.getEmployeeApprovers().stream().forEach(e -> {
+                notificationService.sendNotification(e.getId(), "🔔 You've received a new counter offer from " + offerDTO.getMember().getUsername() + " for a " + offerDTO.getItem().getProductName() + " in store " + storeFacade.getStoreName(offerDTO.getItem().getStoreId()) + "!");
+            });
 
-            TradingLogger.logEvent(CLASS_NAME, method, "Counter offer made by " + member.getUsername() + " on " + item.getProductName() + " for " + newPrice + "$");
+            TradingLogger.logEvent(CLASS_NAME, method, "Counter offer made by " + offerDTO.getMember().getUsername() + " on " + offerDTO.getItem().getProductName() + " for " + newPrice + "$");
             return Response.success(offerDTO);
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error making counter offer: %s", ex.getMessage());
             return Response.error(ex.getMessage());
         }
 
+    }
+
+    private OfferDTO convertOfferToDTO(Offer offer) {
+        UserDTO member = new UserDTO(loginManager.getLoggedInMember(offer.getMemberId()));
+        ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(offer.getStoreId(), offer.getProductId()));
+        Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+        Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
+        approvers.add(member); // Add the member who made the counter offer to the approvers list
+        return new OfferDTO(offer.getId(), member, approvedBy, approvers, item, offer.getPrices(), offer.isCounterOffer(), offer.isAccepted());
     }
 }

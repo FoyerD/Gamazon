@@ -390,34 +390,24 @@ public class StoreService {
             }
 
             Offer offer = offerManager.acceptOfferByEmployee(userId, offerId);
+            OfferDTO offerDTO = convertOfferToDTO(offer);
+            String storeName = storeFacade.getStoreName(offerDTO.getItem().getStoreId());
 
-            UserDTO member = UserDTO.from(loginManager.getMember(offer.getMemberId()));
-            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
-            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
-            approvers.add(member);
-            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
-            String productName = item.getProductName();
-            String storeName = storeFacade.getStoreName(offer.getStoreId());
+            String employeeName = loginManager.getUser(userId).getName();
             if(offer.isAccepted()){
-                approvers.stream().forEach(m -> {
-                    String message = String.format(
-                        "The offer for product '%s' in store '%s' by member '%s' has been accepted and processed successfully. A unit has been deducted from inventory.",
-                        productName,
-                        storeName,
-                        member.getUsername()
-                    );
-                    notificationService.sendNotification(m.getId(), message);
-                });
+
+                String message = 
+                        "🎉 Your offer to " + storeName + " been accepted!\n" + 
+                        "💳 You’ve been successfully billed $" + offerDTO.getLastPrice() + " for your purchase.\n" + //
+                        "🛍️ Get ready to enjoy your new " + offerDTO.getItem().getProductName() + "!";
+                notificationService.sendNotification(offerDTO.getMember().getId(), message);
+                            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + offerDTO.getItem().getProductName() + " in store " + storeName + " was accepted by " + employeeName);
             }
-            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
-            return Response.success(new OfferDTO(offerId, 
-                                                member, 
-                                                approvedBy,
-                                                approvers,
-                                                ItemDTO.fromItem(item),
-                                                offer.getPrices(), 
-                                                offer.isCounterOffer(),
-                                                offer.isAccepted()));
+            else {
+                TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + offerDTO.getItem().getProductName() + " in store " + storeName + " was approved by " + employeeName);
+            }
+            
+            return Response.success(offerDTO);
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error accepting offer %s: %s", offerId, ex.getMessage());
@@ -450,26 +440,17 @@ public class StoreService {
                 throw new Exception("User is banned from rejecting offers.");
             }
 
-            Offer offer = offerManager.rejectOffer(userId, offerId);
+            Offer offer = offerManager.rejectOfferByEmplee(userId, offerId);
+            OfferDTO offerDTO = convertOfferToDTO(offer);
+            String storeName = storeFacade.getStoreName(offerDTO.getItem().getStoreId());
 
-            UserDTO member = UserDTO.from(loginManager.getMember(offer.getMemberId()));
-            Set<UserDTO> approvedBy = offer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
-            Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(offer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
-            approvers.add(member);
-            Item item = itemFacade.getItem(offer.getStoreId(), offer.getProductId());
-            String productName = item.getProductName();
-            String storeName = storeFacade.getStoreName(offer.getStoreId());
-            notificationService.sendNotification(offer.getMemberId(), "Offer on " + productName + " for " + offer.getLastPrice() + " was rejected! womp womp :(");
 
-            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + productName + " in store " + storeName);
-            return Response.success(new OfferDTO(offerId, 
-                                                member, 
-                                                approvedBy,
-                                                approvers,
-                                                ItemDTO.fromItem(item),
-                                                offer.getPrices(), 
-                                                offer.isCounterOffer(),
-                                                offer.isAccepted()));
+            String message = "❌ Your offer to " + storeName + " has been rejected. womp womp :(";
+            notificationService.sendNotification(offerDTO.getMember().getId(), message);
+
+            String employeeName = loginManager.getUser(userId).getName();
+            TradingLogger.logEvent(CLASS_NAME, method, "Offer " + offerId + " on product " + offerDTO.getItem().getProductName() + " in store " + storeName + " was rejected by " + employeeName);
+            return Response.success(offerDTO);
 
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error rejecting offer %s: %s", offerId, ex.getMessage());
@@ -477,6 +458,15 @@ public class StoreService {
         }
     }
 
+
+    private OfferDTO convertOfferToDTO(Offer counteredOffer) {
+        UserDTO member = new UserDTO(loginManager.getLoggedInMember(counteredOffer.getMemberId()));
+        ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(counteredOffer.getStoreId(), counteredOffer.getProductId()));
+        Set<UserDTO> approvedBy = counteredOffer.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
+        Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(counteredOffer.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
+        approvers.add(member); // Add the member who made the counter offer to the approvers list
+        return new OfferDTO(counteredOffer.getId(), member, approvedBy, approvers, item, counteredOffer.getPrices(), counteredOffer.isCounterOffer(), counteredOffer.isAccepted());
+    }
 
     /**
      * Gets all users who have shopping baskets in a specific store.
