@@ -1,6 +1,6 @@
 package StoreTests;
 
-import java.security.Permission;
+
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -75,7 +75,7 @@ public class StoreServiceTests {
         when(mockPaymentService.updatePaymentServiceURL(anyString())).thenReturn(new Response<>());
         
         // Initialize facade manager
-        FacadeManager facadeManager = new FacadeManager(repositoryManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
+        FacadeManager facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mock(IExternalSupplyService.class));
 
         // Initialize service manager and store as a field for use across tests
         this.serviceManager = new ServiceManager(facadeManager);
