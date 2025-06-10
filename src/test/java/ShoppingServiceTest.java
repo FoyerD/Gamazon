@@ -648,6 +648,73 @@ public class ShoppingServiceTest {
     }
 
     @Test
+    public void testCheckout_ShippingServiceReturnsFailure() {
+        // First add a product to the cart
+        Response<Boolean> addToCartResponse = shoppingService.addProductToCart(store_id, clientToken, product_id, 1);
+        assertFalse("Adding to cart should succeed", addToCartResponse.errorOccurred());
+        
+        // Check the current cart state to verify the item is there
+        Response<CartDTO> cartResponse = shoppingService.viewCart(clientToken);
+        assertFalse("Viewing cart should succeed", cartResponse.errorOccurred());
+        
+        CartDTO cart = cartResponse.getValue();
+        assertTrue("Cart should contain the store", cart.getBaskets().containsKey(store_id));
+        
+        ShoppingBasketDTO basket = cart.getBaskets().get(store_id);
+        assertTrue("Basket should contain the product", basket.getOrders().containsKey(product_id));
+        
+        ItemDTO itemInCart = basket.getOrders().get(product_id);
+        int initialQuantityInCart = itemInCart.getAmount();
+        assertEquals("Cart should have 1 item", 1, initialQuantityInCart);
+        
+        // Create a distinctive error message for easy identification
+        final String DISTINCTIVE_ERROR_MESSAGE = "XYZ_TEST_SHIPPING_DECLINED_123";
+        
+        when(this.mockSupplyService.supplyOrder(any(), any(), any(), any(), any())).thenReturn(new Response<>(new Error(DISTINCTIVE_ERROR_MESSAGE)));
+        
+        // Create a facade manager that uses our bad payment service
+        FacadeManager testFacadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
+        ServiceManager testServiceManager = new ServiceManager(testFacadeManager);
+        ShoppingService testShoppingService = testServiceManager.getShoppingService();
+        
+        // Prepare checkout parameters
+        String cardNumber = "1234567890123456";
+        Date expiryDate = new Date();
+        String cvv = "123";
+        String clientName = "John Doe";
+        String deliveryAddress = "123 Main St";
+        String userSSN = "123-45-6789";
+        String city = "Test City";
+        String country = "Test Country";
+        String zip = "12345";
+        
+        Response<Boolean> response = testShoppingService.checkout(
+            clientToken, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zip
+        );
+        
+        assertTrue("Checkout should fail with shipping service error", response.errorOccurred());
+        assertNull("Value should be null on failure", response.getValue());
+        assertNotNull("Error message should not be null", response.getErrorMessage());
+        
+        // Verify that the item is still in the cart (checkout didn't succeed)
+        Response<CartDTO> finalCartResponse = shoppingService.viewCart(clientToken);
+        assertFalse("Final cart view should succeed", finalCartResponse.errorOccurred());
+        
+        CartDTO finalCart = finalCartResponse.getValue();
+        assertTrue("Cart should still contain the store", finalCart.getBaskets().containsKey(store_id));
+        
+        ShoppingBasketDTO finalBasket = finalCart.getBaskets().get(store_id);
+        assertTrue("Basket should still contain the product", finalBasket.getOrders().containsKey(product_id));
+        
+        ItemDTO finalItemInCart = finalBasket.getOrders().get(product_id);
+        assertEquals("Item quantity in cart should be unchanged after failed checkout", 
+            initialQuantityInCart, finalItemInCart.getAmount());
+        
+        checkInventoryInvariants();
+        checkCartInvariants();
+    }
+
+    @Test
     public void testViewCart_ReturnCorrectFinalPrice() {
         // Add product to cart
         Response<Boolean> addToCartResponse = shoppingService.addProductToCart(store_id, clientToken, product_id, 2);
