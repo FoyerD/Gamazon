@@ -2,6 +2,7 @@ package UI;
 
 import java.io.InputStream;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import Application.DTOs.PaymentDetailsDTO;
+import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.MarketService;
 import Application.ProductService;
@@ -269,6 +272,56 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             sessionTokens.get(cmd.get("session").toString()),
                             tokenService.extractId(sessionTokens.get(cmd.get("target").toString())));
                     if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
+                }
+                case "makeOffer" -> {
+                    var resp = shoppingService.makeOffer(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            values.get(cmd.get("store").toString()),
+                            values.get(cmd.get("product").toString()),
+                            ((Number) cmd.get("price")).doubleValue(),
+                    new PaymentDetailsDTO(
+                            (String) cmd.get("Id"),
+                            (String) cmd.get("cardNumber"),
+                            LocalDate.of(
+                                ((Number) cmd.get("expiryDate/year")).intValue(),
+                                ((Number) cmd.get("expiryDate/month")).intValue(),
+                                ((Number) cmd.get("expiryDate/day")).intValue()
+                            ),
+                            (String) cmd.get("cvv"),
+                            (String) cmd.get("holder"))
+                    );
+                    if (!resp.errorOccurred())
+                        values.put((String) cmd.get("as"), resp.getValue().getId());
+                    else    
+                        throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());
+                }
+                case "acceptOfferByMember" -> {
+                    var resp = shoppingService.acceptOffer(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            values.get(cmd.get("offerId").toString()));
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());
+                }
+                case "acceptOfferByEmployee" -> {
+                    var resp = storeService.acceptOffer(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            values.get(cmd.get("offerId").toString()));
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());
+                }
+                case "counterOfferByMember" -> {
+                    var resp = shoppingService.counterOffer(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            values.get(cmd.get("offerId").toString()),
+                            ((Number) cmd.get("price")).doubleValue()
+                    );
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());
+                }
+                case "counterOfferByEmployee" -> {
+                    var resp = storeService.counterOffer(
+                            sessionTokens.get(cmd.get("session").toString()),
+                            values.get(cmd.get("offerId").toString()),
+                            ((Number) cmd.get("price")).doubleValue()
+                    );
+                    if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());
                 }
                 default -> System.err.println("⚠ Unknown command: " + action);
             }

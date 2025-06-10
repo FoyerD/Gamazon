@@ -203,18 +203,27 @@ public interface IManagementPresenter {
      * Accept an offer from a user
      * 
      * @param sessionToken Session identifier for authentication.
-     * @param offerId ID of the offer to be accepted
-     * @return Response with the accepted {@link OfferDTO}, or error.
+     * @param offerId ID of the offer to be approved
+     * @return Response with the approved {@link OfferDTO}, or error.
      */
     public Response<OfferDTO> acceptOffer(String sessionToken, String offerId);
 
-        /**
+    /**
      * Accept an offer from a user
      * 
      * @param sessionToken Session identifier for authentication.
-     * @param offerId ID of the offer to be accepted
-     * @return Response with the accepted {@link OfferDTO}, or error.
+     * @param offerId ID of the offer to be rejected
+     * @return Response with the rejected {@link OfferDTO}, or error.
      */
     public Response<OfferDTO> rejectOffer(String sessionToken, String offerId);
+
+    /**
+     * Accept an offer from a user
+     * 
+     * @param sessionToken Session identifier for authentication.
+     * @param offerId ID of the offer to be countered
+     * @return Response with the countered {@link OfferDTO}, or error.
+     */
+    public Response<OfferDTO> counterOffer(String sessionToken, String offerId, double newPrice);
         
 }
