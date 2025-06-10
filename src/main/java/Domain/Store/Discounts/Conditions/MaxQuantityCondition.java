@@ -4,7 +4,11 @@ import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
+import jakarta.persistence.*;
 
+
+@Entity
+@Table(name = "max_quantity_condition")
 public class MaxQuantityCondition extends SimpleCondition {
 
     private String productId;
@@ -23,6 +27,10 @@ public class MaxQuantityCondition extends SimpleCondition {
         this.maxQuantity = maxQuantity;
     }
 
+    protected MaxQuantityCondition() {
+        super(); // JPA
+    }
+    
     @Override
     public boolean isSatisfied(ShoppingBasket shoppingBasket, BiFunction<String, String, Item> itemGetter) {
         int quantity = shoppingBasket.getQuantity(productId);

@@ -4,7 +4,11 @@ import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
+import jakarta.persistence.*;
 
+
+@Entity
+@Table(name = "max_price_condition")
 public class MaxPriceCondition extends SimpleCondition{
 
     private double maxPrice;
@@ -16,6 +20,10 @@ public class MaxPriceCondition extends SimpleCondition{
             throw new IllegalArgumentException("Max price cannot be negative");
         }
         this.maxPrice = maxPrice;
+    }
+
+    protected MaxPriceCondition() {
+        super(); // Required by JPA
     }
 
     @Override

@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.IDiscountRepository;
 
 @Repository
+@Profile("dev")
 public class MemoryDiscountRepository extends IDiscountRepository {
     
     private final Map<String, Discount> discounts;

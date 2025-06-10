@@ -3,21 +3,32 @@ package Domain.Store.Discounts.Conditions;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CompositeCondition implements Condition {
+import jakarta.persistence.*;
 
-    protected final String id;
+@Entity
+@Table(name = "composite_condition")
+public abstract class CompositeCondition extends Condition {
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "composite_condition_children",
+        joinColumns = @JoinColumn(name = "composite_condition_id"),
+        inverseJoinColumns = @JoinColumn(name = "child_condition_id")
+    )
     protected List<Condition> conditions;
 
     // Constructor for loading from repository with existing ID
     public CompositeCondition(String id, List<Condition> conditions) {
-        if (id == null || id.isEmpty()) {
-            throw new IllegalArgumentException("ID cannot be null or empty");
-        }
+        super(id);
         if (conditions == null || conditions.isEmpty()) {
             throw new IllegalArgumentException("Conditions list cannot be null or empty");
         }
-        this.id = id;
         this.conditions = conditions;
+    }
+
+    protected CompositeCondition() {
+        super(); // JPA only
+        this.conditions = new ArrayList<>();
     }
 
     @Override

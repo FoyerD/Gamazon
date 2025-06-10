@@ -8,9 +8,14 @@ import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
 import Domain.Store.Discounts.Qualifiers.DiscountQualifier;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "simple_discount")
 public class SimpleDiscount extends Discount {
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "qualifier_id")
     private DiscountQualifier qualifier;
     private double discountPercentage; // INV: between 0 and 1 (percentage)
 

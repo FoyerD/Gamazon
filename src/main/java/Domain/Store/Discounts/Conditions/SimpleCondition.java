@@ -1,19 +1,25 @@
 package Domain.Store.Discounts.Conditions;
 
+import jakarta.persistence.*;
+
 // import java.util.UUID;
+@Entity
+@Table(name = "simple_condition")
+public abstract class SimpleCondition extends Condition {
 
-public abstract class SimpleCondition implements Condition {
-
-    protected final String id;
 
     // Constructor for loading from repository with existing ID
     public SimpleCondition(String id) {
-        this.id = id;
+        super(id);
+    }
+
+    protected SimpleCondition() {
+        super(); // JPA only
     }
 
     @Override
     public String getId() {
-        return id.toString();
+        return id;
     }
 
     @Override

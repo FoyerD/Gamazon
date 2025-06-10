@@ -7,7 +7,10 @@ import java.util.function.BiFunction;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "and_discount")
 public class AndDiscount extends CompositeDiscount {
 
 

@@ -19,7 +19,7 @@ public class DiscountQualifierTest {
      * Test class to verify the DiscountQualifier interface contract.
      * Since DiscountQualifier is an interface, we create a test implementation.
      */
-    private static class TestDiscountQualifier implements DiscountQualifier {
+    private static class TestDiscountQualifier extends DiscountQualifier {
         private final boolean returnValue;
         
         public TestDiscountQualifier(boolean returnValue) {
