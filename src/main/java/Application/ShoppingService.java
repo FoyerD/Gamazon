@@ -464,14 +464,15 @@ public class ShoppingService{
             String userId = tokenService.extractId(sessionToken);
             List<OfferDTO> offers = offerManager.getOffersOfMember(userId).stream().map(o -> {
                 String offerId = o.getId();
-                Member member = loginManager.getMember(o.getMemberId());
+                UserDTO member = UserDTO.from(loginManager.getMember(o.getMemberId()));
                 Set<UserDTO> approvedBy = o.getApprovedBy().stream().map(this.loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet());
                 Set<UserDTO> approvers = new HashSet<>(permissionManager.getUsersWithPermission(o.getStoreId(), PermissionType.OVERSEE_OFFERS).stream().map(loginManager::getMember).map(UserDTO::from).collect(Collectors.toSet()));
+                approvers.add(member);
 
                 Item item = itemFacade.getItem(o.getStoreId(), o.getProductId());
 
                 return new OfferDTO(offerId, 
-                            UserDTO.from(member),
+                            member,
                             approvedBy,
                             approvers,
                             ItemDTO.fromItem(item),

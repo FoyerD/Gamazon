@@ -15,7 +15,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 
 import Application.DTOs.OfferDTO;
-import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Domain.Pair;
 
@@ -141,9 +140,10 @@ public class OfferTile extends Div {
         String storeName = storeNameFethcer.apply(offer.getItem().getStoreId());
         // Store name
         content.add(new Span("Store: " + storeName)); // assuming you have this field
+        content.add(new Span("Product: " + offer.getItem().getProductName()));
 
         // Price history
-        List<Pair<String, Double>> prices = offer.getUsernamesPrice();
+        List<Pair<String, Double>> prices = offer.getUsernamesPrice(); //offer.getUsernamesPrice();
         if (!prices.isEmpty()) {
             VerticalLayout priceHistory = new VerticalLayout();
             priceHistory.setPadding(false);
