@@ -45,6 +45,7 @@ import com.vaadin.flow.router.Route;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.DiscountDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OfferDTO;
@@ -66,6 +67,7 @@ import UI.presenters.LoginPresenter;
 import UI.views.components.AddItemForm;
 import UI.views.components.AddUserRoleDialog;
 import UI.views.components.ChangeUserRoleDialog;
+import UI.views.components.DiscountsLayout;
 import UI.views.components.EmployeesLayout;
 import UI.views.components.OfferLayout;
 import UI.views.components.PoliciesLayout;
@@ -87,6 +89,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
 
     private final EmployeesLayout employeesLayout;
     private final PoliciesLayout policiesLayout;
+    private final DiscountsLayout discountsLayout;
     private final OfferLayout offersLayout;
     private final VerticalLayout mainContent = new VerticalLayout();
 
@@ -136,11 +139,12 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         Tab itemsTab = new Tab(VaadinIcon.CHECK.create(), new Span("Items"));
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
         Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
+        Tab discountsTab = new Tab(VaadinIcon.MONEY.create(), new Span("Discounts"));
         Tab offersTab = new Tab(VaadinIcon.TAG.create(), new Span("Offers"));
         
 
         // Style all tabs to have white text and icons
-        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, historyTab}) {
+        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, discountsTab, historyTab}) {
             tab.getStyle().set("color", " #ffffff");
             // Get the icon and span components from the tab
             tab.getChildren().forEach(component -> {
@@ -148,7 +152,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             });
         }
         
-        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, historyTab);
+        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, discountsTab, historyTab);
         tabs.getStyle()
             .set("margin", "1rem 0")
             .set("--lumo-contrast-60pct", " #ffffff"); 
@@ -191,6 +195,60 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             p -> {}
         );
 
+        Supplier<List<ItemDTO>> itemSupplier = () -> {
+            Response<List<ItemDTO>> res = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
+            if (res.errorOccurred()) {
+                Notification.show("Failed fetching items for store: " + res.getErrorMessage());
+                return null;
+            }
+            return res.getValue();
+        };
+
+
+        Supplier<List<CategoryDTO>> categorySupplier = () -> {
+            Response<List<CategoryDTO>> res = storePresenter.getStoreCategories(sessionToken, currentStoreId);
+            if (res.errorOccurred()) {
+                Notification.show("Failed fetching categories for store: " + res.getErrorMessage(), 3000, Position.BOTTOM_END);
+                return null;
+            }
+            return res.getValue();
+        };
+
+        discountsLayout = new DiscountsLayout(
+            currentStoreId,
+            () -> {
+                Response<List<DiscountDTO>> response = storePresenter.getStoreDiscounts(sessionToken, currentStoreId);
+                if (response.errorOccurred()) {
+                    Notification.show("Failed to fetch discounts: " + response.getErrorMessage(), 
+                        3000, Notification.Position.MIDDLE);
+                    return null;
+                }
+                return response.getValue();
+            },
+            d -> {
+                Response<Boolean> response = storePresenter.removeDiscount(sessionToken, currentStoreId, d.getId());
+                if (response.errorOccurred()) {
+                    Notification.show("Failed to remove discount: " + response.getErrorMessage(), 
+                        3000, Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Discount removed successfully", 
+                        3000, Notification.Position.MIDDLE);
+                }
+            },
+            itemSupplier,
+            categorySupplier,
+            d -> {
+                Response<DiscountDTO> response = storePresenter.addDiscount(sessionToken, currentStoreId, d);
+                if (response.errorOccurred()) {
+                    Notification.show("Failed to add discount: " + response.getErrorMessage(), 
+                        3000, Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Discount added successfully", 
+                        3000, Notification.Position.MIDDLE);
+                }
+
+            });
+                        
 
         offersLayout = new OfferLayout(
             () -> { 
@@ -234,6 +292,8 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 showOffersView();
             } else if (event.getSelectedTab().equals(historyTab)) {
                 showHistoryView();
+            } else if (event.getSelectedTab().equals(discountsTab)) {
+                showDiscountsView();
             }
         });
 
@@ -654,6 +714,11 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         }
     }
 
+    private void showDiscountsView() {
+        mainContent.add(discountsLayout);
+    }
+
+
     private void loadItems(Grid<ItemDTO> itemsGrid) {
         Response<List<ItemDTO>> itemsResponse = storePresenter.getItemsByStoreId(sessionToken, currentStoreId);
         if (itemsResponse.errorOccurred()) {
@@ -786,6 +851,9 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         employeesLayout.refreshUsers();
         // Clear permissions map when entering a new store
         managerPermissionsMap.clear();
+
+        discountsLayout.refreshDiscounts();
+
     }
 
     private void styleButton(Button button, String color) {

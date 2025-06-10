@@ -2,6 +2,7 @@ package Domain;
 
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.OfferManager;
@@ -9,6 +10,7 @@ import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
 import Domain.Store.ProductFacade;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.User.LoginManager;
 import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
@@ -23,19 +25,26 @@ public class FacadeManager {
     private ItemFacade itemFacade;
     private ProductFacade productFacade;
     private IExternalPaymentService paymentService;
+    private IExternalSupplyService supplyService;
     private LoginManager loginManager;
     private PermissionManager permissionManager;
     private OfferManager offerManager;
     private INotificationService notificationService;
+    private DiscountFacade discountFacade;
     private PolicyFacade policyFacade;
 
-    public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService) {
+    public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService, IExternalSupplyService supplyService) {
         this.repoManager = repoManager;
         this.paymentService = paymentService;
+        this.supplyService = supplyService;
     }
 
     public IExternalPaymentService getPaymentService() {
         return paymentService;
+    }
+
+    public IExternalSupplyService getSupplyService() {
+        return supplyService;
     }
 
     public IMarketFacade getMarketFacade() {
@@ -92,8 +101,11 @@ public class FacadeManager {
                                                 getStoreFacade(),
                                                 repoManager.getReceiptRepository(),
                                                 repoManager.getProductRepository(),
+                                                getDiscountFacade(),
                                                 getPolicyFacade(),
-                                                repoManager.getUserRepository());
+                                                getRepositoryManager().getUserRepository(),
+                                                getSupplyService(),
+                                                getRepositoryManager().getReceiptRepository());
         }
         return CartFacade;
     }
@@ -118,6 +130,14 @@ public class FacadeManager {
         return permissionManager;
     }
 
+    public DiscountFacade getDiscountFacade() {
+        if (discountFacade == null) {
+            discountFacade = new DiscountFacade(repoManager.getDiscountRepository(),
+                                                getItemFacade());
+        }
+        return discountFacade;
+    }
+    
     public OfferManager getOfferManager() {
         if (offerManager == null) {
             offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager(), repoManager.getItemRepository(), getStoreFacade());

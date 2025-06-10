@@ -1,25 +1,27 @@
 package StoreTests;
 
-import java.util.List;
-import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
 import static org.mockito.Mockito.mock;
 
-import Application.DTOs.PolicyDTO;
-import Application.DTOs.StoreDTO;
-import Application.DTOs.UserDTO;
+import java.util.List;
+import java.util.UUID;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import Application.PolicyService;
 import Application.ServiceManager;
 import Application.TokenService;
+import Application.DTOs.PolicyDTO;
+import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Domain.ExternalServices.IExternalPaymentService;
 import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Repos.IItemRepository;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
@@ -49,8 +51,8 @@ public class PolicyServiceTests {
         MemoryRepoManager repoManager = new MemoryRepoManager();
 
         // 2. Initialize FacadeManager (provides PolicyFacade, PermissionManager, etc.)
-        IExternalPaymentService externalPaymentService = mock(IExternalPaymentService.class); 
-        FacadeManager facadeManager = new FacadeManager(repoManager, externalPaymentService);
+        FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
+
 
         // 3. Initialize ServiceManager so we can register a user and create a store
         this.serviceManager = new ServiceManager(facadeManager);

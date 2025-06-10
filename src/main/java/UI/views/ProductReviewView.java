@@ -229,7 +229,7 @@ public class ProductReviewView extends BaseView implements BeforeEnterObserver {
         ItemDTO ratedItem = new ItemDTO(
             currentProduct.getStoreId(),
             currentProduct.getProductId(),
-            currentProduct.getPrice(),
+            currentProduct.getPriceBreakDown(),
             currentProduct.getAmount(),
             currentProduct.getDescription(),
             currentProduct.getCategories(),

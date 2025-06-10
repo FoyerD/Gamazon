@@ -182,6 +182,14 @@ public class ItemFacade {
         }
     }
 
+    public Product getProduct(String productId) {
+        Product product = productRepository.get(productId);
+        if (product == null) {
+            throw new NoSuchElementException("Product not found for productId: " + productId);
+        }
+        return new Product(product);
+    }
+
     /**
      * Validates the existence of both store and product before any item operation.
      */

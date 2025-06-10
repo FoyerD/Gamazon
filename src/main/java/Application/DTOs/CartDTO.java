@@ -10,7 +10,7 @@ import Domain.Shopping.IShoppingCart;
 
 public class CartDTO {
     private String clientId;
-    private Map<String, ShoppingBasketDTO> baskets;
+    private Map<String, ShoppingBasketDTO> baskets; // maps from a store to a basket
 
     public CartDTO(String clientId, Map<String, ShoppingBasketDTO> baskets) {
         this.clientId = clientId;
@@ -47,5 +47,21 @@ public class CartDTO {
         return baskets.get(storeId);
     }
 
+
+    public float getTotalPrice() {
+        float total = 0;
+        for (ShoppingBasketDTO basket : baskets.values()) {
+            total += basket.getTotalPrice();
+        }
+        return total;
+    }
+
+    public float getPreDiscountPrice() {
+        float total = 0;
+        for (ShoppingBasketDTO basket : baskets.values()) {
+            total += basket.getTotalOriginalPrice();
+        }
+        return total;
+    }
     
 }
