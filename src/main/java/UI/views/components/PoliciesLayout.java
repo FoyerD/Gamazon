@@ -46,25 +46,6 @@ public class PoliciesLayout extends VerticalLayout {
 
         styleButton(addButton, "rgb(6, 177, 0)");
         
-
-        // policyGrid.addColumn(p -> p.getType().name()).setHeader("Type");
-        // policyGrid.addColumn(p -> p.getTargetProduct() != null ? p.getTargetProduct().getProductName() : "")
-        //         .setHeader("Product");
-        // policyGrid.addColumn(p -> p.getTargetCategory() != null ? p.getTargetCategory().getName() : "")
-        //         .setHeader("Category");
-        // policyGrid.addColumn(p -> p.getDisallowedCategory() != null ? p.getDisallowedCategory().getName() : "")
-        //         .setHeader("Disallowed Category");
-        // policyGrid.addColumn(p -> p.getMinAge() != null ? p.getMinAge().toString() : "")
-        //         .setHeader("Min Age");
-        // policyGrid.addColumn(p -> p.getMinItemsAll() != null ? p.getMinItemsAll().toString() : "")
-        //         .setHeader("Min All");
-        // policyGrid.addColumn(p -> p.getMaxItemsAll() != null ? p.getMaxItemsAll().toString() : "")
-        //         .setHeader("Max All");
-
-        // policyGrid.addComponentColumn(this::buildRemoveButton).setHeader("Actions");
-        // policyGrid.setWidthFull();
-        // policyGrid.setAllRowsVisible(true);
-        
         tileContainer.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         tileContainer.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         tileContainer.setWidthFull();
@@ -74,8 +55,6 @@ public class PoliciesLayout extends VerticalLayout {
             .set("gap", "16px") // Adds gap between tiles
             .set("padding", "12px");
         add(addButton, tileContainer);
-
-        // add(addButton, policyGrid);
     }
 
     // private Button buildRemoveButton(PolicyDTO policy) {

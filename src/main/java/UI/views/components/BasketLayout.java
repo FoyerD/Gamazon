@@ -19,23 +19,29 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.QueryParameters;
 
 import Application.DTOs.ItemDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import UI.views.StoreSearchView;
 
 
 public  class BasketLayout extends VerticalLayout{
-    ShoppingBasketDTO basketDTO;
+    private ShoppingBasketDTO basketDTO;
+    private List<PolicyDTO> policies;
     public BasketLayout(ShoppingBasketDTO basketDTO,
+                        List<PolicyDTO> policies,
                         Consumer<String> basketRemover,
                         Consumer<ItemDTO> itemRemover,
                         Consumer<ItemDTO> itemDecrement, Consumer<ItemDTO> itemIncrement) {
 
 
         this.basketDTO = basketDTO;
+        this.policies = policies;
         this.outlineStoreLayout();
         this.add(this.storeHeader(basketRemover));
         this.add(this.basketGrid(itemDecrement, itemIncrement, itemRemover));
+        this.add(this.violatedPoliciesLayout());
         this.add(this.basketTotalSpan());
+        
     }
 
     private HorizontalLayout storeHeader(Consumer<String> basketRemover) {
@@ -234,6 +240,27 @@ public  class BasketLayout extends VerticalLayout{
         return basketTotalLabel;
                 
     }
+
+    private VerticalLayout violatedPoliciesLayout() {
+    VerticalLayout violationsLayout = new VerticalLayout();
+    violationsLayout.setSpacing(false);
+    violationsLayout.setPadding(false);
+    violationsLayout.setMargin(false);
+    violationsLayout.setWidthFull();
+
+    policies.stream()
+        .map(policy -> {
+            Span violationSpan = new Span("⚠️ " + policy.toString()); // Customize message if needed
+            violationSpan.getStyle()
+                .set("color", " #ff4d4f")
+                .set("font-weight", "bold")
+                .set("font-size", "14px");
+            return violationSpan;
+        })
+        .forEach(violationsLayout::add);
+
+    return violationsLayout;
+}
 
     public double calculateBasketTotal() {
         return this.basketDTO.getOrders().values().stream()

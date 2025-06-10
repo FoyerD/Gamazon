@@ -212,4 +212,5 @@ public class UserService {
             return Response.error("Failed to log out all users: " + e.getMessage());
         }
     }
+
 }

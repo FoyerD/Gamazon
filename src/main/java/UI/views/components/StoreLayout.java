@@ -13,16 +13,13 @@ import Application.DTOs.StoreDTO;
 
 public class StoreLayout extends VerticalLayout {
     private final StoreDTO store;
-    private final Consumer<StoreDTO> onOwnerButton;
     private final Consumer<StoreDTO> onManagerButton;
 
     public StoreLayout(StoreDTO store,
                         ItemLayout itemLayout,
-                        Consumer<StoreDTO> onOwnerButton,
                         Consumer<StoreDTO> onManagerButton) {
 
         this.store = store;
-        this.onOwnerButton = onOwnerButton;
         this.onManagerButton = onManagerButton;
         setSpacing(true);
         setPadding(true);
@@ -69,21 +66,11 @@ public class StoreLayout extends VerticalLayout {
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.setSpacing(true);
 
-        if (onOwnerButton != null) {
-            Button ownerButton = new Button("Owner Actions", e -> onOwnerButton.accept(store));
-            ownerButton.getStyle()
-                .set("background-color", "#4a9eff")
-                .set("color", "white");
-            buttons.add(ownerButton);
-        }
-
-        if (onManagerButton != null) {
-            Button managerButton = new Button("Management Actions", e -> onManagerButton.accept(store));
-            managerButton.getStyle()
-                .set("background-color", "#4a9eff")
-                .set("color", "white");
-            buttons.add(managerButton);
-        }
+        Button managerButton = new Button("Management Actions", e -> onManagerButton.accept(store));
+        managerButton.getStyle()
+            .set("background-color", " #4a9eff")
+            .set("color", "white");
+        buttons.add(managerButton);
 
         return buttons;
     }

@@ -3,6 +3,7 @@ package Domain;
 import Domain.Repos.IAuctionRepository;
 import Domain.Repos.IFeedbackRepository;
 import Domain.Repos.IItemRepository;
+import Domain.Repos.IOfferRepository;
 import Domain.Repos.IPermissionRepository;
 import Domain.Repos.IPolicyRepository;
 import Domain.Repos.IProductRepository;
@@ -27,5 +28,6 @@ public interface IRepoManager {
     public IDiscountRepository getDiscountRepository();
     // public IConditionRepository getConditionRepository();
     public IPolicyRepository getPolicyRepository();
+    public IOfferRepository getOfferRepository();
 }
 

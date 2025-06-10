@@ -5,6 +5,7 @@ import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.OfferManager;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
 import Domain.Store.ProductFacade;
@@ -27,6 +28,7 @@ public class FacadeManager {
     private IExternalSupplyService supplyService;
     private LoginManager loginManager;
     private PermissionManager permissionManager;
+    private OfferManager offerManager;
     private INotificationService notificationService;
     private DiscountFacade discountFacade;
     private PolicyFacade policyFacade;
@@ -73,7 +75,10 @@ public class FacadeManager {
                                         repoManager.getFeedbackRepository(),
                                         repoManager.getItemRepository(),
                                         repoManager.getUserRepository(),
-                                        repoManager.getAuctionRepository(), getNotificationService());
+                                        repoManager.getAuctionRepository(),
+                                        getNotificationService(),
+                                        repoManager.getReceiptRepository(),
+                                        repoManager.getProductRepository());
         }
         return storeFacade;
     }
@@ -131,6 +136,13 @@ public class FacadeManager {
                                                 getItemFacade());
         }
         return discountFacade;
+    }
+    
+    public OfferManager getOfferManager() {
+        if (offerManager == null) {
+            offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager(), repoManager.getItemRepository(), getStoreFacade());
+        }
+        return offerManager;
     }
 
     public PolicyFacade getPolicyFacade() {

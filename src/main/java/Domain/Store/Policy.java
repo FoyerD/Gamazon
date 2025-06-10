@@ -29,7 +29,8 @@ public class Policy {
         MIN_QUANTITY_CATEGORY("Minimum quantity for a category"),
         MAX_QUANTITY_CATEGORY("Maximum quantity for a category"),
         CATEGORY_DISALLOW("Disallowed category"),
-        CATEGORY_AGE("Age-restricted category");
+        CATEGORY_AGE("Age-restricted category"),
+        ALLOW_OFFERS("Allow members to make price offers");
 
         private final String displayName;
 
@@ -265,7 +266,6 @@ public class Policy {
                     .map(productLookup)
                     .flatMap(p -> p.getCategories().stream())
                     .anyMatch(c -> c.getName().equalsIgnoreCase(ageCategory));
-
             default:
                 throw new IllegalStateException("Unhandled policy type: " + type);
         }

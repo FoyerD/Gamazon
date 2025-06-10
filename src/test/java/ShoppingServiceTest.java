@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ import Application.DTOs.DiscountDTO.DiscountType;
 import Application.DTOs.DiscountDTO.QualifierType;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ItemPriceBreakdownDTO;
+import Application.DTOs.OfferDTO;
+import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Error;
@@ -715,6 +718,34 @@ public class ShoppingServiceTest {
         checkDiscountInvariants(cart);
     }
 
+    @Test
+    public void testMakeOffer_Success() {
+        // Step 1: Prepare PaymentDetailsDTO
+        PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(
+            user.getId(),
+            "4111111111111111",                // dummy card number
+            LocalDate.now().plusYears(1),      // future expiry date
+            "123",                             // dummy CVV
+            "Offer Tester"                     // card holder name
+        );
+
+        // Step 2: Call makeOffer
+        Response<OfferDTO> response = shoppingService.makeOffer(
+            clientToken,
+            store_id,
+            product_id,
+            8.99,               // new proposed price
+            paymentDetails
+        );
+
+        // Step 3: Assertions
+        assertFalse("Offer creation should not error", response.errorOccurred());
+        OfferDTO offer = response.getValue();
+        assertNotNull("OfferDTO should not be null", offer);
+        assertEquals("Offered price should match", 8.99, offer.getNewPrice(), 0.001);
+        assertEquals("Product ID should match", product_id, offer.getItem().getProductId());
+        assertEquals("Store ID should match", store_id, offer.getItem().getStoreId());
+    }
 
     @Test
     public void testOrDiscount_BestPriceSelection() {

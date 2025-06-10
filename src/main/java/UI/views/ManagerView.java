@@ -45,13 +45,14 @@ import com.vaadin.flow.router.Route;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.DiscountDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
-import Application.DTOs.DiscountDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType;
 import UI.DatabaseRelated.DbHealthStatus;
@@ -66,10 +67,11 @@ import UI.presenters.LoginPresenter;
 import UI.views.components.AddItemForm;
 import UI.views.components.AddUserRoleDialog;
 import UI.views.components.ChangeUserRoleDialog;
+import UI.views.components.DiscountsLayout;
 import UI.views.components.EmployeesLayout;
+import UI.views.components.OfferLayout;
 import UI.views.components.PoliciesLayout;
 import UI.views.components.PolicyDialog;
-import UI.views.components.DiscountsLayout;
 import UI.views.dataobjects.UserPermission;
 
 @Route("manager")
@@ -88,6 +90,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
     private final EmployeesLayout employeesLayout;
     private final PoliciesLayout policiesLayout;
     private final DiscountsLayout discountsLayout;
+    private final OfferLayout offersLayout;
     private final VerticalLayout mainContent = new VerticalLayout();
 
 
@@ -137,10 +140,11 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         Tab auctionsTab = new Tab(VaadinIcon.GAVEL.create(), new Span("Auctions"));
         Tab historyTab = new Tab(VaadinIcon.TIME_BACKWARD.create(), new Span("History"));
         Tab discountsTab = new Tab(VaadinIcon.MONEY.create(), new Span("Discounts"));
+        Tab offersTab = new Tab(VaadinIcon.TAG.create(), new Span("Offers"));
         
 
         // Style all tabs to have white text and icons
-        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, historyTab, discountsTab}) {
+        for (Tab tab : new Tab[]{employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, discountsTab, historyTab}) {
             tab.getStyle().set("color", " #ffffff");
             // Get the icon and span components from the tab
             tab.getChildren().forEach(component -> {
@@ -148,7 +152,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
             });
         }
         
-        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, historyTab, discountsTab);
+        Tabs tabs = new Tabs(employeesTab, policiesTab, itemsTab, auctionsTab, offersTab, discountsTab, historyTab);
         tabs.getStyle()
             .set("margin", "1rem 0")
             .set("--lumo-contrast-60pct", " #ffffff"); 
@@ -242,6 +246,34 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                     Notification.show("Discount added successfully", 
                         3000, Notification.Position.MIDDLE);
                 }
+
+            });
+                        
+
+        offersLayout = new OfferLayout(
+            () -> { 
+                Response<List<OfferDTO>> offersResponse = managementPresenter.getStoreOffers(sessionToken, currentStoreId);
+                if (offersResponse.errorOccurred()) {
+                    Notification.show("Failed to fetch offers: " + offersResponse.getErrorMessage(), 5000,  Notification.Position.MIDDLE);
+                    return null;
+                }
+                return offersResponse.getValue();
+            },
+            o -> {
+                Response<OfferDTO> acceptResponse = managementPresenter.acceptOffer(sessionToken, o.getId());
+                if (acceptResponse.errorOccurred()) {
+                    Notification.show("Faild to accept offer " + acceptResponse.getErrorMessage(), 5000,  Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Offer accepted successfully!", 3000,  Notification.Position.BOTTOM_END);
+                }
+            },
+            o -> {
+                Response<OfferDTO> rejectResponse = managementPresenter.rejectOffer(sessionToken, o.getId());
+                if (rejectResponse.errorOccurred()) {
+                    Notification.show("Faild to reject offer " + rejectResponse.getErrorMessage(), 5000,  Notification.Position.MIDDLE);
+                } else {
+                    Notification.show("Offer rejected successfully!", 3000,  Notification.Position.BOTTOM_END);
+                }
             }
         );
 
@@ -256,6 +288,8 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                 showItemsView();
             } else if (event.getSelectedTab().equals(auctionsTab)) {
                 showAuctionsView();
+            } else if (event.getSelectedTab().equals(offersTab)) {
+                showOffersView();
             } else if (event.getSelectedTab().equals(historyTab)) {
                 showHistoryView();
             } else if (event.getSelectedTab().equals(discountsTab)) {
@@ -643,6 +677,10 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         auctionsGrid.setHeight("300px");
     }
 
+    private void showOffersView() {
+        mainContent.add(offersLayout);
+        offersLayout.refreshOffers();
+    }
     private void showHistoryView() {
         mainContent.removeAll();
         

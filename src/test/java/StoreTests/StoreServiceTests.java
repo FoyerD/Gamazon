@@ -1,29 +1,39 @@
 package StoreTests;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import Application.ItemService;
+import Application.ProductService;
+import Application.ServiceManager;
+import Application.ShoppingService;
+import Application.StoreService;
+import Application.UserService;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ConditionDTO;
 import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
+import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
-import Application.ItemService;
-import Application.ProductService;
-import Application.ServiceManager;
-import Application.StoreService;
 import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.ExternalServices.IExternalPaymentService;
@@ -44,6 +54,17 @@ public class StoreServiceTests {
     public void setUp() {
         // Initialize repository manager
         MemoryRepoManager repositoryManager = new MemoryRepoManager();
+            // Create mock payment service
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+
+        // Define mock behavior
+        when(mockPaymentService.processPayment(
+                anyString(), anyString(), any(Date.class), anyString(), anyString(), anyDouble()
+        )).thenReturn(new Response<>(1234)); // fake transaction ID
+
+        when(mockPaymentService.cancelPayment(anyInt())).thenReturn(new Response<>(true));
+        when(mockPaymentService.handshake()).thenReturn(new Response<>(true));
+        when(mockPaymentService.updatePaymentServiceURL(anyString())).thenReturn(new Response<>());
         
         // Initialize facade manager
         FacadeManager facadeManager = new FacadeManager(repositoryManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
@@ -956,5 +977,71 @@ public class StoreServiceTests {
         
         // Invariant: Sequential operations should maintain consistent state
         // Invariant: Final state should reflect all successful operations
+    }
+
+
+    @Test
+    public void GivenInvalidAuction_WhenAcceptBid_ThenReturnError() {
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "InvalidBidStore", "Test");
+        String storeId = storeRes.getValue().getId();
+        String fakeAuctionId = "invalid-id";
+        String fakeProductId = UUID.randomUUID().toString();
+
+        Response<ItemDTO> result = storeService.acceptBid(tokenId, storeId, fakeProductId, fakeAuctionId);
+        assertTrue(result.errorOccurred());
+    }
+
+    @Test
+    public void GivenOpenStore_WhenCloseStoreNotPermanent_ThenReturnTrue() {
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "TempStore", "For testing");
+        String storeId = storeRes.getValue().getId();
+
+        Response<Boolean> closeRes = storeService.closeStoreNotPermanent(tokenId, storeId);
+        assertFalse(closeRes.errorOccurred());
+        assertTrue(closeRes.getValue());
+    }
+
+
+
+    @Test
+    public void GivenValidOffer_WhenRejectOffer_ThenReturnRejectedOffer() {
+        // Setup store, product, item
+        Response<StoreDTO> storeRes = storeService.addStore(tokenId, "RejectStore", "Reject test");
+        String storeId = storeRes.getValue().getId();
+        ProductService productService = serviceManager.getProductService();
+        ItemService itemService = serviceManager.getItemService();
+        ShoppingService shoppingService = serviceManager.getShoppingService();
+
+        Response<ProductDTO> prodRes = productService.addProduct(tokenId, "RejectProduct", List.of("c"), List.of("d"));
+        String productId = prodRes.getValue().getId();
+        itemService.add(tokenId, storeId, productId, 120f, 5, "desc");
+
+        // Create a second user
+        UserService userService = serviceManager.getUserService();
+        Response<UserDTO> guest = userService.guestEntry();
+        Response<UserDTO> buyer = userService.register(
+            guest.getValue().getSessionToken(),
+            "RejectUser",
+            "AnotherPass1!",
+            "reject@buy.com"
+        );
+        String buyerToken = buyer.getValue().getSessionToken();
+
+        // Create an offer
+        PaymentDetailsDTO payment = new PaymentDetailsDTO(
+            buyer.getValue().getId(),
+            "4111111111111111",
+            LocalDate.now().plusYears(1),
+            "321",
+            "Reject User"
+        );
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 90.0, payment);
+        assertFalse("Making offer should succeed", offerResponse.errorOccurred());
+
+        // Reject the offer
+        String offerId = offerResponse.getValue().getId();
+        Response<OfferDTO> rejected = storeService.rejectOffer(tokenId, offerId);
+        assertFalse("Rejecting offer should succeed.\nError: " + (rejected.errorOccurred() ? rejected.getErrorMessage() : ""), rejected.errorOccurred());
+        assertEquals("Offer ID should match", offerId, rejected.getValue().getId());
     }
 }

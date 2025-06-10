@@ -1,6 +1,9 @@
 package StoreTests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
@@ -9,23 +12,19 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import Application.DTOs.PolicyDTO;
-import Application.DTOs.StoreDTO;
-import Application.DTOs.UserDTO;
 import Application.PolicyService;
 import Application.ServiceManager;
 import Application.TokenService;
+import Application.DTOs.PolicyDTO;
+import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
-
 import Domain.FacadeManager;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Repos.IItemRepository;
-import Domain.Repos.IPolicyRepository;
-import Domain.Repos.IProductRepository;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
-import Domain.management.PermissionType;
 import Infrastructure.MemoryRepoManager;
 
 /**
@@ -54,6 +53,7 @@ public class PolicyServiceTests {
         // 2. Initialize FacadeManager (provides PolicyFacade, PermissionManager, etc.)
         FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
 
+
         // 3. Initialize ServiceManager so we can register a user and create a store
         this.serviceManager = new ServiceManager(facadeManager);
 
@@ -67,12 +67,7 @@ public class PolicyServiceTests {
         this.itemRepo = repoManager.getItemRepository();
 
         // 7. Instantiate PolicyService with its real dependencies
-        this.policyService = new PolicyService(
-            facadeManager.getPolicyFacade(),
-            this.tokenService,
-            this.permManager,
-            this.itemRepo
-        );
+        this.policyService = serviceManager.getPolicyService();
 
         // ----- A) Register a user to get a valid tokenId -----
         Response<UserDTO> guestResp = serviceManager.getUserService().guestEntry();
@@ -338,4 +333,17 @@ public class PolicyServiceTests {
             resp.getErrorMessage().toLowerCase().contains("permission")
         );
     }
+
+
+    // -------------------------------------------------------------
+    // Test 11: getViolatedPolicies for a user with no cart → empty list
+    // -------------------------------------------------------------
+    @Test
+    public void GivenValidUserWithEmptyCart_WhenGetViolatedPolicies_ThenReturnEmptyList() {
+        Response<List<PolicyDTO>> resp = policyService.getViolatedPolicies(this.tokenId);
+        assertFalse(resp.errorOccurred());
+        assertNotNull(resp.getValue());
+        assertEquals(0, resp.getValue().size());
+    }
+
 }
