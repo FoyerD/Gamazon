@@ -51,7 +51,7 @@ public class ExternalSupplyService implements IExternalSupplyService {
     }
 
     @Override
-    public Response<Integer> supplyOrder(String userId, String name, String address, String city, String country, String zip) {
+    public Response<Integer> supplyOrder(String name, String address, String city, String country, String zip) {
         try {
             Map<String, String> data = Map.of(
                 "action_type", "supply",

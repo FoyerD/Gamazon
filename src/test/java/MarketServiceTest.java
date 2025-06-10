@@ -1,11 +1,15 @@
-import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
-import Domain.management.Permission;
-import Domain.management.PermissionManager;
-import Domain.FacadeManager;
-import Domain.management.PermissionType;
-import Infrastructure.MemoryRepoManager;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,22 +20,21 @@ import Application.ProductService;
 import Application.ServiceManager;
 import Application.StoreService;
 import Application.TokenService;
+import Application.UserService;
 import Application.DTOs.ClientOrderDTO;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Application.UserService;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
+import Domain.ExternalServices.INotificationService;
+import Domain.management.Permission;
+import Domain.management.PermissionManager;
+import Domain.management.PermissionType;
+import Infrastructure.MemoryRepoManager;
 
 public class MarketServiceTest {
     // Use concrete implementations instead of interfaces where possible
@@ -72,7 +75,7 @@ public class MarketServiceTest {
 
         // Initialize dependency injectors
         repositoryManager = new MemoryRepoManager();
-        facadeManager = new FacadeManager(repositoryManager, mockPaymentService);
+        facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
         serviceManager = new ServiceManager(facadeManager);
         
         // Get the services
@@ -196,7 +199,7 @@ public class MarketServiceTest {
         thread2.start();
         
         // Wait for both threads to complete
-        thread1.join(5000);  // Wait up to 5 seconds
+        thread1.join();  // Wait up to 5 seconds
         thread2.join(5000);
         
         // Print diagnostic information

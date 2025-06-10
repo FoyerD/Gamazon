@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.ItemPriceBreakdownDTO;
 import Application.DTOs.OrderedItemDTO;
 import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ReceiptDTO;
@@ -33,6 +34,7 @@ import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Product;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.User.LoginManager;
 import Domain.User.User;
 import Domain.management.PermissionManager;
@@ -109,7 +111,6 @@ public class ShoppingService{
             return Response.error("Invalid token");
         }
         String clientId = this.tokenService.extractId(sessionToken);
-        
         try {
             if(this.cartFacade == null) {
                 TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
@@ -119,32 +120,37 @@ public class ShoppingService{
             // Get the cart and baskets
             Set<Pair<Item, Integer>> itemsMap = cartFacade.viewCart(clientId);
             Map<String, ShoppingBasketDTO> baskets = new HashMap<>();
-            
-            // For each item in the cart
-            for (Pair<Item, Integer> itemPair : itemsMap) {
-                Item item = itemPair.getFirst();
-                Integer quantity = itemPair.getSecond();
-                String storeId = item.getStoreId();
+
+            // Creation of BasketDTO's
+            for (Pair<Item, Integer> item : itemsMap) {
+                ItemDTO itemDTO = ItemDTO.fromItem(item.getFirst());
+                itemDTO.setAmount(item.getSecond());
                 
-                // Create or get the basket for this store
-                ShoppingBasketDTO basketDTO;
-                if (baskets.containsKey(storeId)) {
-                    basketDTO = baskets.get(storeId);
+                if(baskets.containsKey(item.getFirst().getStoreId())){
+                    baskets.get(item.getFirst().getStoreId()).getOrders().put(item.getFirst().getProductId(), itemDTO);
                 } else {
-                    String storeName = cartFacade.getStoreName(storeId);
-                    basketDTO = new ShoppingBasketDTO(storeId, clientId, new HashMap<>(), storeName);
-                    baskets.put(storeId, basketDTO);
+                    String storeId = item.getFirst().getStoreId();
+                    String storeName = this.cartFacade.getStoreName(storeId);
+
+                    ShoppingBasketDTO basket = new ShoppingBasketDTO(item.getFirst().getStoreId(), clientId, new HashMap<>(), storeName);
+                    basket.getOrders().put(item.getFirst().getProductId(), itemDTO);
+                    baskets.put(item.getFirst().getStoreId(), basket);
                 }
-                
-                // Add the item to the basket
-                ItemDTO itemDTO = ItemDTO.fromItem(item);
-                itemDTO.setAmount(quantity);
-                basketDTO.getOrders().put(item.getProductId(), itemDTO);
             }
 
-            CartDTO cartDTO = new CartDTO(clientId, baskets);
+            for(ShoppingBasketDTO basket : baskets.values()) {
+                Map<String, ItemPriceBreakdown> priceBreakDowns = this.cartFacade.getBestPrice(basket.getClientId(), basket.getStoreId());
+                basket.getOrders().forEach((productId, item) -> {
+                    if(priceBreakDowns.containsKey(productId)) {
+                        ItemPriceBreakdownDTO priceBreakDownDTO = ItemPriceBreakdownDTO.fromPriceBreakDown(priceBreakDowns.get(productId));
+                        item.setPriceBreakDown(priceBreakDownDTO);
+                    }
+                });
+            }
+
+            CartDTO cart = new CartDTO(clientId, baskets);
             TradingLogger.logEvent(CLASS_NAME, method, "Cart viewed for user " + clientId + " with " + itemsMap.size() + " items");
-            return new Response<>(cartDTO);
+            return new Response<>(cart);
         } catch (Exception e) {
             TradingLogger.logError(CLASS_NAME, method, "Error viewing cart: " + e.getMessage());
             return new Response<>(new Error("Error viewing cart: " + e.getMessage()));
@@ -260,34 +266,34 @@ public class ShoppingService{
     
 
     // Make Immidiate Purchase Use Case 2.5
-        @Transactional
-        public Response<Boolean> checkout(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-            String clientName, String deliveryAddress) {
-            String method = "checkout";
-            if (!tokenService.validateToken(sessionToken)) {
-                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
-                return Response.error("Invalid token");
-            }
-            String clientId = this.tokenService.extractId(sessionToken);
-            
-            try {
-                if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
-                if(permissionManager.isBanned(clientId)){
-                    throw new Exception("User is banned from checking out.");
-                }
-                if(this.cartFacade == null) {
-                    TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
-                    return new Response<>(new Error("cartFacade is not initialized."));
-                }
-
-                cartFacade.checkout(clientId, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
-                TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
-                return new Response<>(true);
-            } catch (Exception ex) {
-                TradingLogger.logError(CLASS_NAME, method, "Error during checkout: %s", ex.getMessage());
-                return new Response<>(new Error(ex.getMessage()));
-            }
+    @Transactional
+    public Response<Boolean> checkout(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode) {
+        String method = "checkout";
+        if (!tokenService.validateToken(sessionToken)) {
+            TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+            return Response.error("Invalid token");
         }
+        String clientId = this.tokenService.extractId(sessionToken);
+        
+        try {
+            if(this.permissionManager == null) return new Response<>(new Error("permissionManager is not initialized."));
+            if(permissionManager.isBanned(clientId)){
+                throw new Exception("User is banned from checking out.");
+            }
+            if(this.cartFacade == null) {
+                TradingLogger.logError(CLASS_NAME, method, "cartFacade is not initialized");
+                return new Response<>(new Error("cartFacade is not initialized."));
+            }
+
+            cartFacade.checkout(clientId, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
+            TradingLogger.logEvent(CLASS_NAME, method, "Checkout completed successfully for user " + clientId);
+            return new Response<>(true);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error during checkout: %s", ex.getMessage());
+            return new Response<>(new Error(ex.getMessage()));
+        }
+    }
 
     @Transactional
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,

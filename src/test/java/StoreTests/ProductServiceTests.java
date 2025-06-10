@@ -1,22 +1,26 @@
 package StoreTests;
 
-import java.util.List;
-import java.util.Set;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import Application.DTOs.ProductDTO;
-import Application.DTOs.UserDTO;
 import Application.ProductService;
 import Application.ServiceManager;
 import Application.UserService;
+import Application.DTOs.ProductDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Infrastructure.MemoryRepoManager;
 
 public class ProductServiceTests {
@@ -30,7 +34,7 @@ public class ProductServiceTests {
     public void setUp() {
         // Initialize in-memory infrastructure
         MemoryRepoManager repoManager = new MemoryRepoManager();
-        FacadeManager facadeManager = new FacadeManager(repoManager, null);
+        FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
 
         // Initialize service manager and services
         this.serviceManager = new ServiceManager(facadeManager);

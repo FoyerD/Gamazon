@@ -13,7 +13,9 @@ import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IShoppingCartRepository;
 import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
+import Domain.Store.Discounts.IDiscountRepository;
 import Infrastructure.MemoryRepositories.MemoryAuctionRepository;
+import Infrastructure.MemoryRepositories.MemoryDiscountRepository;
 import Infrastructure.MemoryRepositories.MemoryFeedbackRepository;
 import Infrastructure.MemoryRepositories.MemoryItemRepository;
 import Infrastructure.MemoryRepositories.MemoryOfferRepository;
@@ -26,6 +28,7 @@ import Infrastructure.MemoryRepositories.MemoryShoppingCartRepository;
 import Infrastructure.MemoryRepositories.MemoryStoreRepository;
 import Infrastructure.MemoryRepositories.MemoryUserRepository;
 
+
 public class MemoryRepoManager implements IRepoManager {
     private MemoryItemRepository itemRepository;
     private MemoryStoreRepository storeRepository;
@@ -37,6 +40,8 @@ public class MemoryRepoManager implements IRepoManager {
     private MemoryFeedbackRepository feedbackRepository;
     private MemoryProductRepository productRepository;
     private MemoryUserRepository userRepository;
+    private MemoryDiscountRepository discountRepository;
+    // private MemoryConditionRepository conditionRepository;
     private MemoryPolicyRepository policyRepository;
     private MemoryOfferRepository offerRepository;
     
@@ -112,6 +117,21 @@ public class MemoryRepoManager implements IRepoManager {
     }
 
     @Override
+    public IDiscountRepository getDiscountRepository() {
+        if (discountRepository == null) {
+            discountRepository = new MemoryDiscountRepository();
+        }
+        return discountRepository;
+    }
+
+    // @Override
+    // public IConditionRepository getConditionRepository() {
+    //     if (conditionRepository == null) {
+    //         conditionRepository = new MemoryConditionRepository();
+    //     }
+    //     return conditionRepository;
+    // }
+    
     public IPolicyRepository getPolicyRepository() {
         if (policyRepository == null) {
             policyRepository = new MemoryPolicyRepository();

@@ -55,7 +55,7 @@ public class Category {
         if (this == o) return true;
         if (!(o instanceof Category)) return false;
         Category that = (Category) o;
-        return Objects.equals(name, that.name);
+        return name.trim().toLowerCase().equals(that.name.trim().toLowerCase());
     }
 
     @Override

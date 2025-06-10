@@ -1,11 +1,6 @@
 package Infrastructure;
 
-import java.util.Date;
-import java.util.List;
-
 import static org.junit.Assert.assertFalse;
-import org.junit.Before;
-import org.junit.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -16,10 +11,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import Application.DTOs.AuctionDTO;
-import Application.DTOs.ProductDTO;
-import Application.DTOs.StoreDTO;
-import Application.DTOs.UserDTO;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import Application.ItemService;
 import Application.MarketService;
 import Application.ProductService;
@@ -28,11 +25,15 @@ import Application.ShoppingService;
 import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
+import Application.DTOs.AuctionDTO;
+import Application.DTOs.ProductDTO;
+import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
+import Domain.FacadeManager;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
-import Domain.FacadeManager;
 
 public class ExternalServiceTest {
 
@@ -66,7 +67,7 @@ public class ExternalServiceTest {
             .thenReturn(Response.success(true));
 
         MemoryRepoManager repoManager = new MemoryRepoManager();
-        FacadeManager facadeManager = new FacadeManager(repoManager, mockPaymentService);
+        FacadeManager facadeManager = new FacadeManager(repoManager, mockPaymentService, mockSupplyService);
         serviceManager = new ServiceManager(facadeManager);
 
         storeService = serviceManager.getStoreService();

@@ -9,6 +9,7 @@ import Domain.Store.FeedbackDTO;
 import java.util.List;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
+import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
 
 import org.springframework.stereotype.Component;
@@ -75,6 +76,21 @@ public class StorePresenter implements IStorePresenter {
     @Override
     public Response<List<CategoryDTO>> getStoreCategories(String sessionToken, String storeId) {
         return storeService.getAllStoreCategories(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<DiscountDTO> addDiscount(String sessionToken, String storeId, DiscountDTO discountDTO) {
+        return storeService.addDiscount(sessionToken, storeId, discountDTO);
+    }
+
+    @Override
+    public Response<Boolean> removeDiscount(String sessionToken, String storeId, String discountId) {
+        return storeService.removeDiscount(sessionToken, storeId, discountId);
+    }
+
+    @Override
+    public Response<List<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeId) {
+        return storeService.getStoreDiscounts(sessionToken, storeId);
     }
     
 }

@@ -12,6 +12,7 @@ import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IShoppingCartRepository;
 import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
+import Domain.Store.Discounts.IDiscountRepository;
 
 public interface IRepoManager {
     public IStoreRepository getStoreRepository();
@@ -24,6 +25,8 @@ public interface IRepoManager {
     public IFeedbackRepository getFeedbackRepository();
     public IProductRepository getProductRepository();
     public IUserRepository getUserRepository();
+    public IDiscountRepository getDiscountRepository();
+    // public IConditionRepository getConditionRepository();
     public IPolicyRepository getPolicyRepository();
     public IOfferRepository getOfferRepository();
 }
