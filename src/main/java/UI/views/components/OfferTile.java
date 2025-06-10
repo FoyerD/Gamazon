@@ -3,23 +3,48 @@ package UI.views.components;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 
 import Application.DTOs.OfferDTO;
+import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Domain.Pair;
 
 public class OfferTile extends Div {
 
-    public OfferTile(OfferDTO offer, String userId, Runnable offersRefresher, Consumer<OfferDTO> offerApprover, Consumer<OfferDTO> offerRejecter, Consumer<OfferDTO> offerCounterer) {
+    private final OfferDTO offer;
+    private final String userId;
+    private final Runnable offersRefresher;
+    private final Consumer<OfferDTO> offerApprover;
+    private final Consumer<OfferDTO> offerRejecter;
+    private final Consumer<OfferDTO> offerCounterer;
+    private final Function<String, String> storeNameFethcer;
+
+    public OfferTile(boolean isManagement, 
+                    OfferDTO offer, 
+                    String userId, 
+                    Runnable offersRefresher, 
+                    Consumer<OfferDTO> offerApprover, 
+                    Consumer<OfferDTO> offerRejecter, 
+                    Consumer<OfferDTO> offerCounterer, 
+                    Function<String, String> storeNameFethcer) {
+        this.offer = offer;
+        this.userId = userId;
+        this.offersRefresher = offersRefresher;
+        this.offerApprover = offerApprover;
+        this.offerRejecter = offerRejecter;
+        this.offerCounterer = offerCounterer;
+        this.storeNameFethcer = storeNameFethcer;
+
         getStyle()
             .set("width", "280px")
             .set("min-height", "180px")
@@ -43,7 +68,14 @@ public class OfferTile extends Div {
             .set("transform", "translateY(0)")
             .set("box-shadow", "0 2px 5px rgba(0,0,0,0.2)"));
 
-        VerticalLayout content = new VerticalLayout();
+        VerticalLayout content = isManagement ? managerContent() : memberContent();
+        HorizontalLayout actions = buttons();
+
+        add(content, actions);
+    }
+
+    private VerticalLayout managerContent() {
+                VerticalLayout content = new VerticalLayout();
         content.setPadding(false);
         content.setSpacing(false);
         content.setWidthFull();
@@ -97,18 +129,62 @@ public class OfferTile extends Div {
             pendingList.getStyle().set("color", "darkorange");
             content.add(pendingList);
         }
+        return content;
+    }
 
+    private VerticalLayout memberContent() {
+        VerticalLayout content = new VerticalLayout();
+        content.setPadding(false);
+        content.setSpacing(false);
+        content.setWidthFull();
+
+        String storeName = storeNameFethcer.apply(offer.getItem().getStoreId());
+        // Store name
+        content.add(new Span("Store: " + storeName)); // assuming you have this field
+
+        // Price history
+        List<Pair<String, Double>> prices = offer.getUsernamesPrice();
+        if (!prices.isEmpty()) {
+            VerticalLayout priceHistory = new VerticalLayout();
+            priceHistory.setPadding(false);
+            priceHistory.setSpacing(false);
+
+            for (int i = 0; i < prices.size(); i++) {
+                Pair<String, Double> p = prices.get(i);
+                Span priceSpan = new Span(p.getFirst() + ": $" + p.getSecond());
+                if (i == prices.size() - 1) {
+                    priceSpan.getStyle().set("font-weight", "bold");
+                } else {
+                    priceSpan.getStyle().set("color", "gray");
+                }
+                priceHistory.add(priceSpan);
+            }
+
+            content.add(priceHistory);
+        }
+
+        // Approval progress
+        int approvedCount = offer.getApprovedBy().size();
+        int totalApprovers = offer.getApprovers().size();
+        Span approvalStatus = new Span("Waiting for approval: " + approvedCount + " / " + totalApprovers);
+        approvalStatus.getStyle().set("color", approvedCount == totalApprovers ? "green" : "darkorange");
+        content.add(approvalStatus);
+
+        return content;
+    }
+
+    private HorizontalLayout buttons() {
         // Buttons
-        Button approveBtn = new Button("Approve", VaadinIcon.CHECK.create(), e -> {
+        Button approveBtn = new Button(VaadinIcon.CHECK.create(), e -> {
             offerApprover.accept(offer);
             offersRefresher.run();
         });
-        Button rejectBtn = new Button("Reject", VaadinIcon.CLOSE.create(), e -> {
+        Button rejectBtn = new Button(VaadinIcon.CLOSE.create(), e -> {
             offerRejecter.accept(offer);
             offersRefresher.run();
         });
 
-        Button counterOfferBtn = new Button("Counter Offer", VaadinIcon.REFRESH.create(), e -> {
+        Button counterOfferBtn = new Button(VaadinIcon.REFRESH.create(), e -> {
             offerCounterer.accept(offer);
             offersRefresher.run();
         });
@@ -129,9 +205,8 @@ public class OfferTile extends Div {
             .set("flex-wrap", "wrap")
             .set("gap", "8px");
         actions.setWidthFull();
-        
-
-        add(content, actions);
+        actions.setJustifyContentMode(JustifyContentMode.END);
+        return actions;
     }
     
     private void styleButton(Button button, String color) {

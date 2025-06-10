@@ -2,35 +2,41 @@ package UI.views.components;
 
 import Application.DTOs.OfferDTO;
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class OfferLayout extends VerticalLayout {
 
+    private final boolean isManagement;
     private final Supplier<List<OfferDTO>> offersSupplier;
     private final Supplier<String> userIdSupplier;
     private final Consumer<OfferDTO> offerApprover;
     private final Consumer<OfferDTO> offerRejecter;
     private final Consumer<OfferDTO> offerCounterer;
+    private final Function<String, String> storeNameFetcher;
 
     private final FlexLayout tileContainer = new FlexLayout();
 
-    public OfferLayout(Supplier<List<OfferDTO>> offersSupplier,
+    public OfferLayout(boolean isManagement, 
+                       Supplier<List<OfferDTO>> offersSupplier,
                        Supplier<String> userIdSupplier,
                        Consumer<OfferDTO> offerAccepter,
                        Consumer<OfferDTO> offerRejecter,
-                       Consumer<OfferDTO> offerCounterer) {
+                       Consumer<OfferDTO> offerCounterer,
+                       Function<String, String> storeNameFetcher) {
         this.offersSupplier = offersSupplier;
         this.userIdSupplier = userIdSupplier;
         this.offerApprover = offerAccepter;
         this.offerRejecter = offerRejecter;
         this.offerCounterer = offerCounterer;
+        this.storeNameFetcher = storeNameFetcher;
+        this.isManagement = isManagement;
 
         setWidthFull();
         setPadding(true);
@@ -55,7 +61,7 @@ public class OfferLayout extends VerticalLayout {
         if (offers == null || offers.isEmpty()) return;
 
         for (OfferDTO offer : offers) {
-            tileContainer.add(new OfferTile(offer, userId, this::refreshOffers, offerApprover, offerRejecter, offerCounterer));
+            tileContainer.add(new OfferTile(isManagement, offer, userId, this::refreshOffers, offerApprover, offerRejecter, offerCounterer, storeNameFetcher));
         }
     }
 }

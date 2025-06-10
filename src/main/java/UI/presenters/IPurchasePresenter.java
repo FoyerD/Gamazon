@@ -135,4 +135,37 @@ public interface IPurchasePresenter {
      * @return {@link OfferDTO}
      */
     public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails);
+
+    /**
+     * Retrieves all offers of a user
+     * @param sessionToken Identifier for user
+     * @return List of {@link OfferDTO}
+     */
+    public Response<List<OfferDTO>> getAllOffersOfUser(String sessionToken);
+
+    /**
+     * Member approves a counter offer
+     * @param sessionToken Identifier for user
+     * @param offerId id of offer to approve
+     * @return approved {@link OfferDTO}
+     */
+    public Response<OfferDTO> approveCounterOffer(String sessionToken, String offerId);
+
+
+    /**
+     * Memeber rejects a counter offer
+     * @param sessionToken Identifier for user
+     * @param offerId id of offer to approve
+     * @return rejected {@link OfferDTO}
+     */
+    public Response<OfferDTO> rejectCounterOffer(String sessionToken, String offerId);
+
+    /**
+     * Member counters a counter offer from store
+     * @param sessionToken Identifier for user
+     * @param offerId id of counter offer to counter (yet again)
+     * @param newPrice new price
+     * @return counterd counter {@link OfferDTO}
+     */
+    public Response<OfferDTO> counterCounterOffer(String sessionToken, String offerId, double newPrice);
 }

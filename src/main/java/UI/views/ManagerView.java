@@ -193,7 +193,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         );
 
 
-        offersLayout = new OfferLayout(
+        offersLayout = new OfferLayout(true,
             () -> { 
                 Response<List<OfferDTO>> offersResponse = managementPresenter.getStoreOffers(sessionToken, currentStoreId);
                 if (offersResponse.errorOccurred()) {
@@ -224,7 +224,15 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
                     Notification.show("Offer rejected successfully!", 3000,  Notification.Position.BOTTOM_END);
                 }
             },
-            this::showCounterOffer
+            this::showCounterOffer,
+            storeId -> {
+                Response<StoreDTO> storeResponse = storePresenter.getStoreById(sessionToken, storeId);
+                if (storeResponse.errorOccurred()) {
+                    Notification.show("Failed to fetch store: " + storeResponse.getErrorMessage(), 5000, Notification.Position.MIDDLE);
+                    return "Unknown";
+                } 
+                return storeResponse.getValue().getName();
+            }
         );
 
         // Tab change listener
