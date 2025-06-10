@@ -54,7 +54,7 @@
 ###  Run with Maven
 
 ```bash
- mvn spring-boot:ru
+ mvn spring-boot:run
 ```
 
 If compiled, use: 
@@ -125,6 +125,21 @@ Below is a list of available action types, their parameters, and what they do.
                                                             cvv, andIncrement, clientName, deliveryAddress
    checkout	         Checks out the cart with payment info	   session, cardNumber, expiryDate, cvv, 
                                                                andIncrement, clientName, deliveryAddress
+
+   Offers
+      Action                     Description                            Parameters
+   makeOffer	                  Member proposes a price for 	session, store, product, price, Id, cardNumber, 
+                                 an item in a store            expiryDate/year, expiryDate/month, expiryDate/day, 
+                                                               cvv, holder, as
+   acceptOfferByMember	   The buyer/member accepts a 	            session, offerId
+                           counter-offer or final offer
+   acceptOfferByEmployee	A store manager/owner accepts a 	         session, offerId
+                           submitted offer
+   counterOfferByMember	   Member responds with a new price 	      session, offerId, price
+                           to an employee’s counter-offer
+   counterOfferByEmployee	Store manager/owner responds with 	      session, offerId, price
+                           a new price to the member’s
+                           original offer 
 ### Example: Adding a New Scenario
    1. Open the file: src/main/resources/config/init.json
    2. Add a new state entry:
