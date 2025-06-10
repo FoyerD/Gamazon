@@ -2,14 +2,23 @@ package Domain.Store.Discounts.Qualifiers;
 
 import Domain.Store.Item;
 
-public class StoreQualifier implements DiscountQualifier {
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "store_qualifier")
+public class StoreQualifier extends DiscountQualifier {
     String storeId;
 
     public StoreQualifier(String storeId) {
+        super();
         if (storeId == null || storeId.isEmpty()) {
             throw new IllegalArgumentException("Store ID cannot be null or empty");
         }
         this.storeId = storeId;
+    }
+
+    protected StoreQualifier() {
+        super(); // JPA
     }
 
     @Override

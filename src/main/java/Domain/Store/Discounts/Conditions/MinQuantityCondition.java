@@ -4,7 +4,10 @@ import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "min_quantity_condition")
 public class MinQuantityCondition extends SimpleCondition{
 
     private String productId;
@@ -22,6 +25,10 @@ public class MinQuantityCondition extends SimpleCondition{
         }
         this.productId = productId;
         this.minQuantity = minQuantity;
+    }
+
+    protected MinQuantityCondition() {
+        super(); // JPA
     }
 
     @Override

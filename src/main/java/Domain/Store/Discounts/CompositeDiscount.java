@@ -8,10 +8,17 @@ import java.util.function.BiFunction;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
+import jakarta.persistence.*;
 
 
+@Entity
+@Table(name = "composite_discount")
 public abstract class CompositeDiscount extends Discount {
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "composite_discount_children",
+               joinColumns = @JoinColumn(name = "parent_id"),
+               inverseJoinColumns = @JoinColumn(name = "child_id"))
     protected List<Discount> discounts;
     protected MergeType mergeType;
 

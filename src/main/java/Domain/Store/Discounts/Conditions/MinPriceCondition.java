@@ -4,7 +4,11 @@ import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
+import jakarta.persistence.*;
 
+
+@Entity
+@Table(name = "min_price_condition")
 public class MinPriceCondition extends SimpleCondition {
 
     private double minPrice;
@@ -16,6 +20,10 @@ public class MinPriceCondition extends SimpleCondition {
             throw new IllegalArgumentException("Min price must be greater than zero");
         }
         this.minPrice = minPrice;
+    }
+
+    protected MinPriceCondition() {
+        super(); // JPA
     }
 
     @Override

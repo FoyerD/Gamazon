@@ -6,14 +6,22 @@ import java.util.function.BiFunction;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
+import jakarta.persistence.*;
 
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "discount")
 public abstract class Discount {
     public enum MergeType {
         MAX,
         MUL
     }
 
+    @Id
     protected final String id;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "condition_id")
     protected Condition condition;
     protected String storeId;
     protected String description;

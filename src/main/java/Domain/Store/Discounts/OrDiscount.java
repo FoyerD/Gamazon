@@ -8,7 +8,10 @@ import java.util.function.BiFunction;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
 import Domain.Store.Discounts.Conditions.Condition;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "or_discount")
 public class OrDiscount extends CompositeDiscount {
 
     // Constructor for loading from repository with existing ID

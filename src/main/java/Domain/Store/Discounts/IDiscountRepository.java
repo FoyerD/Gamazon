@@ -51,7 +51,6 @@ public abstract class IDiscountRepository  extends ILockbasedRepository<Discount
     public abstract boolean exists(String id);
     
     
-    //TODO! Roi or Itay or Almog or anyone adding a DB to this,
     // this method should only return HEAD DISCOUNTS, i.e
     // the discounts that have no parent discount.
     // please make sure to implement this correctly, otherwise some diocunts will be applied multiple times.

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.events.Event.ID;
 
 import Domain.Notification.INotificationRepository;
 import Domain.Repos.IAuctionRepository;
@@ -18,6 +19,7 @@ import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IShoppingCartRepository;
 import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
+import Domain.Store.Discounts.IDiscountRepository;
 import jakarta.transaction.Transactional;
 
 @Component
@@ -35,6 +37,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
     private final IFeedbackRepository feedbackRepo;
     private final INotificationRepository notificationRepo;
     private final IAuctionRepository auctionRepo;
+    private final IDiscountRepository discountRepo;
     private final IOfferRepository offerRepo;
 
 
@@ -48,7 +51,8 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
                             IShoppingBasketRepository shoppingBasketRepo, 
                             IShoppingCartRepository shoppingCartRepo, IPermissionRepository permissionRepo, 
                             IFeedbackRepository feedbackRepo, INotificationRepository notificationRepo, IAuctionRepository auctionRepo,
-                            IPolicyRepository policyRepo, IOfferRepository offerRepo) {
+                            IPolicyRepository policyRepo, IDiscountRepository discountRepo, IOfferRepository offerRepo) {
+        this.discountRepo = discountRepo;
         this.auctionRepo = auctionRepo;
         this.policyRepo = policyRepo;
         this.permissionRepo = permissionRepo;
@@ -86,6 +90,7 @@ public class DatabaseCleaner implements CommandLineRunner, Ordered {
         feedbackRepo.deleteAll();
         notificationRepo.deleteAll();
         auctionRepo.deleteAll();
+        discountRepo.deleteAll();
         offerRepo.deleteAll();
 
         System.out.println("🧹 Database wiped clean (before app init)");

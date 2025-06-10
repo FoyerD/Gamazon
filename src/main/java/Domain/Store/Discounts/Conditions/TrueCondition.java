@@ -5,18 +5,20 @@ import java.util.function.BiFunction;
 
 import Domain.Shopping.ShoppingBasket;
 import Domain.Store.Item;
+import jakarta.persistence.*;
 
-public class TrueCondition implements Condition {
+@Entity
+@Table(name = "true_condition")
+public class TrueCondition extends Condition {
 
-    private final String id;
 
     public TrueCondition() {
-        this.id = UUID.randomUUID().toString();
+        super(UUID.randomUUID().toString());
     }
 
     // Constructor for loading from repository with existing ID
     public TrueCondition(String id) {
-        this.id = id;
+        super(id);
     }
 
     @Override
