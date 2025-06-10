@@ -252,7 +252,7 @@ public class ShoppingService{
         } catch (Exception ex) {
             TradingLogger.logError(CLASS_NAME, method, "Error clearing basket: %s", ex.getMessage());
             return new Response<>(new Error(ex.getMessage()));
-        }
+        }   
     }
 
     
