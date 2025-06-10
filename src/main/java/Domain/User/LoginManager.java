@@ -33,6 +33,36 @@ public class LoginManager {
         return user;
     }
 
+    /**
+     * Retrieves a logged in member by their ID.
+     * @param id the ID of the member to retrieve.
+     * @return The member associated with the given ID.
+     * @throws NoSuchElementException if no member is found with the given ID.
+     * */
+    public Member getMember(String id) {
+        Member member = userRepository.getMember(id);
+        if (member == null) {
+            throw new NoSuchElementException("Member not found");
+        }
+        return member;
+    }
+
+    /**
+     * Retrieves a logged in member by their ID.
+     * @param id the ID of the member to retrieve.
+     * @return The member associated with the given ID.
+     * @throws NoSuchElementException if no member is found with the given ID.
+     * @throws IllegalStateException if the member is not logged in
+     */
+    public Member getLoggedInMember(String id) {
+        Member member = this.getMember(id);
+
+        if (!member.isLoggedIn()) {
+            throw new IllegalStateException(" Member is not logged in");
+        }
+        return member;
+    }
+
     /***
      * Retrieves a user by their username.
      * @param username The username of the user to retrieve.

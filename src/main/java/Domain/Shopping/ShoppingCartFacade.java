@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,10 +21,12 @@ import Domain.Repos.IShoppingCartRepository;
 import Domain.Repos.IUserRepository;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
+import Domain.Store.Policy;
 import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.Discounts.ItemPriceBreakdown;
+import Domain.User.Member;
 import Domain.management.PolicyFacade;
 
 
@@ -42,6 +45,8 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     private final StoreFacade storeFacade;
     private CheckoutManager checkoutManager;
     private final DiscountFacade discountFacade;
+    private final Function<String, Member> memberLookup;
+    private final PolicyFacade policyFacade;
 
     /**
      * Constructor to initialize the ShoppingCartFacade with required repositories and services.
@@ -67,17 +72,15 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         this.storeFacade = storeFacade;
         this.receiptRepo = receiptRepo;
         this.discountFacade = discountFacade;
+        this.policyFacade = policyFacade;
+        this.memberLookup = userRepository::getMember; // Assuming userRepository has a method to get Member by ID
         this.checkoutManager = new CheckoutManager(basketRepo, paymentService, itemFacade, productRepository,
+
          new ReceiptBuilder(receiptRepo, itemFacade), discountFacade, supplyService, policyFacade, receiptRepository, userRepository);
     }
 
-    /**
-     * Retrieves a shopping cart for a specific client, creating a new one if it doesn't exist.
-     * 
-     * @param clientId The ID of the client
-     * @return The shopping cart for the specified client
-     */
-    private IShoppingCart getCart(String clientId) {
+    @Override
+    public IShoppingCart getCart(String clientId) {
         IShoppingCart cart = cartRepo.get(clientId);
         if (cart == null) {
             cart = new ShoppingCart(clientId);
@@ -490,5 +493,15 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
         }
         List<Discount> discounts = discountFacade.getStoreDiscounts(storeId);
         return basket.getBestPrice(itemFacade::getItem, discounts);
+    }
+    
+    public List<Policy> getViolatedPolicies(String memberId) {
+        Member member = memberLookup.apply(memberId);
+        return this.getCart(memberId) .getCart().stream() // get stores ids
+            .flatMap(storeId -> policyFacade.getAllStorePolicies(storeId).stream()) // get all policies for all stores
+            .filter(p -> !p.isApplicable( // check if basket is a applicable
+                this.getBasket(memberId, p.getStoreId()), // get basket
+                member)
+            ).toList();
     }
 }

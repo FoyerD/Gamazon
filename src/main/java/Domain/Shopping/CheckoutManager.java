@@ -152,10 +152,7 @@ public class CheckoutManager {
             }
             cart.clear();
             
-            // Create receipts with discounted prices
-            if (purchaseSuccess) {
-                receiptBuilder.createReceiptsWithDiscounts(clientId, storeProductsMap, storeProductPricesMap, cardNumber);
-            }
+            
 
             supplyResponse = supplyService.supplyOrder(
                 clientName, deliveryAddress, city, country, zipCode
@@ -171,8 +168,6 @@ public class CheckoutManager {
             }
 
             for (String storeId : storeIds) {
-                String maskedCardNumber = "xxxx-xxxx-xxxx-" + cardNumber.substring(cardNumber.length() - 4);
-                String paymentDetails = "Card: " + maskedCardNumber;
                 Map<Product, Double> productPrices = storeProductPricesMap.get(storeId);
                 Map<Product, Integer> productQuantities = storeProductsMap.get(storeId);
                 Map<Product, Pair<Integer, Double>> productPricesWithQuantities = new HashMap<>();
@@ -188,14 +183,13 @@ public class CheckoutManager {
                         }
                     }
                 }
-                double storeTotal = storeProductPricesMap.get(storeId).values().stream()
-                .mapToDouble(price -> price * productQuantities.getOrDefault(price, 0))
-                .sum();
-                
-                receiptRepo.savePurchase(clientId, storeId, productPricesWithQuantities, storeTotal, paymentDetails);
             }
             
-
+            // Create receipts with discounted prices
+            if (purchaseSuccess) {
+                String maskedCardNumber = "xxxx-xxxx-xxxx-" + cardNumber.substring(cardNumber.length() - 4);
+                receiptBuilder.createReceiptsWithDiscounts(clientId, storeProductsMap, storeProductPricesMap, maskedCardNumber);
+            }
             return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData, paymentResponse.getValue(), supplyResponse.getValue());
             
         } catch (Exception e) {

@@ -159,7 +159,7 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         registerBtn.getStyle().set("background-color", " #6b46c1").set("color", "white");
 
         logoutBtn.addClickListener(e -> {
-            Response<Void> response = loginPresenter.logout(sessionToken);
+            Response<Void> response = this.loginPresenter.logout(sessionToken);
             if (!response.errorOccurred()) {
                 UI.getCurrent().getSession().close();
                 UI.getCurrent().navigate("");
@@ -323,7 +323,7 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         // Add to cart button column
         productGrid.addComponentColumn(item -> {
             Button addToCartButton = new Button("Add to Cart", e -> {
-                Response<Boolean> response = purchasePresenter.addProductToCart(sessionToken, item.getProductId(), item.getStoreId(), 1);
+                Response<Boolean> response = this.purchasePresenter.addProductToCart(sessionToken, item.getProductId(), item.getStoreId(), 1);
                 if (!response.errorOccurred()) {
                     Notification.show("Product added to cart successfully!", 3000, Notification.Position.MIDDLE);
                 } else {

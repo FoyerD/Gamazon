@@ -7,6 +7,7 @@ import java.util.Set;
 
 import Domain.Pair;
 import Domain.Store.Item;
+import Domain.Store.Policy;
 import Domain.Store.Discounts.ItemPriceBreakdown;
 
 /**
@@ -33,6 +34,26 @@ public interface IShoppingCartFacade {
     boolean makeBid(String auctionId, String clientId, float price,
                             String cardNumber, Date expiryDate, String cvv,
                             long andIncrement, String clientName, String deliveryAddress);
+
+
+
+    /**
+     * Retrieves a shopping cart for a specific client, creating a new one if it doesn't exist.
+     * 
+     * @param clientId The ID of the client
+     * @return The shopping cart for the specified client
+     */
+    public IShoppingCart getCart(String clientId);
+
+    /**
+     * Retrieves a shopping basket for a specific client and store, creating a new one if it doesn't exist.
+     * 
+     * @param clientId The ID of the client
+     * @param storeId The ID of the store
+     * @return The shopping basket for the specified client and store
+     */
+    public ShoppingBasket getBasket(String clientId, String storeId);
+
     /**
      * Adds a product to the shopping cart
      * 
@@ -148,6 +169,11 @@ public interface IShoppingCartFacade {
      */
     Set<String> getUsersWithBaskets(String storeId);
 
-    ShoppingBasket getBasket(String clientId, String storeId);
     Map<String, ItemPriceBreakdown> getBestPrice(String clientId, String storeId);
+    /**
+     * Gets all polices that are violated of a specific user
+     * @param memberId The ID of the user
+     * @return a list of {@link Policy} that have been violated
+     */
+    public List<Policy> getViolatedPolicies(String memberId);
 }
