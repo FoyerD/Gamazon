@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.events.Event.ID;
 
 import Domain.Notification.INotificationRepository;
 import Domain.Repos.IAuctionRepository;
