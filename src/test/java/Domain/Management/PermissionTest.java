@@ -1,16 +1,15 @@
-package Domain.management;
-import org.junit.Before;
-import org.junit.Test;
-
-import Domain.management.Permission;
-import Domain.management.PermissionType;
-import Domain.management.RoleType;
-import Domain.management.PermissionFactory;
-
+package Domain.Management;
 import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+
+import Domain.management.Permission;
+import Domain.management.PermissionFactory;
+import Domain.management.PermissionType;
+import Domain.management.RoleType;
 
 public class PermissionTest {
 
