@@ -4,33 +4,51 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.vaadin.flow.component.template.Id;
-
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "stores")
 public class Store {
     
+    @Id
+    @Column(name = "id", nullable = false, unique = true)
     private String id;
+    
+    @Column(name = "name")
     private String name;
+    
+    @Column(name = "description")
     private String description;
+    
+    @Column(name = "founder_id")
     private String founderId;
     
-    private Set<String> owners;
-    private Set<String> managers;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "store_owners", joinColumns = @JoinColumn(name = "store_id"))
+    private Set<String> owners = Collections.synchronizedSet(new HashSet<>());
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "store_managers", joinColumns = @JoinColumn(name = "store_id"))
+    private Set<String> managers = Collections.synchronizedSet(new HashSet<>());
+    
+    @Column(name = "is_open")
     private boolean isOpen;
     
-
-    public Store(){
-        this.id = null;
-        this.name = null;
-        this.description = null;
-        this.founderId = null;
-        this.owners = Collections.synchronizedSet(new HashSet<>());
-        this.managers = Collections.synchronizedSet(new HashSet<>());
-        this.isOpen = true;
+    @Column(name = "is_permanently_closed")
+    private boolean isPermanentlyClosed;
+    
+    protected Store() {
+        // Required by JPA
     }
+
+
     
     public Store(String id, String name, String description, String foudnerId) {
         this.id = id;
@@ -40,6 +58,7 @@ public class Store {
         this.owners = Collections.synchronizedSet(new HashSet<>());
         this.managers = Collections.synchronizedSet(new HashSet<>());
         this.isOpen = true;
+        this.isPermanentlyClosed = false;
     }
 
     public String getId() {
@@ -89,6 +108,13 @@ public class Store {
     }
     public void setOpen(boolean isOpen) {
         this.isOpen = isOpen;
+    }
+
+    public boolean isPermanentlyClosed() {
+        return isPermanentlyClosed;
+    }
+    public void setPermanentlyClosed(boolean isPermanentlyClosed) {
+        this.isPermanentlyClosed = isPermanentlyClosed;
     }
     
     public boolean removeOwner(String userId) {

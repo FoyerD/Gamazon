@@ -1,20 +1,21 @@
 package Domain;
 
-
-
-
 import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
-import Domain.ExternalServices.IPaymentService;
 import Domain.Shopping.IShoppingCartFacade;
+import Domain.Shopping.OfferManager;
 import Domain.Shopping.ShoppingCartFacade;
 import Domain.Store.ItemFacade;
 import Domain.Store.ProductFacade;
 import Domain.Store.StoreFacade;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.User.LoginManager;
 import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
 import Domain.management.PermissionManager;
+import Domain.management.PolicyFacade;
 
 public class FacadeManager {
     private IRepoManager repoManager;
@@ -23,17 +24,27 @@ public class FacadeManager {
     private StoreFacade storeFacade;
     private ItemFacade itemFacade;
     private ProductFacade productFacade;
-    private IPaymentService paymentService;
+    private IExternalPaymentService paymentService;
+    private IExternalSupplyService supplyService;
     private LoginManager loginManager;
     private PermissionManager permissionManager;
+    private OfferManager offerManager;
     private INotificationService notificationService;
-    public FacadeManager(IRepoManager repoManager, IPaymentService paymentService) {
+    private DiscountFacade discountFacade;
+    private PolicyFacade policyFacade;
+
+    public FacadeManager(IRepoManager repoManager, IExternalPaymentService paymentService, IExternalSupplyService supplyService) {
         this.repoManager = repoManager;
         this.paymentService = paymentService;
+        this.supplyService = supplyService;
     }
 
-    public IPaymentService getPaymentService() {
+    public IExternalPaymentService getPaymentService() {
         return paymentService;
+    }
+
+    public IExternalSupplyService getSupplyService() {
+        return supplyService;
     }
 
     public IMarketFacade getMarketFacade() {
@@ -64,7 +75,10 @@ public class FacadeManager {
                                         repoManager.getFeedbackRepository(),
                                         repoManager.getItemRepository(),
                                         repoManager.getUserRepository(),
-                                        repoManager.getAuctionRepository(), getNotificationService());
+                                        repoManager.getAuctionRepository(),
+                                        getNotificationService(),
+                                        repoManager.getReceiptRepository(),
+                                        repoManager.getProductRepository());
         }
         return storeFacade;
     }
@@ -86,7 +100,12 @@ public class FacadeManager {
                                                 getItemFacade(),
                                                 getStoreFacade(),
                                                 repoManager.getReceiptRepository(),
-                                                repoManager.getProductRepository());
+                                                repoManager.getProductRepository(),
+                                                getDiscountFacade(),
+                                                getPolicyFacade(),
+                                                getRepositoryManager().getUserRepository(),
+                                                getSupplyService(),
+                                                getRepositoryManager().getReceiptRepository());
         }
         return CartFacade;
     }
@@ -109,5 +128,35 @@ public class FacadeManager {
             permissionManager = new PermissionManager(repoManager.getPermissionRepository());
         }
         return permissionManager;
+    }
+
+    public DiscountFacade getDiscountFacade() {
+        if (discountFacade == null) {
+            discountFacade = new DiscountFacade(repoManager.getDiscountRepository(),
+                                                getItemFacade());
+        }
+        return discountFacade;
+    }
+    
+    public OfferManager getOfferManager() {
+        if (offerManager == null) {
+            offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager(), repoManager.getItemRepository(), getStoreFacade(), getPaymentService(), getRepositoryManager().getReceiptRepository(), getRepositoryManager().getProductRepository());
+        }
+        return offerManager;
+    }
+
+    public PolicyFacade getPolicyFacade() {
+        if (policyFacade == null) {
+            policyFacade = new PolicyFacade(repoManager.getPolicyRepository(),
+                                            repoManager.getUserRepository(),
+                                            getItemFacade(),
+                                            getProductFacade());
+        }
+        return policyFacade;
+    }
+
+    public IRepoManager getRepositoryManager()
+    {
+        return repoManager;
     }
 }

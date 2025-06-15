@@ -6,8 +6,13 @@ import org.springframework.stereotype.Component;
 
 import Application.ItemService;
 import Application.MarketService;
+import Application.PolicyService;
 import Application.StoreService;
+import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ItemDTO;
+import Application.DTOs.OfferDTO;
+import Application.DTOs.PolicyDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
 import Domain.management.PermissionType;
@@ -19,11 +24,13 @@ public class ManagementPresenter implements IManagementPresenter {
     private final MarketService marketService;
     private final StoreService storeService;
     private final ItemService itemService;
+    private final PolicyService policyService;
 
-    public ManagementPresenter(MarketService marketService, StoreService storeService, ItemService itemService){
+    public ManagementPresenter(MarketService marketService, StoreService storeService, ItemService itemService, PolicyService policyService){
         this.marketService = marketService;
         this.storeService = storeService;
         this.itemService = itemService;
+        this.policyService = policyService;
     }
 
     @Override
@@ -39,6 +46,11 @@ public class ManagementPresenter implements IManagementPresenter {
     @Override
     public Response<Boolean> closeStore(String sessionToken, String storeId) {
         return storeService.closeStore(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<Boolean> closeStoreNotPermanent(String sessionToken, String storeId) {
+        return storeService.closeStoreNotPermanent(sessionToken, storeId);
     }
 
     @Override
@@ -65,28 +77,71 @@ public class ManagementPresenter implements IManagementPresenter {
         return itemService.decreaseAmount(sessionToken, new Pair<>(storeId, productId), amount);
     }
 
+
     @Override
-    public Response<Void> appointStoreManager(String sessionToken, String appointerUsername, String appointeeUsername,
+    public Response<Void> appointStoreManager(String sessionToken, String appointeeId,
             String storeId) {
-            return marketService.appointStoreManager(sessionToken, appointerUsername, appointeeUsername, storeId);
+            return marketService.appointStoreManager(sessionToken, appointeeId, storeId);
+    }
+
+
+    @Override
+    public Response<Void> removeStoreOwner(String sessionToken,  String managerId,
+            String storeId) {
+        return marketService.removeStoreOwner(sessionToken, managerId, storeId);
     }
 
     @Override
-    public Response<Void> removeStoreManager(String sessionToken, String removerUsername, String managerUsername,
+    public Response<Void> appointStoreOwner(String sessionToken, String appointeeId,
             String storeId) {
-        return marketService.removeStoreManager(sessionToken, removerUsername, managerUsername, storeId);
+        return marketService.appointStoreOwner(sessionToken, appointeeId, storeId);
     }
 
     @Override
-    public Response<Void> appointStoreOwner(String sessionToken, String appointerUsername, String appointeeUsername,
-            String storeId) {
-        return marketService.appointStoreOwner(sessionToken, appointerUsername, appointeeUsername, storeId);
-    }
-
-    @Override
-    public Response<Void> changeManagerPermissions(String sessionToken, String ownerUsername, String managerUsername,
+    public Response<Void> changeManagerPermissions(String sessionToken, String managerId,
             String storeId, List<PermissionType> newPermissions) {
-        return marketService.changeManagerPermissions(sessionToken, ownerUsername, managerUsername, storeId, newPermissions);
+        return marketService.changeManagerPermissions(sessionToken, managerId, storeId, newPermissions);
+    }
+
+    @Override
+    public Response<EmployeeInfo> getEmployeeInfo(String sessionToken, String storeId) {
+        return marketService.getEmployeeInfo(sessionToken, storeId);
+    }
+
+
+    @Override
+    public Response<List<ClientOrderDTO>> getPurchaseHistory(String sessionToken, String storeId) {
+        return marketService.getStorePurchaseHistory(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<PolicyDTO> savePolicy(String sessionToken, PolicyDTO policy) {
+        return policyService.createPolicy(sessionToken, policy.getStoreId(), policy);
+    }
+
+    @Override
+    public Response<List<PolicyDTO>> getStorePolicies(String sessionToken, String storeId) {
+        return policyService.getAllStorePolicies(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<List<OfferDTO>> getStoreOffers(String sessionToken, String storeId) {
+        return storeService.getAllOffers(sessionToken, storeId);
+    }
+
+    @Override
+    public Response<OfferDTO> acceptOffer(String sessionToken, String offerId) {
+        return storeService.acceptOffer(sessionToken, offerId);
+    }
+
+    @Override
+    public Response<OfferDTO> rejectOffer(String sessionToken, String offerId) {
+        return storeService.rejectOffer(sessionToken, offerId);
+    }
+
+    @Override
+    public Response<OfferDTO> counterOffer(String sessionToken, String offerId, double newPrice) {
+        return storeService.counterOffer(sessionToken, offerId, newPrice);
     }
     
 }

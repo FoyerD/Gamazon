@@ -1,21 +1,27 @@
 package UI.presenters;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import Application.PolicyService;
 import Application.ShoppingService;
 import Application.DTOs.CartDTO;
-import Application.DTOs.OrderDTO;
+import Application.DTOs.OfferDTO;
+import Application.DTOs.PaymentDetailsDTO;
+import Application.DTOs.PolicyDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
 
 @Component
 public class PurchasePresenter implements IPurchasePresenter {
     private final ShoppingService shoppingService;
+    private final PolicyService policyService;
 
-    public PurchasePresenter(ShoppingService shoppingService) {
+    public PurchasePresenter(ShoppingService shoppingService, PolicyService policyService) {
         this.shoppingService = shoppingService;
+        this.policyService = policyService;
     }
 
     @Override
@@ -33,7 +39,6 @@ public class PurchasePresenter implements IPurchasePresenter {
         return this.shoppingService.removeProductFromCart(storeId, sessionToken, productId, amount);
     }
 
-    //This is the real viewCart
     public Response<CartDTO> viewCart(String sessionToken) {
         return this.shoppingService.viewCart(sessionToken);
     }
@@ -47,11 +52,7 @@ public class PurchasePresenter implements IPurchasePresenter {
     public Response<Boolean> clearBasket(String sessionToken, String storeId) {
         return this.shoppingService.clearBasket(sessionToken, storeId);
     }
-
-
-    public Response<Boolean> makeBid(String sessionToken, String auctionId, float bid) {
-        throw new UnsupportedOperationException("bid is wrong");
-    }
+    
 
     @Override
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
@@ -62,9 +63,45 @@ public class PurchasePresenter implements IPurchasePresenter {
     }
 
     @Override
-    public Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress) {
-        return this.shoppingService.checkout(sessionToken, cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+    public Response<Boolean> purchaseCart(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode) {
+        return this.shoppingService.checkout(sessionToken, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, 
+                                             city, country, zipCode);
+    }
+
+    @Override
+    public Response<List<ReceiptDTO>> getPersonalPurchases(String sessionToken) {
+        return this.shoppingService.getUserPurchaseHistory(sessionToken);
+    }
+
+    @Override
+    public Response<List<PolicyDTO>> getViolatedPolicies(String sessionToken) {
+        return this.policyService.getViolatedPolicies(sessionToken);
+    }
+
+    @Override
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails) {
+        return this.shoppingService.makeOffer(sessionToken, storeId, productId, newPrice, paymentDetails);
+    }
+
+    @Override
+    public Response<List<OfferDTO>> getAllOffersOfUser(String sessionToken) {
+        return this.shoppingService.getAllOffersOfUser(sessionToken);
+    }
+
+    @Override
+    public Response<OfferDTO> approveCounterOffer(String sessionToken, String offerId) {
+        return this.shoppingService.acceptOffer(sessionToken, offerId);
+    }
+
+    @Override
+    public Response<OfferDTO> rejectCounterOffer(String sessionToken, String offerId) {
+        return Response.error("Unimplemented in shopping service");
+    }
+
+    @Override
+    public Response<OfferDTO> counterCounterOffer(String sessionToken, String offerId, double newPrice) {
+        return this.shoppingService.counterOffer(sessionToken, offerId, newPrice);
     }
     
 }

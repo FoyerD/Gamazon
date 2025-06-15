@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import Domain.Shopping.IShoppingCart;
 import Domain.Shopping.ShoppingCartFactory;
+import Infrastructure.MemoryRepositories.MemoryShoppingCartRepository;
 
 /**
  * Test class for MemoryShoppingCartRepository.

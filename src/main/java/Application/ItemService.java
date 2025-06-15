@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Application.DTOs.ItemDTO;
 import Application.utils.Error;
@@ -29,6 +30,7 @@ public class ItemService {
         this.permissionManager = permissionManager;
     }
 
+    @Transactional
     public Response<Boolean> changePrice(String sessionToken, String storeId, String productId, float newPrice) {
         String method = "changePrice";
         Response<ItemDTO> itemRes = getItem(sessionToken, storeId, productId);
@@ -54,6 +56,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<List<ItemDTO>> getItemsByProductId(String sessionToken, String productId) {
         String method = "getItemsByProductId";
         try {
@@ -70,6 +73,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<List<ItemDTO>> filterItems(String sessionToken, ItemFilter filter) {
         String method = "filterItems";
         try {
@@ -86,6 +90,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<ItemDTO> getItem(String sessionToken, String storeId, String productId) {
         String method = "getItem";
         try {
@@ -101,6 +106,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<List<ItemDTO>> getItemsByStoreId(String sessionToken, String storeId) {
         String method = "getItemsByStoreId";
         try {
@@ -117,6 +123,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<List<ItemDTO>> getAvailableItems(String sessionToken) {
         String method = "getAvailableItems";
         try {
@@ -133,6 +140,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<Void> addRating(String sessionToken, String storeId, String productId, int rating){
         String method = "addRating";
         try {
@@ -151,10 +159,12 @@ public class ItemService {
         }
     }
 
-
+    @Transactional
     public Response<ItemDTO> add(String sessionToken, String storeId, String productId, String description) {
         return this.add(sessionToken, storeId, productId, 0, 0, description);
     }
+
+    @Transactional
     public Response<ItemDTO> add(String sessionToken, String storeId, String productId, double price, int amount, String description) {
         String method = "add";
         try {
@@ -179,6 +189,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<ItemDTO> remove(String sessionToken, Pair<String, String> id) {
         String method = "remove";
         try {
@@ -197,6 +208,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<Void> increaseAmount(String sessionToken, Pair<String, String> id, int amount) {
         String method = "increaseAmount";
         try {
@@ -217,6 +229,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Response<Void> decreaseAmount(String sessionToken, Pair<String, String> id, int amount) {
         String method = "decreaseAmount";
         try {
@@ -236,4 +249,6 @@ public class ItemService {
             return new Response<>(new Error(ex.getMessage()));
         }
     }
+
+
 }

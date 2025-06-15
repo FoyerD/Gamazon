@@ -2,10 +2,13 @@ package Domain.Store;
 
 import java.util.Objects;
 
+import jakarta.persistence.Embeddable;
+
 /**
  * Represents a category to which a product can belong.
  * Categories are compared by their name.
  */
+@Embeddable
 public class Category {
     private String name;
     private String description;
@@ -19,6 +22,11 @@ public class Category {
     public Category(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+
+    protected Category() {
+        // Required by JPA
     }
 
     /** @return the name of the category */
@@ -47,7 +55,7 @@ public class Category {
         if (this == o) return true;
         if (!(o instanceof Category)) return false;
         Category that = (Category) o;
-        return Objects.equals(name, that.name);
+        return name.trim().toLowerCase().equals(that.name.trim().toLowerCase());
     }
 
     @Override

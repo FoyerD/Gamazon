@@ -1,38 +1,52 @@
 package UI.views;
 
-import UI.presenters.IPurchasePresenter;
-import UI.views.components.BasketLayout;
-import UI.presenters.IProductPresenter;
-import Application.DTOs.CartDTO;
-import Application.DTOs.ItemDTO;
-import Application.DTOs.ShoppingBasketDTO;
-import Application.utils.Response;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.Map;
+import Application.DTOs.CartDTO;
+import Application.DTOs.ItemDTO;
+import Application.DTOs.PolicyDTO;
+import Application.DTOs.ShoppingBasketDTO;
+import Application.DTOs.StoreDTO;
+import Application.MarketService;
+import Application.utils.Response;
+import Domain.management.PermissionManager;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IProductPresenter;
+import UI.presenters.IPurchasePresenter;
+import UI.presenters.IStorePresenter;
+import UI.presenters.IUserSessionPresenter;
+import UI.views.components.BasketLayout;
 
 @Route("cart")
-public class CartView extends VerticalLayout implements BeforeEnterObserver {
+public class CartView extends BaseView implements BeforeEnterObserver {
 
     private final IPurchasePresenter purchasePresenter;
+    private final IStorePresenter storePresenter;
     private String sessionToken;
     private String currentUsername;
+    private boolean isBanned = false;
 
     private final H1 title = new H1("Your Shopping Cart");
     private final VerticalLayout cartContent = new VerticalLayout();
@@ -44,9 +58,14 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
     private double cartTotal = 0.0;
 
     @Autowired
-    public CartView(IPurchasePresenter purchasePresenter, IProductPresenter productPresenter) {
+    public CartView(IPurchasePresenter purchasePresenter, IStorePresenter storePresenter, IProductPresenter productPresenter,
+                    IUserSessionPresenter sessionPresenter,
+                    @Autowired(required = false) DbHealthStatus dbHealthStatus, @Autowired(required = false) GlobalLogoutManager globalLogoutManager
+                        ,INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, globalLogoutManager, sessionPresenter, notificationPresenter);
         this.purchasePresenter = purchasePresenter;
-
+        this.storePresenter = storePresenter;
+        
         setSizeFull();
         setSpacing(true);
         setPadding(true);
@@ -75,6 +94,9 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         checkoutButton.addClickListener(e -> proceedToCheckout());
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
 
+        // Add data attribute to identify checkout button for ban handling
+        checkoutButton.getElement().setAttribute("data-checkout-button", "true");
+
         // Create the bottom layout with total and buttons
         HorizontalLayout bottomLayout = new HorizontalLayout(totalPriceLabel, homeButton, checkoutButton);
         bottomLayout.setWidthFull();
@@ -93,6 +115,32 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         // Update title with username
         this.currentUsername = (String) UI.getCurrent().getSession().getAttribute("username");
         
+        // Check ban status
+        if (sessionToken != null && currentUsername != null) {
+            Response<Boolean> isBannedResponse = sessionPresenter.isUserBanned(sessionToken);
+            if (!isBannedResponse.errorOccurred()) {
+                isBanned = isBannedResponse.getValue();
+                if (isBanned) {
+                    // Disable checkout button
+                    checkoutButton.setEnabled(false);
+                    checkoutButton.getStyle()
+                        .set("background-color", "#718096")
+                        .set("color", "white")
+                        .set("cursor", "not-allowed")
+                        .set("opacity", "0.5");
+                    
+                    // Show notification about ban
+                    Notification notification = new Notification(
+                        "You are currently banned. You can view your cart but cannot proceed to checkout.",
+                        5000,
+                        Notification.Position.MIDDLE
+                    );
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    notification.open();
+                }
+            }
+        }
+
         // Create the header with title and cart clear button
         H1 titleElement = new H1("Hello " + (currentUsername != null ? currentUsername : "User"));
         titleElement.getStyle().set("color", "#1890ff").set("margin", "0");
@@ -129,8 +177,8 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         // Get cart items from presenter with proper error handling
         Response<CartDTO> cartResponse = purchasePresenter.viewCart(sessionToken);
         
-        if (cartResponse.errorOccurred()) {
-            Notification.show("Error loading cart: " + cartResponse.getErrorMessage(), 
+        if (cartResponse == null || cartResponse.getValue() == null) {
+            Notification.show("Error loading cart: Unable to retrieve cart data", 
                 3000, Notification.Position.MIDDLE);
             cartContent.add(new Span("Unable to load cart contents"));
             totalPriceLabel.setText("Total: $0.00");
@@ -145,15 +193,50 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
             return;
         }
 
+        // For banned users or if there's an error, just use an empty policy list without showing an error
+        List<PolicyDTO> policies = Collections.emptyList();
+        if (!isBanned) {
+            Response<List<PolicyDTO>> policiesResponse = purchasePresenter.getViolatedPolicies(sessionToken);
+            if (policiesResponse != null && policiesResponse.getValue() != null) {
+                policies = policiesResponse.getValue();
+            }
+        }
+
         // Create a panel for each store basket
-        for (Map.Entry<String, ShoppingBasketDTO> basket : cart.getBaskets().entrySet()) {
+        for (Map.Entry<String, ShoppingBasketDTO> basketEntry : cart.getBaskets().entrySet()) {
+
+            String storeId = basketEntry.getKey();
+            ShoppingBasketDTO basket = basketEntry.getValue();
+            // Check if the store is closed
+            Response<StoreDTO> storeResponse = storePresenter.getStoreByName(sessionToken, basket.getStoreName());
+            if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen() && storeResponse.getValue().isPermanentlyClosed()) {
+                // Store is permanently closed, remove the basket
+                purchasePresenter.clearBasket(sessionToken, storeId);
+                Notification.show(
+                    String.format("Basket from store '%s' has been removed because the store is permanently closed", 
+                    basket.getStoreName()),
+                    5000, 
+                    Notification.Position.MIDDLE
+                );
+                continue;
+            } else if (!storeResponse.errorOccurred() && !storeResponse.getValue().isOpen() && !storeResponse.getValue().isPermanentlyClosed()) {
+                // Store is temporarily closed, show notification but keep basket
+                Notification.show(
+                    String.format("Note: Store '%s' is temporarily closed. Your basket is preserved.", 
+                    basket.getStoreName()),
+                    5000, 
+                    Notification.Position.MIDDLE
+                );
+            }
+
             BasketLayout basketLayout = new BasketLayout(
-                basket.getValue(),
+                basket,
+                policies.stream().filter(p -> p.getStoreId().equals(storeId)).toList(),
                 this::removeBasket,
                 this::removeProduct,
                 this::decrementAmount,
                 this::incrementAmount
-                );
+            );
             
             cartTotal += basketLayout.calculateBasketTotal();
             cartContent.add(basketLayout);
@@ -161,8 +244,6 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
         // Update cart total
         totalPriceLabel.setText(String.format("Total: $%.2f", cartTotal));
     }
-
-
 
     private void decrementAmount(ItemDTO item) {
         Response<Boolean> response = purchasePresenter.removeProductFromCart(
@@ -229,6 +310,10 @@ public class CartView extends VerticalLayout implements BeforeEnterObserver {
     }
 
     private void proceedToCheckout() {
+        if (isBanned) {
+            Notification.show("You cannot checkout while banned", 3000, Notification.Position.MIDDLE);
+            return;
+        }
         if (cartTotal <= 0) {
             Notification.show("Your cart is empty", 3000, Notification.Position.MIDDLE);
             return;

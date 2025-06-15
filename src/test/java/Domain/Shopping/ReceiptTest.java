@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import Domain.Pair;
 import Domain.Store.Category;
 import Domain.Store.Product;
 
@@ -17,7 +19,7 @@ import Domain.Store.Product;
 public class ReceiptTest {
     
     private Receipt receipt;
-    private Map<Product, Integer> products;
+    private Map<Product, Pair<Integer, Double>> products;
     private static final String CLIENT_ID = "client123";
     private static final String STORE_ID = "store123";
     private static final double TOTAL_PRICE = 35.0;
@@ -29,8 +31,8 @@ public class ReceiptTest {
         Product product1 = createProduct("product1", "Product 1");
         Product product2 = createProduct("product2", "Product 2");
         
-        products.put(product1, 2);
-        products.put(product2, 1);
+        products.put(product1, new Pair<>(2, 10.0));
+        products.put(product2, new Pair<>(1, 15.0));
         
         receipt = new Receipt(CLIENT_ID, STORE_ID, products, TOTAL_PRICE, PAYMENT_DETAILS);
     }
@@ -61,12 +63,14 @@ public class ReceiptTest {
         LocalDateTime timestamp = receipt.getTimestamp();
         assertTrue(timestamp.isBefore(now) || timestamp.isEqual(now));
         assertTrue(timestamp.isAfter(now.minusSeconds(10)));
+        assertTrue(timestamp.isBefore(now.plusSeconds(10)));
     }
     
     @Test
     public void testGetReceiptId() {
         assertNotNull(receipt.getReceiptId());
         assertTrue(receipt.getReceiptId().length() > 0);
+        assertTrue(receipt.getReceiptId().matches("^[a-zA-Z0-9-]+$")); // Check for alphanumeric and hyphen
     }
     
     @Test
@@ -81,13 +85,14 @@ public class ReceiptTest {
     
     @Test
     public void testGetProducts() {
-        Map<Product, Integer> retrievedProducts = receipt.getProducts();
+        Map<Product, Pair<Integer, Double>> retrievedProducts = receipt.getProducts();
         
         assertEquals(2, retrievedProducts.size());
         
         // Verify that the returned map is a copy (products are immutable)
         retrievedProducts.clear();
         assertEquals(2, receipt.getProducts().size());
+
     }
     
     @Test
@@ -121,13 +126,19 @@ public class ReceiptTest {
         assertEquals(TOTAL_PRICE, map.get("totalPrice"));
         assertEquals(PAYMENT_DETAILS, map.get("paymentDetails"));
         
-        @SuppressWarnings("unchecked")
-        Map<String, Integer> productQuantities = (Map<String, Integer>) map.get("products");
+        Map<String, Pair<Integer, Double>> productQuantities = (Map<String, Pair<Integer, Double>>) map.get("products");
         assertNotNull(productQuantities);
         assertEquals(2, productQuantities.size());
         assertTrue(productQuantities.containsKey("product1"));
         assertTrue(productQuantities.containsKey("product2"));
-        assertEquals(Integer.valueOf(2), productQuantities.get("product1"));
-        assertEquals(Integer.valueOf(1), productQuantities.get("product2"));
+
+        Pair<Integer, Double> product1Details = productQuantities.get("product1");
+        Pair<Integer, Double> product2Details = productQuantities.get("product2");
+
+        
+        assertEquals(Integer.valueOf(2), product1Details.getFirst());
+        assertEquals(Integer.valueOf(1), product2Details.getFirst());
+        assertEquals(Double.valueOf(10.0), product1Details.getSecond(), 0.001);
+        assertEquals(Double.valueOf(15.0), product2Details.getSecond(), 0.001);
     }
 }

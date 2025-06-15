@@ -3,18 +3,28 @@ package Domain.Store;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import Domain.User.IUserRepository;
-import Domain.User.User;
-import Domain.Pair;
+import Application.utils.TradingLogger;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
-
+import Domain.Pair;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
+import Domain.User.User;
 
 
 @Component
@@ -25,15 +35,22 @@ public class StoreFacade {
     private IAuctionRepository auctionRepository;
     private Function<String, User> getUser;
     private INotificationService notificationService;
+    private IReceiptRepository receiptRepository;
+    private IProductRepository productRepository;
+
+
 
     @Autowired
-    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, INotificationService notificationService) {
+    public StoreFacade(IStoreRepository storeRepository, IFeedbackRepository feedbackRepository, IItemRepository itemRepository, IUserRepository userRepository, IAuctionRepository auctionRepository, INotificationService notificationService, IReceiptRepository receiptRepository,
+                        IProductRepository productRepository) {
         this.itemRepository = itemRepository;
         this.storeRepository = storeRepository;
         this.feedbackRepository = feedbackRepository;
         this.auctionRepository = auctionRepository;
         this.getUser = userRepository::get;
         this.notificationService = notificationService;
+        this.receiptRepository = receiptRepository;
+        this.productRepository = productRepository;
     }
 
     public StoreFacade() {
@@ -61,6 +78,10 @@ public class StoreFacade {
 
     public void setGetUser(IUserRepository userRepository) {
         this.getUser = userRepository::get;
+    }
+
+    public void setNotificationService(INotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     public boolean isInitialized() {
@@ -146,16 +167,54 @@ public class StoreFacade {
     }
 
     public boolean closeStore(String storeId){
+        // First check if store exists
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found");
+        
+        // Then get or create lock
         Object lock = this.storeRepository.getLock(storeId);
-        if (lock == null) throw new RuntimeException("Store not found");
+        if (lock == null) {
+            // If no lock exists, create one
+            this.storeRepository.addLock(storeId);
+            lock = this.storeRepository.getLock(storeId);
+        }
+        
         synchronized (lock) {
+            // Refresh store data inside synchronized block
+            store = this.storeRepository.get(storeId);
+            if(store.isPermanentlyClosed()) throw new RuntimeException("Store is already closed");
 
-            Store store = this.storeRepository.get(storeId);
-            if (store == null) throw new RuntimeException("Store not found");
+            store.setOpen(false);
+            store.setPermanentlyClosed(true);
+            Store newStore = this.storeRepository.update(storeId, store);
+            notificationService.sendNotification(store.getFounderId(), "Your store " + store.getName() + " has been permanently closed.");
+            if(!store.equals(newStore)) throw new RuntimeException("Store not updated");
+            return true;
+        }
+    }
+
+    public boolean closeStoreNotPermanent(String storeId){
+        // First check if store exists
+        Store store = this.storeRepository.get(storeId);
+        if (store == null) throw new RuntimeException("Store not found");
+        
+        // Then get or create lock
+        Object lock = this.storeRepository.getLock(storeId);
+        if (lock == null) {
+            // If no lock exists, create one
+            this.storeRepository.addLock(storeId);
+            lock = this.storeRepository.getLock(storeId);
+        }
+        
+        synchronized (lock) {
+            // Refresh store data inside synchronized block
+            store = this.storeRepository.get(storeId);
             if(!store.isOpen()) throw new RuntimeException("Store is already closed");
 
             store.setOpen(false);
+            store.setPermanentlyClosed(false);
             Store newStore = this.storeRepository.update(storeId, store);
+            notificationService.sendNotification(store.getFounderId(), "Your store " + store.getName() + " has been closed temporarily.");
             if(!store.equals(newStore)) throw new RuntimeException("Store not updated");
             return true;
         }
@@ -171,11 +230,11 @@ public class StoreFacade {
 
         Date auctionStartDate = new Date();
         Date auctionEndDateParsed = null;
-        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         try {
             auctionEndDateParsed = parser.parse(auctionEndDate);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid date format. Expected format: yyyy-MM-dd");
+            throw new RuntimeException("Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
         
         if (auctionEndDateParsed.before(auctionStartDate)) throw new RuntimeException("Auction end date must be after the start date");
@@ -200,26 +259,45 @@ public class StoreFacade {
         return store.getName();
     }
 
-    public Auction addBid(String auctionId, String userId, float bid, Supplier<Boolean> chargeCallback) {
+    public Auction addBid(String auctionId, String userId, float bid, String cardNumber, Date expiryDate, String cvv
+                            , String clientName, String deliveryAddress) {
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Received bid request. auctionId=" + auctionId + ", userId=" + userId + ", bid=" + bid);
+
         if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
         if (this.auctionRepository.get(auctionId) == null) throw new RuntimeException("Auction not found");
         if (this.getUser.apply(userId) == null) throw new RuntimeException("User not found");
         if (bid < 0) throw new RuntimeException("Bid must be greater than 0");
 
         Auction auction = this.auctionRepository.get(auctionId);
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Fetched auction. currentPrice=" + auction.getCurrentPrice() + ", startPrice=" + auction.getStartPrice());
+
         if (bid <= auction.getCurrentPrice() || bid <= auction.getStartPrice()) {
             throw new RuntimeException("Bid must be greater than current and start");
         }
 
-        if (auction.currentBidderId != null)
-            notificationService.sendNotification(auction.getCurrentBidderId(), "You have been outbid on auction " + auctionId + " womp womp :(");
+        if (auction.getCurrentBidderId() != null && !auction.getCurrentBidderId().equals(userId)) {
+            TradingLogger.logEvent("StoreFacade", "addBid",
+                "DEBUG: Notifying previous bidder: " + auction.getCurrentBidderId());
+            String storeName = this.getStoreName(auction.getStoreId());
+            String productName = this.itemRepository.getItem(auction.getStoreId(), auction.getProductId()).getProductName();
+            System.out.println("Notifying previous bidder: " + auction.getCurrentBidderId());
+            notificationService.sendNotification(auction.getCurrentBidderId(),
+                "You have been outbid on " + productName + "from " + storeName + " womp womp :(");
+        } else {
+            TradingLogger.logEvent("StoreFacade", "addBid",
+                "DEBUG: No previous bidder to notify for auction " + auctionId + " or it's the same user bidding again.");
+        }
 
-        auction.setCurrentPrice(bid);
-        auction.setCurrentBidderId(userId);
-        auction.setChargeCallback(chargeCallback);
+        auction.setHighestBidder(userId, bid, cardNumber, expiryDate, cvv, clientName);
+
+        TradingLogger.logEvent("StoreFacade", "addBid",
+            "DEBUG: Updated auction with new bid. New currentBidderId=" + userId + ", newPrice=" + bid);
 
         return this.auctionRepository.update(auctionId, auction);
     }
+
 
 
     public Auction closeAuction(String auctionId) {
@@ -240,9 +318,13 @@ public class StoreFacade {
         return this.auctionRepository.getAllProductAuctions(productId);
     }
 
-    public Item acceptBid(String storeId, String productId, String auctionId) {
+    public Item acceptBid(String storeId, String productId, String auctionId, IExternalPaymentService paymentService) {
         if (!isInitialized()) {
             throw new RuntimeException("StoreFacade is not initialized");
+        }
+
+        if(paymentService == null) {
+            throw new RuntimeException("Payment service is not set");
         }
 
         // Retrieve the item first and attempt to reserve one unit
@@ -257,7 +339,7 @@ public class StoreFacade {
         if (currentAmount <= 0) {
             throw new RuntimeException("Insufficient item quantity to fulfill auction sale");
         }
-
+        
         item.setAmount(currentAmount - 1);
         itemRepository.update(itemKey, item);
 
@@ -287,32 +369,80 @@ public class StoreFacade {
         }
 
         // Charge the user using stored callback
+        Integer success = -1;
         try {
-            boolean success = auction.triggerCharge();
-            if (!success) {
+            success = paymentService.processPayment(auction.getCurrentBidderId(), auction.getCardNumber(), auction.getCardExpiryDate(), auction.getCvv(), auction.getClientName(), auction.getCurrentPrice()).getValue();
+            if (success == -1) {
                 // Rollback item amount
                 item.setAmount(currentAmount);
                 itemRepository.update(itemKey, item);
                 throw new RuntimeException("Payment failed for accepted bid");
             }
 
+            
         } catch (Exception ex) {
             // Rollback item amount
             item.setAmount(currentAmount);
             itemRepository.update(itemKey, item);
+            if(success != -1) {
+                paymentService.cancelPayment(success);
+            }
             throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);
         }
-
-        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! in auction " + auctionId + " 🎉 🔔");
+        String productName = item.getProductName();
+        String storeName = this.getStoreName(storeId);
+        notificationService.sendNotification(auction.getCurrentBidderId(), "🔔 🎉 You won the bid! purchesed " + productName + " from " + storeName + " 🎉 🔔");
+        
+        Store store = this.storeRepository.get(storeId);
+        Set<String> employees = Stream.concat(store.getManagers().stream(), store.getOwners().stream())
+            .collect(Collectors.toSet());
+        employees.add(store.getFounderId());
+        
+        for (String employeeId : employees) {
+            System.out.println("Notifying manager: " +  employeeId);
+            notificationService.sendNotification(employeeId, "🔔 🎉 Auction for " + productName + " has been fulfilled." + " 🎉 🔔");
+        }
         // Final update: optionally mark buyer (if you have a field), or leave updated amount
         itemRepository.update(itemKey, item);
 
+        Product product = this.productRepository.get(productId);
         // Remove the auction as it's now fulfilled
         this.auctionRepository.remove(auctionId);
+    
+        // Save the receipt with masked card number
+        String cardNumber = auction.getCardNumber();
+        String last4 = cardNumber != null && cardNumber.length() >= 4
+            ? cardNumber.substring(cardNumber.length() - 4)
+            : cardNumber != null ? cardNumber : "????";
 
+        String maskedCardNumber = "xxxx-xxxx-xxxx-" + last4;
+        String paymentDetails = "Card: " + maskedCardNumber;
+        try{
+        this.receiptRepository.savePurchase(
+            auction.getCurrentBidderId(),
+            storeId,
+            Map.of(product, new Pair<>(1, auction.getCurrentPrice())),
+            auction.getCurrentPrice(),
+            paymentDetails  
+        );
+        } catch (Exception e) {
+            // Rollback item amount
+            item.setAmount(currentAmount);
+            itemRepository.update(itemKey, item);
+            throw new RuntimeException("Failed to save receipt: " + e.getMessage(), e);
+        }
+
+        
         return item;
     }
 
+    public List<Category>getAllStoreCategories(String storeId) {
+        if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
+        if (this.storeRepository.get(storeId) == null) throw new RuntimeException("Store not found");
+        return this.itemRepository.getAvailabeItems().stream()
+            .flatMap(item -> item.getCategories().stream())
+            .collect(Collectors.toSet()).stream().toList();
+    }
 
 
 }

@@ -1,33 +1,43 @@
 package UI.views;
 
-import UI.presenters.ILoginPresenter;
-import Application.DTOs.UserDTO;
-import Application.utils.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.presenters.ILoginPresenter;
+
+@JsModule("./ws-client.js")
 @Route("")
 public class LoginView extends VerticalLayout {
 
     private final ILoginPresenter loginPresenter;
-
+    private final DbHealthStatus dbHealthStatus;
+    
     private final TextField usernameField = new TextField("Username");
     private final PasswordField passwordField = new PasswordField("Password");
     private final Button loginButton = new Button("Log In");
     private final Button guestButton = new Button("Continue as Guest");
 
+    
     @Autowired
-    public LoginView(ILoginPresenter loginPresenter) {
+    public LoginView(ILoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus) {
         this.loginPresenter = loginPresenter;
+        this.dbHealthStatus = dbHealthStatus;
 
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -50,8 +60,8 @@ public class LoginView extends VerticalLayout {
         loginButton.setWidthFull();
         guestButton.setWidthFull();
 
-        loginButton.getStyle().set("background-color", "#3498db").set("color", "white");
-        guestButton.getStyle().set("background-color", "#2ecc71").set("color", "white");
+        loginButton.getStyle().set("background-color", " #3498db").set("color", "white");
+        guestButton.getStyle().set("background-color", " #2ecc71").set("color", "white");
 
         loginButton.addClickListener(e -> login());
         guestButton.addClickListener(e -> loginAsGuest());
@@ -66,6 +76,12 @@ public class LoginView extends VerticalLayout {
     }
 
     private void login() {
+        if (dbHealthStatus != null && !dbHealthStatus.isDbAvailable()) {
+            Notification.show("🔌 Database is currently unavailable. Please try again later.",
+                            4000, Notification.Position.MIDDLE);
+            return; // Block login
+        }
+
         String username = usernameField.getValue();
         String password = passwordField.getValue();
 
@@ -73,22 +89,65 @@ public class LoginView extends VerticalLayout {
         if (response.errorOccurred()) {
             Notification.show("Login failed: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
-            UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
+            String sessionToken = response.getValue().getSessionToken();
+            UI.getCurrent().getSession().setAttribute("sessionToken", sessionToken);
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            UI.getCurrent().getSession().setAttribute("user", response.getValue());
+
+            
+            // Initialize WebSocket connection by setting the userId in both window and sessionStorage
+            UI.getCurrent().getPage().executeJs(
+                "window.currentUserId = $0; sessionStorage.setItem('currentUserId', $0);",
+                response.getValue().getUsername()
+            );
+            
+
             Notification.show("Welcome, " + response.getValue().getUsername());
             UI.getCurrent().navigate("home");
         }
     }
 
     private void loginAsGuest() {
+        if (dbHealthStatus != null && !dbHealthStatus.isDbAvailable()) {
+            Notification.show("🔌 Database is currently unavailable. Please try again later.",
+                            4000, Notification.Position.MIDDLE);
+            return; // Block login
+        }
+
         Response<UserDTO> response = loginPresenter.guestEnter();
         if (response.errorOccurred()) {
             Notification.show("Guest login failed: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
         } else {
-            UI.getCurrent().getSession().setAttribute("sessionToken", response.getValue().getSessionToken());
+            String sessionToken = response.getValue().getSessionToken();
+            UI.getCurrent().getSession().setAttribute("sessionToken", sessionToken);
             UI.getCurrent().getSession().setAttribute("username", response.getValue().getUsername());
+            UI.getCurrent().getSession().setAttribute("user", response.getValue());
+
+            
+            // Initialize WebSocket connection by setting the userId in both window and sessionStorage
+            UI.getCurrent().getPage().executeJs(
+                "window.currentUserId = $0; sessionStorage.setItem('currentUserId', $0);",
+                response.getValue().getUsername()
+            );
             Notification.show("Logged in as Guest");
             UI.getCurrent().navigate("home");
         }
+    }
+
+    @ClientCallable
+    private void showNotification(String message, String type, Integer duration, String position) {
+        Notification notification = new Notification(message);
+        notification.setDuration(duration > 0 ? duration : 10000);
+        notification.setPosition(Notification.Position.valueOf(position.toUpperCase().replace('-', '_')));
+        
+        if ("error".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        } else if ("warning".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
+        } else if ("success".equals(type)) {
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        }
+        
+        notification.open();
     }
 }

@@ -1,5 +1,8 @@
 package UI.presenters;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 
@@ -31,9 +34,10 @@ public interface ILoginPresenter {
      * @param username Desired username for the new user.
      * @param password Chosen password for the new user.
      * @param email User's email address.
+     * @param age User's age
      * @return Response containing a {@link UserDTO} for the registered user, or an error.
      */
-    Response<UserDTO> registerUser(String sessionToken, String username, String password, String email);
+    Response<UserDTO> registerUser(String sessionToken, String username, String password, String email, LocalDate birthDate);
 
     /**
      * Authenticates a user using provided credentials.
@@ -43,4 +47,23 @@ public interface ILoginPresenter {
      * @return Response containing a {@link UserDTO} for the authenticated user, or an error.
      */
     Response<UserDTO> login(String username, String password);
+
+
+
+    /**
+     * Retrieves all members of the system.
+     *
+     * @param sessionToken Token of the session requesting the member list.
+     * @return Response containing a list of {@link UserDTO} representing all members, or an error.
+     */
+    Response<List<UserDTO>> getAllMembers(String sessionToken);
+
+
+    /**
+     * Retrieves the currently logged-in user.
+     *
+     * @param sessionToken Token of the session requesting the user details.
+     * @return Response containing void, or an error.
+     */
+    Response<Void> logOutAllUsers();
 }

@@ -1,0 +1,77 @@
+{
+  "urlExternalServices": [{"URL": "https://damp-lynna-wsep-1984852e.koyeb.app/"}],
+  "marketWithTwoStores": [
+    { "action": "guestEntry", "as": "guest1" },
+    { "action": "guestEntry", "as": "guest2" },
+
+    { "action": "registerUser", "session": "guest1", "username": "admin", "password": "Admin123!@", "email": "admin@g.com", "as": "admin" },
+    { "action": "registerUser", "session": "guest2", "username": "buyer", "password": "Buyer123!@", "email": "buyer@g.com", "as": "buyer" },
+
+    { "action": "openMarket", "session": "admin" },
+
+    { "action": "addStore", "session": "admin", "name": "SuperTech", "category": "Electronics", "as": "store1" },
+    { "action": "addStore", "session": "admin", "name": "ComfyHome", "category": "Home & Furniture", "as": "store2" },
+
+    { "action": "appointManager", "session": "admin", "store": "store1", "target": "buyer" },
+
+    { "action": "addProduct", "session": "admin", "name": "Laptop", "categories": ["Electronics"], "keywords": ["All tech"], "as": "laptop" },
+    { "action": "addProduct", "session": "admin", "name": "Chair", "categories": ["Furniture"], "keywords": ["Comfort"], "as": "chair" },
+
+    { "action": "addItem", "session": "admin", "store": "store1", "product": "laptop", "price": 1000.0, "quantity": 10, "description": "Gaming Laptop" },
+    { "action": "addItem", "session": "admin", "store": "store2", "product": "chair", "price": 120.0, "quantity": 15, "description": "Ergonomic Chair" },
+
+    { "action": "changePermissions", "session": "admin", "store": "store1", "target": "buyer", "permissions": ["HANDLE_INVENTORY", "OVERSEE_OFFERS"] },
+
+    { "action": "logout", "session": "admin" },
+    { "action": "logout", "session": "buyer" },
+
+    { "action": "guestEntry", "as": "guest3" },
+    { "action": "registerUser", "session": "guest3", "username": "new_one", "password": "New1234!@", "email": "c@c.il", "as": "new_one" },
+    { "action": "logout", "session": "new_one" }
+  ],
+  "mentoringScenario": [
+    { "action": "guestEntry", "as": "g1" },
+    { "action": "registerUser", "session": "g1", "username": "u1", "password": "Admin123!@", "email": "u1@ex.com", "as": "u1" },
+    { "action": "logout", "session": "u1" },
+
+    { "action": "guestEntry", "as": "g2" },
+    { "action": "registerUser", "session": "g2", "username": "u2", "password": "Buyer123!@", "email": "u2@ex.com", "as": "u2" },
+    { "action": "logout", "session": "u2" },
+
+    { "action": "guestEntry", "as": "g3" },
+    { "action": "registerUser", "session": "g3", "username": "u3", "password": "Pass123!", "email": "u3@ex.com", "as": "u3" },
+    { "action": "logout", "session": "u3" },
+
+    { "action": "guestEntry", "as": "g4" },
+    { "action": "registerUser", "session": "g4", "username": "u4", "password": "Pass123!", "email": "u4@ex.com", "as": "u4" },
+    { "action": "logout", "session": "u4" },
+
+    { "action": "guestEntry", "as": "g5" },
+    { "action": "registerUser", "session": "g5", "username": "u5", "password": "Pass123!", "email": "u5@ex.com", "as": "u5" },
+    { "action": "logout", "session": "u5" },
+
+    { "action": "guestEntry", "as": "g6" },
+    { "action": "registerUser", "session": "g6", "username": "u6", "password": "Pass123!", "email": "u6@ex.com", "as": "u6" },
+    { "action": "logout", "session": "u6" },
+
+    { "action": "loginUser", "username": "u1", "password": "Admin123!@", "as": "u1Logged" },
+    { "action": "openMarket", "session": "u1Logged" },
+    { "action": "logout", "session": "u1Logged" },
+
+    { "action": "loginUser", "username": "u2", "password": "Buyer123!@", "as": "u2Logged" },
+    { "action": "addStore", "session": "u2Logged", "name": "s1", "category": "snacks", "as": "store1" },
+
+    { "action": "addProduct", "session": "u2Logged", "name": "Bamba", "categories": ["snacks"], "keywords": ["corn"], "as": "bamba" },
+
+    { "action": "addItem", "session": "u2Logged", "store": "store1", "product": "bamba", "price": 30.0, "quantity": 20, "description": "Bamba snack" },
+
+    { "action": "appointStoreManager", "session": "u2Logged", "store": "store1", "target": "u3" },
+    { "action": "changeManagerPermissions", "session": "u2Logged", "store": "store1", "target": "u3", "permissions": ["HANDLE_INVENTORY"] },
+
+    { "action": "appointStoreOwner", "session": "u2Logged", "store": "store1", "target": "u4" },
+    { "action": "appointStoreOwner", "session": "u2Logged", "store": "store1", "target": "u5" },
+
+    { "action": "logout", "session": "u2Logged" }
+  ]
+
+}

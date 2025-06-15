@@ -2,11 +2,10 @@ package Application;
 
 
 
-import org.springframework.stereotype.Service;
-
 import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.ExternalServices.INotificationService;
+
 
 
 public class ServiceManager {
@@ -20,6 +19,7 @@ public class ServiceManager {
     private ShoppingService shoppingService;
     private FacadeManager facadeManager;
     private INotificationService notificationService;
+    private PolicyService policyService;
 
     public ServiceManager(FacadeManager facadeManager) {
         this.facadeManager = facadeManager;
@@ -39,6 +39,17 @@ public class ServiceManager {
                                         facadeManager.getPermissionManager());
         }
         return itemService;
+    }
+
+    public PolicyService getPolicyService() {
+        if (policyService == null) {
+            policyService = new PolicyService(facadeManager.getPolicyFacade(),
+                                            getTokenService(),
+                                            facadeManager.getPermissionManager(),
+                                            facadeManager.getRepositoryManager().getItemRepository(),
+                                            facadeManager.getShoppingCartFacade());
+        }
+        return policyService;
     }
 
     public INotificationService getINotificationService() {
@@ -61,7 +72,13 @@ public class ServiceManager {
             storeService = new StoreService(facadeManager.getStoreFacade(),
                                             getTokenService(),
                                             facadeManager.getPermissionManager(),
-                                            getINotificationService());
+                                            getINotificationService(),
+                                            facadeManager.getShoppingCartFacade(),
+                                            facadeManager.getItemFacade(),
+                                            facadeManager.getOfferManager(),
+                                            facadeManager.getLoginManager(),
+                                            facadeManager.getDiscountFacade(),
+                                            facadeManager.getPaymentService());
         }
         return storeService;
     }
@@ -103,9 +120,17 @@ public class ServiceManager {
         if (shoppingService == null) {
             shoppingService = new ShoppingService(facadeManager.getShoppingCartFacade(),
                                                 getTokenService(),
+                                                getINotificationService(),
                                                 facadeManager.getStoreFacade(),
-                                                facadeManager.getPermissionManager());
+                                                facadeManager.getPermissionManager(),
+                                                facadeManager.getLoginManager(),
+                                                facadeManager.getOfferManager(),
+                                                facadeManager.getItemFacade());
         }
         return shoppingService;
+    }
+    
+    public void injectINotificationService(INotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 }

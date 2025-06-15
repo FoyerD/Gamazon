@@ -5,8 +5,6 @@ import com.vaadin.flow.component.button.Button;
 
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,74 +13,65 @@ import Application.DTOs.StoreDTO;
 
 public class StoreLayout extends VerticalLayout {
     private final StoreDTO store;
-    private final Consumer<StoreDTO> onOwnerButton;
     private final Consumer<StoreDTO> onManagerButton;
 
     public StoreLayout(StoreDTO store,
                         ItemLayout itemLayout,
-                        Consumer<StoreDTO> onOwnerButton,
                         Consumer<StoreDTO> onManagerButton) {
 
         this.store = store;
-        this.onOwnerButton = onOwnerButton;
         this.onManagerButton = onManagerButton;
         setSpacing(true);
         setPadding(true);
         setWidthFull();
 
-        
         this.add(storeDetails());
-        this.add(actionButtons());
-        this.add(itemLayout);
+        if (store.isOpen()) {
+            this.add(actionButtons());
+            this.add(itemLayout);
+        } else {
+            Span closedMessage = new Span("This store is currently closed");
+            closedMessage.getStyle()
+                .set("color", "red")
+                .set("font-weight", "bold")
+                .set("font-size", "1.2em")
+                .set("margin", "20px 0");
+            this.add(closedMessage);
+        }
+    }
+
+    private HorizontalLayout storeDetails() {
+        H2 storeName = new H2(store.getName());
+        storeName.getStyle().set("margin", "0");
+
+        Span storeDescription = new Span(store.getDescription());
+        storeDescription.getStyle()
+            .set("color", "#666")
+            .set("margin-left", "20px")
+            .set("align-self", "center");
+
+        Span storeStatus = new Span(store.isOpen() ? "Open" : "Closed");
+        storeStatus.getStyle()
+            .set("color", store.isOpen() ? "green" : "red")
+            .set("font-weight", "bold")
+            .set("margin-left", "20px")
+            .set("align-self", "center");
+
+        HorizontalLayout details = new HorizontalLayout(storeName, storeDescription, storeStatus);
+        details.setAlignItems(Alignment.CENTER);
+        return details;
     }
 
     private HorizontalLayout actionButtons() {
-        // Initialize owner dashboard button
-        Button ownerDashboardButton = new Button("Store Owner Dashboard", VaadinIcon.USER.create(), e -> onOwnerButton.accept(store));
-        ownerDashboardButton.getStyle()
-            .set("background-color", "#6b46c1")
-            .set("color", "white")
-            .set("margin-left", "10px")
-            .set("cursor", "pointer");
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.setSpacing(true);
 
-        // Initialize manager button
-        Button managerButton = new Button("Store Management", VaadinIcon.COGS.create(), e -> onManagerButton.accept(store));
+        Button managerButton = new Button("Management Actions", e -> onManagerButton.accept(store));
         managerButton.getStyle()
-            .set("background-color", "#2196f3")
-            .set("color", "white")
-            .set("margin-left", "10px");
-        
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.add(ownerDashboardButton, managerButton);
-        return layout;
+            .set("background-color", " #4a9eff")
+            .set("color", "white");
+        buttons.add(managerButton);
 
+        return buttons;
     }
-
-    private VerticalLayout storeDetails() {
-        H2 name = new H2(store.getName());
-        Span description = new Span(store.getDescription());
-        description.getStyle().set("color", "gray");
-        Icon statusIcon = store.isOpen() ? VaadinIcon.CHECK_CIRCLE.create() : VaadinIcon.CLOSE_CIRCLE.create();
-        statusIcon.setColor(store.isOpen() ? "green" : "red");
-
-        Span statusText = new Span(store.isOpen() ? "Open" : "Closed");
-        statusText.getStyle().set("margin-left", "0.5em");
-        HorizontalLayout statusLayout = new HorizontalLayout(statusIcon, statusText);
-        statusLayout.setAlignItems(Alignment.CENTER);
-        
-        VerticalLayout layout = new VerticalLayout();
-
-        layout.add(name, description, statusLayout);
-
-        return layout;
-    }
-
-
-
-    
-
-
-
-
-    
 }

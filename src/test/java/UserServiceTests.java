@@ -1,14 +1,18 @@
-import static org.junit.Assert.*;
+import java.time.LocalDate;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import Application.DTOs.UserDTO;
 import Application.TokenService;
 import Application.UserService;
-import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.User.LoginManager;
-import Infrastructure.Repositories.MemoryUserRepository;
+import Infrastructure.MemoryRepositories.MemoryUserRepository;
 
 public class UserServiceTests {
     private UserService userService;
@@ -93,4 +97,48 @@ public class UserServiceTests {
         assertTrue("Login with wrong credentials should fail", loginBad.errorOccurred());
         assertTrue(loginBad.getErrorMessage().contains("Invalid username or password"));
     }
+
+    @Test
+    public void GivenActiveUsers_WhenLogoutAllUsers_ThenTokensAreInvalidated() {
+        // Register a user
+        Response<UserDTO> regResp = userService.register(guestToken, "erin", "Password1!", "erin@mail.com");
+        String erinToken = regResp.getValue().getSessionToken();
+
+        // Create another guest
+        Response<UserDTO> guestResp2 = userService.guestEntry();
+        String guestToken2 = guestResp2.getValue().getSessionToken();
+
+        // Now call logoutAllUsers
+        Response<Void> logoutAllResp = userService.logOutAllUsers();
+        assertFalse("Logout all should succeed", logoutAllResp.errorOccurred());
+
+        // Try to use the tokens (should be invalid now)
+        Response<Void> exit1 = userService.exit(erinToken);
+        Response<Void> exit2 = userService.exit(guestToken2);
+
+        assertTrue("Error should occur!", exit1.errorOccurred());
+        assertTrue(exit1.getErrorMessage().contains("User is not logged in"));
+
+        assertTrue("Error should occur!", exit2.errorOccurred());
+        assertTrue(exit2.getErrorMessage(), exit2.getErrorMessage().contains("User not found"));
+    }
+
+    @Test
+    public void GivenGuestSession_WhenRegisterWithBirthDate_ThenUserRegistered() {
+        LocalDate birthDate = LocalDate.of(1995, 5, 15);
+        
+        Response<UserDTO> response = userService.register(
+            guestToken,
+            "frank",
+            "SecurePass123!",
+            "frank@example.com",
+            birthDate
+        );
+
+        assertFalse("Registration with birth date should succeed", response.errorOccurred());
+        assertEquals("frank", response.getValue().getUsername());
+        assertEquals("frank@example.com", response.getValue().getEmail());
+        assertNotNull("Session token should be returned", response.getValue().getSessionToken());
+    }
+    
 }

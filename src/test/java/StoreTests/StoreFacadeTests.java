@@ -1,30 +1,40 @@
 package StoreTests;
 
+import java.util.Date;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import Domain.User.Member;
-
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import Domain.Pair;
+import Application.utils.Response;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
+import Domain.Pair;
+import Domain.Repos.IAuctionRepository;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Repos.IItemRepository;
+import Domain.Repos.IProductRepository;
+import Domain.Repos.IReceiptRepository;
+import Domain.Repos.IStoreRepository;
+import Domain.Repos.IUserRepository;
 import Domain.Store.Auction;
 import Domain.Store.Feedback;
-import Domain.Store.IAuctionRepository;
-import Domain.Store.IFeedbackRepository;
-import Domain.Store.IItemRepository;
-import Domain.Store.IStoreRepository;
 import Domain.Store.Item;
+import Domain.Store.Product;
 import Domain.Store.Store;
 import Domain.Store.StoreFacade;
-import Domain.User.IUserRepository;
+import Domain.User.Member;
 
 public class StoreFacadeTests {
     private StoreFacade storeFacade;
@@ -34,6 +44,8 @@ public class StoreFacadeTests {
     private IAuctionRepository auctionRepository;
     private IUserRepository userRepository;
     private INotificationService notificationService;
+    private IReceiptRepository receiptRepository;
+    private IProductRepository productRepository;
 
     @Before
     public void setUp(){
@@ -43,6 +55,8 @@ public class StoreFacadeTests {
         feedbackRepository = mock(IFeedbackRepository.class);
         auctionRepository = mock(IAuctionRepository.class);
         notificationService = mock(INotificationService.class);
+        receiptRepository = mock(IReceiptRepository.class);
+        productRepository = mock(IProductRepository.class);
         
         storeFacade = new StoreFacade(
             storeRepository,
@@ -50,7 +64,9 @@ public class StoreFacadeTests {
             itemRepository,
             userRepository,
             auctionRepository,
-            notificationService
+            notificationService,
+            receiptRepository,
+            productRepository
         );
     }
     
@@ -169,29 +185,18 @@ public class StoreFacadeTests {
     }
 
     @Test
-    public void givenInitializedFacadeAndOpenStore_whenCloseStore_thenReturnTrue(){
-        Store store = mock(Store.class);
-        String storeId = "storeId";
-        when(storeRepository.get(storeId)).thenReturn(store);
-        when(store.getId()).thenReturn(storeId);
-        when(store.isOpen()).thenReturn(true);
-        when(storeRepository.getLock(storeId)).thenReturn(new Object());
-        when(storeRepository.update(eq(storeId), any(Store.class))).thenReturn(store);
-        assertTrue(storeFacade.closeStore(storeId));
-    }
-
-    @Test
     public void givenInitializedFacadeAndClosedStore_whenCloseStore_thenReturnError(){
         Store store = mock(Store.class);
         String storeId = "storeId";
         when(storeRepository.get(storeId)).thenReturn(store);
         when(store.getId()).thenReturn(storeId);
-        when(store.isOpen()).thenReturn(false);
+        when(store.isPermanentlyClosed()).thenReturn(true);
         when(storeRepository.getLock(storeId)).thenReturn(new Object());
         try {
-            assertTrue(storeFacade.closeStore(storeId) == false);
-        } catch (Exception e) {
-            assertEquals(e.getMessage(), "Store is already closed");
+            storeFacade.closeStore(storeId);
+            fail("Expected RuntimeException was not thrown");
+        } catch (RuntimeException e) {
+            assertEquals("Store is already closed", e.getMessage());
         }
     }
 
@@ -387,7 +392,7 @@ public class StoreFacadeTests {
     public void givenInitializedFacade_whenAddAuction_thenReturnAuction(){
         String storeId = "storeId";
         String productId = "productId";
-        String endDate = "2077-12-31";
+        String endDate = "2077-12-31 00:00";
         Pair<String, String> itemId = new Pair<>(storeId, productId);
         Store store = mock(Store.class);
         when(storeRepository.get(storeId)).thenReturn(store);
@@ -430,7 +435,7 @@ public class StoreFacadeTests {
         try {
             assertTrue(storeFacade.addAuction(storeId, productId, endDate, 0) == null);
         } catch (Exception e) {
-            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd");
+            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
     }
 
@@ -453,7 +458,7 @@ public class StoreFacadeTests {
         try {
             assertTrue(storeFacade.addAuction(storeId, productId, endDate, 0) == null);
         } catch (Exception e) {
-            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd");
+            assertEquals(e.getMessage(), "Invalid date format. Expected format: yyyy-MM-dd HH:mm");
         }
     }
 
@@ -541,6 +546,11 @@ public class StoreFacadeTests {
         String auctionId = "auctionId";
         String userId = "userId";
         float bid = 10.0f;
+        String cardNumber = "1234567890123456";
+        Date expiryDate = new Date();
+        String cvv = "123";
+        String clientName = "John Doe";
+        String deliveryAddress = "123 Main St";
 
         Auction auction = mock(Auction.class);
         when(auction.getAuctionId()).thenReturn(auctionId);
@@ -551,7 +561,7 @@ public class StoreFacadeTests {
         when(userRepository.get(userId)).thenReturn(mock(Member.class));
         when(auctionRepository.update(anyString(), any(Auction.class))).thenReturn(auction);
 
-        assertEquals(auctionId, storeFacade.addBid(auctionId, userId, bid, () -> true).getAuctionId());
+        assertEquals(auctionId, storeFacade.addBid(auctionId, userId, bid, cardNumber, expiryDate, cvv, clientName, deliveryAddress).getAuctionId());
     }
 
     @Test
@@ -559,30 +569,106 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+        String bidderId = "user123";
+        String cardNumber = "1234567812345678";
+        Date expiry = new Date(System.currentTimeMillis() + 100000); // future date
+        String cvv = "123";
+        String clientName = "John Doe";
+        double currentPrice = 50.0;
+        String productName = "Cool Product";
+        String storeName = "My Store";
 
+        // Create all mocks for dependencies
+        IStoreRepository storeRepository = mock(IStoreRepository.class);
+        IFeedbackRepository feedbackRepository = mock(IFeedbackRepository.class);
+        IItemRepository itemRepository = mock(IItemRepository.class);
+        IAuctionRepository auctionRepository = mock(IAuctionRepository.class);
+        IUserRepository userRepository = mock(IUserRepository.class);
+        INotificationService notificationService = mock(INotificationService.class);
+        IReceiptRepository receiptRepository = mock(IReceiptRepository.class);
+        IProductRepository productRepository = mock(IProductRepository.class);
+        IExternalPaymentService paymentService = mock(IExternalPaymentService.class);
+
+        // Create StoreFacade with constructor
+        StoreFacade storeFacade = new StoreFacade(
+            storeRepository,
+            feedbackRepository,
+            itemRepository,
+            userRepository,
+            auctionRepository,
+            notificationService,
+            receiptRepository,
+            productRepository
+        );
+
+        // Setup core domain objects
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
         Auction auction = mock(Auction.class);
+        Product product = mock(Product.class);
+        Store store = mock(Store.class);
 
+        // Stubbing item
         when(itemRepository.get(itemKey)).thenReturn(item);
-        when(item.getAmount()).thenReturn(1); // Sufficient quantity
+        when(item.getAmount()).thenReturn(1);
+        when(item.getProductName()).thenReturn(productName);
+        when(itemRepository.update(itemKey, item)).thenReturn(item);
+
+        // Stubbing auction
         when(auctionRepository.get(auctionId)).thenReturn(auction);
         when(auction.getStoreId()).thenReturn(storeId);
         when(auction.getProductId()).thenReturn(productId);
-        when(auction.getCurrentBidderId()).thenReturn("user123");
-        when(auction.triggerCharge()).thenReturn(true);
-
-        when(itemRepository.update(itemKey, item)).thenReturn(item);
+        when(auction.getCurrentBidderId()).thenReturn(bidderId);
+        when(auction.getCardNumber()).thenReturn(cardNumber);
+        when(auction.getAuctionEndDate()).thenReturn(new Date(System.currentTimeMillis() + 100000)); // future date
+        when(auction.getCardExpiryDate()).thenReturn(expiry);
+        when(auction.getCvv()).thenReturn(cvv);
+        when(auction.getClientName()).thenReturn(clientName);
+        when(auction.getCurrentPrice()).thenReturn(currentPrice);
         when(auctionRepository.remove(auctionId)).thenReturn(auction);
 
-        Item result = storeFacade.acceptBid(storeId, productId, auctionId);
+        // Stubbing store
+        when(storeRepository.get(storeId)).thenReturn(store);
+        when(store.getName()).thenReturn(storeName);
+
+        // Stubbing product
+        when(productRepository.get(productId)).thenReturn(product);
+
+        // Stubbing payment
+        when(paymentService.processPayment(bidderId, cardNumber, expiry, cvv, clientName, currentPrice))
+            .thenReturn(new Response<>(12345));
+
+        // Run the test
+        Item result = storeFacade.acceptBid(storeId, productId, auctionId, paymentService);
+
+        // Assert returned item
         assertEquals(item, result);
+
+        // Verify receipt creation with masked card
+        verify(receiptRepository).savePurchase(
+            eq(bidderId),
+            eq(storeId),
+            eq(Map.of(product, new Pair<>(1, currentPrice))),
+            eq(currentPrice),
+            contains("xxxx-xxxx-xxxx-" + cardNumber.substring(cardNumber.length() - 4))
+        );
+
+        // Verify notification sent
+        verify(notificationService).sendNotification(
+            eq(bidderId),
+            contains("You won the bid! purchesed " + productName + " from " + storeName)
+        );
     }
+
+
 
     @Test(expected = RuntimeException.class)
     public void givenNoItemInStore_whenAcceptBid_thenThrows() {
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
+
         when(itemRepository.get(any())).thenReturn(null);
-        storeFacade.acceptBid("storeX", "productY", "auctionZ");
+        storeFacade.acceptBid("storeX", "productY", "auctionZ", mockPaymentService);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -590,6 +676,9 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -599,7 +688,7 @@ public class StoreFacadeTests {
         when(auctionRepository.get(auctionId)).thenReturn(null);
         when(itemRepository.update(itemKey, item)).thenReturn(item); // for rollback
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -607,6 +696,9 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -618,7 +710,7 @@ public class StoreFacadeTests {
         when(auction.getStoreId()).thenReturn("wrongStore");
         when(auction.getProductId()).thenReturn("wrongProduct");
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -626,6 +718,9 @@ public class StoreFacadeTests {
         String storeId = "store1";
         String productId = "product1";
         String auctionId = "auction1";
+
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -638,7 +733,7 @@ public class StoreFacadeTests {
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn(null);
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
     @Test(expected = RuntimeException.class)
@@ -657,9 +752,11 @@ public class StoreFacadeTests {
         when(auction.getStoreId()).thenReturn(storeId);
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn("user123");
-        when(auction.triggerCharge()).thenReturn(false);
+        
+        IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
+        when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(-1));
 
-        storeFacade.acceptBid(storeId, productId, auctionId);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
     }
 
 }

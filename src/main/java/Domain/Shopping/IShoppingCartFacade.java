@@ -2,11 +2,13 @@ package Domain.Shopping;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import Domain.Pair;
 import Domain.Store.Item;
+import Domain.Store.Policy;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 
 /**
  * Interface for shopping cart operations
@@ -32,6 +34,26 @@ public interface IShoppingCartFacade {
     boolean makeBid(String auctionId, String clientId, float price,
                             String cardNumber, Date expiryDate, String cvv,
                             long andIncrement, String clientName, String deliveryAddress);
+
+
+
+    /**
+     * Retrieves a shopping cart for a specific client, creating a new one if it doesn't exist.
+     * 
+     * @param clientId The ID of the client
+     * @return The shopping cart for the specified client
+     */
+    public IShoppingCart getCart(String clientId);
+
+    /**
+     * Retrieves a shopping basket for a specific client and store, creating a new one if it doesn't exist.
+     * 
+     * @param clientId The ID of the client
+     * @param storeId The ID of the store
+     * @return The shopping basket for the specified client and store
+     */
+    public ShoppingBasket getBasket(String clientId, String storeId);
+
     /**
      * Adds a product to the shopping cart
      * 
@@ -47,16 +69,17 @@ public interface IShoppingCartFacade {
      * Processes checkout for all items in the cart
      * 
      * @param clientId The client ID
+     * @param userSSN The user's social security number
      * @param card_number The payment card number
      * @param expiry_date The card expiry date
      * @param cvv The card security code
-     * @param andIncrement Transaction identifier
      * @param clientName The client's name
      * @param deliveryAddress The delivery address
      * @return true if checkout was successful
      */
-    boolean checkout(String clientId, String card_number, Date expiry_date, String cvv, 
-                    long andIncrement, String clientName, String deliveryAddress);
+    boolean checkout(String clientId, String userSSN, String card_number, Date expiry_date, String cvv, 
+                    String clientName, String deliveryAddress, String city, 
+                                        String country, String zipCode);
     
     /**
      * Removes a specific quantity of a product from the cart
@@ -137,4 +160,20 @@ public interface IShoppingCartFacade {
     List<Receipt> getStorePurchaseHistory(String storeId);
 
     String getStoreName(String storeId);
+
+    /**
+     * Gets all users who have shopping baskets in a specific store.
+     * 
+     * @param storeId The ID of the store
+     * @return A set of user IDs who have baskets in the store
+     */
+    Set<String> getUsersWithBaskets(String storeId);
+
+    Map<String, ItemPriceBreakdown> getBestPrice(String clientId, String storeId);
+    /**
+     * Gets all polices that are violated of a specific user
+     * @param memberId The ID of the user
+     * @return a list of {@link Policy} that have been violated
+     */
+    public List<Policy> getViolatedPolicies(String memberId);
 }

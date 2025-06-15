@@ -3,15 +3,31 @@ package Domain.Shopping;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 /**
  * Implementation of the IShoppingCart interface.
  * Represents a client's shopping cart containing references to stores where they have items.
  */
-class ShoppingCart implements IShoppingCart {
+@Entity
+@Table(name = "shopping_carts")
+public class ShoppingCart implements IShoppingCart {
 
+    @Id
     private String clientId;
+
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> baskets;
     
+    protected ShoppingCart() {
+        // Required by JPA
+        this.baskets = new HashSet<>();
+    }
+
     /**
      * Constructs a new shopping cart for a client with an empty set of stores.
      * 
@@ -50,7 +66,7 @@ class ShoppingCart implements IShoppingCart {
      */
     @Override
     public Set<String> getCart() {
-        return new HashSet<>(baskets); // return a copy for safety
+        return baskets != null ? new HashSet<>(baskets) : new HashSet<>(); // return a copy for safety
     }
 
     /**
@@ -60,6 +76,9 @@ class ShoppingCart implements IShoppingCart {
      */
     @Override
     public void addStore(String storeId) {
+        if (baskets == null) {
+            baskets = new HashSet<>();
+        }
         baskets.add(storeId);
     }
 

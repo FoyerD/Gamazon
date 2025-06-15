@@ -1,7 +1,14 @@
 package UI.presenters;
 
 import java.util.Date;
+import java.util.List;
+
+
 import Application.DTOs.CartDTO;
+import Application.DTOs.OfferDTO;
+import Application.DTOs.PaymentDetailsDTO;
+import Application.DTOs.PolicyDTO;
+import Application.DTOs.ReceiptDTO;
 import Application.utils.Response;
 
 /**
@@ -84,16 +91,6 @@ public interface IPurchasePresenter {
                                     String cardNumber, Date expiryDate, String cvv,
                                     long andIncrement, String clientName, String deliveryAddress);
 
-    // TODO: Remove this method
-    // /**
-    //  * Submits a bid for an auctioned product.
-    //  *
-    //  * @param sessionToken the token representing the current authenticated user session
-    //  * @param auctionId the unique identifier of the auction
-    //  * @param bid the value of the bid being placed
-    //  * @return a {@link Response} indicating whether the bid was successfully placed
-    //  */
-    // Response<Boolean> makeBid(String sessionToken, String auctionId, float bid);
 
     /**
      * Finalizes the purchase of the entire cart using the provided payment and shipping details.
@@ -107,6 +104,68 @@ public interface IPurchasePresenter {
      * @param deliveryAddress the address where the purchased items will be delivered
      * @return a {@link Response} indicating whether the purchase was successfully completed
      */
-    Response<Boolean> purchaseCart(String sessionToken, String cardNumber, Date expiryDate, String cvv, long andIncrement,
-         String clientName, String deliveryAddress);
+    Response<Boolean> purchaseCart(String sessionToken, String userSSN, String cardNumber, Date expiryDate, String cvv,
+                           String clientName, String deliveryAddress, String city, String country, String zipCode);
+    
+
+    /**
+     * Retrieves a list of all purchases made by the user.
+     * 
+     * @param sessionToken the token representing the current authenticated user session
+     * @return a {@link Response} containing a list of {@link ReceiptDTO} representing the user's purchases
+     */
+    public Response<List<ReceiptDTO>> getPersonalPurchases(String sessionToken);
+
+
+    /**
+     * Gets all of the policies that the user's cart has violated
+     * @param sessionToken the token representing the current authenticated user session
+     * @return a {@link Response} containing a list of {@link PolicyDTO} representing the user's policies
+     */
+    public Response<List<PolicyDTO>> getViolatedPolicies(String sessionToken);
+
+
+    /**
+     * Member offers new price for product
+     * @param sessionToken Identifier for user
+     * @param storeId Store identifier from which user wants to bargain
+     * @param productId Identifier of the product that the user wants to bargain about.
+     * @param newPrice The new price that the user offers
+     * @param paymentDetails payment details of the user
+     * @return {@link OfferDTO}
+     */
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails);
+
+    /**
+     * Retrieves all offers of a user
+     * @param sessionToken Identifier for user
+     * @return List of {@link OfferDTO}
+     */
+    public Response<List<OfferDTO>> getAllOffersOfUser(String sessionToken);
+
+    /**
+     * Member approves a counter offer
+     * @param sessionToken Identifier for user
+     * @param offerId id of offer to approve
+     * @return approved {@link OfferDTO}
+     */
+    public Response<OfferDTO> approveCounterOffer(String sessionToken, String offerId);
+
+
+    /**
+     * Memeber rejects a counter offer
+     * @param sessionToken Identifier for user
+     * @param offerId id of offer to approve
+     * @return rejected {@link OfferDTO}
+     */
+    public Response<OfferDTO> rejectCounterOffer(String sessionToken, String offerId);
+
+    /**
+     * Member counters a counter offer from store
+     * @param sessionToken Identifier for user
+     * @param offerId id of counter offer to counter (yet again)
+     * @param newPrice new price
+     * @return counterd counter {@link OfferDTO}
+     */
+    public Response<OfferDTO> counterCounterOffer(String sessionToken, String offerId, double newPrice);
 }

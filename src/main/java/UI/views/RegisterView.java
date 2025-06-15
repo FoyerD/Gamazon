@@ -1,25 +1,35 @@
 package UI.views;
 
-import UI.presenters.ILoginPresenter;
-import Application.DTOs.UserDTO;
-import Application.utils.Response;
+import java.time.LocalDate;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
+import Application.DTOs.UserDTO;
+import Application.utils.Response;
+import UI.DatabaseRelated.DbHealthStatus;
+import UI.DatabaseRelated.GlobalLogoutManager;
+import UI.presenters.ILoginPresenter;
+import UI.presenters.INotificationPresenter;
+import UI.presenters.IUserSessionPresenter;
+
 @Route("register")
-public class RegisterView extends VerticalLayout {
+public class RegisterView extends BaseView {
 
     private final ILoginPresenter loginPresenter;
 
-    public RegisterView(ILoginPresenter loginPresenter) {
+    public RegisterView(ILoginPresenter loginPresenter, @Autowired(required = false) DbHealthStatus dbHealthStatus, 
+                        @Autowired(required = false) GlobalLogoutManager logoutManager, IUserSessionPresenter sessionPresenter, INotificationPresenter notificationPresenter) {
+        super(dbHealthStatus, logoutManager, sessionPresenter, notificationPresenter);
         this.loginPresenter = loginPresenter;
 
         setSizeFull();
@@ -39,22 +49,33 @@ public class RegisterView extends VerticalLayout {
         EmailField emailField = new EmailField("Email");
         emailField.setWidth("300px");
 
+        DatePicker birthDatePicker = new DatePicker("Birth Date");
+        birthDatePicker.setWidth("300px");
+
+        // Set range: user must be born at least 1 year ago
+        LocalDate today = LocalDate.now();
+        birthDatePicker.setMax(today.minusYears(1));  // latest selectable birth date is 1 year ago
+        birthDatePicker.setInitialPosition(LocalDate.of(2000, 1, 1));
+
+
         Button registerButton = new Button("Register", e -> {
             String username = usernameField.getValue();
             String password = passwordField.getValue();
             String email = emailField.getValue();
+            LocalDate birthDate = birthDatePicker.getValue();
             
-            if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            if (username.isEmpty() || password.isEmpty() || email.isEmpty() || birthDate.equals(birthDatePicker.getEmptyValue())) {
                 Notification.show("Please fill in all fields", 3000, Notification.Position.MIDDLE);
                 return;
             }
 
             String sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
-            Response<UserDTO> response = loginPresenter.registerUser(sessionToken, username, password, email);
+            Response<UserDTO> response = this.loginPresenter.registerUser(sessionToken, username, password, email, birthDate);
             
             if (!response.errorOccurred()) {
                 Notification.show("Registration successful!", 3000, Notification.Position.MIDDLE);
-                UI.getCurrent().navigate("home");
+                this.loginPresenter.logout(sessionToken);
+                UI.getCurrent().navigate("");
             } else {
                 Notification.show("Registration failed: " + response.getErrorMessage(), 
                                 3000, Notification.Position.MIDDLE);
@@ -71,6 +92,6 @@ public class RegisterView extends VerticalLayout {
             .set("color", "white")
             .set("margin-top", "10px");
 
-        add(title, usernameField, passwordField, emailField, registerButton, backButton);
+        add(title, usernameField, passwordField, emailField, birthDatePicker, registerButton, backButton);
     }
 } 
