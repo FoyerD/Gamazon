@@ -16,6 +16,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -38,6 +39,7 @@ import UI.presenters.IStorePresenter;
 import UI.presenters.IUserSessionPresenter;
 import UI.views.components.ItemLayout;
 import UI.views.components.MakeOfferDialog;
+import UI.views.components.StoreBrowser;
 import UI.views.components.StoreLayout;
 
 
@@ -54,6 +56,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
     private final Button homeButton = new Button("Return to Homepage");
     private final Button createStoreButton;
     private final Button addProductButton;
+    private final StoreBrowser storeBrowser;
 
 
     @Autowired
@@ -72,17 +75,26 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         getStyle().set("background", "linear-gradient(to right, #fce4ec, #f3e5f5)");
 
         H1 title = new H1("Marketplace Store Browser");
-        title.getStyle().set("color", "#6a1b9a");
+        title.getStyle().setColor(" #6a1b9a").setFontWeight("bold");
 
-        storeNameField.setPlaceholder("e.g., SuperMart");
+        storeNameField.setPlaceholder("e.g., SuperTech");
         storeNameField.setWidth("300px");
-        storeNameField.getStyle().set("background-color", "#ffffff");
         storeNameField.addValueChangeListener(e -> fetchStoreByName());
 
 
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
         homeButton.getStyle().set("background-color", "#7e57c2").set("color", "white");
 
+        storeBrowser = new StoreBrowser(
+            () -> {
+                Response<List<StoreDTO>> storesResponse = storePresenter.getAllStores(sessionToken);
+                if (storesResponse.errorOccurred()) {
+                    Notification.show("Failed to fetch stores: " + storesResponse.getErrorMessage(), 5000, Notification.Position.MIDDLE);
+                    return null;
+                }
+                return storesResponse.getValue();
+            }
+        );
         // Initialize Create Store button
         createStoreButton = new Button("Create New Store", VaadinIcon.PLUS.create());
         createStoreButton.getStyle()
@@ -100,11 +112,11 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         addProductButton.addClickListener(e -> showAddProductDialog());
 
         // Create a horizontal layout for buttons
-        com.vaadin.flow.component.orderedlayout.HorizontalLayout buttonLayout = new com.vaadin.flow.component.orderedlayout.HorizontalLayout();
+        HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
         buttonLayout.add(createStoreButton, addProductButton, homeButton);
         
-        add(title, storeNameField, buttonLayout);
+        add(title, storeNameField, buttonLayout, storeBrowser);
     }
 
     private void fetchStoreByName() {

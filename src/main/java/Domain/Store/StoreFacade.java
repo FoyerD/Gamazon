@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import Application.DTOs.StoreDTO;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
@@ -442,6 +443,12 @@ public class StoreFacade {
         return this.itemRepository.getAvailabeItems().stream()
             .flatMap(item -> item.getCategories().stream())
             .collect(Collectors.toSet()).stream().toList();
+    }
+
+    public List<Store> getAllStores() {
+        if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
+
+        return storeRepository.getAllStores();
     }
 
 

@@ -144,4 +144,12 @@ public interface IStorePresenter {
      * @return Response containing a list of {@link DiscountDTO} or an error.
      */
     Response<List<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeId);
+
+    /**
+     * Gets all stores in the market
+     * 
+     * @param sessionToken Session identifier for authentication.
+     * @return {@link Response} of {@link List} of {@link StoreDTO}
+     */
+    Response<List<StoreDTO>> getAllStores(String sessionToken);
 }

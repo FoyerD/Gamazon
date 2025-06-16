@@ -736,4 +736,28 @@ public class StoreService {
         }
 
     }
+
+    public Response<List<StoreDTO>> getAllStores(String sessionToken) {
+        String method = "getAllStores";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return Response.error("StoreService is not initialized.");
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return Response.error("Invalid token");
+            }
+
+
+            
+            List<StoreDTO> stores = storeFacade.getAllStores().stream().map(StoreDTO::new).toList();
+
+            return Response.success(stores);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error getting all stores " + ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
+    }
 }
