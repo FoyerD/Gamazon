@@ -9,7 +9,7 @@ import Domain.Repos.IProductRepository;
 import Domain.Store.Product;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaProductRepository extends IProductRepository {
 
     private final IJpaProductRepository jpaProductRepository;

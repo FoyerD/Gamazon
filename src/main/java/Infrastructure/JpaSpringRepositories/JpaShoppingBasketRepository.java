@@ -1,5 +1,7 @@
 package Infrastructure.JpaSpringRepositories;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -9,10 +11,8 @@ import Domain.Repos.IUserRepository;
 import Domain.Shopping.ShoppingBasket;
 import Domain.Shopping.ShoppingBasketId;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaShoppingBasketRepository extends IShoppingBasketRepository {
 
     private final IJpaShoppingBasketRepository jpaShoppingBasketRepository;

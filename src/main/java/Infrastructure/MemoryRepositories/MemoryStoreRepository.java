@@ -10,7 +10,7 @@ import Domain.Repos.IStoreRepository;
 import Domain.Store.Store;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryStoreRepository extends IStoreRepository{
     private Map<String, Store> stores;
 

@@ -1,16 +1,17 @@
 package Infrastructure.JpaSpringRepositories;
 
-import Domain.Repos.IFeedbackRepository;
-import Domain.Store.Feedback;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import Domain.Repos.IFeedbackRepository;
+import Domain.Store.Feedback;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaFeedbackRepository extends IFeedbackRepository {
 
     private final IJpaFeedbackRepository jpaRepo;

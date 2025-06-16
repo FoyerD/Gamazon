@@ -19,7 +19,7 @@ import Domain.Store.Product;
  * Repository for storing and retrieving purchase receipts.
  */
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryReceiptRepository extends IReceiptRepository {
     // Main storage for all receipts: receiptId -> Receipt
     private final Map<String, Receipt> receipts;

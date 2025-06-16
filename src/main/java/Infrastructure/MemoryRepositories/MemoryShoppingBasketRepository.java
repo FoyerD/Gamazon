@@ -11,7 +11,7 @@ import Domain.Repos.IShoppingBasketRepository;
 import Domain.Shopping.ShoppingBasket;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryShoppingBasketRepository extends IShoppingBasketRepository {
     
     private Map<Pair<String, String>, ShoppingBasket> baskets;

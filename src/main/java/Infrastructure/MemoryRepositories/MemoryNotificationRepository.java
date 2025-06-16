@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import Domain.Notification.INotificationRepository;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryNotificationRepository extends INotificationRepository {
 
     private final Map<String, List<String>> notifications = new ConcurrentHashMap<>();

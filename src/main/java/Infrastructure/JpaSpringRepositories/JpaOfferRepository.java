@@ -10,7 +10,7 @@ import Domain.Repos.IOfferRepository;
 import Domain.Shopping.Offer;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaOfferRepository extends IOfferRepository {
 
     private final IJpaOfferRepository jpaOfferRepository;

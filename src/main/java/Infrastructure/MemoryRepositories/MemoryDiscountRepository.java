@@ -13,7 +13,7 @@ import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.IDiscountRepository;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryDiscountRepository extends IDiscountRepository {
     
     private final Map<String, Discount> discounts;

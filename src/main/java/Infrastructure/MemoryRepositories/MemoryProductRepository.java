@@ -16,7 +16,7 @@ import Domain.Store.Product;
  * Provides thread-safe CRUD operations on products.
  */
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryProductRepository extends IProductRepository {
     private final ConcurrentMap<String, Product> products;
 

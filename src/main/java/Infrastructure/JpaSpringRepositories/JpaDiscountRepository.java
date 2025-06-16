@@ -1,15 +1,16 @@
 package Infrastructure.JpaSpringRepositories;
 
-import Domain.Store.Discounts.Discount;
-import Domain.Store.Discounts.IDiscountRepository;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
+
+import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.IDiscountRepository;
+
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaDiscountRepository extends IDiscountRepository {
 
     private final IJpaDiscountRepository jpaRepo;

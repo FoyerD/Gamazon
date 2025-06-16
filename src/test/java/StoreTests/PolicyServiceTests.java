@@ -1,31 +1,29 @@
 package StoreTests;
 
+import java.util.List;
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
-import java.util.List;
-import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import Application.PolicyService;
-import Application.ServiceManager;
-import Application.TokenService;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
+import Application.PolicyService;
+import Application.StoreService;
+import Application.TokenService;
+import Application.UserService;
 import Application.utils.Response;
-import Domain.FacadeManager;
-import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
-import Domain.Repos.IItemRepository;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
-import Infrastructure.MemoryRepoManager;
 
 /**
  * Acceptance‐style tests for PolicyService, updated to use the provided PermissionManager.
@@ -35,45 +33,52 @@ import Infrastructure.MemoryRepoManager;
  * 2. After creating the store, call appointFirstStoreOwner(...) so that this user
  *    becomes owner/founder and thus has EDIT_STORE_POLICIES permission.
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class PolicyServiceTests {
 
-    private ServiceManager       serviceManager;
+    //!private ServiceManager       serviceManager;
+    @Autowired
     private PolicyService        policyService;
+    @Autowired
     private PermissionManager    permManager;
+    @Autowired
     private TokenService         tokenService;
-    private IItemRepository      itemRepo;
+    @Autowired
+    private UserService         userService;
+    @Autowired
+    private StoreService         storeService;
+
     private String               tokenId;
     private String               storeId;
 
     @Before
     public void setUp() {
-        // 1. Initialize in‐memory repositories via MemoryRepoManager
-        MemoryRepoManager repoManager = new MemoryRepoManager();
+        //! 1. Initialize in‐memory repositories via MemoryRepoManager
+        //!MemoryRepoManager repoManager = new MemoryRepoManager();
 
-        // 2. Initialize FacadeManager (provides PolicyFacade, PermissionManager, etc.)
-        FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
+        //! 2. Initialize FacadeManager (provides PolicyFacade, PermissionManager, etc.)
+        //!FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
 
 
-        // 3. Initialize ServiceManager so we can register a user and create a store
-        this.serviceManager = new ServiceManager(facadeManager);
+        //! 3. Initialize ServiceManager so we can register a user and create a store
+        //!this.serviceManager = new ServiceManager(facadeManager);
 
-        // 4. Extract the real PermissionManager from FacadeManager
-        this.permManager = facadeManager.getPermissionManager();
+        //! 4. Extract the real PermissionManager from FacadeManager
+        //!this.permManager = facadeManager.getPermissionManager();
 
-        // 5. Extract the real TokenService from ServiceManager
-        this.tokenService = serviceManager.getTokenService();
+        //! 5. Extract the real TokenService from ServiceManager
+        //!this.tokenService = serviceManager.getTokenService();
 
-        // 6. Extract the real IItemRepository from MemoryRepoManager
-        this.itemRepo = repoManager.getItemRepository();
 
-        // 7. Instantiate PolicyService with its real dependencies
-        this.policyService = serviceManager.getPolicyService();
+        //! 7. Instantiate PolicyService with its real dependencies
+        //!this.policyService = serviceManager.getPolicyService();
 
         // ----- A) Register a user to get a valid tokenId -----
-        Response<UserDTO> guestResp = serviceManager.getUserService().guestEntry();
+        Response<UserDTO> guestResp = userService.guestEntry();
         assertFalse("Guest creation should succeed", guestResp.errorOccurred());
 
-        Response<UserDTO> regResp = serviceManager.getUserService().register(
+        Response<UserDTO> regResp = userService.register(
             guestResp.getValue().getSessionToken(),
             "Member1",
             "Password123!",
@@ -84,8 +89,8 @@ public class PolicyServiceTests {
         // ------------------------------------------------------
 
         // 8. Create a store under that user
-        Response<StoreDTO> storeResp = serviceManager.getStoreService()
-            .addStore(this.tokenId, "PolicyTestStore", "Store for policy tests");
+        Response<StoreDTO> storeResp = storeService.
+            addStore(this.tokenId, "PolicyTestStore", "Store for policy tests");
         assertFalse("Store creation should succeed", storeResp.errorOccurred());
         this.storeId = storeResp.getValue().getId();
 
@@ -299,16 +304,16 @@ public class PolicyServiceTests {
     @Test
     public void GivenNoPermission_WhenCreatePolicy_ThenReturnError() {
         // 1) First create a store under the original user (who does have rights)
-        Response<StoreDTO> respStore = serviceManager.getStoreService()
-            .addStore(this.tokenId, "NoPermStore", "Store without policy-edit perms");
+        Response<StoreDTO> respStore = storeService.
+            addStore(this.tokenId, "NoPermStore", "Store without policy-edit perms");
         assertFalse("Store creation should succeed", respStore.errorOccurred());
         String noPermStoreId = respStore.getValue().getId();
 
         // 2) Register a second, completely new user (so they have no rights on that store)
-        Response<UserDTO> guest2 = serviceManager.getUserService().guestEntry();
+        Response<UserDTO> guest2 = userService.guestEntry();
         assertFalse("Second guest creation should succeed", guest2.errorOccurred());
 
-        Response<UserDTO> reg2 = serviceManager.getUserService().register(
+        Response<UserDTO> reg2 = userService.register(
             guest2.getValue().getSessionToken(),
             "Member2",
             "AnotherPass!234",

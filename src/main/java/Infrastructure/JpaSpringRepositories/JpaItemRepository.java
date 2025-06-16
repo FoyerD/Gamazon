@@ -11,7 +11,7 @@ import Domain.Store.Item;
 import Domain.Store.ItemId;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaItemRepository extends IItemRepository {
 
     private final IJpaItemRepository jpaItemRepository;

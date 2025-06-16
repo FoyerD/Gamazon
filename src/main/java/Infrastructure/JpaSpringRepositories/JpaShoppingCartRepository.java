@@ -11,7 +11,7 @@ import Domain.Shopping.IShoppingCart;
 import Domain.Shopping.ShoppingCart;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaShoppingCartRepository extends IShoppingCartRepository {
 
     private final IJpaShoppingCartRepository jpaShoppingCartRepository;

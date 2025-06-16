@@ -1,43 +1,49 @@
 package StoreTests;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import Application.ItemService;
-import Application.ServiceManager;
-import Application.StoreService;
-import Application.UserService;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
+import Application.ItemService;
+import Application.ProductService;
+import Application.StoreService;
+import Application.UserService;
 import Application.utils.Response;
-import Domain.FacadeManager;
-import Domain.IRepoManager;
-import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
+import Domain.Pair;
 import Domain.Store.ItemFilter;
 import Infrastructure.ExternalPaymentService;
-import Infrastructure.MemoryRepoManager;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ItemServiceTests {
 
-    private IRepoManager repoManager;
+    //!private IRepoManager repoManager;
+    
     private IExternalPaymentService paymentService;
-    private FacadeManager facadeManager;
-    private ServiceManager serviceManager;
+    //!private FacadeManager facadeManager;
+    //!private ServiceManager serviceManager;
+    @Autowired
     private ItemService itemService;
+    @Autowired
     private UserService userService;
+    @Autowired
     private StoreService storeService;
+    @Autowired
+    private ProductService productService;
 
     private String tokenId;
     private UserDTO guest;
@@ -47,13 +53,10 @@ public class ItemServiceTests {
 
     @Before
     public void setUp() {
-        repoManager = new MemoryRepoManager();
+        //!repoManager = new MemoryRepoManager();
         paymentService = new ExternalPaymentService();
-        facadeManager = new FacadeManager(repoManager, paymentService, mock(IExternalSupplyService.class));
-        serviceManager = new ServiceManager(facadeManager);
-        itemService = serviceManager.getItemService();
-        userService = serviceManager.getUserService();
-        storeService = serviceManager.getStoreService();
+        //!facadeManager = new FacadeManager(repoManager, paymentService, mock(IExternalSupplyService.class));
+        //!serviceManager = new ServiceManager(facadeManager);
 
         guest = userService.guestEntry().getValue();
         Response<UserDTO> registerRes = userService.register(guest.getSessionToken(), "user1", "WhyWontWork1!","what@walla.com");
@@ -61,8 +64,8 @@ public class ItemServiceTests {
         
         Response<StoreDTO> storeRes1 = storeService.addStore(tokenId, "Store One", "desc1");
         store1 = storeRes1.getValue();
-        product1 = serviceManager.getProductService().addProduct(tokenId, "prod1", List.of("cat1"), List.of("desc1")).getValue();
-        product2 = serviceManager.getProductService().addProduct(tokenId, "prod2", List.of("cat2"), List.of("desc2")).getValue();
+        product1 = productService.addProduct(tokenId, "prod1", List.of("cat1"), List.of("desc1")).getValue();
+        product2 = productService.addProduct(tokenId, "prod2", List.of("cat2"), List.of("desc2")).getValue();
         
         itemService.add(tokenId, store1.getId(), product1.getId(), 49.99, 10, "In Stock Item");
         itemService.add(tokenId, store1.getId(), "out-of-stock-product", 19.99, 0, "Out of Stock Item");
@@ -165,7 +168,7 @@ public class ItemServiceTests {
     @Test
     public void GivenNewItem_WhenAdd_ThenReturnTrue() {
         StoreDTO newStore = storeService.addStore(tokenId, "StoreY", "desc").getValue();
-        ProductDTO newProduct = serviceManager.getProductService().addProduct(tokenId, "prodY", List.of("c"), List.of("d")).getValue();
+        ProductDTO newProduct = productService.addProduct(tokenId, "prodY", List.of("c"), List.of("d")).getValue();
 
         Response<ItemDTO> response = itemService.add(tokenId, newStore.getId(), newProduct.getId(), 19.99, 3, "Cool Product");
         assertFalse(response.errorOccurred());
@@ -233,7 +236,7 @@ public class ItemServiceTests {
     @Test
     public void WhenConcurrentUpdatesOnTwoItems_ThenEachIsCorrectlyUpdated() throws InterruptedException {
         StoreDTO storeX = storeService.addStore(tokenId, "StoreX", "desc").getValue();
-        ProductDTO productX = serviceManager.getProductService().addProduct(tokenId, "prodX", List.of("cat"), List.of("desc")).getValue();
+        ProductDTO productX = productService.addProduct(tokenId, "prodX", List.of("cat"), List.of("desc")).getValue();
         itemService.add(tokenId, storeX.getId(), productX.getId(), 19.99, 30, "Extra Item");
 
         Pair<String, String> id1 = new Pair<>(store1.getId(), product1.getId());

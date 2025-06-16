@@ -5,32 +5,24 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-
-
-
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-
-import Application.ItemService;
-import Application.MarketService;
-import Application.ProductService;
-import Application.ServiceManager;
-import Application.ShoppingService;
-import Application.StoreService;
-import Application.UserService;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ConditionDTO;
 import Application.DTOs.DiscountDTO;
@@ -40,28 +32,47 @@ import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
+import Application.ItemService;
+import Application.MarketService;
+import Application.ProductService;
+import Application.ShoppingService;
+import Application.StoreService;
+import Application.UserService;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.management.PermissionType;
 
-import Domain.FacadeManager;
-import Domain.ExternalServices.IExternalSupplyService;
-import Infrastructure.MemoryRepoManager;
-
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class StoreServiceTests {
     // Existing fields
+    @Autowired
     private StoreService storeService;
     
+    @Autowired
+    private UserService userService;
     // Add ServiceManager as a field
-    private ServiceManager serviceManager;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private ShoppingService shoppingService;
+
+    @Autowired
+    private MarketService marketService;
+    //!private ServiceManager serviceManager;
 
     private String tokenId = null;
 
     @Before
     public void setUp() {
         // Initialize repository manager
-        MemoryRepoManager repositoryManager = new MemoryRepoManager();
+
+        //!MemoryRepoManager repositoryManager = new MemoryRepoManager();
             // Create mock payment service
         IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
 
@@ -74,21 +85,21 @@ public class StoreServiceTests {
         when(mockPaymentService.handshake()).thenReturn(new Response<>(true));
         when(mockPaymentService.updatePaymentServiceURL(anyString())).thenReturn(new Response<>());
         
-        // Initialize facade manager
-        FacadeManager facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mock(IExternalSupplyService.class));
+        //! Initialize facade manager
+        //!FacadeManager facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mock(IExternalSupplyService.class));
 
-        // Initialize service manager and store as a field for use across tests
-        this.serviceManager = new ServiceManager(facadeManager);
+        //! Initialize service manager and store as a field for use across tests
+        //!this.serviceManager = new ServiceManager(facadeManager);
         
-        // Get needed services directly from the service manager
-        this.storeService = serviceManager.getStoreService();
+        //! Get needed services directly from the service manager
+        //!this.storeService = serviceManager.getStoreService();
         
         // Create a guest user
-        Response<UserDTO> guestResponse = serviceManager.getUserService().guestEntry();
+        Response<UserDTO> guestResponse = userService.guestEntry();
         assertFalse("Guest creation should succeed", guestResponse.errorOccurred());
         
         // Register a test user
-        Response<UserDTO> userResponse = serviceManager.getUserService().register(
+        Response<UserDTO> userResponse = userService.register(
             guestResponse.getValue().getSessionToken(),
             "Member1",
             "WhyWontWork1!",
@@ -178,7 +189,6 @@ public class StoreServiceTests {
         String storeId = addResult.getValue().getId();
         
         // Create a product using ProductService from the shared service manager
-        ProductService productService = serviceManager.getProductService();
         Response<ProductDTO> productResponse = productService.addProduct(
             tokenId,
             "Test Product",
@@ -189,7 +199,6 @@ public class StoreServiceTests {
         String productId = productResponse.getValue().getId();
         
         // Add the product to the store using ItemService from the shared service manager
-        ItemService itemService = serviceManager.getItemService();
         Response<ItemDTO> itemResponse = itemService.add(
             tokenId,
             storeId,
@@ -212,8 +221,6 @@ public class StoreServiceTests {
 
     @Test
     public void GivenExistingMemberAndAndNewProduct_WhenAddAuctionForNoneexistingStore_ThenReturnError() {
-        // Get services from the shared serviceManager
-        ProductService productService = serviceManager.getProductService();
         
         // Create a product using ProductService
         Response<ProductDTO> productResponse = productService.addProduct(
@@ -274,10 +281,6 @@ public class StoreServiceTests {
         Response<StoreDTO> storeResponse = storeService.addStore(this.tokenId, storeName, "Store with auctions");
         assertFalse("Store creation should succeed", storeResponse.errorOccurred());
         String storeId = storeResponse.getValue().getId();
-
-        // Get services from the shared ServiceManager
-        ProductService productService = serviceManager.getProductService();
-        ItemService itemService = serviceManager.getItemService();
         
         // Create 3 products
         Response<ProductDTO> product1Response = productService.addProduct(
@@ -411,9 +414,6 @@ public class StoreServiceTests {
 
     @Test
     public void GivenStoreWithAuctions_WhenGetAllProductAuctions_ThenReturnAllAuctions() {
-        // Get services from the shared ServiceManager
-        ProductService productService = serviceManager.getProductService();
-        ItemService itemService = serviceManager.getItemService();
         
         // Create a product
         Response<ProductDTO> productResponse = productService.addProduct(
@@ -1016,16 +1016,13 @@ public class StoreServiceTests {
         // Setup store, product, item
         Response<StoreDTO> storeRes = storeService.addStore(tokenId, "RejectStore", "Reject test");
         String storeId = storeRes.getValue().getId();
-        ProductService productService = serviceManager.getProductService();
-        ItemService itemService = serviceManager.getItemService();
-        ShoppingService shoppingService = serviceManager.getShoppingService();
 
         Response<ProductDTO> prodRes = productService.addProduct(tokenId, "RejectProduct", List.of("c"), List.of("d"));
         String productId = prodRes.getValue().getId();
         itemService.add(tokenId, storeId, productId, 120f, 5, "desc");
 
         // Create a second user
-        UserService userService = serviceManager.getUserService();
+
         Response<UserDTO> guest = userService.guestEntry();
         Response<UserDTO> buyer = userService.register(
             guest.getValue().getSessionToken(),
@@ -1058,12 +1055,6 @@ public class StoreServiceTests {
         // Setup store and services
         Response<StoreDTO> storeRes = storeService.addStore(tokenId, "DualManagerStore", "Approval Test");
         String storeId = storeRes.getValue().getId();
-
-        ProductService productService = serviceManager.getProductService();
-        ItemService itemService = serviceManager.getItemService();
-        ShoppingService shoppingService = serviceManager.getShoppingService();
-        UserService userService = serviceManager.getUserService();
-        MarketService marketService = serviceManager.getMarketService();
 
         // Add product and item
         Response<ProductDTO> prodRes = productService.addProduct(tokenId, "OfferProduct", List.of("cat"), List.of("desc"));
@@ -1098,12 +1089,6 @@ public class StoreServiceTests {
         // Setup store and services
         Response<StoreDTO> storeRes = storeService.addStore(tokenId, "DualManagerStoreAccepted", "Approval Test");
         String storeId = storeRes.getValue().getId();
-
-        ProductService productService = serviceManager.getProductService();
-        ItemService itemService = serviceManager.getItemService();
-        ShoppingService shoppingService = serviceManager.getShoppingService();
-        UserService userService = serviceManager.getUserService();
-        MarketService marketService = serviceManager.getMarketService();
 
         // Add product and item
         Response<ProductDTO> prodRes = productService.addProduct(tokenId, "OfferProduct", List.of("cat"), List.of("desc"));
@@ -1147,15 +1132,11 @@ public class StoreServiceTests {
     public void GivenValidOffer_WhenRejectOffer_ThenOfferIsRejected() {
         Response<StoreDTO> storeRes = storeService.addStore(tokenId, "RejectableStore", "Rejection test");
         String storeId = storeRes.getValue().getId();
-        ProductService productService = serviceManager.getProductService();
-        ItemService itemService = serviceManager.getItemService();
-        ShoppingService shoppingService = serviceManager.getShoppingService();
 
         Response<ProductDTO> prodRes = productService.addProduct(tokenId, "RejectProduct", List.of("cat"), List.of("desc"));
         String productId = prodRes.getValue().getId();
         itemService.add(tokenId, storeId, productId, 200f, 5, "desc");
 
-        UserService userService = serviceManager.getUserService();
         Response<UserDTO> guest = userService.guestEntry();
         Response<UserDTO> buyer = userService.register(guest.getValue().getSessionToken(), "RejectUser", "Pass1234!", "reject@store.com");
         String buyerToken = buyer.getValue().getSessionToken();
@@ -1180,15 +1161,11 @@ public class StoreServiceTests {
     public void GivenValidOffer_WhenCounterOfferByManager_ThenCounterOfferReturned() {
         Response<StoreDTO> storeRes = storeService.addStore(tokenId, "CounterStore", "Counter test");
         String storeId = storeRes.getValue().getId();
-        ProductService productService = serviceManager.getProductService();
-        ItemService itemService = serviceManager.getItemService();
-        ShoppingService shoppingService = serviceManager.getShoppingService();
 
         Response<ProductDTO> prodRes = productService.addProduct(tokenId, "CounterProduct", List.of("cat"), List.of("desc"));
         String productId = prodRes.getValue().getId();
         itemService.add(tokenId, storeId, productId, 250f, 2, "desc");
 
-        UserService userService = serviceManager.getUserService();
         Response<UserDTO> guest = userService.guestEntry();
         Response<UserDTO> buyer = userService.register(guest.getValue().getSessionToken(), "CounterBuyer", "Pass5678!", "counter@store.com");
         String buyerToken = buyer.getValue().getSessionToken();

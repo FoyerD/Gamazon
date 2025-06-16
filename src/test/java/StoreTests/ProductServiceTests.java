@@ -1,45 +1,49 @@
 package StoreTests;
 
+import java.util.List;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import Application.ProductService;
-import Application.ServiceManager;
-import Application.UserService;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.UserDTO;
+import Application.ProductService;
+import Application.UserService;
 import Application.utils.Response;
-import Domain.FacadeManager;
-import Domain.ExternalServices.IExternalPaymentService;
-import Domain.ExternalServices.IExternalSupplyService;
-import Infrastructure.MemoryRepoManager;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ProductServiceTests {
 
-    private ServiceManager serviceManager;
+    //!private ServiceManager serviceManager;
+
+    @Autowired
     private ProductService productService;
+    @Autowired
     private UserService userService;
+
+
     private String tokenId;
 
     @Before
     public void setUp() {
-        // Initialize in-memory infrastructure
-        MemoryRepoManager repoManager = new MemoryRepoManager();
-        FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
+        //! Initialize in-memory infrastructure
+        //!MemoryRepoManager repoManager = new MemoryRepoManager();
+        //!FacadeManager facadeManager = new FacadeManager(repoManager, mock(IExternalPaymentService.class), mock(IExternalSupplyService.class));
 
-        // Initialize service manager and services
-        this.serviceManager = new ServiceManager(facadeManager);
-        this.productService = serviceManager.getProductService();
-        this.userService = serviceManager.getUserService();
+        //! Initialize service manager and services
+        //!this.serviceManager = new ServiceManager(facadeManager);
+        //!this.productService = serviceManager.getProductService();
+        //!this.userService = serviceManager.getUserService();
 
         // Register a user and obtain token
         Response<UserDTO> guestResp = userService.guestEntry();

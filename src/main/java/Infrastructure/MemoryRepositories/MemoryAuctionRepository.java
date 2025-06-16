@@ -9,7 +9,7 @@ import Domain.Repos.IAuctionRepository;
 import Domain.Store.Auction;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryAuctionRepository extends IAuctionRepository {
     private Map<String, Auction> auctions;
     

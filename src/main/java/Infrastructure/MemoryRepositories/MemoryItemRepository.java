@@ -16,7 +16,7 @@ import Domain.Store.Item;
  * Stores items in a thread-safe map keyed by (storeId, productId) pairs.
  */
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryItemRepository extends IItemRepository {
 
     private final Map<Pair<String, String>, Item> items;

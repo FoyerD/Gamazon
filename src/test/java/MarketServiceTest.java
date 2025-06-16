@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import Application.ItemService;
 import Application.MarketService;
@@ -36,18 +41,27 @@ import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
 import Infrastructure.MemoryRepoManager;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class MarketServiceTest {
     // Use concrete implementations instead of interfaces where possible
-    private ServiceManager serviceManager;
-    private FacadeManager facadeManager;
-    private MemoryRepoManager repositoryManager;
+    //!private ServiceManager serviceManager;
+    //!private FacadeManager facadeManager;
+    //!private MemoryRepoManager repositoryManager;
+    @Autowired
     private MarketService marketService;
+    @Autowired
     private UserService userService;
+    @Autowired
     private StoreService storeService;
+    @Autowired  
     private ItemService itemService;
+    @Autowired
     private ProductService productService;
+    @Autowired
     private TokenService tokenService;
-
+    @Autowired
+    private PermissionManager permissionManager;
     // User related fields
     private String tokenId1;
     private String tokenId2;
@@ -73,18 +87,12 @@ public class MarketServiceTest {
         when(mockPaymentService.handshake()).thenReturn(Response.success(true));
         when(mockSupplyService.handshake()).thenReturn(Response.success(true));
 
-        // Initialize dependency injectors
-        repositoryManager = new MemoryRepoManager();
-        facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
-        serviceManager = new ServiceManager(facadeManager);
+        //! Initialize dependency injectors
+        //!repositoryManager = new MemoryRepoManager();
+        //!facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
+        //!serviceManager = new ServiceManager(facadeManager);
         
-        // Get the services
-        marketService = serviceManager.getMarketService();
-        userService = serviceManager.getUserService();
-        storeService = serviceManager.getStoreService();
-        itemService = serviceManager.getItemService();
-        tokenService = serviceManager.getTokenService();
-        productService = serviceManager.getProductService();
+
 
         // Configure mockNotificationService to return successful responses by default
         when(mockNotificationService.sendNotification(anyString(), anyString()))
@@ -323,8 +331,6 @@ public class MarketServiceTest {
         assertTrue(threadSuccess[0], "First owner appointment should succeed");
         assertTrue(threadSuccess[1], "Second owner appointment should succeed");
         
-        // Get the permission manager to check permissions properly
-        PermissionManager permissionManager = facadeManager.getPermissionManager();
         
         // Verify the first user is a store owner
         Permission appointee1Permission = permissionManager.getPermission(storeId, appointee1Id);
@@ -370,7 +376,7 @@ public class MarketServiceTest {
 
     @Test
     public void givenValidPaymentService_whenUpdatingPaymentService_thenServiceIsUpdated() {
-        Response<Void> response = marketService.updatePaymentService(tokenId1, facadeManager.getPaymentService());
+        Response<Void> response = marketService.updatePaymentService(tokenId1, mockPaymentService);
         assertFalse(response.errorOccurred());
     }
 

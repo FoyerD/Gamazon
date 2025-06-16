@@ -12,7 +12,7 @@ import Domain.Repos.IPermissionRepository;
 import Domain.management.Permission;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryPermissionRepository extends IPermissionRepository {
 
     private final Map<String, Map<String, Permission>> permissions = new ConcurrentHashMap<>();

@@ -13,7 +13,7 @@ import Domain.User.Member;
 import Domain.User.User;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaUserSpringRepository extends IUserRepository {
 
     private final IJpaUserSpringRepository jpaRepo;

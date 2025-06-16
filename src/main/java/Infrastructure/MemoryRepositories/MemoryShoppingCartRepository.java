@@ -10,7 +10,7 @@ import Domain.Repos.IShoppingCartRepository;
 import Domain.Shopping.IShoppingCart;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryShoppingCartRepository extends IShoppingCartRepository {
     private final Map<String, IShoppingCart> carts;
 

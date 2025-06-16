@@ -10,7 +10,7 @@ import Domain.Notification.INotificationRepository;
 import Domain.Notification.Notification;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaNotificationRepository extends INotificationRepository {
 
     private final IJpaNotificationRepository jpaNotificationRepository;

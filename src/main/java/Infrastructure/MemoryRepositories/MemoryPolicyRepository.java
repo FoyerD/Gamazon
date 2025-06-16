@@ -11,13 +11,11 @@ import org.springframework.stereotype.Repository;
 import Domain.Repos.IPolicyRepository;
 import Domain.Store.Policy;
 
-import java.util.UUID;
-
 /**
  * In-memory implementation of IPolicyRepository for Policy objects.
  */
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryPolicyRepository extends IPolicyRepository {
     // Thread-safe storage of policies by ID
     private final Map<String, Policy> policies = new ConcurrentHashMap<>();

@@ -6,22 +6,26 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import Application.DTOs.UserDTO;
-import Application.TokenService;
 import Application.UserService;
 import Application.utils.Response;
-import Domain.User.LoginManager;
-import Infrastructure.MemoryRepositories.MemoryUserRepository;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UserServiceTests {
+    @Autowired
     private UserService userService;
+
     private String guestToken;
 
     @Before
     public void setUp() {
         // Initialize service and obtain a guest session token
-        userService = new UserService(new LoginManager(new MemoryUserRepository()), new TokenService());
         Response<UserDTO> guestResp = userService.guestEntry();
         assertFalse("Guest entry should succeed", guestResp.errorOccurred());
         guestToken = guestResp.getValue().getSessionToken();

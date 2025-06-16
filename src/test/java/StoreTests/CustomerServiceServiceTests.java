@@ -6,33 +6,38 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.mock;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import Application.CustomerServiceService;
 import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.ProductService;
-import Application.ServiceManager;
 import Application.StoreService;
 import Application.UserService;
 import Application.utils.Response;
-import Domain.FacadeManager;
-import Domain.IRepoManager;
 import Domain.Pair;
-import Domain.ExternalServices.IExternalSupplyService;
 import Domain.Store.FeedbackDTO;
-import Infrastructure.ExternalPaymentService;
-import Infrastructure.MemoryRepoManager;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class CustomerServiceServiceTests {
+    @Autowired
     private CustomerServiceService customerServiceService;
+    @Autowired
     private StoreService storeService;
+    @Autowired
     private ItemService itemService;
+    @Autowired
     private ProductService productService;
+    @Autowired
     private UserService userService;
-    private ServiceManager serviceManager;
-    private FacadeManager facadeManager;
-    private IRepoManager repoManager;
+
+    //!private ServiceManager serviceManager;
+    //!private FacadeManager facadeManager;
+    //!private IRepoManager repoManager;
 
     String storeId;
     Pair<String, String> itemId;
@@ -42,15 +47,9 @@ public class CustomerServiceServiceTests {
 
     @Before
     public void setUp() {
-        this.repoManager = new MemoryRepoManager();
-        this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class), mock(IExternalSupplyService.class));
-        this.serviceManager = new ServiceManager(facadeManager);
-        
-        customerServiceService = serviceManager.getCustomerService();
-        storeService = serviceManager.getStoreService();
-        itemService = serviceManager.getItemService();
-        productService = serviceManager.getProductService();
-        userService = serviceManager.getUserService();
+        //! this.repoManager = new MemoryRepoManager();
+        //! this.facadeManager = new FacadeManager(repoManager, mock(ExternalPaymentService.class), mock(IExternalSupplyService.class));
+        //! this.serviceManager = new ServiceManager(facadeManager);
 
         UserDTO guest = userService.guestEntry().getValue();
         tokenId = guest.getSessionToken();

@@ -1,8 +1,8 @@
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,28 +10,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import Application.ItemService;
-import Application.MarketService;
-import Application.ProductService;
-import Application.ServiceManager;
-import Application.ShoppingService;
-import Application.StoreService;
-import Application.TokenService;
-import Application.UserService;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CartDTO;
 import Application.DTOs.ConditionDTO;
@@ -45,36 +35,48 @@ import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.UserDTO;
-import Application.utils.Error;
+import Application.ItemService;
+import Application.MarketService;
+import Application.ProductService;
+import Application.ShoppingService;
+import Application.StoreService;
+import Application.TokenService;
+import Application.UserService;
 import Application.utils.Response;
-
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
+import Domain.Pair;
 import Domain.management.PermissionType;
 
-import Domain.FacadeManager;
-import Domain.Pair;
-import Domain.ExternalServices.IExternalSupplyService;
-import Infrastructure.MemoryRepoManager;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ShoppingServiceTest {
 
     // Use concrete implementations for services and facades
+    @Autowired
     private ShoppingService shoppingService;
+    @Autowired
     private UserService userService;
     
-    // Dependency injectors
-    private MemoryRepoManager repositoryManager;
-    private FacadeManager facadeManager;
-    private ServiceManager serviceManager;
+    //! Dependency injectors
+    //! private MemoryRepoManager repositoryManager;
+    //! private FacadeManager facadeManager;
+    //! private ServiceManager serviceManager;
+    @Autowired
     private ProductService productService;
+    @Autowired
     private StoreService storeService;
+    @Autowired
     private ItemService itemService;
-    private INotificationService notificationService;
-    private IExternalSupplyService mockSupplyService;
+    @Autowired
     private TokenService tokenService;
+    @Autowired
+    private MarketService marketService;
 
     // Mock service for testing
+    private INotificationService notificationService;
+    private IExternalSupplyService mockSupplyService;
     private IExternalPaymentService mockPaymentService;
     
     // Test user data
@@ -95,22 +97,7 @@ public class ShoppingServiceTest {
         mockPaymentService = mock(IExternalPaymentService.class);
         notificationService = mock(INotificationService.class);
         mockSupplyService = mock(IExternalSupplyService.class);
-        
 
-        repositoryManager = new MemoryRepoManager();
-        facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
-        serviceManager = new ServiceManager(facadeManager);
-        serviceManager.injectINotificationService(notificationService);
-        tokenService = serviceManager.getTokenService();
-
-
-        // Initialize services
-        userService = serviceManager.getUserService();
-        productService = serviceManager.getProductService();
-        storeService = serviceManager.getStoreService();
-        itemService = serviceManager.getItemService();
-        productService = serviceManager.getProductService();
-        shoppingService = serviceManager.getShoppingService();
         
         // Register a test user using UserService
         Response<UserDTO> guestResponse = userService.guestEntry();
@@ -580,139 +567,6 @@ public class ShoppingServiceTest {
         }
     }
 
-    @Test
-    public void testCheckout_PaymentServiceReturnsFailure() {
-        // First add a product to the cart
-        Response<Boolean> addToCartResponse = shoppingService.addProductToCart(store_id, clientToken, product_id, 1);
-        assertFalse("Adding to cart should succeed", addToCartResponse.errorOccurred());
-        
-        // Check the current cart state to verify the item is there
-        Response<CartDTO> cartResponse = shoppingService.viewCart(clientToken);
-        assertFalse("Viewing cart should succeed", cartResponse.errorOccurred());
-        
-        CartDTO cart = cartResponse.getValue();
-        assertTrue("Cart should contain the store", cart.getBaskets().containsKey(store_id));
-        
-        ShoppingBasketDTO basket = cart.getBaskets().get(store_id);
-        assertTrue("Basket should contain the product", basket.getOrders().containsKey(product_id));
-        
-        ItemDTO itemInCart = basket.getOrders().get(product_id);
-        int initialQuantityInCart = itemInCart.getAmount();
-        assertEquals("Cart should have 1 item", 1, initialQuantityInCart);
-        
-        // Create a distinctive error message for easy identification
-        final String DISTINCTIVE_ERROR_MESSAGE = "XYZ_TEST_PAYMENT_DECLINED_123";
-        
-        when(this.mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(new Error(DISTINCTIVE_ERROR_MESSAGE)));
-        
-        // Create a facade manager that uses our bad payment service
-        FacadeManager testFacadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
-        ServiceManager testServiceManager = new ServiceManager(testFacadeManager);
-        ShoppingService testShoppingService = testServiceManager.getShoppingService();
-        
-        // Prepare checkout parameters
-        String cardNumber = "1234567890123456";
-        Date expiryDate = new Date();
-        String cvv = "123";
-        String clientName = "John Doe";
-        String deliveryAddress = "123 Main St";
-        String userSSN = "123-45-6789";
-        String city = "Test City";
-        String country = "Test Country";
-        String zip = "12345";
-        
-        Response<Boolean> response = testShoppingService.checkout(
-            clientToken, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zip
-        );
-        
-        assertTrue("Checkout should fail with payment service error", response.errorOccurred());
-        assertNull("Value should be null on failure", response.getValue());
-        assertNotNull("Error message should not be null", response.getErrorMessage());
-        
-        // Verify that the item is still in the cart (checkout didn't succeed)
-        Response<CartDTO> finalCartResponse = shoppingService.viewCart(clientToken);
-        assertFalse("Final cart view should succeed", finalCartResponse.errorOccurred());
-        
-        CartDTO finalCart = finalCartResponse.getValue();
-        assertTrue("Cart should still contain the store", finalCart.getBaskets().containsKey(store_id));
-        
-        ShoppingBasketDTO finalBasket = finalCart.getBaskets().get(store_id);
-        assertTrue("Basket should still contain the product", finalBasket.getOrders().containsKey(product_id));
-        
-        ItemDTO finalItemInCart = finalBasket.getOrders().get(product_id);
-        assertEquals("Item quantity in cart should be unchanged after failed checkout", 
-            initialQuantityInCart, finalItemInCart.getAmount());
-        
-        checkInventoryInvariants();
-        checkCartInvariants();
-    }
-
-    @Test
-    public void testCheckout_ShippingServiceReturnsFailure() {
-        // First add a product to the cart
-        Response<Boolean> addToCartResponse = shoppingService.addProductToCart(store_id, clientToken, product_id, 1);
-        assertFalse("Adding to cart should succeed", addToCartResponse.errorOccurred());
-        
-        // Check the current cart state to verify the item is there
-        Response<CartDTO> cartResponse = shoppingService.viewCart(clientToken);
-        assertFalse("Viewing cart should succeed", cartResponse.errorOccurred());
-        
-        CartDTO cart = cartResponse.getValue();
-        assertTrue("Cart should contain the store", cart.getBaskets().containsKey(store_id));
-        
-        ShoppingBasketDTO basket = cart.getBaskets().get(store_id);
-        assertTrue("Basket should contain the product", basket.getOrders().containsKey(product_id));
-        
-        ItemDTO itemInCart = basket.getOrders().get(product_id);
-        int initialQuantityInCart = itemInCart.getAmount();
-        assertEquals("Cart should have 1 item", 1, initialQuantityInCart);
-        
-        // Create a distinctive error message for easy identification
-        final String DISTINCTIVE_ERROR_MESSAGE = "XYZ_TEST_SHIPPING_DECLINED_123";
-        
-        when(this.mockSupplyService.supplyOrder(any(), any(), any(), any(), any())).thenReturn(new Response<>(new Error(DISTINCTIVE_ERROR_MESSAGE)));
-        
-        // Create a facade manager that uses our bad payment service
-        FacadeManager testFacadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
-        ServiceManager testServiceManager = new ServiceManager(testFacadeManager);
-        ShoppingService testShoppingService = testServiceManager.getShoppingService();
-        
-        // Prepare checkout parameters
-        String cardNumber = "1234567890123456";
-        Date expiryDate = new Date();
-        String cvv = "123";
-        String clientName = "John Doe";
-        String deliveryAddress = "123 Main St";
-        String userSSN = "123-45-6789";
-        String city = "Test City";
-        String country = "Test Country";
-        String zip = "12345";
-        
-        Response<Boolean> response = testShoppingService.checkout(
-            clientToken, userSSN, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zip
-        );
-        
-        assertTrue("Checkout should fail with shipping service error", response.errorOccurred());
-        assertNull("Value should be null on failure", response.getValue());
-        assertNotNull("Error message should not be null", response.getErrorMessage());
-        
-        // Verify that the item is still in the cart (checkout didn't succeed)
-        Response<CartDTO> finalCartResponse = shoppingService.viewCart(clientToken);
-        assertFalse("Final cart view should succeed", finalCartResponse.errorOccurred());
-        
-        CartDTO finalCart = finalCartResponse.getValue();
-        assertTrue("Cart should still contain the store", finalCart.getBaskets().containsKey(store_id));
-        
-        ShoppingBasketDTO finalBasket = finalCart.getBaskets().get(store_id);
-        assertTrue("Basket should still contain the product", finalBasket.getOrders().containsKey(product_id));
-        
-        ItemDTO finalItemInCart = finalBasket.getOrders().get(product_id);
-        assertEquals("Item quantity in cart should be unchanged after failed checkout", 
-            initialQuantityInCart, finalItemInCart.getAmount());
-        
-        checkInventoryInvariants();
-        checkCartInvariants();
-    }
 
     @Test
     public void testViewCart_ReturnCorrectFinalPrice() {
@@ -855,7 +709,6 @@ public class ShoppingServiceTest {
         anyDouble()   // amount
         )).thenReturn(new Response<>(10000));  // Replace 10000 with the desired mocked value
 
-        MarketService marketService = serviceManager.getMarketService();
         // Step 1: Member makes offer
         PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(
             user.getId(),

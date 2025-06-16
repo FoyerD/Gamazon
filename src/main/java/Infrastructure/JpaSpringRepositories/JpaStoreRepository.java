@@ -9,7 +9,7 @@ import Domain.Repos.IStoreRepository;
 import Domain.Store.Store;
 
 @Repository
-@Profile("prod") // Only active when profile is 'prod'
+@Profile({"prod", "dbtest"})
 public class JpaStoreRepository extends IStoreRepository {
 
     private final IJpaStoreRepository jpaStoreRepository;

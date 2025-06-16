@@ -1,18 +1,19 @@
 package Infrastructure.JpaSpringRepositories;
 
-import Domain.Pair;
-import Domain.Repos.IPermissionRepository;
-import Domain.management.Permission;
-import Domain.management.PermissionId;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
+
+import Domain.Pair;
+import Domain.Repos.IPermissionRepository;
+import Domain.management.Permission;
+import Domain.management.PermissionId;
+
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaPermissionRepository extends IPermissionRepository {
 
     private final IJpaPermissionRepository jpaRepository;

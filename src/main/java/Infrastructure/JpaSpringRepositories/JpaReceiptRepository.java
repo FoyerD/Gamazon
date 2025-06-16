@@ -12,7 +12,7 @@ import Domain.Shopping.Receipt;
 import Domain.Store.Product;
 
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaReceiptRepository extends IReceiptRepository {
 
     private final IJpaReceiptRepository jpaReceiptRepository;

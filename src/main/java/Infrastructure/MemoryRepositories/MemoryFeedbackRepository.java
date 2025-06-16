@@ -12,7 +12,7 @@ import Domain.Repos.IFeedbackRepository;
 import Domain.Store.Feedback;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryFeedbackRepository extends IFeedbackRepository{
     private Map<String, Feedback> feedbacks;
 

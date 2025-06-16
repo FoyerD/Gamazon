@@ -11,7 +11,7 @@ import Domain.Repos.IOfferRepository;
 import Domain.Shopping.Offer;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryOfferRepository extends IOfferRepository {
     private final Map<String, Offer> offers;
 

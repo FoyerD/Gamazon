@@ -1,15 +1,16 @@
 package Infrastructure.JpaSpringRepositories;
 
-import Domain.Repos.IAuctionRepository;
-import Domain.Store.Auction;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
+
+import Domain.Repos.IAuctionRepository;
+import Domain.Store.Auction;
+
 @Repository
-@Profile("prod")
+@Profile({"prod", "dbtest"})
 public class JpaAuctionRepository extends IAuctionRepository {
 
     private final IJpaAuctionRepository jpaAuctionRepository;

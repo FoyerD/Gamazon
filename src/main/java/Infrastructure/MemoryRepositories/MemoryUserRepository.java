@@ -12,7 +12,7 @@ import Domain.User.Member;
 import Domain.User.User;
 
 @Repository
-@Profile("dev")
+@Profile({"dev", "memorytest"})
 public class MemoryUserRepository extends IUserRepository {
     Map<String, User> users;
     public MemoryUserRepository() {
