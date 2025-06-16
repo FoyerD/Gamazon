@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import Application.DTOs.UserDTO;
 import Application.ProductService;
 import Application.UserService;
 import Application.utils.Response;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -30,7 +32,8 @@ public class ProductServiceTests {
     private ProductService productService;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
 
     private String tokenId;
 
@@ -57,6 +60,11 @@ public class ProductServiceTests {
         );
         assertFalse("User registration failed", registerResp.errorOccurred());
         this.tokenId = registerResp.getValue().getSessionToken();
+    }
+
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
     }
 
     @Test

@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +23,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import Application.ItemService;
 import Application.MarketService;
 import Application.ProductService;
-import Application.ServiceManager;
 import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
@@ -32,14 +32,13 @@ import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Domain.FacadeManager;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
-import Infrastructure.MemoryRepoManager;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -62,6 +61,9 @@ public class MarketServiceTest {
     private TokenService tokenService;
     @Autowired
     private PermissionManager permissionManager;
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
     // User related fields
     private String tokenId1;
     private String tokenId2;
@@ -118,6 +120,11 @@ public class MarketServiceTest {
         marketService.updatePaymentService(tokenId1, mockPaymentService);
         marketService.updateSupplyService(tokenId1, mockSupplyService);
         marketService.updateNotificationService(tokenId1, mockNotificationService);
+    }
+
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
     }
     
     // Helper method

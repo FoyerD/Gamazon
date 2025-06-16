@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -41,6 +42,7 @@ import Application.UserService;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.management.PermissionType;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -64,7 +66,9 @@ public class StoreServiceTests {
 
     @Autowired
     private MarketService marketService;
-    //!private ServiceManager serviceManager;
+    
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
 
     private String tokenId = null;
 
@@ -111,6 +115,11 @@ public class StoreServiceTests {
         this.tokenId = userResponse.getValue().getSessionToken();
     }
 
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
+    }
+    
     @Test
     public void GivenExistingMemberAndNewStore_WhenAddStore_ThenReturnStore() {
         String storeName = "NewStore";

@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import Application.UserService;
 import Application.utils.Response;
 import Domain.Store.Policy;
 import Domain.management.PermissionManager;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 /**
  * Acceptance‐style tests for PolicyService, updated to use the provided PermissionManager.
@@ -48,6 +50,8 @@ public class PolicyServiceTests {
     private UserService         userService;
     @Autowired
     private StoreService         storeService;
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
 
     private String               tokenId;
     private String               storeId;
@@ -98,6 +102,12 @@ public class PolicyServiceTests {
         String userId = tokenService.extractId(this.tokenId);
         permManager.appointFirstStoreOwner(userId, this.storeId);
         // --------------------------------------------------------------------------------------
+    }
+
+
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
     }
 
     // -------------------------------------------------------------

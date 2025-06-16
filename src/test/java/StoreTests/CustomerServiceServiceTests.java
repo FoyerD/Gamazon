@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import Application.UserService;
 import Application.utils.Response;
 import Domain.Pair;
 import Domain.Store.FeedbackDTO;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -34,6 +36,8 @@ public class CustomerServiceServiceTests {
     private ProductService productService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
 
     //!private ServiceManager serviceManager;
     //!private FacadeManager facadeManager;
@@ -59,6 +63,11 @@ public class CustomerServiceServiceTests {
         productId = productService.addProduct(tokenId, "Cool Product", List.of("Prod Cat"), List.of("Cat desc")).getValue().getId();
         itemId = new Pair<>(storeId, productId);
         itemService.add(tokenId, storeId, productId, 10.0, 5, "Cool Item");
+    }
+
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
     }
 
     @Test

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -48,6 +49,7 @@ import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
 import Domain.management.PermissionType;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -73,6 +75,8 @@ public class ShoppingServiceTest {
     private TokenService tokenService;
     @Autowired
     private MarketService marketService;
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
 
     // Mock service for testing
     private INotificationService notificationService;
@@ -138,6 +142,10 @@ public class ShoppingServiceTest {
         itemService.add(clientToken, store_id, product_id_2, 20.0, 5, "Test Item 2 Description");
     }
 
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
+    }
     //
     // HELPER METHODS FOR CREATING VALID DISCOUNTS
     //

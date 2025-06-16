@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ import Domain.ExternalServices.IExternalPaymentService;
 import Domain.Pair;
 import Domain.Store.ItemFilter;
 import Infrastructure.ExternalPaymentService;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -44,7 +46,9 @@ public class ItemServiceTests {
     private StoreService storeService;
     @Autowired
     private ProductService productService;
-
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+    
     private String tokenId;
     private UserDTO guest;
     private StoreDTO store1;
@@ -70,6 +74,11 @@ public class ItemServiceTests {
         itemService.add(tokenId, store1.getId(), product1.getId(), 49.99, 10, "In Stock Item");
         itemService.add(tokenId, store1.getId(), "out-of-stock-product", 19.99, 0, "Out of Stock Item");
         itemService.add(tokenId, store1.getId(), product2.getId(), 39.99, 5, "Another Stocked Item");
+    }
+
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
     }
 
     @Test

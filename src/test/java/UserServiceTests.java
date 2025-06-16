@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,12 +15,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import Application.DTOs.UserDTO;
 import Application.UserService;
 import Application.utils.Response;
+import UI.DatabaseRelated.DatabaseCleaner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserServiceTests {
     @Autowired
     private UserService userService;
+    @Autowired
+    private DatabaseCleaner databaseCleaner; // Assuming this is used to clean up the database before/after tests
 
     private String guestToken;
 
@@ -30,6 +34,11 @@ public class UserServiceTests {
         assertFalse("Guest entry should succeed", guestResp.errorOccurred());
         guestToken = guestResp.getValue().getSessionToken();
 
+    }
+
+    @BeforeEach
+    public void cleanDatabase() {
+        databaseCleaner.run();
     }
 
     // 1.1 Guest Entry
