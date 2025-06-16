@@ -26,7 +26,6 @@ import Application.ShoppingService;
 import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
-import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
@@ -48,6 +47,9 @@ public class AppInitializer implements CommandLineRunner, Ordered {
 
     @Value("${app.init.state:default}")
     private String initState;
+
+    @Value("${external.services.url}")
+    private String externalServicesUrl;
 
     public AppInitializer(
             UserService userService,
@@ -88,11 +90,9 @@ public class AppInitializer implements CommandLineRunner, Ordered {
             InputStream stream = new ClassPathResource("config/init.json").getInputStream();
             Map<String, List<Map<String, Object>>> states = mapper.readValue(stream, new TypeReference<>() {});
 
-            // Updating external services URLs
-            String URL = (String)(states.get("urlExternalServices").get(0).get("URL"));
-            Response<Void> paymentServiceResponse = externalPaymentService.updatePaymentServiceURL(URL);
-            Response<Void> supplyServiceResponse = externalSupplyService.updateSupplyServiceURL(URL);
-            System.out.println("External services URLs updated successfully. With URL: " + URL);
+            Response<Void> paymentServiceResponse = externalPaymentService.updatePaymentServiceURL(externalServicesUrl);
+            Response<Void> supplyServiceResponse = externalSupplyService.updateSupplyServiceURL(externalServicesUrl);
+            System.out.println("External services URLs updated successfully. With URL: " + externalServicesUrl);
 
             List<Map<String, Object>> commands = states.get(initState);
             if (commands == null) {
