@@ -153,3 +153,6 @@ Below is a list of available action types, their parameters, and what they do.
    3. In application.properties set: app.init.state=testScenario
    4. On next run, this script will be executed automatically.
 
+
+
+<pre> ### 🔧 External Services Configuration The application requires an external URL for payment and supply services. This is configured via the `application.properties` file and no longer comes from `init.json`. **Location:** `src/main/resources/application.properties` ```properties # External service base URL external.services.url=https://damp-lynna-wsep-1984852e.koyeb.app/ ``` Replace the value with your own service endpoint if needed. This URL will be used automatically during application startup to initialize the external services. </pre>
