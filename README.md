@@ -92,7 +92,55 @@ Place your JSON file at: src/main/resources/init/appInitializer.json
 ### Supported JSON Actions 
 Below is a list of available action types, their parameters, and what they do.
 
- ### 🧾 Supported User Actions #### 🧍 User Actions | Action | Description | Parameters | |----------------|-----------------------------------------|-------------------------------------------------------------| | `guestEntry` | Creates a guest session | `as` (alias for storing session token) | | `registerUser` | Registers a user using a guest session | `session`, `username`, `password`, `email`, `as` | | `loginUser` | Logs in with a username and password | `username`, `password`, `as` | | `logout` | Logs out a session | `session` | --- #### 🏬 Market & Store Actions | Action | Description | Parameters | |--------------------------|--------------------------------------------|-------------------------------------------------| | `openMarket` | Opens the market | – | | `addStore` | Adds a store | `session`, `name`, `category`, `as` | | `appointManager` | Makes a user a store manager | `session`, `store`, `target` | | `appointStoreManager` | (Alias) same as appointManager | Same | | `appointStoreOwner` | Adds a co-owner to the store | `session`, `store`, `target` | | `changePermissions` | Changes manager permissions | `session`, `store`, `target`, `permissions` | | `changeManagerPermissions` | (Alias) same as above | Same | | `ban` | Temporarily or permanently bans a user | `session`, `target`, `experationDate` | | `unban` | Unbans a previously banned user | `session`, `target` | --- #### 📦 Product & Item Actions | Action | Description | Parameters | |-------------|--------------------------------------|---------------------------------------------------------------| | `addProduct`| Adds a new product | `session`, `name`, `categories`, `keywords`, `as` | | `addItem` | Adds a product to a store's stock | `session`, `store`, `product`, `price`, `quantity`, `description` | --- #### 🛒 Shopping & Auction Actions | Action | Description | Parameters | |-------------|--------------------------------------|----------------------------------------------------------------------------| | `addAuction`| Starts an auction for a product | `session`, `store`, `product`, `auctionEndDate`, `startPrice` | | `addToCart` | Adds a product to a user's cart | `session`, `store`, `product`, `quantity` | | `makeBid` | Places a bid on an auction | `session`, `auction`, `price`, `cardNumber`, `expiryDate`, `cvv`, `andIncrement`, `clientName`, `deliveryAddress` | | `checkout` | Checks out the cart with payment info| `session`, `cardNumber`, `expiryDate`, `cvv`, `andIncrement`, `clientName`, `deliveryAddress`, `city`, `country`, `zip` | --- #### 💬 Offers | Action | Description | Parameters | |--------------------------|--------------------------------------------------|----------------------------------------------------------------------------| | `makeOffer` | Member proposes a price for an item | `session`, `store`, `product`, `price`, `Id`, `cardNumber`, `expiryDate/year`, `expiryDate/month`, `expiryDate/day`, `cvv`, `holder`, `as` | | `acceptOfferByMember` | Buyer/member accepts a counter/final offer | `session`, `offerId` | | `acceptOfferByEmployee` | Manager/owner accepts a submitted offer | `session`, `offerId` | | `counterOfferByMember` | Member responds with a new price | `session`, `offerId`, `price` | | `counterOfferByEmployee` | Manager/owner responds with a new counter-price| `session`, `offerId`, `price` | 
+
+🧾 Supported User Actions
+| Action         | Description                            | Parameters                                       |
+| -------------- | -------------------------------------- | ------------------------------------------------ |
+| `guestEntry`   | Creates a guest session                | `as` (alias for storing session token)           |
+| `registerUser` | Registers a user using a guest session | `session`, `username`, `password`, `email`, `as` |
+| `loginUser`    | Logs in with a username and password   | `username`, `password`, `as`                     |
+| `logout`       | Logs out a session                     | `session`                                        |
+
+🏬 Market & Store Actions
+| Action                     | Description                            | Parameters                                  |
+| -------------------------- | -------------------------------------- | ------------------------------------------- |
+| `openMarket`               | Opens the market                       | –                                           |
+| `addStore`                 | Adds a store                           | `session`, `name`, `category`, `as`         |
+| `appointManager`           | Makes a user a store manager           | `session`, `store`, `target`                |
+| `appointStoreManager`      | (Alias) same as appointManager         | Same                                        |
+| `appointStoreOwner`        | Adds a co-owner to the store           | `session`, `store`, `target`                |
+| `changePermissions`        | Changes manager permissions            | `session`, `store`, `target`, `permissions` |
+| `changeManagerPermissions` | (Alias) same as above                  | Same                                        |
+| `ban`                      | Temporarily or permanently bans a user | `session`, `target`, `experationDate`       |
+| `unban`                    | Unbans a previously banned user        | `session`, `target`                         |
+
+
+📦 Product & Item Actions
+| Action       | Description                       | Parameters                                                        |
+| ------------ | --------------------------------- | ----------------------------------------------------------------- |
+| `addProduct` | Adds a new product                | `session`, `name`, `categories`, `keywords`, `as`                 |
+| `addItem`    | Adds a product to a store's stock | `session`, `store`, `product`, `price`, `quantity`, `description` |
+
+
+🛒 Shopping & Auction Actions
+
+| Action       | Description                           | Parameters                                                                                                              |
+| ------------ | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `addAuction` | Starts an auction for a product       | `session`, `store`, `product`, `auctionEndDate`, `startPrice`                                                           |
+| `addToCart`  | Adds a product to a user's cart       | `session`, `store`, `product`, `quantity`                                                                               |
+| `makeBid`    | Places a bid on an auction            | `session`, `auction`, `price`, `cardNumber`, `expiryDate`, `cvv`, `andIncrement`, `clientName`, `deliveryAddress`       |
+| `checkout`   | Checks out the cart with payment info | `session`, `cardNumber`, `expiryDate`, `cvv`, `andIncrement`, `clientName`, `deliveryAddress`, `city`, `country`, `zip` |
+
+💬 Offers
+| Action                   | Description                                     | Parameters                                                                                                                                 |
+| ------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `makeOffer`              | Member proposes a price for an item             | `session`, `store`, `product`, `price`, `Id`, `cardNumber`, `expiryDate/year`, `expiryDate/month`, `expiryDate/day`, `cvv`, `holder`, `as` |
+| `acceptOfferByMember`    | Buyer/member accepts a counter/final offer      | `session`, `offerId`                                                                                                                       |
+| `acceptOfferByEmployee`  | Manager/owner accepts a submitted offer         | `session`, `offerId`                                                                                                                       |
+| `counterOfferByMember`   | Member responds with a new price                | `session`, `offerId`, `price`                                                                                                              |
+| `counterOfferByEmployee` | Manager/owner responds with a new counter-price | `session`, `offerId`, `price`                                                                                                              |
+
+
 
 ### Example: Adding a New Scenario
    1. Open the file: src/main/resources/config/init.json
