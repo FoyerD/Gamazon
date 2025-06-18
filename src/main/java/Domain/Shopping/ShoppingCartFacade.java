@@ -289,12 +289,19 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             // Perform rollback and throw exception
             Integer paymentTransactionId = result.getPaymentTransactionId();
             Integer supplyTransactionId = result.getSupplyTransactionId();
-
-            if(paymentTransactionId != -1)
+            if (paymentTransactionId == null || supplyTransactionId == null) {}
+            else {
+                if(paymentTransactionId != -1 && supplyTransactionId != -1){
                 paymentService.cancelPayment(paymentTransactionId);
-            if(supplyTransactionId != -1)
                 supplyService.cancelSupply(supplyTransactionId);
-
+                }
+                else{
+                    if(paymentTransactionId != -1 && supplyTransactionId == -1)
+                        paymentService.cancelPayment(paymentTransactionId);
+                    else
+                        supplyService.cancelSupply(supplyTransactionId);
+                }
+            }
             checkoutManager.performRollback(clientId, cart, result);
             cartRepo.update(clientId, cart);
             throw new RuntimeException("Checkout failed: " + result.getErrorMessage());

@@ -137,7 +137,8 @@ public class CheckoutManager {
                 );
                 
                 if (paymentResponse == null || paymentResponse.errorOccurred()) {
-                    String errorMsg = paymentResponse != null ? paymentResponse.getErrorMessage() : "service returned null response";
+                    String errorMsg = paymentResponse != null ? "An error has occurred while processing payment\n and therefore you haven't been charged" 
+                    : "service returned null response";
                     throw new RuntimeException("Payment failed: " + errorMsg);
                 }
 
@@ -159,7 +160,8 @@ public class CheckoutManager {
             );
             
             if (supplyResponse == null || supplyResponse.errorOccurred()) {
-                String errorMsg = supplyResponse != null ? supplyResponse.getErrorMessage() : "service returned null response";
+                String errorMsg = supplyResponse != null ? "An error has occurred while attempting to ship the item" 
+                : "service returned null response";
                 throw new RuntimeException("Supply failed: " + errorMsg);
             }
 
