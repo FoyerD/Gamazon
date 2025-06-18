@@ -74,9 +74,19 @@ public class StoreServiceTests {
         when(mockPaymentService.cancelPayment(anyInt())).thenReturn(new Response<>(true));
         when(mockPaymentService.handshake()).thenReturn(new Response<>(true));
         when(mockPaymentService.updatePaymentServiceURL(anyString())).thenReturn(new Response<>());
+
+        IExternalSupplyService mockSupplyService = mock(IExternalSupplyService.class);
+
+        when(mockSupplyService.supplyOrder(
+                anyString(), anyString(), anyString(), anyString(), anyString()
+        )).thenReturn(new Response<>(1234)); // fake transaction ID
+
+        when(mockSupplyService.cancelSupply(anyInt())).thenReturn(new Response<>(true));
+        when(mockSupplyService.handshake()).thenReturn(new Response<>(true));
+        when(mockSupplyService.updateSupplyServiceURL(anyString())).thenReturn(new Response<>());
         
         // Initialize facade manager
-        FacadeManager facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mock(IExternalSupplyService.class));
+        FacadeManager facadeManager = new FacadeManager(repositoryManager, mockPaymentService, mockSupplyService);
 
         // Initialize service manager and store as a field for use across tests
         this.serviceManager = new ServiceManager(facadeManager);
@@ -1142,7 +1152,7 @@ public class StoreServiceTests {
             "Test City",
             "Test Country",
             "12345",
-            "Offer Tester"
+            "Buyer"
         );
         Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 100.0, payment, supply);
         String offerId = offerResponse.getValue().getId();

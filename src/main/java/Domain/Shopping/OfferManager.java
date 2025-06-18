@@ -171,7 +171,7 @@ public class OfferManager {
             }
 
             SupplyDetails supplyDetails = offer.getSupplyDetails();
-            Response<Integer> supplyResponse = supplyService.supplyOrder(supplyDetails.getHolder(), supplyDetails.getDeliveryAddress(), supplyDetails.getCity(), supplyDetails.getCountry(), supplyDetails.getZipCode()); 
+            Response<Integer> supplyResponse = supplyService.supplyOrder(paymentDetails.getHolder(), supplyDetails.getDeliveryAddress(), supplyDetails.getCity(), supplyDetails.getCountry(), supplyDetails.getZipCode()); 
             if (supplyResponse.getValue() == null || supplyResponse.errorOccurred() || supplyResponse.getValue() == -1) {
                 if(paymentResponse.getValue() != -1)
                     paymentService.cancelPayment(paymentResponse.getValue());

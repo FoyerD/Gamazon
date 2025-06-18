@@ -401,10 +401,10 @@ public class StoreFacade {
             // Rollback item amount
             item.setAmount(currentAmount);
             itemRepository.update(itemKey, item);
-            if(paymentSuccess.getValue() != -1) {
+            if(paymentSuccess != null && paymentSuccess.getValue() != -1) {
                 paymentService.cancelPayment(paymentSuccess.getValue());
             }
-            if(supplySuccess.getValue() != -1) {
+            if(supplySuccess != null && supplySuccess.getValue() != -1) {
                 supplyService.cancelSupply(supplySuccess.getValue());
             }
             throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);

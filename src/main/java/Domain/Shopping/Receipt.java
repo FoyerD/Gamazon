@@ -165,7 +165,8 @@ public class Receipt {
         map.put("timestamp", timestamp);
         map.put("totalPrice", totalPrice);
         map.put("paymentDetails", paymentDetails);
-        
+        map.put("supplyDetails", supplyDetails);
+
         // Convert products to map of productId to quantity and price
         Map<String, Pair<Integer, Double>> productQtyPrice = new HashMap<>();
         for (Map.Entry<String, ReceiptProduct> entry : products.entrySet()) {

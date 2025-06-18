@@ -634,6 +634,10 @@ public class StoreFacadeTests {
         when(auction.getCvv()).thenReturn(cvv);
         when(auction.getClientName()).thenReturn(clientName);
         when(auction.getCurrentPrice()).thenReturn(currentPrice);
+        when((auction.getDeliveryAddress())).thenReturn(address);
+        when(auction.getCity()).thenReturn(city);
+        when(auction.getCountry()).thenReturn(country);
+        when(auction.getZipCode()).thenReturn(zip);
         when(auctionRepository.remove(auctionId)).thenReturn(auction);
 
         // Stubbing store

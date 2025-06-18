@@ -874,6 +874,10 @@ public class ShoppingServiceTest {
         anyDouble()   // amount
         )).thenReturn(new Response<>(10000));  // Replace 10000 with the desired mocked value
 
+        when(mockSupplyService.supplyOrder(
+            anyString(), anyString(), anyString(), anyString(), anyString()
+        )).thenReturn(new Response<>(10000)); // fake transaction ID
+
         MarketService marketService = serviceManager.getMarketService();
         // Step 1: Member makes offer
         PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(

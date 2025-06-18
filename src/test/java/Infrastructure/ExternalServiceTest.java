@@ -63,6 +63,8 @@ public class ExternalServiceTest {
 
         when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble()))
             .thenReturn(Response.success(1));
+        when(mockSupplyService.supplyOrder(any(), any(), any(), any(), any()))
+            .thenReturn(Response.success(1));
         when(mockNotificationService.sendNotification(any(), any()))
             .thenReturn(Response.success(true));
 
