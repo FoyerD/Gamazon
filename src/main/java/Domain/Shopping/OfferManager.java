@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
 import Domain.Repos.IItemRepository;
@@ -32,6 +33,7 @@ public class OfferManager {
     private final PermissionManager permissionManager;
     private final IItemRepository itemRepository;
     private final IExternalPaymentService paymentService;
+    private final IExternalSupplyService supplyService;
     private final IReceiptRepository receiptRepository;
     private final IProductRepository productRepository;
 
@@ -43,13 +45,14 @@ public class OfferManager {
     StoreFacade storeFacade,
     IExternalPaymentService paymentService,
     IReceiptRepository receiptRepository,
-    IProductRepository productRepository) {
+    IProductRepository productRepository, IExternalSupplyService supplyService) {
         this.offerRepository = offerRepository;
         this.permissionManager = permissionManager;
         this.itemRepository = itemRepository;
         this.paymentService = paymentService;
         this.receiptRepository = receiptRepository;
         this.productRepository = productRepository;
+        this.supplyService = supplyService;
     }
 
     
@@ -84,9 +87,9 @@ public class OfferManager {
             throw new RuntimeException("Payment service is not set");
         }
 
-        // if (supplyService == null) {
-        //     throw new IllegalArgumentException("Supply service is not set");
-        // }
+        if (supplyService == null) {
+            throw new IllegalArgumentException("Supply service is not set");
+        }
 
         synchronized (offerRepository.getLock(offer.getId())) {        
             offer.approveOffer(userId); 
@@ -95,7 +98,7 @@ public class OfferManager {
             offerApprovers.add(offer.getMemberId()); // Include the member who made the offer
             if (offer.getApprovedBy().equals(offerApprovers)) {
                 // Process payment
-                Offer acceptedOffer = processPayment(offer);
+                Offer acceptedOffer = processOrder(offer);
                 offerRepository.remove(offer.getId());
                 return acceptedOffer;
             }
@@ -143,7 +146,7 @@ public class OfferManager {
         return rejectOffer(employeeId, offerId);
     }
 
-    private Offer processPayment(Offer offer) {
+    private Offer processOrder(Offer offer) {
         
         
         Pair<String, String> itemId = new Pair<>(offer.getStoreId(), offer.getProductId());
@@ -163,9 +166,16 @@ public class OfferManager {
                                                     paymentDetails.getCvv(),
                                                     paymentDetails.getHolder(),
                                                     offer.getLastPrice());
-            if (paymentResponse.errorOccurred()) {
-                throw new RuntimeException("Payment Service failed to proccess transaction: " + paymentResponse.getErrorMessage());
+            if (paymentResponse.getValue() == null || paymentResponse.errorOccurred() || paymentResponse.getValue() == -1) {
+                throw new RuntimeException("Payment Service failed to proccess transaction");
             }
+
+            Response<Integer> supplyResponse = shippingService.shipItem(
+                offer.getStoreId(),
+                offer.getProductId(),
+                offer.getMemberId(),
+                item.getAmount() - 1 // Decrease the amount by 1 for the order
+            ); 
 
             item.decreaseAmount(1);
             itemRepository.update(itemId, item);
