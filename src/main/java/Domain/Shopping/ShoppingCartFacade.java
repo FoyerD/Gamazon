@@ -290,10 +290,16 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             Integer paymentTransactionId = result.getPaymentTransactionId();
             Integer supplyTransactionId = result.getSupplyTransactionId();
 
-            if(paymentTransactionId != -1)
+            if(paymentTransactionId != -1 && supplyTransactionId != -1){
                 paymentService.cancelPayment(paymentTransactionId);
-            if(supplyTransactionId != -1)
                 supplyService.cancelSupply(supplyTransactionId);
+            }
+            else{
+                if(paymentTransactionId != -1 && supplyTransactionId == -1)
+                    paymentService.cancelPayment(paymentTransactionId);
+                else
+                    supplyService.cancelSupply(supplyTransactionId);
+            }
 
             checkoutManager.performRollback(clientId, cart, result);
             cartRepo.update(clientId, cart);
