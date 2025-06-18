@@ -39,6 +39,7 @@ import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.SupplyDetailsDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
@@ -1043,7 +1044,14 @@ public class StoreServiceTests {
             "321",
             "Reject User"
         );
-        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 90.0, payment);
+        SupplyDetailsDTO supply = new SupplyDetailsDTO(
+            "123 Main St",
+            "Test City",
+            "Test Country",
+            "12345",
+            "Reject User"
+        );
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 90.0, payment, supply);
         assertFalse("Making offer should succeed", offerResponse.errorOccurred());
 
         // Reject the offer
@@ -1083,7 +1091,8 @@ public class StoreServiceTests {
         Response<UserDTO> buyer = userService.register(guestBuyer.getValue().getSessionToken(), "Buyer1", "Pass1!word", "buyer@store.com");
         String buyerToken = buyer.getValue().getSessionToken();
         PaymentDetailsDTO payment = new PaymentDetailsDTO(buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Buyer");
-        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 100.0, payment);
+        SupplyDetailsDTO supply = new SupplyDetailsDTO("123 Main St", "Test City", "Test Country", "12345", "Offer Tester");
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 100.0, payment, supply);
         String offerId = offerResponse.getValue().getId();
 
         // First manager approves
@@ -1128,7 +1137,14 @@ public class StoreServiceTests {
 
         PaymentDetailsDTO payment = new PaymentDetailsDTO(
             buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Buyer");
-        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 100.0, payment);
+        SupplyDetailsDTO supply = new SupplyDetailsDTO(
+            "123 Main St",
+            "Test City",
+            "Test Country",
+            "12345",
+            "Offer Tester"
+        );
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 100.0, payment, supply);
         String offerId = offerResponse.getValue().getId();
 
         // First manager approves
@@ -1161,7 +1177,8 @@ public class StoreServiceTests {
         String buyerToken = buyer.getValue().getSessionToken();
 
         PaymentDetailsDTO payment = new PaymentDetailsDTO(buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Reject User");
-        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 180.0, payment);
+        SupplyDetailsDTO supply = new SupplyDetailsDTO("123 Main St", "Test City", "Test Country", "12345", "Reject User");
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 180.0, payment, supply);
         String offerId = offerResponse.getValue().getId();
 
         Response<OfferDTO> result = storeService.rejectOffer(tokenId, offerId);
@@ -1194,7 +1211,8 @@ public class StoreServiceTests {
         String buyerToken = buyer.getValue().getSessionToken();
 
         PaymentDetailsDTO payment = new PaymentDetailsDTO(buyer.getValue().getId(), "4111111111111111", LocalDate.now().plusYears(1), "321", "Counter Buyer");
-        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 190.0, payment);
+        SupplyDetailsDTO supply = new SupplyDetailsDTO("123 Main St", "Test City", "Test Country", "12345", "Counter Buyer");
+        Response<OfferDTO> offerResponse = shoppingService.makeOffer(buyerToken, storeId, productId, 190.0, payment, supply);
         String offerId = offerResponse.getValue().getId();
 
         Response<OfferDTO> result = storeService.counterOffer(tokenId, offerId, 220.0);

@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
 import Domain.Repos.IAuctionRepository;
@@ -551,6 +552,9 @@ public class StoreFacadeTests {
         String cvv = "123";
         String clientName = "John Doe";
         String deliveryAddress = "123 Main St";
+        String city = "City";
+        String country = "Country";
+        String zip = "12345";
 
         Auction auction = mock(Auction.class);
         when(auction.getAuctionId()).thenReturn(auctionId);
@@ -561,7 +565,7 @@ public class StoreFacadeTests {
         when(userRepository.get(userId)).thenReturn(mock(Member.class));
         when(auctionRepository.update(anyString(), any(Auction.class))).thenReturn(auction);
 
-        assertEquals(auctionId, storeFacade.addBid(auctionId, userId, bid, cardNumber, expiryDate, cvv, clientName, deliveryAddress).getAuctionId());
+        assertEquals(auctionId, storeFacade.addBid(auctionId, userId, bid, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zip).getAuctionId());
     }
 
     @Test
@@ -576,7 +580,11 @@ public class StoreFacadeTests {
         String clientName = "John Doe";
         double currentPrice = 50.0;
         String productName = "Cool Product";
+        String address = "123 Main St";
         String storeName = "My Store";
+        String city = "City";
+        String country = "Country";
+        String zip = "12345";
 
         // Create all mocks for dependencies
         IStoreRepository storeRepository = mock(IStoreRepository.class);
@@ -588,6 +596,7 @@ public class StoreFacadeTests {
         IReceiptRepository receiptRepository = mock(IReceiptRepository.class);
         IProductRepository productRepository = mock(IProductRepository.class);
         IExternalPaymentService paymentService = mock(IExternalPaymentService.class);
+        IExternalSupplyService supplyService = mock(IExternalSupplyService.class);
 
         // Create StoreFacade with constructor
         StoreFacade storeFacade = new StoreFacade(
@@ -638,8 +647,10 @@ public class StoreFacadeTests {
         when(paymentService.processPayment(bidderId, cardNumber, expiry, cvv, clientName, currentPrice))
             .thenReturn(new Response<>(12345));
 
+        when(supplyService.supplyOrder(clientName, address, city, country, zip))
+            .thenReturn(new Response<>(12345));
         // Run the test
-        Item result = storeFacade.acceptBid(storeId, productId, auctionId, paymentService);
+        Item result = storeFacade.acceptBid(storeId, productId, auctionId, paymentService, supplyService);
 
         // Assert returned item
         assertEquals(item, result);
@@ -650,7 +661,8 @@ public class StoreFacadeTests {
             eq(storeId),
             eq(Map.of(product, new Pair<>(1, currentPrice))),
             eq(currentPrice),
-            contains("xxxx-xxxx-xxxx-" + cardNumber.substring(cardNumber.length() - 4))
+            contains("xxxx-xxxx-xxxx-" + cardNumber.substring(cardNumber.length() - 4)),
+            eq(address + ", " + city + ", " + country + ", " + zip)
         );
 
         // Verify notification sent
@@ -667,8 +679,11 @@ public class StoreFacadeTests {
         IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
         when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
+        IExternalSupplyService mockSupplyService = mock(IExternalSupplyService.class);
+        when(mockSupplyService.supplyOrder(any(), any(), any(), any(), any())).thenReturn(new Response<>(10000));
+
         when(itemRepository.get(any())).thenReturn(null);
-        storeFacade.acceptBid("storeX", "productY", "auctionZ", mockPaymentService);
+        storeFacade.acceptBid("storeX", "productY", "auctionZ", mockPaymentService, mockSupplyService);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -680,6 +695,9 @@ public class StoreFacadeTests {
         IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
         when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
+        IExternalSupplyService mockSupplyService = mock(IExternalSupplyService.class);
+        when(mockSupplyService.supplyOrder(any(), any(), any(), any(), any())).thenReturn(new Response<>(10000));
+
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
         when(item.getAmount()).thenReturn(1);
@@ -688,7 +706,7 @@ public class StoreFacadeTests {
         when(auctionRepository.get(auctionId)).thenReturn(null);
         when(itemRepository.update(itemKey, item)).thenReturn(item); // for rollback
 
-        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService, mockSupplyService);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -700,6 +718,9 @@ public class StoreFacadeTests {
         IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
         when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
 
+        IExternalSupplyService mockSupplyService = mock(IExternalSupplyService.class);
+        when(mockSupplyService.supplyOrder(any(), any(), any(), any(), any())).thenReturn(new Response<>(10000));
+
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
         Auction auction = mock(Auction.class);
@@ -710,7 +731,7 @@ public class StoreFacadeTests {
         when(auction.getStoreId()).thenReturn("wrongStore");
         when(auction.getProductId()).thenReturn("wrongProduct");
 
-        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService, mockSupplyService);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -721,6 +742,9 @@ public class StoreFacadeTests {
 
         IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
         when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(10000));
+
+        IExternalSupplyService mockSupplyService = mock(IExternalSupplyService.class);
+        when(mockSupplyService.supplyOrder(any(), any(), any(), any(), any())).thenReturn(new Response<>(10000));
 
         Pair<String, String> itemKey = new Pair<>(storeId, productId);
         Item item = mock(Item.class);
@@ -733,7 +757,7 @@ public class StoreFacadeTests {
         when(auction.getProductId()).thenReturn(productId);
         when(auction.getCurrentBidderId()).thenReturn(null);
 
-        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService, mockSupplyService);
     }
 
     @Test(expected = RuntimeException.class)
@@ -756,7 +780,10 @@ public class StoreFacadeTests {
         IExternalPaymentService mockPaymentService = mock(IExternalPaymentService.class);
         when(mockPaymentService.processPayment(any(), any(), any(), any(), any(), anyDouble())).thenReturn(new Response<>(-1));
 
-        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService);
+        IExternalSupplyService mockSupplyService = mock(IExternalSupplyService.class);
+        when(mockSupplyService.supplyOrder(any(), any(), any(), any(), any())).thenReturn(new Response<>(-1));
+
+        storeFacade.acceptBid(storeId, productId, auctionId, mockPaymentService, mockSupplyService);
     }
 
 }

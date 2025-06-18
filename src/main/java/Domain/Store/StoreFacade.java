@@ -437,7 +437,7 @@ public class StoreFacade {
 
         String maskedCardNumber = "xxxx-xxxx-xxxx-" + last4;
         String paymentDetails = "Card: " + maskedCardNumber;
-        String supplyDetails = "Address: " + auction.getDeliveryAddress() + ", " + auction.getCity() + ", " + auction.getCountry() + ", " + auction.getZipCode();
+        String supplyDetails = auction.getDeliveryAddress() + ", " + auction.getCity() + ", " + auction.getCountry() + ", " + auction.getZipCode();
         try{
         this.receiptRepository.savePurchase(
             auction.getCurrentBidderId(),

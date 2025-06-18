@@ -147,6 +147,10 @@ public class Receipt {
     public String getPaymentDetails() {
         return paymentDetails;
     }
+
+    public String getSupplyDetails() {
+        return supplyDetails;
+    }
     
     /**
      * Converts this receipt to a map representation for serialization or storage.

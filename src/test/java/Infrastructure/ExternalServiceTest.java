@@ -110,7 +110,7 @@ public class ExternalServiceTest {
         AuctionDTO auctionDTO = storeService.addAuction(userToken, storeId, productId, dateStr, 5.0).getValue();
         String auctionId = auctionDTO.getAuctionId();
 
-        shoppingService.makeBid(auctionId, userToken, 6.0f, "1234567812345678", new Date(), "123", 1L, "Buyer", "Address");
+        shoppingService.makeBid(auctionId, userToken, 6.0f, "1234567812345678", new Date(), "123", 1L, "Buyer", "Address", "City", "Country", "12345");
         storeService.acceptBid(userToken, storeId, productId, auctionId);
 
         verify(mockPaymentService, times(1))
@@ -130,7 +130,7 @@ public class ExternalServiceTest {
         AuctionDTO auctionDTO = storeService.addAuction(userToken, storeId, productId, dateStr, 5.0).getValue();
         String auctionId = auctionDTO.getAuctionId();
 
-        shoppingService.makeBid(auctionId, userToken, 6.0f, "1234567812345678", new Date(), "123", 1L, "Buyer", "Address");
+        shoppingService.makeBid(auctionId, userToken, 6.0f, "1234567812345678", new Date(), "123", 1L, "Buyer", "Address", "City", "Country", "12345");
         storeService.acceptBid(userToken, storeId, productId, auctionId);
 
         verify(mockNotificationService, atLeastOnce())
@@ -159,14 +159,14 @@ public class ExternalServiceTest {
         String auctionId = auctionDTO.getAuctionId();
 
         // First bid – no outbid notification expected
-        shoppingService.makeBid(auctionId, userToken, 6.0f, "1234567812345678", new Date(), "123", 1L, "FirstBuyer", "Address");
+        shoppingService.makeBid(auctionId, userToken, 6.0f, "1234567812345678", new Date(), "123", 1L, "FirstBuyer", "Address", "City", "Country", "12345");
 
         // Create a second user and bid higher
         UserDTO guest2 = userService.guestEntry().getValue();
         UserDTO user2 = userService.register(guest2.getSessionToken(), "User2", "Password2!", "user2@example.com").getValue();
         String user2Token = user2.getSessionToken();
 
-        shoppingService.makeBid(auctionId, user2Token, 7.0f, "8765432187654321", new Date(), "321", 1L, "SecondBuyer", "AnotherAddress");
+        shoppingService.makeBid(auctionId, user2Token, 7.0f, "8765432187654321", new Date(), "321", 1L, "SecondBuyer", "AnotherAddress", "AnotherCity", "AnotherCountry", "54321");
 
         verify(mockNotificationService, atLeastOnce())
             .sendNotification(anyString(), contains("outbid"));

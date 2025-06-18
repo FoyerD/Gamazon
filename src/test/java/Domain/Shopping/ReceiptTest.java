@@ -24,7 +24,8 @@ public class ReceiptTest {
     private static final String STORE_ID = "store123";
     private static final double TOTAL_PRICE = 35.0;
     private static final String PAYMENT_DETAILS = "xxxx-xxxx-xxxx-1234";
-    
+    private static final String SUPPLY_DETAILS = "123 Main St, City, Country, 12345";
+
     @Before
     public void setUp() {
         products = new HashMap<>();
@@ -34,7 +35,7 @@ public class ReceiptTest {
         products.put(product1, new Pair<>(2, 10.0));
         products.put(product2, new Pair<>(1, 15.0));
         
-        receipt = new Receipt(CLIENT_ID, STORE_ID, products, TOTAL_PRICE, PAYMENT_DETAILS);
+        receipt = new Receipt(CLIENT_ID, STORE_ID, products, TOTAL_PRICE, PAYMENT_DETAILS, SUPPLY_DETAILS);
     }
     
     /**
@@ -53,6 +54,7 @@ public class ReceiptTest {
         assertEquals(STORE_ID, receipt.getStoreId());
         assertEquals(TOTAL_PRICE, receipt.getTotalPrice(), 0.001);
         assertEquals(PAYMENT_DETAILS, receipt.getPaymentDetails());
+        assertEquals(SUPPLY_DETAILS, receipt.getSupplyDetails());
         
         // Check that products map is not the same instance but contains the same products
         assertNotSame(products, receipt.getProducts());
@@ -125,6 +127,7 @@ public class ReceiptTest {
         assertEquals(receipt.getTimestamp(), map.get("timestamp"));
         assertEquals(TOTAL_PRICE, map.get("totalPrice"));
         assertEquals(PAYMENT_DETAILS, map.get("paymentDetails"));
+        assertEquals(SUPPLY_DETAILS, map.get("supplyDetails"));
         
         Map<String, Pair<Integer, Double>> productQuantities = (Map<String, Pair<Integer, Double>>) map.get("products");
         assertNotNull(productQuantities);
