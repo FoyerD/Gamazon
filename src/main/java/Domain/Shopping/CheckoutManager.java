@@ -160,7 +160,8 @@ public class CheckoutManager {
             );
             
             if (supplyResponse == null || supplyResponse.errorOccurred()) {
-                String errorMsg = supplyResponse != null ? supplyResponse.getErrorMessage() : "service returned null response";
+                String errorMsg = supplyResponse != null ? "An error has occurred while attempting to ship the item" 
+                : "service returned null response";
                 throw new RuntimeException("Supply failed: " + errorMsg);
             }
 
