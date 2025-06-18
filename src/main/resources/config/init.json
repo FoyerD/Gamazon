@@ -1,5 +1,4 @@
 {
-  "urlExternalServices": [{"URL": "https://damp-lynna-wsep-1984852e.koyeb.app/"}],
   "marketWithTwoStores": [
     { "action": "guestEntry", "as": "guest1" },
     { "action": "guestEntry", "as": "guest2" },
