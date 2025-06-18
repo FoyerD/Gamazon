@@ -56,8 +56,8 @@ public class OfferManager {
     }
 
     
-    public Offer makeOffer(String memberId, String storeId, String productId, double newPrice, PaymentDetails paymentDetails) {
-        Offer offer = new Offer(memberId, storeId, productId, newPrice, paymentDetails);
+    public Offer makeOffer(String memberId, String storeId, String productId, double newPrice, PaymentDetails paymentDetails, SupplyDetails supplyDetails) {
+        Offer offer = new Offer(memberId, storeId, productId, newPrice, paymentDetails, supplyDetails);
         offerRepository.add(offer.getId(), offer);
         return offer;
     }
@@ -170,12 +170,13 @@ public class OfferManager {
                 throw new RuntimeException("Payment Service failed to proccess transaction");
             }
 
-            Response<Integer> supplyResponse = shippingService.shipItem(
-                offer.getStoreId(),
-                offer.getProductId(),
-                offer.getMemberId(),
-                item.getAmount() - 1 // Decrease the amount by 1 for the order
-            ); 
+            SupplyDetails supplyDetails = offer.getSupplyDetails();
+            Response<Integer> supplyResponse = supplyService.supplyOrder(supplyDetails.getHolder(), supplyDetails.getDeliveryAddress(), supplyDetails.getCity(), supplyDetails.getCountry(), supplyDetails.getZipCode()); 
+            if (supplyResponse.getValue() == null || supplyResponse.errorOccurred() || supplyResponse.getValue() == -1) {
+                if(paymentResponse.getValue() != -1)
+                    paymentService.cancelPayment(paymentResponse.getValue());
+                throw new RuntimeException("Supply Service failed to proccess transaction");
+            }
 
             item.decreaseAmount(1);
             itemRepository.update(itemId, item);
@@ -189,7 +190,8 @@ public class OfferManager {
             Map.of(productRepository.get(offer.getProductId()), new Pair<>(1, offer.getLastPrice())),
             offer.getLastPrice(),
             //TODO change this
-            offer.getPaymentDetails().toString()
+            offer.getPaymentDetails().toString(),
+            offer.getSupplyDetails().toString()
         );
         } catch (Exception e) {
             // dont know what to do surely not rollback!!!
