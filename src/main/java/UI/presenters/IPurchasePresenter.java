@@ -9,6 +9,7 @@ import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.ReceiptDTO;
+import Application.DTOs.SupplyDetailsDTO;
 import Application.utils.Response;
 
 /**
@@ -89,7 +90,7 @@ public interface IPurchasePresenter {
      */
     Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
-                                    long andIncrement, String clientName, String deliveryAddress);
+                                    long andIncrement, String clientName, String deliveryAddress, String city, String country, String zipCode);
 
 
     /**
@@ -134,7 +135,7 @@ public interface IPurchasePresenter {
      * @param paymentDetails payment details of the user
      * @return {@link OfferDTO}
      */
-    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails);
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails, SupplyDetailsDTO supplyDetails);
 
     /**
      * Retrieves all offers of a user
