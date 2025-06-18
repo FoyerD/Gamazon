@@ -188,7 +188,8 @@ public class CheckoutManager {
             // Create receipts with discounted prices
             if (purchaseSuccess) {
                 String maskedCardNumber = "xxxx-xxxx-xxxx-" + cardNumber.substring(cardNumber.length() - 4);
-                receiptBuilder.createReceiptsWithDiscounts(clientId, storeProductsMap, storeProductPricesMap, maskedCardNumber);
+                String address = deliveryAddress + ", " + city + ", " + country + ", " + zipCode;
+                receiptBuilder.createReceiptsWithDiscounts(clientId, storeProductsMap, storeProductPricesMap, maskedCardNumber, address);
             }
             return new CheckoutResult(true, null, itemsRollbackData, cartRollbackData, basketsRollbackData, paymentResponse.getValue(), supplyResponse.getValue());
             
