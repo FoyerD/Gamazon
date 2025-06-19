@@ -1,20 +1,43 @@
 package UI.views.components;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
+import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
 
 public class StoreBrowser extends VerticalLayout {
     private final Supplier<List<StoreDTO>> storesSupplier;
+    private final Runnable onStoreSelect;
+    private final Function<StoreDTO, List<ItemDTO>> itemFetcher;
+    private final Consumer<ItemDTO> onAddToCart;
+    private final Consumer<ItemDTO> onReview;
+    private final Consumer<ItemDTO> onOffer;
+    private final Consumer<StoreDTO> onManager;
     private final FlexLayout tileContainer = new FlexLayout();
+    private String nameFilter;
 
-    public StoreBrowser(Supplier<List<StoreDTO>> storesSupplier) {
+    public StoreBrowser(Supplier<List<StoreDTO>> storesSupplier,
+                        Runnable onStoreSelect,
+                        Function<StoreDTO, List<ItemDTO>> itemFetcher,
+                        Consumer<ItemDTO> onAddToCart,
+                        Consumer<ItemDTO> onReview,
+                        Consumer<ItemDTO> onOffer,
+                        Consumer<StoreDTO> onManager) {
+        this.nameFilter = "";
         this.storesSupplier = storesSupplier;
+        this.onStoreSelect = onStoreSelect;
+        this.itemFetcher = itemFetcher;
+        this.onAddToCart = onAddToCart;
+        this.onReview = onReview;
+        this.onOffer = onOffer;
+        this.onManager = onManager;
 
         setWidthFull();
         setPadding(true);
@@ -32,11 +55,21 @@ public class StoreBrowser extends VerticalLayout {
         add(tileContainer);
     }
 
-    public void refreresh() {
-        tileContainer.removeAll();
-        List<StoreDTO> stores = storesSupplier.get();
-        if (stores == null || stores.isEmpty()) return;
-
-        stores.stream().forEach(s -> tileContainer.add(new StoreTile(s)));
+    public void setNameFilter(String name) {
+        this.nameFilter = name;
     }
+
+    public void refresh() {
+    tileContainer.removeAll();
+    List<StoreDTO> stores = storesSupplier.get();
+    if (stores == null || stores.isEmpty()) return;
+
+    stores.stream()
+        .filter(s -> nameFilter.isEmpty() || s.getName().toLowerCase().contains(nameFilter.toLowerCase()))
+        .forEach(s -> {
+            StoreTile tile = new StoreTile(s, onStoreSelect, itemFetcher, onAddToCart, onReview, onOffer, onManager);
+            tileContainer.add(tile);
+        });
+}
+
 }

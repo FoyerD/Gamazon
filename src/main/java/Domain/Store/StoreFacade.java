@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import Application.DTOs.StoreDTO;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;

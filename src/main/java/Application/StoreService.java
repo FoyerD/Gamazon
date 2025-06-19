@@ -34,8 +34,6 @@ import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.User.LoginManager;
-import Domain.User.Member;
-
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;

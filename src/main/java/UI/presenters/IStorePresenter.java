@@ -1,7 +1,6 @@
 package UI.presenters;
 
 import java.util.List;
-import java.util.Locale.Category;
 
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.CategoryDTO;
