@@ -20,6 +20,7 @@ import Application.DTOs.OrderedItemDTO;
 import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ReceiptDTO;
 import Application.DTOs.ShoppingBasketDTO;
+import Application.DTOs.SupplyDetailsDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Error;
 import Application.utils.Response;
@@ -298,7 +299,7 @@ public class ShoppingService{
     @Transactional
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
-                                    long andIncrement, String clientName, String deliveryAddress) {
+                                    long andIncrement, String clientName, String deliveryAddress, String city, String country, String zipCode) {
         String method = "makeBid";
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
@@ -315,7 +316,7 @@ public class ShoppingService{
 
             cartFacade.makeBid(auctionId, clientId, price,
                             cardNumber, expiryDate, cvv,
-                            andIncrement, clientName, deliveryAddress);
+                            andIncrement, clientName, deliveryAddress, city, country, zipCode);
             TradingLogger.logEvent(CLASS_NAME, method, "Bid made successfully for auction " + auctionId + " by user " + clientId + " with price " + price);
             return new Response<>(true);
         } catch (Exception ex) {
@@ -394,7 +395,7 @@ public class ShoppingService{
      * @return {@link OfferDTO}
      */
     @Transactional
-    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetailsDTO) {
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetailsDTO, SupplyDetailsDTO supplyDetailsDTO) {
         String method = "makeOffer";
         if (!tokenService.validateToken(sessionToken)) {
             TradingLogger.logError(CLASS_NAME, method, "Invalid token");
@@ -408,7 +409,7 @@ public class ShoppingService{
             ItemDTO item = ItemDTO.fromItem(itemFacade.getItem(storeId, productId)); // assure real item exists
 
             
-            Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails());
+            Offer offer = offerManager.makeOffer(clientId, storeId, productId, newPrice, paymentDetailsDTO.toPaymentDetails(), supplyDetailsDTO.toSupplyDetails());
             OfferDTO offerDTO = convertOfferToDTO(offer);
             offerDTO.getEmployeeApprovers().stream().forEach(e -> {
                 notificationService.sendNotification(e.getId(), "🔔 You've received a new offer from " + offerDTO.getMember().getUsername() + " for a " + offerDTO.getItem().getProductName() + " in store " + storeFacade.getStoreName(storeId) + "!");

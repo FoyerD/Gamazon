@@ -44,12 +44,14 @@ import Application.DTOs.ItemPriceBreakdownDTO;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.ShoppingBasketDTO;
+import Application.DTOs.SupplyDetailsDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Error;
 import Application.utils.Response;
 
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.INotificationService;
+import Domain.Shopping.SupplyDetails;
 import Domain.management.PermissionType;
 
 import Domain.FacadeManager;
@@ -510,13 +512,16 @@ public class ShoppingServiceTest {
             long transactionId = 12345L;
             String clientName = "John Doe";
             String deliveryAddress = "123 Main St";
+            String city = "Test City";
+            String country = "Test Country";
+            String zip = "12345";
             String auctionEndDate = "2077-01-01 07:00";
             Response<AuctionDTO> res = storeService.addAuction(clientToken, store_id, product_id, auctionEndDate.toString(), 49.99f);
             mockAuctionId = res.getValue().getAuctionId();
             
             Response<Boolean> response = shoppingService.makeBid(
                 mockAuctionId, clientToken, validBidPrice,
-                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress, city, country, zip
             );
             
             assertFalse("Valid bid should be accepted", response.errorOccurred());
@@ -526,7 +531,7 @@ public class ShoppingServiceTest {
             float lowBidPrice = 40.0f;
             Response<Boolean> lowBidResponse = shoppingService.makeBid(
                 mockAuctionId, clientToken, lowBidPrice,
-                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress, city, country, zip
             );
             
             assertTrue("Low bid should be rejected", lowBidResponse.errorOccurred());
@@ -551,12 +556,15 @@ public class ShoppingServiceTest {
             String clientName = "John Doe";
             String auctionEndDate = "2077-01-01 07:00";
             String deliveryAddress = "123 Main St";
+            String city = "Test City";
+            String country = "Test Country";
+            String zip = "12345";
             
             mockAuctionId = storeService.addAuction(clientToken, store_id, product_id, auctionEndDate.toString(), 101.0).getValue().getAuctionId();
             
             Response<Boolean> response = shoppingService.makeBid(
                 mockAuctionId, clientToken, lowBidPrice,
-                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress, city, country, zip
             );
             
             assertTrue("Should have error for low bid price", response.errorOccurred());
@@ -570,7 +578,7 @@ public class ShoppingServiceTest {
             float highBidPrice = 200.0f;
             Response<Boolean> highBidResponse = shoppingService.makeBid(
                 mockAuctionId, clientToken, highBidPrice,
-                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress
+                cardNumber, expiryDate, cvv, transactionId, clientName, deliveryAddress, city, country, zip
             );
             
             assertFalse("Higher bid should be accepted", highBidResponse.errorOccurred());
@@ -806,13 +814,22 @@ public class ShoppingServiceTest {
             "Offer Tester"                     // card holder name
         );
 
+        SupplyDetailsDTO supplyDetails = new SupplyDetailsDTO(
+            "123 Main St",                     // delivery address
+            "Test City",                        // city
+            "Test Country",                     // country
+            "12345",                             // zip code
+            "Offer Tester"                     // card holder name
+        );
+
         // Step 2: Call makeOffer
         Response<OfferDTO> response = shoppingService.makeOffer(
             clientToken,
             store_id,
             product_id,
             8.99,               // new proposed price
-            paymentDetails
+            paymentDetails,
+            supplyDetails
         );
 
         // Step 3: Assertions
@@ -827,7 +844,8 @@ public class ShoppingServiceTest {
     @Test
     public void testMakeOffer_ValidInput_ReturnsOfferDTO() {
         PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
-        Response<OfferDTO> response = shoppingService.makeOffer(clientToken, store_id, product_id, 7.77, paymentDetails);
+        SupplyDetailsDTO supplyDetails = new SupplyDetailsDTO("123 Main St", "Test City", "Test Country", "12345", "Offer Tester");
+        Response<OfferDTO> response = shoppingService.makeOffer(clientToken, store_id, product_id, 7.77, paymentDetails, supplyDetails);
 
         assertFalse(response.errorOccurred());
         assertNotNull(response.getValue());
@@ -838,7 +856,8 @@ public class ShoppingServiceTest {
     @Test
     public void testMakeOffer_InvalidToken_ReturnsError() {
         PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
-        Response<OfferDTO> response = shoppingService.makeOffer("invalidToken", store_id, product_id, 9.99, paymentDetails);
+        SupplyDetailsDTO supplyDetails = new SupplyDetailsDTO("123 Main St", "Test City", "Test Country", "12345", "Offer Tester");
+        Response<OfferDTO> response = shoppingService.makeOffer("invalidToken", store_id, product_id, 9.99, paymentDetails, supplyDetails);
 
         assertTrue(response.errorOccurred());
         assertEquals("Invalid token", response.getErrorMessage());
@@ -855,6 +874,10 @@ public class ShoppingServiceTest {
         anyDouble()   // amount
         )).thenReturn(new Response<>(10000));  // Replace 10000 with the desired mocked value
 
+        when(mockSupplyService.supplyOrder(
+            anyString(), anyString(), anyString(), anyString(), anyString()
+        )).thenReturn(new Response<>(10000)); // fake transaction ID
+
         MarketService marketService = serviceManager.getMarketService();
         // Step 1: Member makes offer
         PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(
@@ -865,8 +888,16 @@ public class ShoppingServiceTest {
             "Offer Tester"
         );
 
+        SupplyDetailsDTO supplyDetails = new SupplyDetailsDTO(
+            "123 Main St",
+            "Test City",
+            "Test Country",
+            "12345",
+            "Offer Tester"
+        );
+
         Response<OfferDTO> offerResponse = shoppingService.makeOffer(
-            clientToken, store_id, product_id, 5.55, paymentDetails
+            clientToken, store_id, product_id, 5.55, paymentDetails, supplyDetails
         );
 
         assertFalse("Offer creation should succeed", offerResponse.errorOccurred());
@@ -1242,7 +1273,8 @@ public class ShoppingServiceTest {
     @Test
     public void testGetAllOffersOfUser_Success() {
         PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
-        shoppingService.makeOffer(clientToken, store_id, product_id, 11.11, paymentDetails);
+        SupplyDetailsDTO supplyDetails = new SupplyDetailsDTO("123 Main St", "Test City", "Test Country", "12345", "Offer Tester");
+        shoppingService.makeOffer(clientToken, store_id, product_id, 11.11, paymentDetails, supplyDetails);
 
         Response<List<OfferDTO>> response = shoppingService.getAllOffersOfUser(clientToken);
         assertFalse(response.errorOccurred());
@@ -1261,7 +1293,8 @@ public class ShoppingServiceTest {
     @Test
     public void testCounterOffer_ValidInput_ReturnsUpdatedOffer() {
         PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO(user.getId(), "4111111111111111", LocalDate.now().plusYears(1), "123", "Offer Tester");
-        OfferDTO offer = shoppingService.makeOffer(clientToken, store_id, product_id, 6.66, paymentDetails).getValue();
+        SupplyDetailsDTO supplyDetails = new SupplyDetailsDTO("123 Main St", "Test City", "Test Country", "12345", "Offer Tester");
+        OfferDTO offer = shoppingService.makeOffer(clientToken, store_id, product_id, 6.66, paymentDetails, supplyDetails).getValue();
         Response<OfferDTO> counterResponse = shoppingService.counterOffer(clientToken, offer.getId(), 7.77);
 
         assertFalse(counterResponse.errorOccurred());

@@ -23,6 +23,7 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Offer;
@@ -57,6 +58,7 @@ public class StoreService {
     private final OfferManager offerManager;
     private final LoginManager loginManager;
     private IExternalPaymentService externalPaymentService;
+    private IExternalSupplyService externalSupplyService;
 
     public StoreService() {
         this.storeFacade = null;
@@ -68,6 +70,7 @@ public class StoreService {
         // this.discountBuilder = null;
         // this.conditionBuilder = null;
         this.externalPaymentService = null;
+        this.externalSupplyService = null;
         this.loginManager = null;
         this.offerManager = null;
         this.itemFacade = null;
@@ -78,9 +81,10 @@ public class StoreService {
                        INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, ItemFacade itemFacade, 
                        OfferManager offerManager, 
                        LoginManager loginManager, DiscountFacade discountFacade,
-                       IExternalPaymentService externalPaymentService) {
+                       IExternalPaymentService externalPaymentService, IExternalSupplyService externalSupplyService) {
 
         this.externalPaymentService = externalPaymentService;
+        this.externalSupplyService = externalSupplyService;
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
@@ -360,7 +364,7 @@ public class StoreService {
             permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
 
             // Accept the bid for the given auction and product
-            Item item = storeFacade.acceptBid(storeId, productId, auctionId, externalPaymentService);
+            Item item = storeFacade.acceptBid(storeId, productId, auctionId, externalPaymentService, externalSupplyService);
             if (item == null) {
                 TradingLogger.logError(CLASS_NAME, method, "Failed to accept bid for auction %s", auctionId);
                 return new Response<>(new Error("Failed to accept bid. It may not exist or the auction is closed."));

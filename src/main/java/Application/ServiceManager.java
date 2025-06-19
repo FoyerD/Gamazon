@@ -78,7 +78,8 @@ public class ServiceManager {
                                             facadeManager.getOfferManager(),
                                             facadeManager.getLoginManager(),
                                             facadeManager.getDiscountFacade(),
-                                            facadeManager.getPaymentService());
+                                            facadeManager.getPaymentService(),
+                                            facadeManager.getSupplyService());
         }
         return storeService;
     }

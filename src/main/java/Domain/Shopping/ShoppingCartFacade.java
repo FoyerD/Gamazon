@@ -235,12 +235,12 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     @Override
     public boolean makeBid(String auctionId, String clientId, float price,
                         String cardNumber, Date expiryDate, String cvv,
-                        long andIncrement, String clientName, String deliveryAddress) {
+                        long andIncrement, String clientName, String deliveryAddress, String city, String country, String zipCode) {
 
         
 
         storeFacade.addBid(auctionId, clientId, price, 
-                cardNumber, expiryDate, cvv, clientName, deliveryAddress);
+                cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
         return true;
     }
 
