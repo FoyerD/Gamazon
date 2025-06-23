@@ -235,12 +235,12 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     @Override
     public boolean makeBid(String auctionId, String clientId, float price,
                         String cardNumber, Date expiryDate, String cvv,
-                        long andIncrement, String clientName, String deliveryAddress) {
+                        long andIncrement, String clientName, String deliveryAddress, String city, String country, String zipCode) {
 
         
 
         storeFacade.addBid(auctionId, clientId, price, 
-                cardNumber, expiryDate, cvv, clientName, deliveryAddress);
+                cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
         return true;
     }
 
@@ -289,12 +289,19 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             // Perform rollback and throw exception
             Integer paymentTransactionId = result.getPaymentTransactionId();
             Integer supplyTransactionId = result.getSupplyTransactionId();
-
-            if(paymentTransactionId != -1)
+            if (paymentTransactionId == null || supplyTransactionId == null) {}
+            else {
+                if(paymentTransactionId != -1 && supplyTransactionId != -1){
                 paymentService.cancelPayment(paymentTransactionId);
-            if(supplyTransactionId != -1)
                 supplyService.cancelSupply(supplyTransactionId);
-
+                }
+                else{
+                    if(paymentTransactionId != -1 && supplyTransactionId == -1)
+                        paymentService.cancelPayment(paymentTransactionId);
+                    else
+                        supplyService.cancelSupply(supplyTransactionId);
+                }
+            }
             checkoutManager.performRollback(clientId, cart, result);
             cartRepo.update(clientId, cart);
             throw new RuntimeException("Checkout failed: " + result.getErrorMessage());

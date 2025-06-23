@@ -236,19 +236,27 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
                     TextField name = new TextField("Full Name");
                     TextField address = new TextField("Delivery Address");
                     
+                    TextField city = new TextField("City");
+                    TextField country = new TextField("Country");
+                    TextField zipCode = new TextField("ZIP Code");
+
                     bidForm.add(
                         bidAmount,
                         cardNumber,
                         expiryDate,
                         cvv,
                         name,
-                        address
+                        address,
+                        city,
+                        country,
+                        zipCode 
                     );
                     
                     Button placeBidButton = new Button("Place Bid", event -> {
-                        if (bidAmount.getValue() == null || cardNumber.isEmpty() || 
-                            expiryDate.isEmpty() || cvv.isEmpty() || 
-                            name.isEmpty() || address.isEmpty()) {
+                        if (bidAmount.getValue() == null || cardNumber.isEmpty() ||
+                            expiryDate.isEmpty() || cvv.isEmpty() ||
+                            name.isEmpty() || address.isEmpty() ||
+                            city.isEmpty() || country.isEmpty() || zipCode.isEmpty()) {
                             Notification.show("Please fill in all fields");
                             return;
                         }
@@ -270,7 +278,10 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
                             cvv.getValue(),
                             increment,
                             name.getValue(),
-                            address.getValue()
+                            address.getValue(),
+                            city.getValue(),
+                            country.getValue(),
+                            zipCode.getValue()
                         );
                         
                         if (!response.errorOccurred() && response.getValue()) {
@@ -345,9 +356,39 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         mainContent.setSpacing(true);
         add(mainContent);
 
+        // mute background music
+        Button muteButton = new Button("Mute");
+        muteButton.getStyle()
+            .set("background-color", "#ff4d4f")
+            .set("color", "white")
+            .set("font-weight", "bold");
+
+        muteButton.addClickListener(e -> {
+            muteButton.getElement().executeJs("""
+                const audio = document.getElementById('backgroundMusic');
+                if (audio) {
+                    audio.muted = !audio.muted;
+                    this.textContent = audio.muted ? 'Unmute' : 'Mute';
+                }
+            """, muteButton.getElement());
+        });
+
+        // Sync button text to actual audio state when view loads
+        muteButton.getElement().executeJs("""
+            const audio = document.getElementById('backgroundMusic');
+            if (audio) {
+                this.textContent = audio.muted ? 'Unmute' : 'Mute';
+            }
+        """, muteButton.getElement());
+
+        add(muteButton);
+
+
+    
         loadAllProducts();
 
         setupNavigation();
+    
     
     }
 

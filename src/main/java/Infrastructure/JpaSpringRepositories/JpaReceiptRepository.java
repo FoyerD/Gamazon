@@ -29,8 +29,8 @@ public class JpaReceiptRepository extends IReceiptRepository {
 
     @Override
     public String savePurchase(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products,
-            double totalPrice, String paymentDetails) {
-        Receipt receipt = new Receipt(clientId, storeId, products, totalPrice, paymentDetails);
+            double totalPrice, String paymentDetails, String supplyDetails) {
+        Receipt receipt = new Receipt(clientId, storeId, products, totalPrice, paymentDetails, supplyDetails);
         return saveReceipt(receipt);
     }
 

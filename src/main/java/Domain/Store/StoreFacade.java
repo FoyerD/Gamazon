@@ -13,8 +13,10 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Pair;
 import Domain.Repos.IAuctionRepository;
@@ -260,7 +262,7 @@ public class StoreFacade {
     }
 
     public Auction addBid(String auctionId, String userId, float bid, String cardNumber, Date expiryDate, String cvv
-                            , String clientName, String deliveryAddress) {
+                            , String clientName, String deliveryAddress, String city, String country, String zipCode) {
         TradingLogger.logEvent("StoreFacade", "addBid",
             "DEBUG: Received bid request. auctionId=" + auctionId + ", userId=" + userId + ", bid=" + bid);
 
@@ -290,7 +292,7 @@ public class StoreFacade {
                 "DEBUG: No previous bidder to notify for auction " + auctionId + " or it's the same user bidding again.");
         }
 
-        auction.setHighestBidder(userId, bid, cardNumber, expiryDate, cvv, clientName);
+        auction.setHighestBidder(userId, bid, cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
 
         TradingLogger.logEvent("StoreFacade", "addBid",
             "DEBUG: Updated auction with new bid. New currentBidderId=" + userId + ", newPrice=" + bid);
@@ -318,13 +320,17 @@ public class StoreFacade {
         return this.auctionRepository.getAllProductAuctions(productId);
     }
 
-    public Item acceptBid(String storeId, String productId, String auctionId, IExternalPaymentService paymentService) {
+    public Item acceptBid(String storeId, String productId, String auctionId, IExternalPaymentService paymentService, IExternalSupplyService supplyService) {
         if (!isInitialized()) {
             throw new RuntimeException("StoreFacade is not initialized");
         }
 
         if(paymentService == null) {
             throw new RuntimeException("Payment service is not set");
+        }
+
+        if (supplyService == null) {
+            throw new IllegalArgumentException("Supply service is not set");
         }
 
         // Retrieve the item first and attempt to reserve one unit
@@ -369,23 +375,37 @@ public class StoreFacade {
         }
 
         // Charge the user using stored callback
-        Integer success = -1;
+        Response<Integer> paymentSuccess = new Response<>(-1);
+        Response<Integer> supplySuccess = new Response<>(-1);
         try {
-            success = paymentService.processPayment(auction.getCurrentBidderId(), auction.getCardNumber(), auction.getCardExpiryDate(), auction.getCvv(), auction.getClientName(), auction.getCurrentPrice()).getValue();
-            if (success == -1) {
+            paymentSuccess = paymentService.processPayment(auction.getCurrentBidderId(), auction.getCardNumber(), auction.getCardExpiryDate(), auction.getCvv(), auction.getClientName(), auction.getCurrentPrice());
+            if (paymentSuccess == null || paymentSuccess.errorOccurred() || paymentSuccess.getValue() == -1) {
                 // Rollback item amount
                 item.setAmount(currentAmount);
                 itemRepository.update(itemKey, item);
                 throw new RuntimeException("Payment failed for accepted bid");
             }
 
-            
+            supplySuccess = supplyService.supplyOrder(auction.getClientName(), auction.getDeliveryAddress(), auction.getCity(), auction.getCountry(), auction.getZipCode());
+            if (supplySuccess == null || supplySuccess.errorOccurred() || supplySuccess.getValue() == -1) {
+                if(paymentSuccess.getValue() != -1) {
+                    paymentService.cancelPayment(paymentSuccess.getValue());
+                }
+                // Rollback item amount
+                item.setAmount(currentAmount);
+                itemRepository.update(itemKey, item);
+                throw new RuntimeException("Supply processing failed for accepted bid");
+            }
+
         } catch (Exception ex) {
             // Rollback item amount
             item.setAmount(currentAmount);
             itemRepository.update(itemKey, item);
-            if(success != -1) {
-                paymentService.cancelPayment(success);
+            if(paymentSuccess != null && paymentSuccess.getValue() != -1) {
+                paymentService.cancelPayment(paymentSuccess.getValue());
+            }
+            if(supplySuccess != null && supplySuccess.getValue() != -1) {
+                supplyService.cancelSupply(supplySuccess.getValue());
             }
             throw new RuntimeException("Failed to charge the client for the accepted bid: " +  ex.getMessage(), ex);
         }
@@ -417,13 +437,15 @@ public class StoreFacade {
 
         String maskedCardNumber = "xxxx-xxxx-xxxx-" + last4;
         String paymentDetails = "Card: " + maskedCardNumber;
+        String supplyDetails = auction.getDeliveryAddress() + ", " + auction.getCity() + ", " + auction.getCountry() + ", " + auction.getZipCode();
         try{
         this.receiptRepository.savePurchase(
             auction.getCurrentBidderId(),
             storeId,
             Map.of(product, new Pair<>(1, auction.getCurrentPrice())),
             auction.getCurrentPrice(),
-            paymentDetails  
+            paymentDetails,
+            supplyDetails  
         );
         } catch (Exception e) {
             // Rollback item amount

@@ -20,6 +20,9 @@ public class Offer {
     @Embedded
     private PaymentDetails paymentDetails;
 
+    @Embedded
+    private SupplyDetails supplyDetails;
+
     @ElementCollection
     @CollectionTable(name = "offer_prices", joinColumns = @JoinColumn(name = "offer_id"))
     private List<PriceEntry> prices = new ArrayList<>();
@@ -31,12 +34,13 @@ public class Offer {
 
     protected Offer() {} // JPA needs a default constructor
 
-    public Offer(String memberId, String storeId, String productId, double newPrice, PaymentDetails paymentDetails) {
+    public Offer(String memberId, String storeId, String productId, double newPrice, PaymentDetails paymentDetails, SupplyDetails supplyDetails) {
         this.offerId = UUID.randomUUID().toString();
         this.memberId = memberId;
         this.storeId = storeId;
         this.productId = productId;
         this.paymentDetails = paymentDetails;
+        this.supplyDetails = supplyDetails;
         this.counterOffer = false;
         this.isAccepted = false;
 
@@ -82,4 +86,5 @@ public class Offer {
 
     public Set<String> getApprovedBy() { return approvedBy; }
     public PaymentDetails getPaymentDetails() { return paymentDetails; }
+    public SupplyDetails getSupplyDetails() { return supplyDetails; }
 }
