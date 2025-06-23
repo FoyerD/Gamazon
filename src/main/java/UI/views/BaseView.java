@@ -134,6 +134,7 @@ public abstract class BaseView extends VerticalLayout {
                 });
             }
         """);
+        
         getElement().executeJs("document.getElementById('backgroundMusic').volume = 0.3;");
         if (sessionToken != null) {
             String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
