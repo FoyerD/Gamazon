@@ -6,6 +6,7 @@ import java.util.TimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.notification.Notification;
@@ -18,6 +19,7 @@ import UI.presenters.INotificationPresenter;
 import UI.presenters.IUserSessionPresenter;
 
 @JsModule("./ws-client.js")
+
 public abstract class BaseView extends VerticalLayout {
 
     protected final DbHealthStatus dbHealthStatus;
@@ -110,6 +112,41 @@ public abstract class BaseView extends VerticalLayout {
             ui.setPollInterval(4000);
         }
     }
+
+    @Override
+    protected void onAttach(AttachEvent event) {
+        super.onAttach(event);
+
+        getElement().executeJs("""
+            if (!document.getElementById('backgroundMusic')) {
+                const audio = document.createElement('audio');
+                audio.id = 'backgroundMusic';
+                audio.loop = true;
+                const source = document.createElement('source');
+                source.src = '/audio/background.mp3';
+                source.type = 'audio/mpeg';
+                audio.appendChild(source);
+                document.body.appendChild(audio);
+
+                document.addEventListener('click', function handler() {
+                    audio.play();
+                    document.removeEventListener('click', handler);
+                });
+            }
+        """);
+        getElement().executeJs("document.getElementById('backgroundMusic').volume = 0.3;");
+        if (sessionToken != null) {
+            String userId = sessionPresenter.extractUserIdFromToken(sessionToken);
+            UI.getCurrent().getPage().executeJs("window.currentUserId = $0;", userId);
+            UI.getCurrent().getPage().executeJs("sessionStorage.setItem('currentUserId', $0); window.connectWebSocket && window.connectWebSocket($0);", userId);
+
+            List<String> messages = notificationPresenter.getNotifications(userId);
+            for (String msg : messages) {
+                Notification.show("🔔 " + msg, 4000, Notification.Position.TOP_CENTER);
+            }
+        }
+    }
+
 
 
 }
