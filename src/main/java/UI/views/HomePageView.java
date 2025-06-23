@@ -356,9 +356,39 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         mainContent.setSpacing(true);
         add(mainContent);
 
+        // mute background music
+        Button muteButton = new Button("Mute");
+        muteButton.getStyle()
+            .set("background-color", "#ff4d4f")
+            .set("color", "white")
+            .set("font-weight", "bold");
+
+        muteButton.addClickListener(e -> {
+            muteButton.getElement().executeJs("""
+                const audio = document.getElementById('backgroundMusic');
+                if (audio) {
+                    audio.muted = !audio.muted;
+                    this.textContent = audio.muted ? 'Unmute' : 'Mute';
+                }
+            """, muteButton.getElement());
+        });
+
+        // Sync button text to actual audio state when view loads
+        muteButton.getElement().executeJs("""
+            const audio = document.getElementById('backgroundMusic');
+            if (audio) {
+                this.textContent = audio.muted ? 'Unmute' : 'Mute';
+            }
+        """, muteButton.getElement());
+
+        add(muteButton);
+
+
+    
         loadAllProducts();
 
         setupNavigation();
+    
     
     }
 
