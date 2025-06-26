@@ -99,7 +99,7 @@ public class StoreTile extends Div {
             const el = this;
             const rect = el.getBoundingClientRect();
             el.style.position = 'relative';
-            el.style.margin = '0';
+            el.style.marginTop = '-100px';
             el.style.transition = 'all 400ms ease-in-out';
             el.style.zIndex = '9999';
             el.style.borderRadius = '10px';
