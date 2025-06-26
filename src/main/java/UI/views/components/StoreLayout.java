@@ -17,7 +17,8 @@ public class StoreLayout extends VerticalLayout {
 
     public StoreLayout(StoreDTO store,
                         ItemLayout itemLayout,
-                        Consumer<StoreDTO> onManagerButton) {
+                        Consumer<StoreDTO> onManagerButton,
+                        boolean canUse) {
 
         this.store = store;
         this.onManagerButton = onManagerButton;
@@ -27,7 +28,7 @@ public class StoreLayout extends VerticalLayout {
 
         this.add(storeDetails());
         if (store.isOpen()) {
-            this.add(actionButtons());
+            this.add(actionButtons(canUse));
             this.add(itemLayout);
         } else {
             Span closedMessage = new Span("This store is currently closed");
@@ -62,7 +63,7 @@ public class StoreLayout extends VerticalLayout {
         return details;
     }
 
-    private HorizontalLayout actionButtons() {
+    private HorizontalLayout actionButtons(boolean canUse) {
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.setSpacing(true);
 
@@ -71,6 +72,8 @@ public class StoreLayout extends VerticalLayout {
             .set("background-color", " #4a9eff")
             .set("color", "white");
         buttons.add(managerButton);
+
+        managerButton.setVisible(canUse);
 
         return buttons;
     }

@@ -28,6 +28,7 @@ import Application.DTOs.OfferDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.utils.Response;
+import Domain.User.User;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IManagementPresenter;
@@ -36,6 +37,7 @@ import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
 import UI.presenters.IUserSessionPresenter;
+import UI.presenters.UserSessionPresenter;
 import UI.views.components.ItemLayout;
 import UI.views.components.MakeOfferDialog;
 import UI.views.components.StoreLayout;
@@ -172,7 +174,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         s -> {            // Keep manager action
             UI.getCurrent().getSession().setAttribute("currentStoreId", s.getId());
             UI.getCurrent().navigate("manager");
-        });
+        }, store.getManagers().contains(sessionPresenter.extractUserIdFromToken(sessionToken)) || store.getOwners().contains(sessionPresenter.extractUserIdFromToken(sessionToken)) || (store.getFounderId().equals(sessionPresenter.extractUserIdFromToken(sessionToken)))) ;
 
         this.add(storelayout);
         itemLayout.setItems(refresher.apply(store));
