@@ -47,7 +47,7 @@ public class ItemLayout extends VerticalLayout {
         }).setHeader("Cart");
 
         grid.addComponentColumn(item -> {
-            Button makeOfferButton = new Button("make an offer", e -> offerMaker.accept(item));
+            Button makeOfferButton = new Button("Make an Offer", e -> offerMaker.accept(item));
             makeOfferButton.getStyle()
             .setBackgroundColor("rgb(255, 128, 55)")
             .setColor("white");

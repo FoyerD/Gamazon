@@ -1,5 +1,6 @@
 package Infrastructure.MemoryRepositories;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -63,5 +64,10 @@ public class MemoryStoreRepository extends IStoreRepository{
     public void deleteAll() {
         this.stores.clear();
         this.deleteAllLocks();
+    }
+
+    @Override
+    public List<Store> getAllStores() {
+        return List.copyOf(this.stores.values());
     }
 }
