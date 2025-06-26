@@ -41,6 +41,9 @@ public class Receipt {
     
     @Column(length = 1000)
     private String paymentDetails; // Could contain masked card details or payment method
+
+    @Column(length = 1000)
+    private String supplyDetails; // Details about the supply method (e.g., delivery address)
     
     protected Receipt() {
         // Required by JPA
@@ -56,7 +59,7 @@ public class Receipt {
      * @param paymentDetails Payment method or masked card details
      */
     public Receipt(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products, 
-                  double totalPrice, String paymentDetails) {
+                  double totalPrice, String paymentDetails, String supplyDetails) {
         this.receiptId = UUID.randomUUID().toString();
         this.clientId = clientId;
         this.storeId = storeId;
@@ -71,6 +74,7 @@ public class Receipt {
         this.timestamp = LocalDateTime.now();
         this.totalPrice = totalPrice;
         this.paymentDetails = paymentDetails;
+        this.supplyDetails = supplyDetails;
     }
     
     /**
@@ -143,6 +147,10 @@ public class Receipt {
     public String getPaymentDetails() {
         return paymentDetails;
     }
+
+    public String getSupplyDetails() {
+        return supplyDetails;
+    }
     
     /**
      * Converts this receipt to a map representation for serialization or storage.
@@ -157,7 +165,8 @@ public class Receipt {
         map.put("timestamp", timestamp);
         map.put("totalPrice", totalPrice);
         map.put("paymentDetails", paymentDetails);
-        
+        map.put("supplyDetails", supplyDetails);
+
         // Convert products to map of productId to quantity and price
         Map<String, Pair<Integer, Double>> productQtyPrice = new HashMap<>();
         for (Map.Entry<String, ReceiptProduct> entry : products.entrySet()) {

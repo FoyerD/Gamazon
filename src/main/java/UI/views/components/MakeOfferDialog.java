@@ -2,6 +2,8 @@ package UI.views.components;
 
 import Application.DTOs.ItemDTO;
 import Application.DTOs.PaymentDetailsDTO;
+import Application.DTOs.SupplyDetailsDTO;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -15,11 +17,11 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 
-import java.util.function.BiConsumer;
+import org.apache.commons.lang3.function.TriConsumer;
 
 public class MakeOfferDialog extends Dialog {
 
-    public MakeOfferDialog(ItemDTO item, BiConsumer<Double, PaymentDetailsDTO> onMakeOffer) {
+    public MakeOfferDialog(ItemDTO item, TriConsumer<Double, PaymentDetailsDTO, SupplyDetailsDTO> onMakeOffer) {
         setCloseOnOutsideClick(true);
         setCloseOnEsc(true);
 
@@ -56,6 +58,11 @@ public class MakeOfferDialog extends Dialog {
         TextField holderID = new TextField("Cardholder ID");
         holderID.setPlaceholder("ID number");
 
+        TextField address = new TextField("Delivery Address");
+        TextField city = new TextField("City");
+        TextField country = new TextField("Country");
+        TextField zipCode = new TextField("ZIP Code");
+
         // Payment form layout
         FormLayout form = new FormLayout();
         form.setResponsiveSteps(
@@ -66,6 +73,8 @@ public class MakeOfferDialog extends Dialog {
         form.add(offerField, cardNumber);
         form.add(expiryDate, cvv);
         form.add(holderName, holderID);
+        form.add(address, city);
+        form.add(country, zipCode);
 
         // Submit button
         Button submit = new Button("Submit Offer", e -> {
@@ -74,8 +83,10 @@ public class MakeOfferDialog extends Dialog {
                 Notification.show("Enter a valid offer price.", 4000, Notification.Position.MIDDLE);
                 return;
             }
-            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || holderName.isEmpty() || holderID.isEmpty()) {
-                Notification.show("Please complete all payment details.", 4000, Notification.Position.MIDDLE);
+            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || 
+                holderName.isEmpty() || holderID.isEmpty() ||
+                address.isEmpty() || city.isEmpty() || country.isEmpty() || zipCode.isEmpty()) {
+                Notification.show("Please complete all payment and delivery details.", 4000, Notification.Position.MIDDLE);
                 return;
             }
 
@@ -87,7 +98,15 @@ public class MakeOfferDialog extends Dialog {
                 holderName.getValue()
             );
 
-            onMakeOffer.accept(offer, payment);
+            SupplyDetailsDTO supply = new SupplyDetailsDTO(
+                address.getValue(),
+                city.getValue(),
+                country.getValue(),
+                zipCode.getValue(),
+                holderName.getValue()
+            );
+
+            onMakeOffer.accept(offer, payment, supply);
             close();
         });
         submit.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);

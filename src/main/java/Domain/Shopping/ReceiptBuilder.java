@@ -34,9 +34,10 @@ public class ReceiptBuilder {
      * @param storeProductsMap Map of store IDs to their purchased products and quantities
      * @param cardNumber The card number used for payment (will be masked in receipt)
      */
-    public void createReceipts(String clientId, Map<String, Map<Product, Integer>> storeProductsMap, String cardNumber) {
+    public void createReceipts(String clientId, Map<String, Map<Product, Integer>> storeProductsMap, String cardNumber, String address) {
         String maskedCardNumber = maskCardNumber(cardNumber);
         String paymentDetails = "Card: " + maskedCardNumber;
+        String supplyDetails = "Address: " + address;
         
         for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
             String storeId = entry.getKey();
@@ -44,7 +45,7 @@ public class ReceiptBuilder {
             Map<Product, Double> productPrices = getProductPrices(storeId, products);
             Map<Product, Pair<Integer, Double>> productsWithPrices = mergeProductMaps(storeId, products, productPrices);
             double storeTotal = calculateStoreTotal(storeId, products);
-            receiptRepo.savePurchase(clientId, storeId, productsWithPrices, storeTotal, paymentDetails);
+            receiptRepo.savePurchase(clientId, storeId, productsWithPrices, storeTotal, paymentDetails, supplyDetails);
         }
     }
 
@@ -59,10 +60,11 @@ public class ReceiptBuilder {
     public void createReceiptsWithDiscounts(String clientId, 
                                           Map<String, Map<Product, Integer>> storeProductsMap,
                                           Map<String, Map<Product, Double>> storeProductPricesMap,
-                                          String cardNumber) {
+                                          String cardNumber, String address) {
         String maskedCardNumber = maskCardNumber(cardNumber);
         String paymentDetails = "Card: " + maskedCardNumber;
-        
+        String supplyDetails = "Address: " + address;
+
         for (Map.Entry<String, Map<Product, Integer>> entry : storeProductsMap.entrySet()) {
             String storeId = entry.getKey();
             Map<Product, Integer> products = entry.getValue();
@@ -70,7 +72,7 @@ public class ReceiptBuilder {
             Map<Product, Pair<Integer, Double>> productsWithPrices = mergeProductMaps(storeId, products, productPrices);
             
             double storeTotal = calculateStoreTotalWithDiscounts(storeId, products, productPrices);
-            receiptRepo.savePurchase(clientId, storeId, productsWithPrices, storeTotal, paymentDetails);
+            receiptRepo.savePurchase(clientId, storeId, productsWithPrices, storeTotal, paymentDetails, supplyDetails);
         }
     }
 

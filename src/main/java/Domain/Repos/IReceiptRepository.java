@@ -30,7 +30,7 @@ public abstract class IReceiptRepository extends ILockbasedRepository<Receipt, S
      * @return The generated receipt ID
      */
     public abstract String savePurchase(String clientId, String storeId, Map<Product, Pair<Integer, Double>> products, 
-                       double totalPrice, String paymentDetails);
+                       double totalPrice, String paymentDetails, String supplyDetails);
     
     /**
      * Get a specific receipt by ID

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Application.DTOs.PaymentDetailsDTO;
+import Application.DTOs.SupplyDetailsDTO;
 import Application.DTOs.UserDTO;
 import Application.ItemService;
 import Application.MarketService;
@@ -26,7 +27,6 @@ import Application.ShoppingService;
 import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
-import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
@@ -48,6 +48,9 @@ public class AppInitializer implements CommandLineRunner, Ordered {
 
     @Value("${app.init.state:default}")
     private String initState;
+
+    @Value("${external.services.url}")
+    private String externalServicesUrl;
 
     public AppInitializer(
             UserService userService,
@@ -88,11 +91,9 @@ public class AppInitializer implements CommandLineRunner, Ordered {
             InputStream stream = new ClassPathResource("config/init.json").getInputStream();
             Map<String, List<Map<String, Object>>> states = mapper.readValue(stream, new TypeReference<>() {});
 
-            // Updating external services URLs
-            String URL = (String)(states.get("urlExternalServices").get(0).get("URL"));
-            Response<Void> paymentServiceResponse = externalPaymentService.updatePaymentServiceURL(URL);
-            Response<Void> supplyServiceResponse = externalSupplyService.updateSupplyServiceURL(URL);
-            System.out.println("External services URLs updated successfully. With URL: " + URL);
+            Response<Void> paymentServiceResponse = externalPaymentService.updatePaymentServiceURL(externalServicesUrl);
+            Response<Void> supplyServiceResponse = externalSupplyService.updateSupplyServiceURL(externalServicesUrl);
+            System.out.println("External services URLs updated successfully. With URL: " + externalServicesUrl);
 
             List<Map<String, Object>> commands = states.get(initState);
             if (commands == null) {
@@ -241,7 +242,10 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                             (String) cmd.get("cvv"),
                             ((Number) cmd.get("andIncrement")).longValue(),
                             (String) cmd.get("clientName"),
-                            (String) cmd.get("deliveryAddress"));
+                            (String) cmd.get("deliveryAddress"),
+                            (String) cmd.get("city"),
+                            (String) cmd.get("country"),
+                            (String) cmd.get("zip"));
                     if (resp.errorOccurred()) throw new RuntimeException("❌ Command '" + action + "' failed: " + resp.getErrorMessage());;
                 }
                 case "checkout" -> {
@@ -288,6 +292,12 @@ public class AppInitializer implements CommandLineRunner, Ordered {
                                 ((Number) cmd.get("expiryDate/day")).intValue()
                             ),
                             (String) cmd.get("cvv"),
+                            (String) cmd.get("holder")),
+                    new SupplyDetailsDTO(
+                            (String) cmd.get("deliveryAddress"),
+                            (String) cmd.get("city"),
+                            (String) cmd.get("country"),
+                            (String) cmd.get("zip"),
                             (String) cmd.get("holder"))
                     );
                     if (!resp.errorOccurred())

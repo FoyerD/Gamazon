@@ -24,6 +24,7 @@ public class MemoryReceiptRepositoryTest {
     private static final String CLIENT_ID = "client123";
     private static final String STORE_ID = "store123";
     private static final String PAYMENT_DETAILS = "xxxx-xxxx-xxxx-1234";
+    private static final String SUPPLY_DETAILS = "123 Main St, City, Country, 12345";
     
     @Before
     public void setUp() {
@@ -37,7 +38,7 @@ public class MemoryReceiptRepositoryTest {
         products.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         products.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
-        Receipt receipt = new Receipt(CLIENT_ID, STORE_ID, products, 35.0, PAYMENT_DETAILS);
+        Receipt receipt = new Receipt(CLIENT_ID, STORE_ID, products, 35.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
         
         // Save the receipt
         String receiptId = repository.saveReceipt(receipt);
@@ -61,7 +62,7 @@ public class MemoryReceiptRepositoryTest {
         products.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
         // Save the purchase
-        String receiptId = repository.savePurchase(CLIENT_ID, STORE_ID, products, 35.0, PAYMENT_DETAILS);
+        String receiptId = repository.savePurchase(CLIENT_ID, STORE_ID, products, 35.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
         
         // Verify the purchase was saved
         assertNotNull(receiptId);
@@ -71,6 +72,7 @@ public class MemoryReceiptRepositoryTest {
         assertEquals(STORE_ID, savedReceipt.getStoreId());
         assertEquals(35.0, savedReceipt.getTotalPrice(), 0.001);
         assertEquals(PAYMENT_DETAILS, savedReceipt.getPaymentDetails());
+        assertEquals(SUPPLY_DETAILS, savedReceipt.getSupplyDetails());
         assertEquals(2, savedReceipt.getProducts().size());
     }
     
@@ -80,7 +82,7 @@ public class MemoryReceiptRepositoryTest {
         Map<Product, Pair<Integer, Double>> products = new HashMap<>();
         products.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         
-        Receipt receipt = new Receipt(CLIENT_ID, STORE_ID, products, 20.0, PAYMENT_DETAILS);
+        Receipt receipt = new Receipt(CLIENT_ID, STORE_ID, products, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
         String receiptId = repository.saveReceipt(receipt);
         
         // Get the receipt
@@ -108,9 +110,9 @@ public class MemoryReceiptRepositoryTest {
         Map<Product, Pair<Integer, Double>> products2 = new HashMap<>();
         products2.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
-        repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS);
-        repository.savePurchase(CLIENT_ID, "store456", products2, 15.0, PAYMENT_DETAILS);
-        repository.savePurchase("client456", STORE_ID, products1, 20.0, PAYMENT_DETAILS);
+        repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase(CLIENT_ID, "store456", products2, 15.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase("client456", STORE_ID, products1, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
         
         // Get the client's receipts
         List<Receipt> clientReceipts = repository.getClientReceipts(CLIENT_ID);
@@ -131,9 +133,9 @@ public class MemoryReceiptRepositoryTest {
         Map<Product, Pair<Integer, Double>> products2 = new HashMap<>();
         products2.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
-        repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS);
-        repository.savePurchase("client456", STORE_ID, products2, 15.0, PAYMENT_DETAILS);
-        repository.savePurchase(CLIENT_ID, "store456", products1, 20.0, PAYMENT_DETAILS);
+        repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase("client456", STORE_ID, products2, 15.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase(CLIENT_ID, "store456", products1, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
         
         // Get the store's receipts
         List<Receipt> storeReceipts = repository.getStoreReceipts(STORE_ID);
@@ -154,11 +156,11 @@ public class MemoryReceiptRepositoryTest {
         Map<Product, Pair<Integer, Double>> products2 = new HashMap<>();
         products2.put(createProduct("product2", "Product 2"), new Pair<>(1, 15.0));
         
-        repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS);
-        repository.savePurchase(CLIENT_ID, STORE_ID, products2, 15.0, PAYMENT_DETAILS);
-        repository.savePurchase(CLIENT_ID, "store456", products1, 20.0, PAYMENT_DETAILS);
-        repository.savePurchase("client456", STORE_ID, products1, 20.0, PAYMENT_DETAILS);
-        
+        repository.savePurchase(CLIENT_ID, STORE_ID, products1, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase(CLIENT_ID, STORE_ID, products2, 15.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase(CLIENT_ID, "store456", products1, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase("client456", STORE_ID, products1, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+
         // Get the client-store receipts
         List<Receipt> clientStoreReceipts = repository.getClientStoreReceipts(CLIENT_ID, STORE_ID);
         
@@ -176,8 +178,8 @@ public class MemoryReceiptRepositoryTest {
         Map<Product, Pair<Integer, Double>> products = new HashMap<>();
         products.put(createProduct("product1", "Product 1"), new Pair<>(2, 10.0));
         
-        repository.savePurchase(CLIENT_ID, STORE_ID, products, 20.0, PAYMENT_DETAILS);
-        repository.savePurchase("client456", "store456", products, 20.0, PAYMENT_DETAILS);
+        repository.savePurchase(CLIENT_ID, STORE_ID, products, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
+        repository.savePurchase("client456", "store456", products, 20.0, PAYMENT_DETAILS, SUPPLY_DETAILS);
         
         // Verify receipts were saved
         assertFalse(repository.getClientReceipts(CLIENT_ID).isEmpty());

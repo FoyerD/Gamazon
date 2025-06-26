@@ -28,7 +28,10 @@ public class Auction {
     @Temporal(TemporalType.DATE)
     private Date cardExpiryDate;
 
-
+    private String deliveryAddress;
+    private String city;
+    private String country;
+    private String zipCode;
 
     public Auction(String auctionId, Date auctionStartDate,
                    Date auctionEndDate, double startPrice, double currentPrice,
@@ -45,6 +48,10 @@ public class Auction {
         this.cvv = null;
         this.clientName = null;
         this.cardExpiryDate = null;
+        this.deliveryAddress = null;
+        this.city = null;
+        this.country = null;
+        this.zipCode = null;
     }
 
     protected Auction() { // changed to protected for JPA
@@ -60,6 +67,10 @@ public class Auction {
         this.cvv = null;
         this.clientName = null;
         this.cardExpiryDate = null;
+        this.deliveryAddress = null;
+        this.city = null;
+        this.country = null;
+        this.zipCode = null;
     }
 
     public String getAuctionId() {
@@ -122,14 +133,34 @@ public class Auction {
         return clientName;
     }
 
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
     public void setHighestBidder(String clientId, double price,
-                          String cardNumber, Date expiryDate, String cvv, String clientName) {
+                          String cardNumber, Date expiryDate, String cvv, String clientName, String deliveryAddress, String city, String country, String zipCode) {
         this.currentBidderId = clientId;
         this.currentPrice = price;
         this.cardNumber = cardNumber;
         this.cardExpiryDate = expiryDate;
         this.cvv = cvv;
         this.clientName = clientName;
+        this.deliveryAddress = deliveryAddress;
+        this.city = city;
+        this.country = country;
+        this.zipCode = zipCode;
     }
     
     public boolean isAuctionOpen() {
