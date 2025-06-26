@@ -91,7 +91,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
                 Notification.show("Failed to fetch items: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
                 return null;
             } else {
-                Notification.show("Fetched items", 3000, Notification.Position.MIDDLE);
+                Notification.show("Fetched items", 3000, Notification.Position.BOTTOM_END);
                 return response.getValue();
             }
         };
@@ -109,17 +109,17 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         Consumer<ItemDTO> onReview = i -> UI.getCurrent().navigate("product-review/" + i.getProductId());
 
         Consumer<ItemDTO> onMakeOffer = i -> {
-            // MakeOfferDialog offerDialog = new MakeOfferDialog(i, (price, details) -> {
-            //     Response<OfferDTO> offerResponse = purchasePresenter.makeOffer(sessionToken, i.getStoreId(), i.getProductId(), price, details);
-            //     if (offerResponse.errorOccurred()) {
-            //         Notification.show("Failed to make offer: " + offerResponse.getErrorMessage(), 5000, Notification.Position.BOTTOM_END);
-            //     } else {
-            //         OfferDTO offer = offerResponse.getValue();
-            //         Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getLastPrice() + " was made successfully");
-            //     }
-            // });
+            MakeOfferDialog offerDialog = new MakeOfferDialog(i, (price, paymentDetails, supplyDetails) -> {
+                Response<OfferDTO> offerResponse = purchasePresenter.makeOffer(sessionToken, i.getStoreId(), i.getProductId(), price, paymentDetails, supplyDetails);
+                if (offerResponse.errorOccurred()) {
+                    Notification.show("Failed to make offer: " + offerResponse.getErrorMessage(), 5000, Notification.Position.BOTTOM_END);
+                } else {
+                    OfferDTO offer = offerResponse.getValue();
+                    Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getLastPrice() + " was made successfully");
+                }
+            });
 
-            // offerDialog.open();
+            offerDialog.open();
         };
 
         Consumer<StoreDTO> onManager = s -> {            // Keep manager action
@@ -128,7 +128,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         };
         storeBrowser = new StoreBrowser(
             storesFetcher,
-            () -> this.expandedStoreMode(true),
+            () -> {}, // No action needed on store select
             itemsFetcher,
             onAddToCart,
             onReview,
@@ -182,29 +182,6 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         expand(mainContent);
     }
 
-    public void expandedStoreMode(boolean expanded) {
-        storeNameField.setVisible(!expanded);
-    }
-
-    // private void fetchStoreByName() {
-    //     String storeName = storeNameField.getValue();
-    //     if (storeName == null || storeName.isEmpty()) {
-    //         return;
-    //     }
-        
-    //     Response<StoreDTO> response = storePresenter.getStoreByName(sessionToken, storeName);
-
-    //     if (response.errorOccurred()) {
-    //         Notification.show("Store not found: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
-    //     } else {
-    //         StoreDTO store = response.getValue();
-    //         if (!store.isOpen()) {
-    //             Notification.show("This store is currently closed", 3000, Notification.Position.MIDDLE);
-    //             return;
-    //         }
-    //         showStoreLayout(store);
-    //     }
-    // }
 
 
     private void showStoreBrowser() {
