@@ -27,6 +27,7 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Domain.User.User;
 import UI.DatabaseRelated.DbHealthStatus;
@@ -142,6 +143,8 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
             }
         };
 
+        boolean isGuest = ((UserDTO)(UI.getCurrent().getSession().getAttribute("user"))).getUsername().equals("Guest");
+
         ItemLayout itemLayout = new ItemLayout(store,
             refresher,
             i -> {
@@ -163,10 +166,12 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
                         OfferDTO offer = offerResponse.getValue();
                         Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getLastPrice() + " was made successfully");
                     }
-                });
+                }
+                );
 
                 offerDialog.open();
-            }
+            },
+            isGuest
         );
 
         StoreLayout storelayout = new StoreLayout(store,
