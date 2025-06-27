@@ -181,7 +181,9 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         welcomeLayout.setAlignItems(Alignment.BASELINE);
         welcomeLayout.setWidthFull();
         welcomeLayout.setJustifyContentMode(JustifyContentMode.START);
+
         HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
+        
         navButtons.setJustifyContentMode(JustifyContentMode.END);
         navButtons.getStyle().set("padding", "10px");
 
@@ -662,6 +664,10 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
             }
             // Then proceed with regular ban status check which will handle other UI elements
             checkBanStatus();
+                
+            registerBtn.setEnabled("Guest".equals(currentUsername));
+            registerBtn.setVisible("Guest".equals(currentUsername));
+            
         }
     }
 
