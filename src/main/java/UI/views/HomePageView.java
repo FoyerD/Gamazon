@@ -21,10 +21,8 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -92,6 +90,8 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
     private final Button registerBtn = new Button("Register");
     private final Button logoutBtn = new Button("Logout");
 
+    //! my change
+    private final Button gifViewBtn = new Button("GIF View", e -> UI.getCurrent().navigate("gif-view"));
 
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
@@ -183,7 +183,7 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         welcomeLayout.setAlignItems(Alignment.BASELINE);
         welcomeLayout.setWidthFull();
         welcomeLayout.setJustifyContentMode(JustifyContentMode.START);
-        HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
+        HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn, gifViewBtn,registerBtn, logoutBtn);
         navButtons.setJustifyContentMode(JustifyContentMode.END);
         navButtons.getStyle().set("padding", "10px");
 
@@ -357,67 +357,10 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         productGrid.setWidthFull();
         productGrid.getStyle().set("background-color", "#f7fafc");
 
-        //my change im dumb
-        Image gif = new Image("https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGdhbTAxbTlwcjdpdDFlcmpiMHB6eWE2MWdnZWtzaWVkcmthdzR2MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JmPenP1svctdfDCEHi/giphy.gif", "Rick Dancing");
-        gif.setWidth("215px"); // Optional: adjust size
-        gif.setHeight("300px"); // Optional: adjust size
-        Div gifWrapper = new Div(gif);
-        gifWrapper.getStyle()
-            .set("position", "fixed")
-            .set("bottom", "20px")
-            .set("right", "20px")
-            .set("z-index", "1000");
-            
-        add(gifWrapper);
-        VerticalLayout mainContent = new VerticalLayout(topBar, activeFiltersLabel, productGrid, gifWrapper);
+        VerticalLayout mainContent = new VerticalLayout(topBar, activeFiltersLabel, productGrid);
         mainContent.setPadding(false);
         mainContent.setSpacing(true);
         add(mainContent);
-
-        Image topGif = new Image("https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExb3BucmY3bjV0a2ExM3Q4aDBpb2xidHBuNWRtb3ZlbnAya3A1cXczOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XEg38j4mGddszAddiT/giphy.gif", "Top Center GIF");
-
-        // Set width much larger than height for the stretched/squeezed effect
-        topGif.setWidth("600px"); 
-        topGif.setHeight("130px");
-
-        Div topGifWrapper = new Div(topGif);
-        topGifWrapper.getStyle()
-            .set("position", "fixed")
-            .set("top", "20px")
-            .set("left", "50%")
-            .set("transform", "translateX(-50%)")
-            .set("z-index", "1000");
-
-        add(topGifWrapper);
-
-        Image bottomCenterGif = new Image("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXh4NWppZXhpdmxmeXh3bzA3OThoYTMzOHVnb3M5Yzg5c3M2dG83ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ZtusrBPGWbqlW/giphy.gif", "Bottom Center GIF");
-        bottomCenterGif.setWidth("600px"); // Adjust as needed
-        bottomCenterGif.setHeight("286px"); // Adjust as needed
-
-        Div bottomCenterWrapper = new Div(bottomCenterGif);
-        bottomCenterWrapper.getStyle()
-            .set("position", "fixed")
-            .set("bottom", "20px")
-            .set("left", "70%")
-            .set("transform", "translateX(-50%)")
-            .set("z-index", "1000");
-
-        add(bottomCenterWrapper);
-
-        Image bottomLeftGif = new Image("https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExajM5Y2cweTNxcGNndWhjdnhmaHFhYWk0NTVneml1dGx3NGR5c2NqcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L3bj6t3opdeNddYCyl/giphy.gif", "Left of Skeleton GIF");
-        bottomLeftGif.setWidth("350px");
-        bottomLeftGif.setHeight("275px");
-
-        Div bottomLeftWrapper = new Div(bottomLeftGif);
-        bottomLeftWrapper.getStyle()
-            .set("position", "fixed")
-            .set("bottom", "20px")
-            .set("left", "calc(50% - 350px)") // Skeleton is centered, 350px to the left
-            .set("z-index", "1000");
-
-        add(bottomLeftWrapper);
-
-
 
 
         // Music Settings Dialog
@@ -469,11 +412,41 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
             }
         });
 
-        VerticalLayout layout = new VerticalLayout(playMusicBtn, muteBtn, upload);
+        
+        NumberField volumeField = new NumberField("Volume (%)");
+        volumeField.setValue(20.0);  // Default 20%
+        volumeField.setMin(0);
+        volumeField.setMax(100);
+        volumeField.setStep(1);
+
+        volumeField.addValueChangeListener(event -> {
+            Double val = event.getValue();
+            if (val != null) {
+                UI.getCurrent().getPage().executeJs("""
+                    const audio = document.getElementById('backgroundMusic');
+                    if (audio) {
+                        audio.volume = $0;
+                    }
+                """, val / 100.0);
+            }
+        });
+
+        VerticalLayout layout = new VerticalLayout(playMusicBtn, muteBtn, volumeField, upload);
         musicDialog.add(layout);
+
 
         musicSettingsBtn.addClickListener(e -> musicDialog.open());
         add(musicSettingsBtn, musicDialog);
+
+        gifViewBtn.getStyle()
+            .set("background", "transparent") // Completely blends in
+            .set("color", "transparent")      // Hides text
+            .set("border", "none")
+            .set("position", "fixed")
+            .set("bottom", "20px")
+            .set("right", "20px")
+            .set("z-index", "1000")
+            .set("opacity", "0.01");          // Almost invisible but still clickable
 
 
 
