@@ -92,5 +92,10 @@ public class StorePresenter implements IStorePresenter {
     public Response<List<DiscountDTO>> getStoreDiscounts(String sessionToken, String storeId) {
         return storeService.getStoreDiscounts(sessionToken, storeId);
     }
+
+    @Override
+    public Response<List<StoreDTO>> getAllStores(String sessionToken) {
+        return storeService.getAllStores(sessionToken);
+    }
     
 }

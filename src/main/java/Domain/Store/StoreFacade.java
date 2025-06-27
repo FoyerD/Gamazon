@@ -466,5 +466,11 @@ public class StoreFacade {
             .collect(Collectors.toSet()).stream().toList();
     }
 
+    public List<Store> getAllStores() {
+        if (!isInitialized()) throw new RuntimeException("Store facade must be initialized");
+
+        return storeRepository.getAllStores();
+    }
+
 
 }

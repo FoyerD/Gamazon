@@ -3,11 +3,12 @@ package UI.views;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -15,7 +16,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -41,6 +42,7 @@ import UI.presenters.IUserSessionPresenter;
 import UI.presenters.UserSessionPresenter;
 import UI.views.components.ItemLayout;
 import UI.views.components.MakeOfferDialog;
+import UI.views.components.StoreBrowser;
 import UI.views.components.StoreLayout;
 
 
@@ -54,9 +56,8 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
     private String sessionToken;
 
     private final TextField storeNameField = new TextField("Search Store by Name");
-    private final Button homeButton = new Button("Return to Homepage");
-    private final Button createStoreButton;
-    private final Button addProductButton;
+    private final StoreBrowser storeBrowser;
+    private final VerticalLayout mainContent;
 
 
     @Autowired
@@ -75,63 +76,127 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         getStyle().set("background", "linear-gradient(to right, #fce4ec, #f3e5f5)");
 
         H1 title = new H1("Marketplace Store Browser");
-        title.getStyle().set("color", "#6a1b9a");
+        title.getStyle().setColor(" #6a1b9a").setFontWeight("bold");
 
-        storeNameField.setPlaceholder("e.g., SuperMart");
+        Supplier<List<StoreDTO>> storesFetcher =  () -> {
+                Response<List<StoreDTO>> storesResponse = storePresenter.getAllStores(sessionToken);
+                if (storesResponse.errorOccurred()) {
+                    Notification.show("Failed to fetch stores: " + storesResponse.getErrorMessage(), 5000, Notification.Position.MIDDLE);
+                    return null;
+                }
+                List<StoreDTO> stores = storesResponse.getValue();
+                return stores;
+        }; 
+        
+        Function<StoreDTO, List<ItemDTO>> itemsFetcher = s -> {
+            Response<List<ItemDTO>> response = storePresenter.getItemsByStoreId(sessionToken, s.getId());
+            if (response.errorOccurred()) {
+                Notification.show("Failed to fetch items: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
+                return null;
+            } else {
+                Notification.show("Fetched items", 3000, Notification.Position.BOTTOM_END);
+                return response.getValue();
+            }
+        };
+
+        Consumer<ItemDTO> onAddToCart = i -> {
+            Response<Boolean> response = purchasePresenter.addProductToCart(sessionToken, i.getProductId(), i.getStoreId(), 1);
+            if (!response.errorOccurred()) {
+                Notification.show("Product added to cart successfully!", 3000, Notification.Position.MIDDLE);
+            } else {
+                Notification.show("Failed to add product to cart: " + response.getErrorMessage(), 
+                                3000, Notification.Position.MIDDLE);
+            }
+        };
+
+        Consumer<ItemDTO> onReview = i -> UI.getCurrent().navigate("product-review/" + i.getProductId());
+
+        Consumer<ItemDTO> onMakeOffer = i -> {
+            MakeOfferDialog offerDialog = new MakeOfferDialog(i, (price, paymentDetails, supplyDetails) -> {
+                Response<OfferDTO> offerResponse = purchasePresenter.makeOffer(sessionToken, i.getStoreId(), i.getProductId(), price, paymentDetails, supplyDetails);
+                if (offerResponse.errorOccurred()) {
+                    Notification.show("Failed to make offer: " + offerResponse.getErrorMessage(), 5000, Notification.Position.BOTTOM_END);
+                } else {
+                    OfferDTO offer = offerResponse.getValue();
+                    Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getLastPrice() + " was made successfully");
+                }
+            });
+
+            offerDialog.open();
+        };
+
+        Consumer<StoreDTO> onManager = s -> {            // Keep manager action
+            UI.getCurrent().getSession().setAttribute("currentStoreId", s.getId());
+            UI.getCurrent().navigate("manager");
+        };
+        storeBrowser = new StoreBrowser(
+            storesFetcher,
+            () -> {}, // No action needed on store select
+            itemsFetcher,
+            onAddToCart,
+            onReview,
+            onMakeOffer,
+            onManager,
+            ((UserDTO)(UI.getCurrent().getSession().getAttribute("user"))).getUsername().equals("Guest"),
+            (UserDTO)(UI.getCurrent().getSession().getAttribute("user"))
+        );
+
+        storeNameField.setPlaceholder("e.g., SuperTech");
         storeNameField.setWidth("300px");
-        storeNameField.getStyle().set("background-color", "#ffffff");
-        storeNameField.addValueChangeListener(e -> fetchStoreByName());
+        storeNameField.addValueChangeListener(e -> this.storeBrowser.setNameFilter(e.getValue()));
 
-
+        Button homeButton = new Button("Return to Homepage", VaadinIcon.HOME.create());
         homeButton.addClickListener(e -> UI.getCurrent().navigate("home"));
         homeButton.getStyle().set("background-color", "#7e57c2").set("color", "white");
 
         // Initialize Create Store button
-        createStoreButton = new Button("Create New Store", VaadinIcon.PLUS.create());
+        Button createStoreButton = new Button("Create New Store", VaadinIcon.PLUS.create());
         createStoreButton.getStyle()
-            .set("background-color", "#4caf50")
+            .set("background-color", " #4caf50")
             .set("color", "white")
             .set("margin-left", "10px");
         createStoreButton.addClickListener(e -> showCreateStoreDialog());
 
         // Initialize Add Product button
-        addProductButton = new Button("Add New Product", VaadinIcon.PLUS_CIRCLE.create());
+        Button addProductButton = new Button("Add New Product", VaadinIcon.PLUS_CIRCLE.create());
         addProductButton.getStyle()
-            .set("background-color", "#2196f3")
+            .set("background-color", " #2196f3")
             .set("color", "white")
             .set("margin-left", "10px");
         addProductButton.addClickListener(e -> showAddProductDialog());
 
+        Button backButton = new Button("Back to Stores", VaadinIcon.ARROW_BACKWARD.create());
+        backButton.getStyle()
+            .set("background-color", "rgb(141, 59, 171)")
+            .set("color", "white")
+            .set("margin-left", "10px");
+        backButton.addClickListener(e -> {
+            showStoreBrowser();
+        });
         // Create a horizontal layout for buttons
-        com.vaadin.flow.component.orderedlayout.HorizontalLayout buttonLayout = new com.vaadin.flow.component.orderedlayout.HorizontalLayout();
+        HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
-        buttonLayout.add(createStoreButton, addProductButton, homeButton);
+        buttonLayout.add(createStoreButton, addProductButton, homeButton, backButton);
+
+
         
-        add(title, storeNameField, buttonLayout);
+        mainContent = new VerticalLayout();
+        mainContent.setSizeFull();
+
+        add(title, buttonLayout, storeNameField, mainContent);
+        expand(mainContent);
     }
 
-    private void fetchStoreByName() {
-        String storeName = storeNameField.getValue();
-        if (storeName == null || storeName.isEmpty()) {
-            return;
-        }
-        
-        Response<StoreDTO> response = storePresenter.getStoreByName(sessionToken, storeName);
 
-        if (response.errorOccurred()) {
-            Notification.show("Store not found: " + response.getErrorMessage(), 3000, Notification.Position.MIDDLE);
-        } else {
-            StoreDTO store = response.getValue();
-            if (!store.isOpen()) {
-                Notification.show("This store is currently closed", 3000, Notification.Position.MIDDLE);
-                return;
-            }
-            showStoreLayout(store);
-            Notification.show("Store found: " + store.getName());
-        }
+
+    private void showStoreBrowser() {
+        mainContent.removeAll();
+        mainContent.add(storeBrowser);
+        storeBrowser.refresh();
     }
 
     private void showStoreLayout(StoreDTO store) {
+        mainContent.removeAll();
         Function<StoreDTO, List<ItemDTO>> refresher = s -> {
             Response<List<ItemDTO>> response = storePresenter.getItemsByStoreId(sessionToken, s.getId());
             if (response.errorOccurred()) {
@@ -181,8 +246,8 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
             UI.getCurrent().navigate("manager");
         }, store.getManagers().contains(sessionPresenter.extractUserIdFromToken(sessionToken)) || store.getOwners().contains(sessionPresenter.extractUserIdFromToken(sessionToken)) || (store.getFounderId().equals(sessionPresenter.extractUserIdFromToken(sessionToken)))) ;
 
-        this.add(storelayout);
         itemLayout.setItems(refresher.apply(store));
+        mainContent.add(storelayout);
     }
 
     private void showCreateStoreDialog() {
@@ -285,9 +350,11 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         sessionToken = (String) UI.getCurrent().getSession().getAttribute("sessionToken");
         if (sessionToken == null) {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
-            event.forwardTo("login");
+            event.forwardTo("");
             return;
         }
+
+        showStoreBrowser();
         
         // Check for query parameters
         Location location = event.getLocation();
@@ -301,22 +368,5 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
                 // fetchStoreByName will be triggered by the value change listener
             }
         }
-    }
-
-    @ClientCallable
-    private void showNotification(String message, String type, Integer duration, String position) {
-        Notification notification = new Notification(message);
-        notification.setDuration(duration > 0 ? duration : 10000);
-        notification.setPosition(Notification.Position.valueOf(position.toUpperCase().replace('-', '_')));
-        
-        if ("error".equals(type)) {
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        } else if ("warning".equals(type)) {
-            notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
-        } else if ("success".equals(type)) {
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        }
-        
-        notification.open();
     }
 }

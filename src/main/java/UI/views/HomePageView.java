@@ -1,5 +1,7 @@
 package UI.views;
 
+import java.io.File;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.FileBuffer;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
@@ -358,35 +362,62 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         mainContent.setSpacing(true);
         add(mainContent);
 
-        // mute background music
-        Button muteButton = new Button("Mute");
-        muteButton.getStyle()
-            .set("background-color", "#ff4d4f")
-            .set("color", "white")
-            .set("font-weight", "bold");
+        // Music Settings Dialog
+        Button musicSettingsBtn = new Button("🎵 Music Settings");
 
-        muteButton.addClickListener(e -> {
-            muteButton.getElement().executeJs("""
+        Dialog musicDialog = new Dialog();
+        musicDialog.setHeaderTitle("Music Settings");
+
+        Button playMusicBtn = new Button("Play Music 🎶");
+        playMusicBtn.addClickListener(e -> {
+            UI.getCurrent().getPage().executeJs("window.startBackgroundMusic && window.startBackgroundMusic();");
+        });
+
+        Button muteBtn = new Button("Mute/Unmute 🔇");
+        muteBtn.addClickListener(e -> {
+            UI.getCurrent().getPage().executeJs("""
                 const audio = document.getElementById('backgroundMusic');
                 if (audio) {
                     audio.muted = !audio.muted;
-                    this.textContent = audio.muted ? 'Unmute' : 'Mute';
                 }
-            """, muteButton.getElement());
+            """);
         });
 
-        // Sync button text to actual audio state when view loads
-        muteButton.getElement().executeJs("""
-            const audio = document.getElementById('backgroundMusic');
-            if (audio) {
-                this.textContent = audio.muted ? 'Unmute' : 'Mute';
+        // Upload setup
+        FileBuffer fileBuffer = new FileBuffer();
+        Upload upload = new Upload(fileBuffer);
+        upload.setAcceptedFileTypes(".mp3");
+        upload.setMaxFiles(1);
+        upload.setDropLabel(new Span("Upload .mp3 file"));
+
+        upload.addSucceededListener(event -> {
+            try (InputStream inputStream = fileBuffer.getInputStream()) {
+                
+                File targetDir = new File("src/main/resources/static/audio");
+                if (!targetDir.exists()) {
+                    targetDir.mkdirs();
+                }
+
+                File targetFile = new File(targetDir, event.getFileName());
+                java.nio.file.Files.copy(inputStream, targetFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                Notification.show("File uploaded successfully. You can now press Play.", 3000, Notification.Position.MIDDLE);
+
+                injectTracksToClient();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Notification.show("Upload failed!", 3000, Notification.Position.MIDDLE);
             }
-        """, muteButton.getElement());
+        });
 
-        add(muteButton);
+        VerticalLayout layout = new VerticalLayout(playMusicBtn, muteBtn, upload);
+        musicDialog.add(layout);
+
+        musicSettingsBtn.addClickListener(e -> musicDialog.open());
+        add(musicSettingsBtn, musicDialog);
 
 
-    
         loadAllProducts();
 
         setupNavigation();
