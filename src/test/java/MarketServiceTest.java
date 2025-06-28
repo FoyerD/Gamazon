@@ -683,13 +683,4 @@ public class MarketServiceTest {
         assertTrue(result.errorOccurred());
     }
 
-    public void testAddSimpleDiscount(){
-        ConditionDTO trueCondition = new ConditionDTO("1", ConditionType.TRUE);
-        DiscountDTO discount = new DiscountDTO("1", store1.getId(), DiscountType.SIMPLE, trueCondition);
-        discount.setDiscountPercentage(0.1);
-        discount.setQualifierType(QualifierType.STORE);
-        discount.setQualifierValue(store1.getId());
-        Response<Void> response = storeServicey.addDiscount(user1.getSessionToken(), discount);
-    }
-
 }
