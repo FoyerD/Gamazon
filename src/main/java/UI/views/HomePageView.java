@@ -183,7 +183,7 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         welcomeLayout.setAlignItems(Alignment.BASELINE);
         welcomeLayout.setWidthFull();
         welcomeLayout.setJustifyContentMode(JustifyContentMode.START);
-        HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn, gifViewBtn,registerBtn, logoutBtn);
+        HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn,registerBtn, logoutBtn);
         navButtons.setJustifyContentMode(JustifyContentMode.END);
         navButtons.getStyle().set("padding", "10px");
 
@@ -438,20 +438,75 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         musicSettingsBtn.addClickListener(e -> musicDialog.open());
         add(musicSettingsBtn, musicDialog);
 
-        gifViewBtn.getStyle()
-            .set("background", "transparent") // Completely blends in
-            .set("color", "transparent")      // Hides text
-            .set("border", "none")
-            .set("position", "fixed")
-            .set("bottom", "20px")
-            .set("right", "20px")
-            .set("z-index", "1000")
-            .set("opacity", "0.01");          // Almost invisible but still clickable
-
-
-
-
         loadAllProducts();
+
+        UI.getCurrent().getPage().executeJs("""
+            if (!document.getElementById('easterEggDragArea')) {
+                const dragArea = document.createElement('div');
+                dragArea.id = 'easterEggDragArea';
+                dragArea.style.position = 'fixed';
+                dragArea.style.bottom = '20px';
+                dragArea.style.right = '20px';
+                dragArea.style.width = '60px';
+                dragArea.style.height = '60px';
+                dragArea.style.background = 'transparent';
+                dragArea.style.zIndex = '1000';
+                dragArea.style.cursor = 'grab';
+
+                const button = document.createElement('button');
+                button.textContent = '';
+                button.style.display = 'none';
+                button.style.width = '100%';
+                button.style.height = '100%';
+                button.style.position = 'absolute';
+                button.style.top = '0';
+                button.style.left = '0';
+                button.style.backgroundImage = "url('images/esterEgg.png')";
+                button.style.backgroundSize = 'cover';
+                button.style.backgroundColor = 'transparent';
+                button.style.border = 'none';
+                button.style.borderRadius = '50%';
+                button.style.cursor = 'pointer';
+
+                button.addEventListener('click', () => {
+                    window.location.href = '/gif-view';
+                });
+
+                dragArea.appendChild(button);
+                document.body.appendChild(dragArea);
+
+                let isDragging = false;
+                let offsetX = 0;
+                let offsetY = 0;
+                let moved = false;
+
+                dragArea.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    offsetX = e.clientX - dragArea.getBoundingClientRect().left;
+                    offsetY = e.clientY - dragArea.getBoundingClientRect().top;
+                    dragArea.style.cursor = 'grabbing';
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) {
+                        dragArea.style.left = (e.clientX - offsetX) + 'px';
+                        dragArea.style.top = (e.clientY - offsetY) + 'px';
+                        dragArea.style.right = 'auto';
+                        dragArea.style.bottom = 'auto';
+                        moved = true;
+                    }
+                });
+
+                document.addEventListener('mouseup', function() {
+                    if (isDragging && moved) {
+                        button.style.display = 'block';
+                    }
+                    isDragging = false;
+                    moved = false;
+                    dragArea.style.cursor = 'grab';
+                });
+            }
+        """);
 
         setupNavigation();
     
