@@ -11,6 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import Application.DTOs.ItemDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 
 public class StoreBrowser extends VerticalLayout {
     private final Supplier<List<StoreDTO>> storesSupplier;
@@ -22,6 +23,8 @@ public class StoreBrowser extends VerticalLayout {
     private final Consumer<StoreDTO> onManager;
     private final FlexLayout tileContainer = new FlexLayout();
     private String nameFilter;
+    private boolean isGuest;
+    private UserDTO user;
 
     public StoreBrowser(Supplier<List<StoreDTO>> storesSupplier,
                         Runnable onStoreSelect,
@@ -29,7 +32,9 @@ public class StoreBrowser extends VerticalLayout {
                         Consumer<ItemDTO> onAddToCart,
                         Consumer<ItemDTO> onReview,
                         Consumer<ItemDTO> onOffer,
-                        Consumer<StoreDTO> onManager) {
+                        Consumer<StoreDTO> onManager,
+                        boolean isGuest,
+                        UserDTO user) {
         this.nameFilter = "";
         this.storesSupplier = storesSupplier;
         this.onStoreSelect = onStoreSelect;
@@ -38,6 +43,8 @@ public class StoreBrowser extends VerticalLayout {
         this.onReview = onReview;
         this.onOffer = onOffer;
         this.onManager = onManager;
+        this.isGuest = isGuest;
+        this.user = user;
 
         setWidthFull();
         setPadding(true);
@@ -53,6 +60,7 @@ public class StoreBrowser extends VerticalLayout {
             .set("padding", "12px");
 
         add(tileContainer);
+        
     }
 
     public void setNameFilter(String name) {
@@ -63,11 +71,12 @@ public class StoreBrowser extends VerticalLayout {
     tileContainer.removeAll();
     List<StoreDTO> stores = storesSupplier.get();
     if (stores == null || stores.isEmpty()) return;
-
+    
     stores.stream()
         .filter(s -> nameFilter.isEmpty() || s.getName().toLowerCase().contains(nameFilter.toLowerCase()))
         .forEach(s -> {
-            StoreTile tile = new StoreTile(s, onStoreSelect, itemFetcher, onAddToCart, onReview, onOffer, onManager);
+            StoreTile tile = new StoreTile(s, onStoreSelect, itemFetcher, onAddToCart, onReview, onOffer, onManager, isGuest,
+             s.getManagers().contains(user.getId()) || s.getOwners().contains(user.getId()) || s.getFounderId().equals(user.getId()));
             tileContainer.add(tile);
         });
 }

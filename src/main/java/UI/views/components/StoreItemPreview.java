@@ -11,7 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import Application.DTOs.ItemDTO;
 
 public class StoreItemPreview extends VerticalLayout {
-    public StoreItemPreview(ItemDTO item, Consumer<ItemDTO> onAddToCart, Consumer<ItemDTO> onReview, Consumer<ItemDTO> onOffer) {
+    public StoreItemPreview(ItemDTO item, Consumer<ItemDTO> onAddToCart, Consumer<ItemDTO> onReview, Consumer<ItemDTO> onOffer, boolean isGuest) {
         setPadding(true);
         setSpacing(false);
 
@@ -48,10 +48,16 @@ public class StoreItemPreview extends VerticalLayout {
         Button addToCartButton = new Button("Add to Cart", e -> onAddToCart.accept(item));
         addToCartButton.getStyle().set("background-color", "#38a169").set("color", "white");
 
+
         Button makeOfferButton = new Button("Offer", e -> onOffer.accept(item));
         makeOfferButton.getStyle().set("background-color", "rgb(255, 128, 55)").set("color", "white");
-
         HorizontalLayout buttons = new HorizontalLayout(reviewButton, addToCartButton, makeOfferButton);
+
+        if(isGuest)
+        {
+            makeOfferButton.setVisible(false);
+        }
+
         buttons.setSpacing(true);
         buttons.getStyle().set("margin-top", "8px");
 

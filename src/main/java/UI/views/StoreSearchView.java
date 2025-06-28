@@ -28,7 +28,9 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
+import Application.DTOs.UserDTO;
 import Application.utils.Response;
+import Domain.User.User;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IManagementPresenter;
@@ -37,6 +39,7 @@ import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
 import UI.presenters.IUserSessionPresenter;
+import UI.presenters.UserSessionPresenter;
 import UI.views.components.ItemLayout;
 import UI.views.components.MakeOfferDialog;
 import UI.views.components.StoreBrowser;
@@ -133,7 +136,9 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
             onAddToCart,
             onReview,
             onMakeOffer,
-            onManager
+            onManager,
+            ((UserDTO)(UI.getCurrent().getSession().getAttribute("user"))).getUsername().equals("Guest"),
+            (UserDTO)(UI.getCurrent().getSession().getAttribute("user"))
         );
 
         storeNameField.setPlaceholder("e.g., SuperTech");
@@ -203,6 +208,8 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
             }
         };
 
+        boolean isGuest = ((UserDTO)(UI.getCurrent().getSession().getAttribute("user"))).getUsername().equals("Guest");
+
         ItemLayout itemLayout = new ItemLayout(store,
             refresher,
             i -> {
@@ -224,10 +231,12 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
                         OfferDTO offer = offerResponse.getValue();
                         Notification.show("Offer on " + offer.getItem().getProductName() + " for $" + offer.getLastPrice() + " was made successfully");
                     }
-                });
+                }
+                );
 
                 offerDialog.open();
-            }
+            },
+            isGuest
         );
 
         StoreLayout storelayout = new StoreLayout(store,
@@ -235,7 +244,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
         s -> {            // Keep manager action
             UI.getCurrent().getSession().setAttribute("currentStoreId", s.getId());
             UI.getCurrent().navigate("manager");
-        });
+        }, store.getManagers().contains(sessionPresenter.extractUserIdFromToken(sessionToken)) || store.getOwners().contains(sessionPresenter.extractUserIdFromToken(sessionToken)) || (store.getFounderId().equals(sessionPresenter.extractUserIdFromToken(sessionToken)))) ;
 
         itemLayout.setItems(refresher.apply(store));
         mainContent.add(storelayout);

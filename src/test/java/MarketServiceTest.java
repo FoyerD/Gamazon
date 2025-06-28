@@ -22,6 +22,11 @@ import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.ConditionDTO;
+import Application.DTOs.ConditionDTO.ConditionType;
+import Application.DTOs.DiscountDTO;
+import Application.DTOs.DiscountDTO.DiscountType;
+import Application.DTOs.DiscountDTO.QualifierType;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
@@ -395,7 +400,8 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {        Response<Void> response = marketService.appointStoreManager(tokenId1, "dontexists", store1.getId());
+    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {
+        Response<Void> response = marketService.appointStoreManager(tokenId1, "dontexists", store1.getId());
         assertTrue(response.errorOccurred());
     }
 
@@ -676,7 +682,5 @@ public class MarketServiceTest {
         Response<Boolean> result = marketService.unbanUser(managerToken, targetId);
         assertTrue(result.errorOccurred());
     }
-
-
 
 }
