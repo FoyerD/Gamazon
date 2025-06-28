@@ -1,21 +1,10 @@
 package StoreTests;
 
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-
-
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -23,6 +12,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import Application.ItemService;
 import Application.MarketService;
@@ -33,7 +30,10 @@ import Application.StoreService;
 import Application.UserService;
 import Application.DTOs.AuctionDTO;
 import Application.DTOs.ConditionDTO;
+import Application.DTOs.ConditionDTO.ConditionType;
 import Application.DTOs.DiscountDTO;
+import Application.DTOs.DiscountDTO.DiscountType;
+import Application.DTOs.DiscountDTO.QualifierType;
 import Application.DTOs.ItemDTO;
 import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
@@ -42,11 +42,10 @@ import Application.DTOs.StoreDTO;
 import Application.DTOs.SupplyDetailsDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Domain.ExternalServices.IExternalPaymentService;
-import Domain.management.PermissionType;
-
 import Domain.FacadeManager;
+import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.management.PermissionType;
 import Infrastructure.MemoryRepoManager;
 
 
@@ -1237,4 +1236,16 @@ public class StoreServiceTests {
         assertTrue(result.errorOccurred());
     }
 
+
+    @Test
+    public void testAddSimpleDiscount(){
+        StoreDTO store1 = storeService.addStore(tokenId, "Store1", "Test Store").getValue();
+        ConditionDTO trueCondition = new ConditionDTO("1", ConditionType.TRUE);
+        DiscountDTO discount = new DiscountDTO("1", store1.getId(), DiscountType.SIMPLE, trueCondition);
+        discount.setDiscountPercentage(0.1);
+        discount.setQualifierType(QualifierType.STORE);
+        discount.setQualifierValue(store1.getId());
+        Response<DiscountDTO> response = storeService.addDiscount(tokenId, store1.getId(), discount);
+        assertFalse(Optional.of(response.getErrorMessage()).get(), response.errorOccurred());
+    }
 }

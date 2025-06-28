@@ -22,6 +22,11 @@ import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.ConditionDTO;
+import Application.DTOs.ConditionDTO.ConditionType;
+import Application.DTOs.DiscountDTO;
+import Application.DTOs.DiscountDTO.DiscountType;
+import Application.DTOs.DiscountDTO.QualifierType;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
@@ -395,7 +400,8 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {        Response<Void> response = marketService.appointStoreManager(tokenId1, "dontexists", store1.getId());
+    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {
+        Response<Void> response = marketService.appointStoreManager(tokenId1, "dontexists", store1.getId());
         assertTrue(response.errorOccurred());
     }
 
@@ -677,6 +683,13 @@ public class MarketServiceTest {
         assertTrue(result.errorOccurred());
     }
 
-
+    public void testAddSimpleDiscount(){
+        ConditionDTO trueCondition = new ConditionDTO("1", ConditionType.TRUE);
+        DiscountDTO discount = new DiscountDTO("1", store1.getId(), DiscountType.SIMPLE, trueCondition);
+        discount.setDiscountPercentage(0.1);
+        discount.setQualifierType(QualifierType.STORE);
+        discount.setQualifierValue(store1.getId());
+        Response<Void> response = storeServicey.addDiscount(user1.getSessionToken(), discount);
+    }
 
 }

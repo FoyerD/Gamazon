@@ -29,7 +29,7 @@ public class Response<T> {
     }
 
     public String getErrorMessage() {
-        return errorMessage.getErrorMessage();
+        return errorMessage != null ? errorMessage.getErrorMessage() : null;
     }
     
     public boolean errorOccurred() { 
