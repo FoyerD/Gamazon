@@ -15,7 +15,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -45,6 +44,7 @@ import Application.utils.Response;
 import Domain.FacadeManager;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.Store.Discounts.Discount;
 import Domain.management.PermissionType;
 import Infrastructure.MemoryRepoManager;
 
@@ -55,6 +55,10 @@ public class StoreServiceTests {
     
     // Add ServiceManager as a field
     private ServiceManager serviceManager;
+
+    private ProductService productService;
+
+    private ItemService itemService;
 
     private String tokenId = null;
 
@@ -108,6 +112,9 @@ public class StoreServiceTests {
         
         // Get the token for the registered user
         this.tokenId = userResponse.getValue().getSessionToken();
+
+        productService = serviceManager.getProductService();
+        itemService = serviceManager.getItemService();
     }
 
     @Test
@@ -1246,6 +1253,145 @@ public class StoreServiceTests {
         discount.setQualifierType(QualifierType.STORE);
         discount.setQualifierValue(store1.getId());
         Response<DiscountDTO> response = storeService.addDiscount(tokenId, store1.getId(), discount);
-        assertFalse(Optional.of(response.getErrorMessage()).get(), response.errorOccurred());
+        assertFalse(response.getErrorMessage(), response.errorOccurred());
+        DiscountDTO addedDiscount = response.getValue();
+        assertNotNull(addedDiscount);
+        assertEquals(DiscountType.SIMPLE, addedDiscount.getType());
+        assertEquals(0.1, addedDiscount.getDiscountPercentage(), 0.01);
+        assertEquals(QualifierType.STORE, addedDiscount.getQualifierType());
+        assertEquals(store1.getId(), addedDiscount.getQualifierValue());
+        assertEquals(0, addedDiscount.getSubDiscountCount());
+        assertEquals(ConditionType.TRUE, addedDiscount.getCondition().getType());
+        assertEquals(ConditionType.TRUE, addedDiscount.getCondition().getType());
     }
+
+    @Test
+    public void testAddAndDicount(){
+        StoreDTO store1 = storeService.addStore(tokenId, "Store2", "Test Store").getValue();
+        ConditionDTO trueCondition = new ConditionDTO("1", ConditionType.TRUE);
+        DiscountDTO andDiscount = new DiscountDTO("1", store1.getId(), DiscountType.AND, trueCondition);
+        DiscountDTO subDiscount1 = new DiscountDTO("2", store1.getId(), DiscountType.SIMPLE, trueCondition);
+        DiscountDTO subDiscount2 = new DiscountDTO("3", store1.getId(), DiscountType.SIMPLE, trueCondition);
+        subDiscount1.setDiscountPercentage(0.1);
+        subDiscount1.setQualifierType(QualifierType.STORE);
+        subDiscount1.setQualifierValue(store1.getId());
+        subDiscount2.setDiscountPercentage(0.2);
+        subDiscount2.setQualifierType(QualifierType.STORE);
+        subDiscount2.setQualifierValue(store1.getId());
+        andDiscount.setSubDiscounts(List.of(subDiscount1, subDiscount2));
+        andDiscount.setMergeType(Discount.MergeType.MUL);
+        Response<DiscountDTO> response = storeService.addDiscount(tokenId, store1.getId(), andDiscount);
+        assertFalse(response.getErrorMessage(), response.errorOccurred());
+        DiscountDTO addedDiscount = response.getValue();
+        assertNotNull(addedDiscount);
+        assertEquals(DiscountType.AND, addedDiscount.getType());
+        assertEquals(2, addedDiscount.getSubDiscountCount());
+        assertEquals(ConditionType.TRUE, addedDiscount.getCondition().getType());
+        assertEquals(2, addedDiscount.getSubDiscounts().size());
+        assertEquals(0.1, addedDiscount.getSubDiscounts().get(0).getDiscountPercentage(), 0.01);
+        assertEquals(0.2, addedDiscount.getSubDiscounts().get(1).getDiscountPercentage(), 0.01);    
+    }
+
+    @Test
+    public void testAddOrDiscount(){
+        StoreDTO store1 = storeService.addStore(tokenId, "Store3", "Test Store").getValue();
+        ProductDTO product = productService.addProduct(tokenId, "TestProduct", List.of("cat1"), List.of("desc1")).getValue();
+        ItemDTO item = itemService.add(tokenId, store1.getId(), product.getId(), 100f, 10, "Test Item").getValue();
+        ConditionDTO andCondition = new ConditionDTO("1", ConditionType.AND);
+        ConditionDTO maxPriceCondition = new ConditionDTO("2", ConditionType.MAX_PRICE);
+        ConditionDTO trueCondition = new ConditionDTO("3", ConditionType.TRUE);
+        maxPriceCondition.setMaxPrice(150.0);
+        ConditionDTO minQuantityCondition = new ConditionDTO("3", ConditionType.MIN_QUANTITY);
+        minQuantityCondition.setMinQuantity(5);
+        minQuantityCondition.setProductId(product.getId());
+        andCondition.setSubConditions(List.of(maxPriceCondition, minQuantityCondition));
+        DiscountDTO orDiscount = new DiscountDTO("1", store1.getId(), DiscountType.OR, trueCondition);
+        DiscountDTO subDiscount1 = new DiscountDTO("2", store1.getId(), DiscountType.SIMPLE, andCondition);
+        subDiscount1.setQualifierType(QualifierType.PRODUCT);
+        subDiscount1.setQualifierValue(product.getId());
+        subDiscount1.setDiscountPercentage(0.15);
+        DiscountDTO subDiscount2 = new DiscountDTO("3", store1.getId(), DiscountType.SIMPLE, trueCondition);
+        subDiscount2.setQualifierType(QualifierType.STORE);
+        subDiscount2.setQualifierValue(store1.getId());
+        subDiscount2.setDiscountPercentage(0.05);
+        orDiscount.setSubDiscounts(List.of(subDiscount1, subDiscount2));
+        orDiscount.setMergeType(Discount.MergeType.MAX);
+        Response<DiscountDTO> response = storeService.addDiscount(tokenId, store1.getId(), orDiscount);
+        assertFalse(response.getErrorMessage(), response.errorOccurred());
+        DiscountDTO addedDiscount = response.getValue();
+        assertNotNull(addedDiscount);
+        assertEquals(DiscountType.OR, addedDiscount.getType());
+        assertEquals(2, addedDiscount.getSubDiscountCount());
+        assertEquals(ConditionType.TRUE, addedDiscount.getCondition().getType());
+        assertEquals(2, addedDiscount.getSubDiscounts().size());
+        assertEquals(0.15, addedDiscount.getSubDiscounts().get(0).getDiscountPercentage(), 0.01);
+        assertEquals(0.05, addedDiscount.getSubDiscounts().get(1).getDiscountPercentage(), 0.01);
+        assertEquals(Discount.MergeType.MAX, addedDiscount.getMergeType());
+        assertEquals(QualifierType.PRODUCT, addedDiscount.getSubDiscounts().get(0).getQualifierType());
+        assertEquals(QualifierType.STORE, addedDiscount.getSubDiscounts().get(1).getQualifierType());
+    }
+
+    @Test
+    public void testAddXorDiscount() {
+        StoreDTO store1 = storeService.addStore(tokenId, "StoreXor", "XOR Store").getValue();
+        ConditionDTO trueCondition = new ConditionDTO("1", ConditionType.TRUE);
+
+        DiscountDTO xorDiscount = new DiscountDTO("1", store1.getId(), DiscountType.XOR, trueCondition);
+        
+        DiscountDTO subDiscount1 = new DiscountDTO("2", store1.getId(), DiscountType.SIMPLE, trueCondition);
+        subDiscount1.setDiscountPercentage(0.25);
+        subDiscount1.setQualifierType(QualifierType.STORE);
+        subDiscount1.setQualifierValue(store1.getId());
+        
+        DiscountDTO subDiscount2 = new DiscountDTO("3", store1.getId(), DiscountType.SIMPLE, trueCondition);
+        subDiscount2.setDiscountPercentage(0.35);
+        subDiscount2.setQualifierType(QualifierType.STORE);
+        subDiscount2.setQualifierValue(store1.getId());
+
+        xorDiscount.setSubDiscounts(List.of(subDiscount1, subDiscount2));
+        xorDiscount.setMergeType(Discount.MergeType.MAX);
+
+        Response<DiscountDTO> response = storeService.addDiscount(tokenId, store1.getId(), xorDiscount);
+        assertFalse(response.getErrorMessage(), response.errorOccurred());
+        DiscountDTO addedDiscount = response.getValue();
+
+        assertEquals(DiscountType.XOR, addedDiscount.getType());
+        assertEquals(2, addedDiscount.getSubDiscountCount());
+        assertEquals(0.25, addedDiscount.getSubDiscounts().get(0).getDiscountPercentage(), 0.01);
+        assertEquals(0.35, addedDiscount.getSubDiscounts().get(1).getDiscountPercentage(), 0.01);
+    }
+
+    
+    @Test
+    public void testAddNestedCompositeDiscount() {
+        StoreDTO store = storeService.addStore(tokenId, "NestedDiscountStore", "Nested Discounts").getValue();
+        ConditionDTO trueCond = new ConditionDTO("c1", ConditionType.TRUE);
+
+        DiscountDTO innerSimple = new DiscountDTO("inner1", store.getId(), DiscountType.SIMPLE, trueCond);
+        innerSimple.setDiscountPercentage(0.1);
+        innerSimple.setQualifierType(QualifierType.STORE);
+        innerSimple.setQualifierValue(store.getId());
+
+        DiscountDTO innerSimple2 = new DiscountDTO("inner2", store.getId(), DiscountType.SIMPLE, trueCond);
+        innerSimple2.setDiscountPercentage(0.2);
+        innerSimple2.setQualifierType(QualifierType.STORE);
+        innerSimple2.setQualifierValue(store.getId());
+
+        DiscountDTO innerAnd = new DiscountDTO("and1", store.getId(), DiscountType.AND, trueCond);
+        innerAnd.setSubDiscounts(List.of(innerSimple, innerSimple2));
+        innerAnd.setMergeType(Discount.MergeType.MUL);
+
+        DiscountDTO outerOr = new DiscountDTO("outer", store.getId(), DiscountType.OR, trueCond);
+        outerOr.setSubDiscounts(List.of(innerAnd));
+        outerOr.setMergeType(Discount.MergeType.MAX);
+
+        Response<DiscountDTO> response = storeService.addDiscount(tokenId, store.getId(), outerOr);
+        assertFalse(response.getErrorMessage(), response.errorOccurred());
+
+        DiscountDTO added = response.getValue();
+        assertEquals(DiscountType.OR, added.getType());
+        assertEquals(1, added.getSubDiscountCount());
+        assertEquals(DiscountType.AND, added.getSubDiscounts().get(0).getType());
+    }
+
 }
