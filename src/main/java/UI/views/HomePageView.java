@@ -90,6 +90,8 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
     private final Button registerBtn = new Button("Register");
     private final Button logoutBtn = new Button("Logout");
 
+    //! my change
+    private final Button gifViewBtn = new Button("GIF View", e -> UI.getCurrent().navigate("gif-view"));
 
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
@@ -362,6 +364,7 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         mainContent.setSpacing(true);
         add(mainContent);
 
+
         // Music Settings Dialog
         Button musicSettingsBtn = new Button("🎵 Music Settings");
 
@@ -411,14 +414,101 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
             }
         });
 
-        VerticalLayout layout = new VerticalLayout(playMusicBtn, muteBtn, upload);
+        
+        NumberField volumeField = new NumberField("Volume (%)");
+        volumeField.setValue(20.0);  // Default 20%
+        volumeField.setMin(0);
+        volumeField.setMax(100);
+        volumeField.setStep(1);
+
+        volumeField.addValueChangeListener(event -> {
+            Double val = event.getValue();
+            if (val != null) {
+                UI.getCurrent().getPage().executeJs("""
+                    const audio = document.getElementById('backgroundMusic');
+                    if (audio) {
+                        audio.volume = $0;
+                    }
+                """, val / 100.0);
+            }
+        });
+
+        VerticalLayout layout = new VerticalLayout(playMusicBtn, muteBtn, volumeField, upload);
         musicDialog.add(layout);
+
 
         musicSettingsBtn.addClickListener(e -> musicDialog.open());
         add(musicSettingsBtn, musicDialog);
 
-
         loadAllProducts();
+
+        UI.getCurrent().getPage().executeJs("""
+            if (!document.getElementById('easterEggDragArea')) {
+                const dragArea = document.createElement('div');
+                dragArea.id = 'easterEggDragArea';
+                dragArea.style.position = 'fixed';
+                dragArea.style.bottom = '20px';
+                dragArea.style.right = '20px';
+                dragArea.style.width = '60px';
+                dragArea.style.height = '60px';
+                dragArea.style.background = 'transparent';
+                dragArea.style.zIndex = '1000';
+                dragArea.style.cursor = 'grab';
+
+                const button = document.createElement('button');
+                button.textContent = '';
+                button.style.display = 'none';
+                button.style.width = '100%';
+                button.style.height = '100%';
+                button.style.position = 'absolute';
+                button.style.top = '0';
+                button.style.left = '0';
+                button.style.backgroundImage = "url('images/esterEgg.png')";
+                button.style.backgroundSize = 'cover';
+                button.style.backgroundColor = 'transparent';
+                button.style.border = 'none';
+                button.style.borderRadius = '50%';
+                button.style.cursor = 'pointer';
+
+                button.addEventListener('click', () => {
+                    window.location.href = '/gif-view';
+                });
+
+                dragArea.appendChild(button);
+                document.body.appendChild(dragArea);
+
+                let isDragging = false;
+                let offsetX = 0;
+                let offsetY = 0;
+                let moved = false;
+
+                dragArea.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    offsetX = e.clientX - dragArea.getBoundingClientRect().left;
+                    offsetY = e.clientY - dragArea.getBoundingClientRect().top;
+                    dragArea.style.cursor = 'grabbing';
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) {
+                        dragArea.style.left = (e.clientX - offsetX) + 'px';
+                        dragArea.style.top = (e.clientY - offsetY) + 'px';
+                        dragArea.style.right = 'auto';
+                        dragArea.style.bottom = 'auto';
+                        moved = true;
+                    }
+                });
+
+                document.addEventListener('mouseup', function() {
+                    if (isDragging && moved) {
+                        button.style.display = 'block';
+                    }
+                    isDragging = false;
+                    moved = false;
+                    dragArea.style.cursor = 'grab';
+                });
+            }
+        """);
 
         setupNavigation();
     
