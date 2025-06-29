@@ -367,6 +367,8 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
 
         // Music Settings Dialog
         Button musicSettingsBtn = new Button("🎵 Music Settings");
+        musicSettingsBtn.getStyle().set("color", "white");
+
 
         Dialog musicDialog = new Dialog();
         musicDialog.setHeaderTitle("Music Settings");
