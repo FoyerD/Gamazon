@@ -908,6 +908,7 @@ public class ManagerView extends BaseView implements BeforeEnterObserver {
         if (sessionToken == null) {
             Notification.show("Access denied. Please log in.", 4000, Notification.Position.MIDDLE);
             event.forwardTo("");
+            return;
         }
         if (currentStoreId == null) {
             Notification.show("Please select a store first", 3000, Notification.Position.MIDDLE);
