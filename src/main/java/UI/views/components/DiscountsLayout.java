@@ -272,8 +272,8 @@ public class DiscountsLayout extends VerticalLayout {
         addDiscountDialog = new Dialog();
         addDiscountDialog.setHeaderTitle("Add New Simple Discount");
 
-        // Create form fields
-        TextField idField = new TextField("Discount ID");
+        // // Create form fields
+        // TextField idField = new TextField("Discount ID");
         
         NumberField percentageField = new NumberField("Discount Percentage");
         percentageField.setMin(0);
@@ -327,10 +327,10 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Create buttons
         Button saveButton = new Button("Save", e -> {
-            if (idField.isEmpty()) {
-                Notification.show("Discount ID is required");
-                return;
-            }
+            // if (idField.isEmpty()) {
+            //     Notification.show("Discount ID is required");
+            //     return;
+            // }
             if (qualifierTypeComboBox.isEmpty()) {
                 Notification.show("Qualifier Type is required");
                 return;
@@ -367,11 +367,11 @@ public class DiscountsLayout extends VerticalLayout {
             }
             
             // Build DiscountDTO
-            String id = idField.getValue();
+            // String id = idField.getValue();
             Float precentage = percentageField.getValue().floatValue() / 100;
             ConditionDTO condition = conditionComboBox.getValue();
             QualifierType qualifierType = qualifierTypeComboBox.getValue();
-            DiscountDTO newDiscount = new DiscountDTO(id, storeId, DiscountType.SIMPLE, condition);
+            DiscountDTO newDiscount = new DiscountDTO(storeId, DiscountType.SIMPLE, condition);
             newDiscount.setDiscountPercentage(precentage);
             newDiscount.setQualifierType(qualifierType);
             newDiscount.setQualifierValue(qualifierValue);
@@ -381,11 +381,11 @@ public class DiscountsLayout extends VerticalLayout {
             discounts.add(newDiscount);
             Notification.show("Discount added successfully");
             addDiscountDialog.close();
-            clearDiscountFields(idField, percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
+            clearDiscountFields(percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
         });
 
         Button cancelButton = new Button("Cancel", e -> {
-            clearDiscountFields(idField, percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
+            clearDiscountFields(percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
             addDiscountDialog.close();
         });
 
@@ -394,7 +394,7 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Layout for the dialog
         VerticalLayout dialogLayout = new VerticalLayout(
-            idField,
+            // idField,
             percentageField,
             qualifierTypeComboBox,
             productComboBox,
@@ -575,14 +575,14 @@ public class DiscountsLayout extends VerticalLayout {
     }
 
     private void clearDiscountFields(
-        TextField idField,
+        // TextField idField,
         NumberField percentageField,
         ComboBox<QualifierType> qualifierTypeComboBox,
         ComboBox<ItemDTO> productComboBox,
         ComboBox<CategoryDTO> categoryComboBox,
         ComboBox<ConditionDTO> conditionComboBox
     ) {
-        idField.clear();
+        // idField.clear();
         percentageField.setValue(0.0);
         qualifierTypeComboBox.clear();
         productComboBox.clear();

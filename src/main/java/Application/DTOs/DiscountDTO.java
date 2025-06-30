@@ -57,6 +57,13 @@ public class DiscountDTO {
         this.description = description;
     }
 
+    public DiscountDTO(String storeId, DiscountType type, ConditionDTO condition) {
+        this.storeId = storeId;
+        this.type = type;
+        this.condition = condition;
+        this.description = "Default Discount Description";
+    }
+
     public DiscountDTO(String id, String storeId, DiscountType type, ConditionDTO condition) {
         this.id = id;
         this.storeId = storeId;
