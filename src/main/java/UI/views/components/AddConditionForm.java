@@ -133,6 +133,7 @@ public class AddConditionForm extends VerticalLayout {
                     return null;
                 }
                 newCondition.setProductId(productComboBox.getValue().getProductId());
+                newCondition.setProduct(productComboBox.getValue());
                 newCondition.setMinQuantity(minQuantityField.getValue().intValue());
                 break;
             case MAX_QUANTITY:
@@ -141,6 +142,7 @@ public class AddConditionForm extends VerticalLayout {
                     return null;
                 }
                 newCondition.setProductId(productComboBox.getValue().getProductId());
+                newCondition.setProduct(productComboBox.getValue());
                 newCondition.setMaxQuantity(maxQuantityField.getValue().intValue());
                 break;
             case TRUE: 

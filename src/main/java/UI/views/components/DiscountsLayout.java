@@ -417,13 +417,16 @@ public class DiscountsLayout extends VerticalLayout {
     private void setupComposeDiscountDialog() {
         composeDiscountDialog = new Dialog();
         composeDiscountDialog.setHeaderTitle("Compose New Discount");
+        composeDiscountDialog.setWidth("1200px");
 
         // Create form fields
         // TextField idField = new TextField("Discount ID");
         TextField descriptionField = new TextField("Description");
         descriptionField.setPlaceholder("Enter a description for this discount");
+        descriptionField.setWidth("300px");
         
         ComboBox<DiscountDTO.DiscountType> typeComboBox = new ComboBox<>("Discount Type");
+
         typeComboBox.setItems(Arrays.asList(
             DiscountDTO.DiscountType.AND,
             DiscountDTO.DiscountType.OR,
@@ -439,6 +442,8 @@ public class DiscountsLayout extends VerticalLayout {
         subDiscountsGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         // subDiscountsGrid.addColumn(DiscountDTO::getId).setHeader("ID");
         subDiscountsGrid.addColumn(d -> d.getType().toString()).setHeader("Type");
+        subDiscountsGrid.addColumn(DiscountDTO::getDescription).setHeader("Description");
+        subDiscountsGrid.addColumn(d -> d.getCondition().conditionRepr()).setHeader("Condition");
         subDiscountsGrid.addColumn(d -> String.format("%.0f%%", d.getDiscountPercentage() * 100))
             .setHeader("Discount");
         subDiscountsGrid.setHeight("200px");
