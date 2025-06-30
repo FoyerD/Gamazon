@@ -2,13 +2,11 @@ package UI.views.components;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Condition;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.Arrays;
 import java.util.Set;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -18,21 +16,20 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 
 import Application.DTOs.CategoryDTO;
 import Application.DTOs.ConditionDTO;
 import Application.DTOs.DiscountDTO;
 import Application.DTOs.ItemDTO;
-import Domain.Store.Discounts.Discount;
 import Application.DTOs.ConditionDTO.ConditionType;
 import Application.DTOs.DiscountDTO.DiscountType;
 import Application.DTOs.DiscountDTO.QualifierType;
 
+import Domain.Store.Discounts.Discount;
 public class DiscountsLayout extends VerticalLayout {
     private String storeId;
     private final Supplier<List<DiscountDTO>> discountsSupplier;
@@ -43,11 +40,14 @@ public class DiscountsLayout extends VerticalLayout {
     private Supplier<List<CategoryDTO>> categorySupplier;
 
     private List<DiscountDTO> discounts;
+    private ListDataProvider<DiscountDTO> tempDiscountDataProvider;
+
     private List<ConditionDTO> conditions;
     private Dialog addConditionDialog;
     private Dialog addDiscountDialog;
     private Dialog composeDiscountDialog;
     private Grid<DiscountDTO> discountGrid;
+    private Grid<DiscountDTO> tempDiscountGrid;
 
     public DiscountsLayout(
         String storeId,
@@ -72,29 +72,27 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Create header
         H3 title = new H3("Store Discounts");
-        title.getStyle().set("color", "#ffffff");
+        title.getStyle().set("color", "rgb(255, 255, 255)");
 
-        setupAddConditionDialog();
+        //setupAddConditionDialog();
         setupAddDiscountDialog();
         setupComposeDiscountDialog();
         setupDiscountGrid();
         
         // Add buttons
-        Button addConditionButton = new Button("Add Condition", VaadinIcon.PLUS.create());
+        // Button addConditionButton = new Button("Add Condition", VaadinIcon.PLUS.create());
         Button addDiscountButton = new Button("Add Discount", VaadinIcon.PLUS.create());
         Button composeDiscountButton = new Button("Compose Discount", VaadinIcon.PLUS.create());
         
-        styleButton(addConditionButton, "#4caf50");
-        styleButton(addDiscountButton, "#2196f3");
-        styleButton(composeDiscountButton, "#ff9800");
+        styleButton(addDiscountButton, " #2196f3");
+        styleButton(composeDiscountButton, " #ff9800");
         
-        addConditionButton.addClickListener(e -> addConditionDialog.open());
+
         addDiscountButton.addClickListener(e -> addDiscountDialog.open());
         composeDiscountButton.addClickListener(e -> composeDiscountDialog.open());
         
         // Create buttons layout
         HorizontalLayout buttonsLayout = new HorizontalLayout(
-            addConditionButton,
             addDiscountButton,
             composeDiscountButton
         );
@@ -119,6 +117,16 @@ public class DiscountsLayout extends VerticalLayout {
         topBar.setAlignItems(Alignment.END);
         topBar.setPadding(false);
         
+
+        // for debugging purposes, right now isn't shown
+        tempDiscountGrid = new Grid<>();
+        tempDiscountGrid.addColumn(d -> d.getType().toString()).setHeader("Type");
+        tempDiscountGrid.addColumn(d -> d.getDiscountPercentage() * 100 + "%").setHeader("Discount");
+
+        tempDiscountDataProvider = new ListDataProvider<>(discounts);
+        tempDiscountGrid.setDataProvider(tempDiscountDataProvider);
+
+
         add(topBar, discountGrid);
         
         // Set alignment and spacing
@@ -135,7 +143,7 @@ public class DiscountsLayout extends VerticalLayout {
         addConditionDialog.setHeaderTitle("Add New Condition");
 
         // Create form fields
-        TextField idField = new TextField("Condition ID");
+        // TextField idField = new TextField("Condition ID");
         ComboBox<ConditionType> typeComboBox = new ComboBox<>("Condition Type");
         typeComboBox.setItems(ConditionType.values());
 
@@ -189,17 +197,17 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Create buttons
         Button saveButton = new Button("Save", e -> {
-            if (idField.isEmpty()) {
-                Notification.show("Condition ID is required");
-                return;
-            }
+            // if (idField.isEmpty()) {
+            //     Notification.show("Condition ID is required");
+            //     return;
+            // }
             if (typeComboBox.isEmpty()) {
                 Notification.show("Condition Type is required");
                 return;
             }
 
             ConditionDTO newCondition = new ConditionDTO();
-            newCondition.setId(idField.getValue());
+            // newCondition.setId(idField.getValue());
             newCondition.setType(typeComboBox.getValue());
 
             switch (typeComboBox.getValue()) {
@@ -238,11 +246,11 @@ public class DiscountsLayout extends VerticalLayout {
             conditions.add(newCondition);
             Notification.show("Condition added successfully");
             addConditionDialog.close();
-            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
+            clearFields(typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
         });
 
         Button cancelButton = new Button("Cancel", e -> {
-            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
+            clearFields(typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
             addConditionDialog.close();
         });
 
@@ -251,7 +259,7 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Layout for the dialog
         VerticalLayout dialogLayout = new VerticalLayout(
-            idField,
+            // idField,
             typeComboBox,
             minPriceField,
             maxPriceField,
@@ -267,13 +275,17 @@ public class DiscountsLayout extends VerticalLayout {
         addConditionDialog.add(dialogLayout);
     }
 
+
+
     private void setupAddDiscountDialog() {
         addDiscountDialog = new Dialog();
         addDiscountDialog.setHeaderTitle("Add New Simple Discount");
 
-        // Create form fields
-        TextField idField = new TextField("Discount ID");
+        // // Create form fields
+        // TextField idField = new TextField("Discount ID");
         
+        AddConditionForm conditionForm = new AddConditionForm(itemSupplier, categorySupplier);
+
         NumberField percentageField = new NumberField("Discount Percentage");
         percentageField.setMin(0);
         percentageField.setMax(100);
@@ -291,10 +303,7 @@ public class DiscountsLayout extends VerticalLayout {
         ComboBox<CategoryDTO> categoryComboBox = new ComboBox<>("Category");
         categoryComboBox.setItemLabelGenerator(CategoryDTO::getName);
         categoryComboBox.setVisible(false);
-        
-        ComboBox<ConditionDTO> conditionComboBox = new ComboBox<>("Condition");
-        conditionComboBox.setItemLabelGenerator(condition -> 
-            condition.getType().toString() + " (ID: " + condition.getId() + ")");
+    
         
         // Add dialog open listener to populate ComboBoxes
         addDiscountDialog.addOpenedChangeListener(event -> {
@@ -307,10 +316,6 @@ public class DiscountsLayout extends VerticalLayout {
                 List<CategoryDTO> categories = categorySupplier.get();
                 if (categories != null) {
                     categoryComboBox.setItems(categories);
-                }
-                
-                if (!conditions.isEmpty()) {
-                    conditionComboBox.setItems(conditions);
                 }
             }
         });
@@ -326,10 +331,10 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Create buttons
         Button saveButton = new Button("Save", e -> {
-            if (idField.isEmpty()) {
-                Notification.show("Discount ID is required");
-                return;
-            }
+            // if (idField.isEmpty()) {
+            //     Notification.show("Discount ID is required");
+            //     return;
+            // }
             if (qualifierTypeComboBox.isEmpty()) {
                 Notification.show("Qualifier Type is required");
                 return;
@@ -338,9 +343,8 @@ public class DiscountsLayout extends VerticalLayout {
                 Notification.show("Discount Percentage is required");
                 return;
             }
-
-            if (conditionComboBox.isEmpty()) {
-                Notification.show("Condition is required");
+            ConditionDTO condition = conditionForm.getCondition();
+            if (condition == null) {
                 return;
             }
             
@@ -366,11 +370,10 @@ public class DiscountsLayout extends VerticalLayout {
             }
             
             // Build DiscountDTO
-            String id = idField.getValue();
+            // String id = idField.getValue();
             Float precentage = percentageField.getValue().floatValue() / 100;
-            ConditionDTO condition = conditionComboBox.getValue();
             QualifierType qualifierType = qualifierTypeComboBox.getValue();
-            DiscountDTO newDiscount = new DiscountDTO(id, storeId, DiscountType.SIMPLE, condition);
+            DiscountDTO newDiscount = new DiscountDTO(storeId, DiscountType.SIMPLE, condition);
             newDiscount.setDiscountPercentage(precentage);
             newDiscount.setQualifierType(qualifierType);
             newDiscount.setQualifierValue(qualifierValue);
@@ -378,27 +381,31 @@ public class DiscountsLayout extends VerticalLayout {
             newDiscount.setSubDiscounts(new ArrayList<>());
 
             discounts.add(newDiscount);
+            tempDiscountDataProvider.refreshAll();
             Notification.show("Discount added successfully");
             addDiscountDialog.close();
-            clearDiscountFields(idField, percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
+            
+            conditionForm.clearFields();
+            clearDiscountFields(percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox);
         });
 
         Button cancelButton = new Button("Cancel", e -> {
-            clearDiscountFields(idField, percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox, conditionComboBox);
+            conditionForm.clearFields();
+            clearDiscountFields(percentageField, qualifierTypeComboBox, productComboBox, categoryComboBox);
             addDiscountDialog.close();
         });
 
         styleButton(saveButton, "var(--lumo-primary-color)");
-        styleButton(cancelButton, "#9e9e9e");
+        styleButton(cancelButton, " #9e9e9e");
 
         // Layout for the dialog
         VerticalLayout dialogLayout = new VerticalLayout(
-            idField,
+            // idField,
+            conditionForm,
             percentageField,
             qualifierTypeComboBox,
             productComboBox,
             categoryComboBox,
-            conditionComboBox,
             new HorizontalLayout(saveButton, cancelButton)
         );
         dialogLayout.setSpacing(true);
@@ -410,13 +417,16 @@ public class DiscountsLayout extends VerticalLayout {
     private void setupComposeDiscountDialog() {
         composeDiscountDialog = new Dialog();
         composeDiscountDialog.setHeaderTitle("Compose New Discount");
+        composeDiscountDialog.setWidth("1200px");
 
         // Create form fields
-        TextField idField = new TextField("Discount ID");
+        // TextField idField = new TextField("Discount ID");
         TextField descriptionField = new TextField("Description");
         descriptionField.setPlaceholder("Enter a description for this discount");
+        descriptionField.setWidth("300px");
         
         ComboBox<DiscountDTO.DiscountType> typeComboBox = new ComboBox<>("Discount Type");
+
         typeComboBox.setItems(Arrays.asList(
             DiscountDTO.DiscountType.AND,
             DiscountDTO.DiscountType.OR,
@@ -425,16 +435,15 @@ public class DiscountsLayout extends VerticalLayout {
         
         ComboBox<Discount.MergeType> mergeTypeComboBox = new ComboBox<>("Merge Type");
         mergeTypeComboBox.setItems(Discount.MergeType.values());
-        
-        ComboBox<ConditionDTO> conditionComboBox = new ComboBox<>("Condition");
-        conditionComboBox.setItemLabelGenerator(condition -> 
-            condition.getType().toString() + " (ID: " + condition.getId() + ")");
+    
         
         // Multi-select combo box for sub-discounts
         Grid<DiscountDTO> subDiscountsGrid = new Grid<>();
         subDiscountsGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-        subDiscountsGrid.addColumn(DiscountDTO::getId).setHeader("ID");
+        // subDiscountsGrid.addColumn(DiscountDTO::getId).setHeader("ID");
         subDiscountsGrid.addColumn(d -> d.getType().toString()).setHeader("Type");
+        subDiscountsGrid.addColumn(DiscountDTO::getDescription).setHeader("Description");
+        subDiscountsGrid.addColumn(d -> d.getCondition().conditionRepr()).setHeader("Condition");
         subDiscountsGrid.addColumn(d -> String.format("%.0f%%", d.getDiscountPercentage() * 100))
             .setHeader("Discount");
         subDiscountsGrid.setHeight("200px");
@@ -442,21 +451,16 @@ public class DiscountsLayout extends VerticalLayout {
         // Add dialog open listener to populate fields
         composeDiscountDialog.addOpenedChangeListener(event -> {
             if (event.isOpened()) {
-                if (!conditions.isEmpty()) {
-                    conditionComboBox.setItems(conditions);
-                }
-                
                 subDiscountsGrid.setItems(discounts);
-                
             }
         });
 
         // Create buttons
         Button saveButton = new Button("Save", e -> {
-            if (idField.isEmpty()) {
-                Notification.show("Discount ID is required");
-                return;
-            }
+            // if (idField.isEmpty()) {
+            //     Notification.show("Discount ID is required");
+            //     return;
+            // }
             if (typeComboBox.isEmpty()) {
                 Notification.show("Discount Type is required");
                 return;
@@ -465,10 +469,10 @@ public class DiscountsLayout extends VerticalLayout {
                 Notification.show("Merge Type is required");
                 return;
             }
-            if (conditionComboBox.isEmpty()) {
-                Notification.show("Condition is required");
-                return;
-            }
+            // if (conditionComboBox.isEmpty()) {
+            //     Notification.show("Condition is required");
+            //     return;
+            // }
     
             Set<DiscountDTO> selectedDiscounts = subDiscountsGrid.getSelectedItems();
             if (selectedDiscounts.isEmpty()) {
@@ -477,21 +481,19 @@ public class DiscountsLayout extends VerticalLayout {
             }
 
             DiscountDTO newDiscount = new DiscountDTO();
-            newDiscount.setId(idField.getValue());
+            // newDiscount.setId(idField.getValue());
             newDiscount.setType(typeComboBox.getValue());
             newDiscount.setStoreId(storeId);
             newDiscount.setMergeType(mergeTypeComboBox.getValue());
             newDiscount.setDescription(descriptionField.isEmpty() ? "Default Composite Discount Description" : descriptionField.getValue());
             
-            if (!conditionComboBox.isEmpty()) {
-                newDiscount.setCondition(conditionComboBox.getValue());
-            }
-            
+            newDiscount.setCondition(new ConditionDTO(ConditionType.TRUE)); // Default condition for composite discounts
+
             newDiscount.setSubDiscounts(new ArrayList<>(selectedDiscounts));
             
             for (DiscountDTO discount : newDiscount.getSubDiscounts()) {
                 for (DiscountDTO existingDiscount : discounts) {
-                    if (existingDiscount.getId().equals(discount.getId())) {
+                    if (existingDiscount.equals(discount)) {
                         discounts.remove(existingDiscount);
                     }
                 }
@@ -500,11 +502,11 @@ public class DiscountsLayout extends VerticalLayout {
             discounts.add(newDiscount);
             Notification.show("Composite discount added successfully");
             composeDiscountDialog.close();
-            clearComposeDiscountFields(idField, typeComboBox, mergeTypeComboBox, conditionComboBox, subDiscountsGrid, descriptionField);
+            clearComposeDiscountFields(typeComboBox, mergeTypeComboBox, subDiscountsGrid, descriptionField);
         });
 
         Button cancelButton = new Button("Cancel", e -> {
-            clearComposeDiscountFields(idField, typeComboBox, mergeTypeComboBox, conditionComboBox, subDiscountsGrid, descriptionField);
+            clearComposeDiscountFields(typeComboBox, mergeTypeComboBox, subDiscountsGrid, descriptionField);
             composeDiscountDialog.close();
         });
 
@@ -513,11 +515,11 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Layout for the dialog
         VerticalLayout dialogLayout = new VerticalLayout(
-            idField,
+            // idField,
             descriptionField,
             typeComboBox,
             mergeTypeComboBox,
-            conditionComboBox,
+            // conditionComboBox,
             new H3("Select Sub-Discounts"),
             subDiscountsGrid,
             new HorizontalLayout(saveButton, cancelButton)
@@ -559,11 +561,11 @@ public class DiscountsLayout extends VerticalLayout {
         }
     }
 
-    private void clearFields(TextField idField, ComboBox<ConditionType> typeComboBox,
+    private void clearFields(ComboBox<ConditionType> typeComboBox,
                            NumberField minPriceField, NumberField maxPriceField,
                            ComboBox<ItemDTO> productComboBox, ComboBox<CategoryDTO> categoryComboBox,
                            NumberField minQuantityField, NumberField maxQuantityField) {
-        idField.clear();
+        //idField.clear();
         typeComboBox.clear();
         minPriceField.clear();
         maxPriceField.clear();
@@ -574,33 +576,33 @@ public class DiscountsLayout extends VerticalLayout {
     }
 
     private void clearDiscountFields(
-        TextField idField,
+        // TextField idField,
         NumberField percentageField,
         ComboBox<QualifierType> qualifierTypeComboBox,
         ComboBox<ItemDTO> productComboBox,
-        ComboBox<CategoryDTO> categoryComboBox,
-        ComboBox<ConditionDTO> conditionComboBox
+        ComboBox<CategoryDTO> categoryComboBox
+        // ComboBox<ConditionDTO> conditionComboBox
     ) {
-        idField.clear();
+        // idField.clear();
         percentageField.setValue(0.0);
         qualifierTypeComboBox.clear();
         productComboBox.clear();
         categoryComboBox.clear();
-        conditionComboBox.clear();
+        // conditionComboBox.clear();
     }
 
     private void clearComposeDiscountFields(
-        TextField idField,
+        // TextField idField,
         ComboBox<DiscountDTO.DiscountType> typeComboBox,
         ComboBox<Discount.MergeType> mergeTypeComboBox,
-        ComboBox<ConditionDTO> conditionComboBox,
+        // ComboBox<ConditionDTO> conditionComboBox,
         Grid<DiscountDTO> subDiscountsGrid,
         TextField descriptionField
     ) {
-        idField.clear();
+        // idField.clear();
         typeComboBox.clear();
         mergeTypeComboBox.clear();
-        conditionComboBox.clear();
+        // conditionComboBox.clear();
         subDiscountsGrid.deselectAll();
         descriptionField.clear();
     }
@@ -616,6 +618,7 @@ public class DiscountsLayout extends VerticalLayout {
             onAddDiscount.accept(discount);
         }
         discounts.clear();
+        tempDiscountDataProvider.refreshAll();
         refreshDiscounts();
     }
 

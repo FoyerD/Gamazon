@@ -57,6 +57,14 @@ public class DiscountDTO {
         this.description = description;
     }
 
+    public DiscountDTO(String storeId, DiscountType type, ConditionDTO condition) {
+        this.id = "";
+        this.storeId = storeId;
+        this.type = type;
+        this.condition = condition;
+        this.description = "Default Discount Description";
+    }
+
     public DiscountDTO(String id, String storeId, DiscountType type, ConditionDTO condition) {
         this.id = id;
         this.storeId = storeId;
@@ -253,14 +261,14 @@ public class DiscountDTO {
         return sb.toString();
     }
     
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+    // @Override
+    // public boolean equals(Object obj) {
+    //     if (this == obj) return true;
+    //     if (obj == null || getClass() != obj.getClass()) return false;
         
-        DiscountDTO that = (DiscountDTO) obj;
-        return id != null && id.equals(that.id);
-    }
+    //     DiscountDTO that = (DiscountDTO) obj;
+    //     return id != null && id.equals(that.id);
+    // }
     
     @Override
     public int hashCode() {
