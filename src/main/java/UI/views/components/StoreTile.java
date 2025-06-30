@@ -25,6 +25,8 @@ public class StoreTile extends Div {
     private final VerticalLayout content = new VerticalLayout();
 
     private boolean isExpanded = false;
+    private boolean isGuest = true;
+    private boolean isManager = false;
 
 
     public StoreTile(StoreDTO store,
@@ -33,11 +35,14 @@ public class StoreTile extends Div {
                      Consumer<ItemDTO> onAddToCart,
                      Consumer<ItemDTO> onReview,
                      Consumer<ItemDTO> onOffer,
-                     Consumer<StoreDTO> onManager) {
+                     Consumer<StoreDTO> onManager,
+                     boolean isGuest,
+                     boolean isManager) {
 
         this.store = store;
         this.onClick = onClick;
-
+        this.isGuest = isGuest;  
+        this.isManager = isManager;                          
         // Initial appearance
         getStyle()
             .set("width", "280px")
@@ -159,7 +164,8 @@ public class StoreTile extends Div {
             // Manager button
             Button managerBtn = new Button("Manager Actions", VaadinIcon.USER_STAR.create(), e -> onManager.accept(store));
             managerBtn.getStyle().set("background-color", "#4a9eff").set("color", "white");
-            content.add(managerBtn);
+            if (isManager) content.add(managerBtn);
+
 
             // Create FlexLayout for items
             FlexLayout itemTileLayout = new FlexLayout();
@@ -174,7 +180,7 @@ public class StoreTile extends Div {
             List<ItemDTO> items = itemFetcher.apply(store);
             if (items != null) {
                 items.forEach(item -> {
-                    StoreItemPreview preview = new StoreItemPreview(item, onAddToCart, onReview, onOffer);
+                    StoreItemPreview preview = new StoreItemPreview(item, onAddToCart, onReview, onOffer, isGuest);
                     itemTileLayout.add(preview);
                 });
             }
