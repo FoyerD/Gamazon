@@ -115,7 +115,7 @@ public class StoreTile extends Div {
                 el.style.position = 'relative';
                 el.style.marginTop = '-50px';
                 el.style.transition = 'all 400ms ease-in-out';
-                el.style.zIndex = '9999';
+                el.style.zIndex = '10';
                 el.style.borderRadius = '10px';
 
                 void el.offsetWidth;
