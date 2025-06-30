@@ -72,7 +72,7 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Create header
         H3 title = new H3("Store Discounts");
-        title.getStyle().set("color", "#ffffff");
+        title.getStyle().set("color", "rgb(255, 255, 255)");
 
         setupAddConditionDialog();
         setupAddDiscountDialog();
@@ -84,9 +84,9 @@ public class DiscountsLayout extends VerticalLayout {
         Button addDiscountButton = new Button("Add Discount", VaadinIcon.PLUS.create());
         Button composeDiscountButton = new Button("Compose Discount", VaadinIcon.PLUS.create());
         
-        styleButton(addConditionButton, "#4caf50");
-        styleButton(addDiscountButton, "#2196f3");
-        styleButton(composeDiscountButton, "#ff9800");
+        styleButton(addConditionButton, " #4caf50");
+        styleButton(addDiscountButton, " #2196f3");
+        styleButton(composeDiscountButton, " #ff9800");
         
         addConditionButton.addClickListener(e -> addConditionDialog.open());
         addDiscountButton.addClickListener(e -> addDiscountDialog.open());
@@ -135,7 +135,7 @@ public class DiscountsLayout extends VerticalLayout {
         addConditionDialog.setHeaderTitle("Add New Condition");
 
         // Create form fields
-        TextField idField = new TextField("Condition ID");
+        // TextField idField = new TextField("Condition ID");
         ComboBox<ConditionType> typeComboBox = new ComboBox<>("Condition Type");
         typeComboBox.setItems(ConditionType.values());
 
@@ -189,17 +189,17 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Create buttons
         Button saveButton = new Button("Save", e -> {
-            if (idField.isEmpty()) {
-                Notification.show("Condition ID is required");
-                return;
-            }
+            // if (idField.isEmpty()) {
+            //     Notification.show("Condition ID is required");
+            //     return;
+            // }
             if (typeComboBox.isEmpty()) {
                 Notification.show("Condition Type is required");
                 return;
             }
 
             ConditionDTO newCondition = new ConditionDTO();
-            newCondition.setId(idField.getValue());
+            // newCondition.setId(idField.getValue());
             newCondition.setType(typeComboBox.getValue());
 
             switch (typeComboBox.getValue()) {
@@ -238,11 +238,11 @@ public class DiscountsLayout extends VerticalLayout {
             conditions.add(newCondition);
             Notification.show("Condition added successfully");
             addConditionDialog.close();
-            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
+            clearFields(typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
         });
 
         Button cancelButton = new Button("Cancel", e -> {
-            clearFields(idField, typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
+            clearFields(typeComboBox, minPriceField, maxPriceField, productComboBox, categoryComboBox, minQuantityField, maxQuantityField);
             addConditionDialog.close();
         });
 
@@ -251,7 +251,7 @@ public class DiscountsLayout extends VerticalLayout {
 
         // Layout for the dialog
         VerticalLayout dialogLayout = new VerticalLayout(
-            idField,
+            // idField,
             typeComboBox,
             minPriceField,
             maxPriceField,
@@ -266,6 +266,7 @@ public class DiscountsLayout extends VerticalLayout {
 
         addConditionDialog.add(dialogLayout);
     }
+
 
     private void setupAddDiscountDialog() {
         addDiscountDialog = new Dialog();
@@ -294,7 +295,7 @@ public class DiscountsLayout extends VerticalLayout {
         
         ComboBox<ConditionDTO> conditionComboBox = new ComboBox<>("Condition");
         conditionComboBox.setItemLabelGenerator(condition -> 
-            condition.getType().toString() + " (ID: " + condition.getId() + ")");
+            condition.getType().toString());
         
         // Add dialog open listener to populate ComboBoxes
         addDiscountDialog.addOpenedChangeListener(event -> {
@@ -559,11 +560,11 @@ public class DiscountsLayout extends VerticalLayout {
         }
     }
 
-    private void clearFields(TextField idField, ComboBox<ConditionType> typeComboBox,
+    private void clearFields(ComboBox<ConditionType> typeComboBox,
                            NumberField minPriceField, NumberField maxPriceField,
                            ComboBox<ItemDTO> productComboBox, ComboBox<CategoryDTO> categoryComboBox,
                            NumberField minQuantityField, NumberField maxQuantityField) {
-        idField.clear();
+        //idField.clear();
         typeComboBox.clear();
         minPriceField.clear();
         maxPriceField.clear();

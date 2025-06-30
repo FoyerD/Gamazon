@@ -41,6 +41,11 @@ public class ConditionDTO {
     public ConditionDTO() {}
     
     // Constructor for simple conditions
+    public ConditionDTO(ConditionType type) {
+        id = "";
+        this.type = type;
+    }
+
     public ConditionDTO(String id, ConditionType type) {
         this.id = id;
         this.type = type;

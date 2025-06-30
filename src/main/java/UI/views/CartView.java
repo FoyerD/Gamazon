@@ -27,9 +27,8 @@ import Application.DTOs.ItemDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.ShoppingBasketDTO;
 import Application.DTOs.StoreDTO;
-import Application.MarketService;
 import Application.utils.Response;
-import Domain.management.PermissionManager;
+
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.INotificationPresenter;
