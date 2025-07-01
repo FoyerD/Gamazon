@@ -6,22 +6,30 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import Application.DTOs.UserDTO;
 import Application.TokenService;
 import Application.UserService;
 import Application.utils.Response;
+import Domain.Shopping.IShoppingCartFacade;
 import Domain.User.LoginManager;
 import Infrastructure.MemoryRepositories.MemoryUserRepository;
 
 public class UserServiceTests {
     private UserService userService;
     private String guestToken;
+    private IShoppingCartFacade shoppingCartFacade;
 
     @Before
     public void setUp() {
         // Initialize service and obtain a guest session token
-        userService = new UserService(new LoginManager(new MemoryUserRepository()), new TokenService());
+        // Tom's fault
+        shoppingCartFacade = mock(IShoppingCartFacade.class);
+        when(shoppingCartFacade.clearCart(anyString())).thenReturn(true);
+        userService = new UserService(new LoginManager(new MemoryUserRepository()), new TokenService(), shoppingCartFacade);
         Response<UserDTO> guestResp = userService.guestEntry();
         assertFalse("Guest entry should succeed", guestResp.errorOccurred());
         guestToken = guestResp.getValue().getSessionToken();

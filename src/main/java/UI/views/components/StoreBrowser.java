@@ -76,9 +76,9 @@ public class StoreBrowser extends VerticalLayout {
         .filter(s -> nameFilter.isEmpty() || s.getName().toLowerCase().contains(nameFilter.toLowerCase()))
         .forEach(s -> {
             StoreTile tile = new StoreTile(s, onStoreSelect, itemFetcher, onAddToCart, onReview, onOffer, onManager, isGuest,
-             s.getManagers().contains(user.getId()) || s.getOwners().contains(user.getId()) || s.getFounderId().equals(user.getId()));
+            s.getManagers().contains(user.getId()) || s.getOwners().contains(user.getId()) || s.getFounderId().equals(user.getId()));
             tileContainer.add(tile);
         });
-}
+    }
 
 }

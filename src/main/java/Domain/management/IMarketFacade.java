@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
@@ -89,7 +90,7 @@ public interface IMarketFacade {
      * @param storeFacade Facade for store management
      * @param shoppingCartFacade Facade for shopping cart management
      */
-    void initFacades(IUserRepository userRepository, IShoppingCartFacade shoppingCartFacade, PermissionManager permissionManager);
+    void initFacades(IUserRepository userRepository,IStoreRepository storeRepository, IShoppingCartFacade shoppingCartFacade, PermissionManager permissionManager);
     // Section 4
 
     /**

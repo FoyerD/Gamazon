@@ -14,10 +14,20 @@
     { "action": "appointManager", "session": "admin", "store": "store1", "target": "buyer" },
 
     { "action": "addProduct", "session": "admin", "name": "Laptop", "categories": ["Electronics"], "keywords": ["All tech"], "as": "laptop" },
+    { "action": "addProduct", "session": "admin", "name": "Smartphone", "categories": ["Electronics"], "keywords": ["Mobile", "Tech"], "as": "smartphone" },
+    { "action": "addProduct", "session": "admin", "name": "Headphones", "categories": ["Electronics"], "keywords": ["Audio", "Music"], "as": "headphones" },
+
     { "action": "addProduct", "session": "admin", "name": "Chair", "categories": ["Furniture"], "keywords": ["Comfort"], "as": "chair" },
+    { "action": "addProduct", "session": "admin", "name": "Sofa", "categories": ["Furniture"], "keywords": ["Comfort", "Living Room"], "as": "sofa" },
+    { "action": "addProduct", "session": "admin", "name": "Coffee Table", "categories": ["Furniture"], "keywords": ["Living Room"], "as": "coffeetable" },
 
     { "action": "addItem", "session": "admin", "store": "store1", "product": "laptop", "price": 1000.0, "quantity": 10, "description": "Gaming Laptop" },
+    { "action": "addItem", "session": "admin", "store": "store1", "product": "smartphone", "price": 800.0, "quantity": 25, "description": "Latest Model Smartphone" },
+    { "action": "addItem", "session": "admin", "store": "store1", "product": "headphones", "price": 150.0, "quantity": 50, "description": "Noise Cancelling Headphones" },
+
     { "action": "addItem", "session": "admin", "store": "store2", "product": "chair", "price": 120.0, "quantity": 15, "description": "Ergonomic Chair" },
+    { "action": "addItem", "session": "admin", "store": "store2", "product": "sofa", "price": 750.0, "quantity": 5, "description": "Luxury Sofa" },
+    { "action": "addItem", "session": "admin", "store": "store2", "product": "coffeetable", "price": 90.0, "quantity": 20, "description": "Wooden Coffee Table" },
 
     { "action": "changePermissions", "session": "admin", "store": "store1", "target": "buyer", "permissions": ["HANDLE_INVENTORY", "OVERSEE_OFFERS"] },
 

@@ -32,6 +32,7 @@ public class PermissionManager {
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
         checkPermission(appointerId, storeId, PermissionType.SUPERVISE_MANAGERS);
         getOrCreatePermission(appointerId, appointeeId, storeId, RoleType.STORE_MANAGER);
+        
     }
 
     public void removeStoreOwner(String removerId, String ownerId, String storeId) {
