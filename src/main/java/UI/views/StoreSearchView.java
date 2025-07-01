@@ -30,7 +30,6 @@ import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
-import Domain.User.User;
 import UI.DatabaseRelated.DbHealthStatus;
 import UI.DatabaseRelated.GlobalLogoutManager;
 import UI.presenters.IManagementPresenter;
@@ -39,7 +38,6 @@ import UI.presenters.IProductPresenter;
 import UI.presenters.IPurchasePresenter;
 import UI.presenters.IStorePresenter;
 import UI.presenters.IUserSessionPresenter;
-import UI.presenters.UserSessionPresenter;
 import UI.views.components.ItemLayout;
 import UI.views.components.MakeOfferDialog;
 import UI.views.components.StoreBrowser;
@@ -274,6 +272,7 @@ public class StoreSearchView extends BaseView implements BeforeEnterObserver {
                 Notification.show("Store created successfully!", 
                     3000, Notification.Position.MIDDLE);
                 dialog.close();
+                storeBrowser.refresh();
             }
         });
 

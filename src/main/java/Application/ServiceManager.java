@@ -3,8 +3,8 @@ package Application;
 
 
 import Application.utils.Response;
-import Domain.FacadeManager;
 import Domain.ExternalServices.INotificationService;
+import Domain.FacadeManager;
 
 
 
@@ -103,7 +103,7 @@ public class ServiceManager {
     public UserService getUserService() {
         if (userService == null) {
             userService = new UserService(facadeManager.getLoginManager(),
-                                        getTokenService());
+                                        getTokenService(), facadeManager.getShoppingCartFacade());
         }
         return userService;
     }

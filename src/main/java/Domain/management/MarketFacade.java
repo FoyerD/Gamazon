@@ -15,9 +15,11 @@ import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Receipt;
+import Domain.Store.Store;
 import Domain.User.Member;
 
 
@@ -30,6 +32,7 @@ public class MarketFacade implements IMarketFacade {
     private IUserRepository userRepository;
     private PermissionManager permissionManager;
     private IShoppingCartFacade shoppingCartFacade;
+    private IStoreRepository storeRepository;
 
 
     private static final MarketFacade INSTANCE = new MarketFacade();
@@ -44,23 +47,26 @@ public class MarketFacade implements IMarketFacade {
                         INotificationService notificationService,
                         IUserRepository userRepository,
                         IShoppingCartFacade shoppingCartFacade,
-                        PermissionManager permissionManager) {
+                        PermissionManager permissionManager,
+                        IStoreRepository storeRepository) {
         this.paymentService = paymentService;
         this.supplyService = supplyService;
         this.notificationService = notificationService;
         this.userRepository = userRepository;
         this.shoppingCartFacade = shoppingCartFacade;
         this.permissionManager = permissionManager;
+        this.storeRepository = storeRepository;
     }
 
     //Ask Amit if this is needed
     private MarketFacade() {}
 
     @Override
-    public void initFacades(IUserRepository userRepository, IShoppingCartFacade shoppingCartFacade, PermissionManager permissionManager) {
+    public void initFacades(IUserRepository userRepository, IStoreRepository storeRepository, IShoppingCartFacade shoppingCartFacade, PermissionManager permissionManager) {
         this.userRepository = userRepository;
         this.shoppingCartFacade = shoppingCartFacade;
         this.permissionManager = permissionManager;
+        this.storeRepository = storeRepository;
     }
 
     // For unit testing
@@ -111,10 +117,18 @@ public class MarketFacade implements IMarketFacade {
     public void appointStoreManager(String appointerId, String appointeeId, String storeId) {
         if (userRepository.getMember(appointeeId) == null) {
             throw new IllegalArgumentException("Appointee not found.");
-        } else if (isStoreManager(appointeeId, storeId)) {
+        } else if (storeRepository.get(storeId) == null) {
+            throw new IllegalArgumentException("Store not found: " + storeId);
+        } else if (isStoreOwner(appointeeId, storeId)) {
+            throw new IllegalArgumentException("Appointee is already a store owner.");
+        }
+        else if (isStoreManager(appointeeId, storeId)) {
             throw new IllegalArgumentException("Appointee is already a store manager.");
         }
         permissionManager.appointStoreManager(appointerId, appointeeId, storeId);
+        Store store = storeRepository.get(storeId);
+        store.addManager(appointeeId);
+        storeRepository.update(storeId, store);
     }
 
     @Override
@@ -196,7 +210,7 @@ public class MarketFacade implements IMarketFacade {
             !Boolean.TRUE.equals(paymentCheck.getValue()) ||
             !Boolean.TRUE.equals(supplyCheck.getValue())) {
             //TODO: remove when ready to use VPN :(
-            // throw new IllegalStateException("Handshake failed with external API.");
+            throw new IllegalStateException("Handshake failed with external API.");
         }
 
 
