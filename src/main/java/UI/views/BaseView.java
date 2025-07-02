@@ -156,7 +156,7 @@ public abstract class BaseView extends VerticalLayout {
 
                     const audio = document.createElement('audio');
                     audio.id = 'backgroundMusic';
-                    audio.volume = 0.2;
+                    audio.volume = 0.1;
                     document.body.appendChild(audio);
 
                     function playRandom() {
