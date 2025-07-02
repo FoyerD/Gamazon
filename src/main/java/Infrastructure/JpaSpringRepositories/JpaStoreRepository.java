@@ -1,5 +1,6 @@
 package Infrastructure.JpaSpringRepositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
@@ -49,5 +50,10 @@ public class JpaStoreRepository extends IStoreRepository {
     @Override
     public void deleteAll() {
         jpaStoreRepository.deleteAll();
+    }
+
+    @Override
+    public List<Store> getAllStores() {
+        return jpaStoreRepository.getAllStores();
     }
 }

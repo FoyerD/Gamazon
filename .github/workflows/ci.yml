@@ -2,9 +2,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "develop", "v2", "v1-fixes", "v3" ]
+    branches: [ "develop", "v2", "v1-fixes", "v3", "v4", "main" ]
   pull_request:
-    branches: [ "develop", "v2", "v1-fixes", "v3" ]
+    branches: [ "develop", "v2", "v1-fixes", "v3", "v4", "main" ]
 permissions:
   contents: read
   id-token: write

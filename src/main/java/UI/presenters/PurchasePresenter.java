@@ -12,6 +12,7 @@ import Application.DTOs.OfferDTO;
 import Application.DTOs.PaymentDetailsDTO;
 import Application.DTOs.PolicyDTO;
 import Application.DTOs.ReceiptDTO;
+import Application.DTOs.SupplyDetailsDTO;
 import Application.utils.Response;
 
 @Component
@@ -57,9 +58,9 @@ public class PurchasePresenter implements IPurchasePresenter {
     @Override
     public Response<Boolean> makeBid(String auctionId, String sessionToken, float price,
                                     String cardNumber, Date expiryDate, String cvv,
-                                    long andIncrement, String clientName, String deliveryAddress) {
+                                    long andIncrement, String clientName, String deliveryAddress, String city, String country, String zipCode) {
         return this.shoppingService.makeBid(auctionId, sessionToken, price,
-                cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress);
+                cardNumber, expiryDate, cvv, andIncrement, clientName, deliveryAddress, city, country, zipCode);
     }
 
     @Override
@@ -80,8 +81,8 @@ public class PurchasePresenter implements IPurchasePresenter {
     }
 
     @Override
-    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails) {
-        return this.shoppingService.makeOffer(sessionToken, storeId, productId, newPrice, paymentDetails);
+    public Response<OfferDTO> makeOffer(String sessionToken, String storeId, String productId, double newPrice, PaymentDetailsDTO paymentDetails, SupplyDetailsDTO supplyDetails) {
+        return this.shoppingService.makeOffer(sessionToken, storeId, productId, newPrice, paymentDetails, supplyDetails);
     }
 
     @Override

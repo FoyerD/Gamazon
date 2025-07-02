@@ -22,7 +22,8 @@ public class ItemLayout extends VerticalLayout {
                         Function<StoreDTO, List<ItemDTO>> itemRefresher,
                         Consumer<ItemDTO> onAddToCart, 
                         Consumer<ItemDTO> itemReviewer,
-                        Consumer<ItemDTO> offerMaker) {
+                        Consumer<ItemDTO> offerMaker,
+                        boolean isGuest) {
 
         grid = new Grid<>(ItemDTO.class);
         grid.setColumns("productName", "description", "price", "amount");
@@ -46,13 +47,16 @@ public class ItemLayout extends VerticalLayout {
             return addToCartButton;
         }).setHeader("Cart");
 
-        grid.addComponentColumn(item -> {
+        if(!isGuest)
+        {
+            grid.addComponentColumn(item -> {
             Button makeOfferButton = new Button("make an offer", e -> offerMaker.accept(item));
             makeOfferButton.getStyle()
             .setBackgroundColor("rgb(255, 128, 55)")
             .setColor("white");
             return makeOfferButton;
         }).setHeader("Offer");
+        }
 
         refreshButton = new Button(VaadinIcon.REFRESH.create());
         refreshButton.getStyle()

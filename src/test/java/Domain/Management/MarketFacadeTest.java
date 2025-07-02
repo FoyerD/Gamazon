@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -22,9 +23,11 @@ import Application.utils.Response;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
+import Domain.Repos.IStoreRepository;
 import Domain.Repos.IUserRepository;
 import Domain.Shopping.Receipt;
 import Domain.Shopping.ShoppingCartFacade;
+import Domain.Store.Store;
 import Domain.User.Member;
 import Domain.User.User;
 import Domain.management.MarketFacade;
@@ -41,11 +44,13 @@ public class MarketFacadeTest {
     private IExternalSupplyService supplyService;
     private INotificationService notificationService;
     private PermissionManager permissionManager;
+    private IStoreRepository storeRepository;
 
     @Before
     public void setUp() {
         // Create the mock objects
         userRepository = mock(IUserRepository.class);
+        storeRepository = mock(IStoreRepository.class);
         paymentService = mock(IExternalPaymentService.class);
         supplyService = mock(IExternalSupplyService.class);
         notificationService = mock(INotificationService.class);
@@ -56,11 +61,16 @@ public class MarketFacadeTest {
         Map<String, Map<String, Permission>> permissionsMap = new HashMap<>();
         when(permissionManager.getAllStorePermissions()).thenReturn(permissionsMap);
         
+        Store store = mock(Store.class);
+        when(store.addManager(anyString())).thenReturn(true);
+
+        when(storeRepository.get(anyString())).thenReturn(store);
+        when(storeRepository.update(anyString(), any(Store.class))).thenReturn(store);
         // Get the singleton instance
         marketFacade = MarketFacade.getInstance();
         
         // Initialize with our mocks
-        marketFacade.initFacades(userRepository, shoppingCartFacade, permissionManager);
+        marketFacade.initFacades(userRepository, storeRepository, shoppingCartFacade, permissionManager);
         marketFacade.updatePaymentService(paymentService);
         marketFacade.updateSupplyService(supplyService);
         marketFacade.updateNotificationService(notificationService);

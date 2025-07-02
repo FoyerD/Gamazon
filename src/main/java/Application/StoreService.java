@@ -23,6 +23,7 @@ import Application.utils.Error;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
 import Domain.ExternalServices.IExternalPaymentService;
+import Domain.ExternalServices.IExternalSupplyService;
 import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.Offer;
@@ -34,8 +35,6 @@ import Domain.Store.StoreFacade;
 import Domain.Store.Discounts.Discount;
 import Domain.Store.Discounts.DiscountFacade;
 import Domain.User.LoginManager;
-import Domain.User.Member;
-
 import Domain.management.Permission;
 import Domain.management.PermissionManager;
 import Domain.management.PermissionType;
@@ -57,6 +56,7 @@ public class StoreService {
     private final OfferManager offerManager;
     private final LoginManager loginManager;
     private IExternalPaymentService externalPaymentService;
+    private IExternalSupplyService externalSupplyService;
 
     public StoreService() {
         this.storeFacade = null;
@@ -68,6 +68,7 @@ public class StoreService {
         // this.discountBuilder = null;
         // this.conditionBuilder = null;
         this.externalPaymentService = null;
+        this.externalSupplyService = null;
         this.loginManager = null;
         this.offerManager = null;
         this.itemFacade = null;
@@ -78,9 +79,10 @@ public class StoreService {
                        INotificationService notificationService, IShoppingCartFacade shoppingCartFacade, ItemFacade itemFacade, 
                        OfferManager offerManager, 
                        LoginManager loginManager, DiscountFacade discountFacade,
-                       IExternalPaymentService externalPaymentService) {
+                       IExternalPaymentService externalPaymentService, IExternalSupplyService externalSupplyService) {
 
         this.externalPaymentService = externalPaymentService;
+        this.externalSupplyService = externalSupplyService;
         this.notificationService = notificationService;
         this.storeFacade = storeFacade;
         this.tokenService = tokenService;
@@ -360,7 +362,7 @@ public class StoreService {
             permissionManager.checkPermission(userId, storeId, PermissionType.OVERSEE_OFFERS);
 
             // Accept the bid for the given auction and product
-            Item item = storeFacade.acceptBid(storeId, productId, auctionId, externalPaymentService);
+            Item item = storeFacade.acceptBid(storeId, productId, auctionId, externalPaymentService, externalSupplyService);
             if (item == null) {
                 TradingLogger.logError(CLASS_NAME, method, "Failed to accept bid for auction %s", auctionId);
                 return new Response<>(new Error("Failed to accept bid. It may not exist or the auction is closed."));
@@ -735,5 +737,29 @@ public class StoreService {
             return Response.error(ex.getMessage());
         }
 
+    }
+
+    public Response<List<StoreDTO>> getAllStores(String sessionToken) {
+        String method = "getAllStores";
+        try {
+            if (!this.isInitialized()) {
+                TradingLogger.logError(CLASS_NAME, method, "StoreService is not initialized");
+                return Response.error("StoreService is not initialized.");
+            }
+
+            if (!tokenService.validateToken(sessionToken)) {
+                TradingLogger.logError(CLASS_NAME, method, "Invalid token");
+                return Response.error("Invalid token");
+            }
+
+
+            
+            List<StoreDTO> stores = storeFacade.getAllStores().stream().map(StoreDTO::new).toList();
+
+            return Response.success(stores);
+        } catch (Exception ex) {
+            TradingLogger.logError(CLASS_NAME, method, "Error getting all stores " + ex.getMessage());
+            return Response.error(ex.getMessage());
+        }
     }
 }

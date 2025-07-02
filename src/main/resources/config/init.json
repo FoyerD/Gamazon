@@ -1,5 +1,4 @@
 {
-  "urlExternalServices": [{"URL": "https://damp-lynna-wsep-1984852e.koyeb.app/"}],
   "marketWithTwoStores": [
     { "action": "guestEntry", "as": "guest1" },
     { "action": "guestEntry", "as": "guest2" },
@@ -15,10 +14,20 @@
     { "action": "appointManager", "session": "admin", "store": "store1", "target": "buyer" },
 
     { "action": "addProduct", "session": "admin", "name": "Laptop", "categories": ["Electronics"], "keywords": ["All tech"], "as": "laptop" },
+    { "action": "addProduct", "session": "admin", "name": "Smartphone", "categories": ["Electronics"], "keywords": ["Mobile", "Tech"], "as": "smartphone" },
+    { "action": "addProduct", "session": "admin", "name": "Headphones", "categories": ["Electronics"], "keywords": ["Audio", "Music"], "as": "headphones" },
+
     { "action": "addProduct", "session": "admin", "name": "Chair", "categories": ["Furniture"], "keywords": ["Comfort"], "as": "chair" },
+    { "action": "addProduct", "session": "admin", "name": "Sofa", "categories": ["Furniture"], "keywords": ["Comfort", "Living Room"], "as": "sofa" },
+    { "action": "addProduct", "session": "admin", "name": "Coffee Table", "categories": ["Furniture"], "keywords": ["Living Room"], "as": "coffeetable" },
 
     { "action": "addItem", "session": "admin", "store": "store1", "product": "laptop", "price": 1000.0, "quantity": 10, "description": "Gaming Laptop" },
+    { "action": "addItem", "session": "admin", "store": "store1", "product": "smartphone", "price": 800.0, "quantity": 25, "description": "Latest Model Smartphone" },
+    { "action": "addItem", "session": "admin", "store": "store1", "product": "headphones", "price": 150.0, "quantity": 50, "description": "Noise Cancelling Headphones" },
+
     { "action": "addItem", "session": "admin", "store": "store2", "product": "chair", "price": 120.0, "quantity": 15, "description": "Ergonomic Chair" },
+    { "action": "addItem", "session": "admin", "store": "store2", "product": "sofa", "price": 750.0, "quantity": 5, "description": "Luxury Sofa" },
+    { "action": "addItem", "session": "admin", "store": "store2", "product": "coffeetable", "price": 90.0, "quantity": 20, "description": "Wooden Coffee Table" },
 
     { "action": "changePermissions", "session": "admin", "store": "store1", "target": "buyer", "permissions": ["HANDLE_INVENTORY", "OVERSEE_OFFERS"] },
 
@@ -72,6 +81,125 @@
     { "action": "appointStoreOwner", "session": "u2Logged", "store": "store1", "target": "u5" },
 
     { "action": "logout", "session": "u2Logged" }
+  ],
+  
+  "storeWith30ItemsScenario": [
+    { "action": "guestEntry", "as": "g1" },
+    { "action": "registerUser", "session": "g1", "username": "admin", "password": "Admin123!@", "email": "admin@g.com", "as": "admin" },
+
+    { "action": "guestEntry", "as": "g2" },
+    { "action": "registerUser", "session": "g2", "username": "owner", "password": "Owner123!@", "email": "owner@g.com", "as": "owner" },
+
+    { "action": "guestEntry", "as": "g3" },
+    { "action": "registerUser", "session": "g3", "username": "manager", "password": "Manager123!@", "email": "manager@g.com", "as": "manager" },
+
+    { "action": "guestEntry", "as": "g4" },
+    { "action": "registerUser", "session": "g4", "username": "buyer", "password": "Buyer123!@", "email": "buyer@g.com", "as": "buyer" },
+
+    { "action": "openMarket", "session": "admin" },
+
+    { "action": "addStore", "session": "admin", "name": "UrbanGadget", "category": "Electronics & Accessories", "as": "urbanStore" },
+
+    { "action": "appointStoreOwner", "session": "admin", "store": "urbanStore", "target": "owner" },
+    { "action": "appointStoreManager", "session": "owner", "store": "urbanStore", "target": "manager" },
+    { "action": "changeManagerPermissions", "session": "owner", "store": "urbanStore", "target": "manager", "permissions": ["HANDLE_INVENTORY", "OVERSEE_OFFERS"] },
+
+    { "action": "addProduct", "session": "admin", "name": "Wireless Mouse", "categories": ["Accessories"], "keywords": ["mouse", "wireless"], "as": "p1" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p1", "price": 25.99, "quantity": 20, "description": "Ergonomic wireless mouse with 2.4GHz support" },
+
+    { "action": "addProduct", "session": "admin", "name": "Mechanical Keyboard", "categories": ["Accessories"], "keywords": ["keyboard", "mechanical"], "as": "p2" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p2", "price": 79.99, "quantity": 15, "description": "RGB mechanical keyboard with blue switches" },
+
+    { "action": "addProduct", "session": "admin", "name": "USB-C Hub", "categories": ["Adapters"], "keywords": ["usb-c", "hub"], "as": "p3" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p3", "price": 34.99, "quantity": 25, "description": "5-in-1 USB-C hub with HDMI, SD reader" },
+
+    { "action": "addProduct", "session": "admin", "name": "Bluetooth Speaker", "categories": ["Audio"], "keywords": ["speaker", "bluetooth"], "as": "p4" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p4", "price": 49.99, "quantity": 10, "description": "Portable Bluetooth speaker with 12h battery life" },
+
+    { "action": "addProduct", "session": "admin", "name": "Noise-Cancelling Headphones", "categories": ["Audio"], "keywords": ["headphones", "noise-cancelling"], "as": "p5" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p5", "price": 129.99, "quantity": 8, "description": "Over-ear noise-cancelling headphones with mic" },
+
+    { "action": "addProduct", "session": "admin", "name": "Smartphone Stand", "categories": ["Accessories"], "keywords": ["phone", "stand"], "as": "p6" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p6", "price": 15.99, "quantity": 30, "description": "Adjustable aluminum smartphone stand" },
+
+    { "action": "addProduct", "session": "admin", "name": "Webcam 1080p", "categories": ["Video"], "keywords": ["webcam", "hd"], "as": "p7" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p7", "price": 39.99, "quantity": 12, "description": "Full HD 1080p USB webcam with microphone" },
+
+    { "action": "addProduct", "session": "admin", "name": "Portable SSD 1TB", "categories": ["Storage"], "keywords": ["ssd", "portable"], "as": "p8" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p8", "price": 109.99, "quantity": 5, "description": "Ultra-fast portable SSD with USB-C support" },
+
+    { "action": "addProduct", "session": "admin", "name": "Laptop Cooling Pad", "categories": ["Accessories"], "keywords": ["cooling", "laptop"], "as": "p9" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p9", "price": 29.99, "quantity": 18, "description": "Cooling pad with dual fans and LED lights" },
+
+    { "action": "addProduct", "session": "admin", "name": "Wireless Charger", "categories": ["Power"], "keywords": ["charger", "wireless"], "as": "p10" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p10", "price": 19.99, "quantity": 22, "description": "10W fast wireless charger pad" },
+
+    { "action": "addProduct", "session": "admin", "name": "Action Camera", "categories": ["Video"], "keywords": ["camera", "action"], "as": "p11" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p11", "price": 89.99, "quantity": 7, "description": "Waterproof 4K action camera with accessories" },
+
+    { "action": "addProduct", "session": "admin", "name": "Fitness Tracker", "categories": ["Wearables"], "keywords": ["fitness", "tracker"], "as": "p12" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p12", "price": 45.00, "quantity": 14, "description": "Smart fitness band with heart rate and sleep monitor" },
+
+    { "action": "addProduct", "session": "admin", "name": "Smart Light Bulb", "categories": ["Smart Home"], "keywords": ["bulb", "smart"], "as": "p13" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p13", "price": 12.99, "quantity": 40, "description": "Color-changing smart LED bulb with app control" },
+
+    { "action": "addProduct", "session": "admin", "name": "Streaming Microphone", "categories": ["Audio"], "keywords": ["microphone", "streaming"], "as": "p14" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p14", "price": 59.99, "quantity": 6, "description": "USB condenser mic for streaming and podcasts" },
+
+    { "action": "addProduct", "session": "admin", "name": "Gaming Controller", "categories": ["Gaming"], "keywords": ["controller", "gaming"], "as": "p15" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p15", "price": 49.99, "quantity": 10, "description": "Wireless game controller compatible with PC/Console" },
+
+    { "action": "addProduct", "session": "admin", "name": "VR Headset", "categories": ["Gaming"], "keywords": ["vr", "headset"], "as": "p16" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p16", "price": 299.99, "quantity": 3, "description": "Virtual reality headset with motion tracking" },
+
+    { "action": "addProduct", "session": "admin", "name": "Smartwatch", "categories": ["Wearables"], "keywords": ["watch", "smart"], "as": "p17" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p17", "price": 199.99, "quantity": 9, "description": "Smartwatch with call, GPS and fitness tracking" },
+
+    { "action": "addProduct", "session": "admin", "name": "Power Bank 20000mAh", "categories": ["Power"], "keywords": ["power bank", "portable"], "as": "p18" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p18", "price": 39.99, "quantity": 16, "description": "Fast-charging high-capacity portable power bank" },
+
+    { "action": "addProduct", "session": "admin", "name": "Laptop Stand", "categories": ["Accessories"], "keywords": ["stand", "laptop"], "as": "p19" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p19", "price": 24.99, "quantity": 18, "description": "Foldable and adjustable laptop stand" },
+
+    { "action": "addProduct", "session": "admin", "name": "Cable Organizer", "categories": ["Accessories"], "keywords": ["cable", "organizer"], "as": "p20" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p20", "price": 9.99, "quantity": 35, "description": "Desk cable organizer with 5 slots" },
+
+    { "action": "addProduct", "session": "admin", "name": "LED Strip Lights", "categories": ["Lighting"], "keywords": ["led", "strip"], "as": "p21" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p21", "price": 22.99, "quantity": 25, "description": "RGB LED strip lights with remote and music sync" },
+
+    { "action": "addProduct", "session": "admin", "name": "HDMI Cable", "categories": ["Cables"], "keywords": ["hdmi", "cable"], "as": "p22" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p22", "price": 7.99, "quantity": 50, "description": "2m high-speed HDMI 2.0 cable" },
+
+    { "action": "addProduct", "session": "admin", "name": "Ethernet Switch", "categories": ["Networking"], "keywords": ["ethernet", "switch"], "as": "p23" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p23", "price": 44.99, "quantity": 6, "description": "5-port gigabit unmanaged network switch" },
+
+    { "action": "addProduct", "session": "admin", "name": "Wi-Fi Range Extender", "categories": ["Networking"], "keywords": ["wifi", "extender"], "as": "p24" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p24", "price": 29.99, "quantity": 10, "description": "Wireless signal booster with WPS support" },
+
+    { "action": "addProduct", "session": "admin", "name": "Smart Plug", "categories": ["Smart Home"], "keywords": ["plug", "smart"], "as": "p25" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p25", "price": 14.99, "quantity": 20, "description": "Wi-Fi smart plug with voice control support" },
+
+    { "action": "addProduct", "session": "admin", "name": "Phone Camera Lens Kit", "categories": ["Accessories"], "keywords": ["lens", "phone"], "as": "p26" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p26", "price": 17.99, "quantity": 10, "description": "Clip-on wide, macro, and fisheye lens set" },
+
+    { "action": "addProduct", "session": "admin", "name": "USB Desk Fan", "categories": ["Cooling"], "keywords": ["fan", "usb"], "as": "p27" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p27", "price": 11.99, "quantity": 25, "description": "Mini USB desk fan with quiet operation" },
+
+    { "action": "addProduct", "session": "admin", "name": "Wireless Earbuds", "categories": ["Audio"], "keywords": ["earbuds", "wireless"], "as": "p28" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p28", "price": 69.99, "quantity": 13, "description": "Bluetooth earbuds with noise isolation and case" },
+
+    { "action": "addProduct", "session": "admin", "name": "Portable Projector", "categories": ["Video"], "keywords": ["projector", "portable"], "as": "p29" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p29", "price": 149.99, "quantity": 4, "description": "Compact projector for movies and presentations" },
+
+    { "action": "addProduct", "session": "admin", "name": "Laptop Backpack", "categories": ["Bags"], "keywords": ["backpack", "laptop"], "as": "p30" },
+    { "action": "addItem", "session": "admin", "store": "urbanStore", "product": "p30", "price": 59.99, "quantity": 10, "description": "Water-resistant backpack with USB charging port" },
+
+    { "action": "logout", "session": "admin" },
+    { "action": "logout", "session": "owner" },
+    { "action": "logout", "session": "manager" },
+    { "action": "logout", "session": "buyer" }
+
   ]
+
 
 }

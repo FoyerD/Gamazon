@@ -33,7 +33,8 @@ public interface IShoppingCartFacade {
      */
     boolean makeBid(String auctionId, String clientId, float price,
                             String cardNumber, Date expiryDate, String cvv,
-                            long andIncrement, String clientName, String deliveryAddress);
+                            long andIncrement, String clientName, String deliveryAddress, String city, 
+                                        String country, String zipCode);
 
 
 

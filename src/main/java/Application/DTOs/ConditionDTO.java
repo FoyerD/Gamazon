@@ -31,6 +31,7 @@ public class ConditionDTO {
     private Double minPrice;
     private Double maxPrice;
     private String productId;
+    private ItemDTO product; // Optional, for UI representation
     private Integer minQuantity;
     private Integer maxQuantity;
     
@@ -41,6 +42,11 @@ public class ConditionDTO {
     public ConditionDTO() {}
     
     // Constructor for simple conditions
+    public ConditionDTO(ConditionType type) {
+        id = "";
+        this.type = type;
+    }
+
     public ConditionDTO(String id, ConditionType type) {
         this.id = id;
         this.type = type;
@@ -170,6 +176,10 @@ public class ConditionDTO {
     public void setProductId(String productId) {
         this.productId = productId;
     }
+
+    public void setProduct(ItemDTO product) {
+        this.product = product;
+    }
     
     public Integer getMinQuantity() {
         return minQuantity;
@@ -199,7 +209,7 @@ public class ConditionDTO {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("ConditionDTO{");
-        sb.append("id=").append(id);
+        // sb.append("id=").append(id);
         sb.append(", type=").append(type);
         
         switch (type) {
@@ -227,6 +237,37 @@ public class ConditionDTO {
         }
         
         sb.append('}');
+        return sb.toString();
+    }
+
+    public String conditionRepr() {
+        StringBuilder sb = new StringBuilder();
+        // sb.append("id=").append(id);
+        sb.append(type.toString().toLowerCase());
+        
+        switch (type) {
+            case MIN_PRICE:
+                sb.append("\nminPrice=").append(minPrice);
+                break;
+            case MAX_PRICE:
+                sb.append("\nmaxPrice=").append(maxPrice);
+                break;
+            case MIN_QUANTITY:
+                sb.append("\nproduct='").append(product.getProductName()).append('\'');
+                sb.append("\nminQuantity=").append(minQuantity);
+                break;
+            case MAX_QUANTITY:
+                sb.append("\nproduct='").append(product.getProductName()).append('\'');
+                sb.append("\nmaxQuantity=").append(maxQuantity);
+                break;
+
+                
+            case TRUE:
+                // No additional fields
+                break;
+            default:
+        }
+        
         return sb.toString();
     }
 

@@ -11,21 +11,21 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import Domain.Pair;
 import Domain.ExternalServices.IExternalPaymentService;
 import Domain.ExternalServices.IExternalSupplyService;
+import Domain.Pair;
 import Domain.Repos.IProductRepository;
 import Domain.Repos.IReceiptRepository;
 import Domain.Repos.IShoppingBasketRepository;
 import Domain.Repos.IShoppingCartRepository;
 import Domain.Repos.IUserRepository;
+import Domain.Store.Discounts.Discount;
+import Domain.Store.Discounts.DiscountFacade;
+import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.Store.Item;
 import Domain.Store.ItemFacade;
 import Domain.Store.Policy;
 import Domain.Store.StoreFacade;
-import Domain.Store.Discounts.Discount;
-import Domain.Store.Discounts.DiscountFacade;
-import Domain.Store.Discounts.ItemPriceBreakdown;
 import Domain.User.Member;
 import Domain.management.PolicyFacade;
 
@@ -235,12 +235,12 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
     @Override
     public boolean makeBid(String auctionId, String clientId, float price,
                         String cardNumber, Date expiryDate, String cvv,
-                        long andIncrement, String clientName, String deliveryAddress) {
+                        long andIncrement, String clientName, String deliveryAddress, String city, String country, String zipCode) {
 
         
 
         storeFacade.addBid(auctionId, clientId, price, 
-                cardNumber, expiryDate, cvv, clientName, deliveryAddress);
+                cardNumber, expiryDate, cvv, clientName, deliveryAddress, city, country, zipCode);
         return true;
     }
 
@@ -289,12 +289,19 @@ public class ShoppingCartFacade implements IShoppingCartFacade {
             // Perform rollback and throw exception
             Integer paymentTransactionId = result.getPaymentTransactionId();
             Integer supplyTransactionId = result.getSupplyTransactionId();
-
-            if(paymentTransactionId != -1)
+            if (paymentTransactionId == null || supplyTransactionId == null) {}
+            else {
+                if(paymentTransactionId != -1 && supplyTransactionId != -1){
                 paymentService.cancelPayment(paymentTransactionId);
-            if(supplyTransactionId != -1)
                 supplyService.cancelSupply(supplyTransactionId);
-
+                }
+                else{
+                    if(paymentTransactionId != -1 && supplyTransactionId == -1)
+                        paymentService.cancelPayment(paymentTransactionId);
+                    else
+                        supplyService.cancelSupply(supplyTransactionId);
+                }
+            }
             checkoutManager.performRollback(clientId, cart, result);
             cartRepo.update(clientId, cart);
             throw new RuntimeException("Checkout failed: " + result.getErrorMessage());

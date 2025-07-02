@@ -7,10 +7,10 @@ import Domain.ExternalServices.INotificationService;
 import Domain.Shopping.IShoppingCartFacade;
 import Domain.Shopping.OfferManager;
 import Domain.Shopping.ShoppingCartFacade;
+import Domain.Store.Discounts.DiscountFacade;
 import Domain.Store.ItemFacade;
 import Domain.Store.ProductFacade;
 import Domain.Store.StoreFacade;
-import Domain.Store.Discounts.DiscountFacade;
 import Domain.User.LoginManager;
 import Domain.management.IMarketFacade;
 import Domain.management.MarketFacade;
@@ -50,7 +50,8 @@ public class FacadeManager {
     public IMarketFacade getMarketFacade() {
         if (marketFacade == null) {
             marketFacade = MarketFacade.getInstance();
-            marketFacade.initFacades(repoManager.getUserRepository(),
+            marketFacade.initFacades(repoManager.getUserRepository(), 
+                                    repoManager.getStoreRepository(),
                                     getShoppingCartFacade(),
                                     getPermissionManager());
 
@@ -140,7 +141,7 @@ public class FacadeManager {
     
     public OfferManager getOfferManager() {
         if (offerManager == null) {
-            offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager(), repoManager.getItemRepository(), getStoreFacade(), getPaymentService(), getRepositoryManager().getReceiptRepository(), getRepositoryManager().getProductRepository());
+            offerManager = new OfferManager(repoManager.getOfferRepository(), getPermissionManager(), repoManager.getItemRepository(), getStoreFacade(), getPaymentService(), getRepositoryManager().getReceiptRepository(), getRepositoryManager().getProductRepository(), getSupplyService());
         }
         return offerManager;
     }

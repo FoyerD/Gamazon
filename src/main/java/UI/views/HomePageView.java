@@ -1,5 +1,7 @@
 package UI.views;
 
+import java.io.File;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.FileBuffer;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
@@ -86,6 +90,8 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
     private final Button registerBtn = new Button("Register");
     private final Button logoutBtn = new Button("Logout");
 
+    //! my change
+    private final Button gifViewBtn = new Button("GIF View", e -> UI.getCurrent().navigate("gif-view"));
 
 
     public HomePageView(IProductPresenter productPresenter, IUserSessionPresenter sessionPresenter, 
@@ -177,7 +183,9 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         welcomeLayout.setAlignItems(Alignment.BASELINE);
         welcomeLayout.setWidthFull();
         welcomeLayout.setJustifyContentMode(JustifyContentMode.START);
+
         HorizontalLayout navButtons = new HorizontalLayout(searchAndFilter, goToSearchBtn, cartBtn, registerBtn, logoutBtn);
+        
         navButtons.setJustifyContentMode(JustifyContentMode.END);
         navButtons.getStyle().set("padding", "10px");
 
@@ -236,19 +244,27 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
                     TextField name = new TextField("Full Name");
                     TextField address = new TextField("Delivery Address");
                     
+                    TextField city = new TextField("City");
+                    TextField country = new TextField("Country");
+                    TextField zipCode = new TextField("ZIP Code");
+
                     bidForm.add(
                         bidAmount,
                         cardNumber,
                         expiryDate,
                         cvv,
                         name,
-                        address
+                        address,
+                        city,
+                        country,
+                        zipCode 
                     );
                     
                     Button placeBidButton = new Button("Place Bid", event -> {
-                        if (bidAmount.getValue() == null || cardNumber.isEmpty() || 
-                            expiryDate.isEmpty() || cvv.isEmpty() || 
-                            name.isEmpty() || address.isEmpty()) {
+                        if (bidAmount.getValue() == null || cardNumber.isEmpty() ||
+                            expiryDate.isEmpty() || cvv.isEmpty() ||
+                            name.isEmpty() || address.isEmpty() ||
+                            city.isEmpty() || country.isEmpty() || zipCode.isEmpty()) {
                             Notification.show("Please fill in all fields");
                             return;
                         }
@@ -270,7 +286,10 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
                             cvv.getValue(),
                             increment,
                             name.getValue(),
-                            address.getValue()
+                            address.getValue(),
+                            city.getValue(),
+                            country.getValue(),
+                            zipCode.getValue()
                         );
                         
                         if (!response.errorOccurred() && response.getValue()) {
@@ -345,9 +364,156 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
         mainContent.setSpacing(true);
         add(mainContent);
 
+
+        // Music Settings Dialog
+        Button musicSettingsBtn = new Button("🎵 Music Settings");
+        musicSettingsBtn.getStyle().set("color", "white");
+
+
+        Dialog musicDialog = new Dialog();
+        musicDialog.setHeaderTitle("Music Settings");
+
+        Button playMusicBtn = new Button("Play Music 🎶");
+        playMusicBtn.addClickListener(e -> {
+            UI.getCurrent().getPage().executeJs("window.startBackgroundMusic && window.startBackgroundMusic();");
+        });
+
+        Button muteBtn = new Button("Mute/Unmute 🔇");
+        muteBtn.addClickListener(e -> {
+            UI.getCurrent().getPage().executeJs("""
+                const audio = document.getElementById('backgroundMusic');
+                if (audio) {
+                    audio.muted = !audio.muted;
+                }
+            """);
+        });
+
+        // Upload setup
+        FileBuffer fileBuffer = new FileBuffer();
+        Upload upload = new Upload(fileBuffer);
+        upload.setAcceptedFileTypes(".mp3");
+        upload.setMaxFiles(1);
+        upload.setDropLabel(new Span("Upload .mp3 file"));
+
+        upload.addSucceededListener(event -> {
+            try (InputStream inputStream = fileBuffer.getInputStream()) {
+                
+                File targetDir = new File("src/main/resources/static/audio");
+                if (!targetDir.exists()) {
+                    targetDir.mkdirs();
+                }
+
+                File targetFile = new File(targetDir, event.getFileName());
+                java.nio.file.Files.copy(inputStream, targetFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                Notification.show("File uploaded successfully. You can now press Play.", 3000, Notification.Position.MIDDLE);
+
+                injectTracksToClient();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Notification.show("Upload failed!", 3000, Notification.Position.MIDDLE);
+            }
+        });
+
+        
+        NumberField volumeField = new NumberField("Volume (%)");
+        volumeField.setValue(20.0);  // Default 20%
+        volumeField.setMin(0);
+        volumeField.setMax(100);
+        volumeField.setStep(1);
+
+        volumeField.addValueChangeListener(event -> {
+            Double val = event.getValue();
+            if (val != null) {
+                UI.getCurrent().getPage().executeJs("""
+                    const audio = document.getElementById('backgroundMusic');
+                    if (audio) {
+                        audio.volume = $0;
+                    }
+                """, val / 100.0);
+            }
+        });
+
+        VerticalLayout layout = new VerticalLayout(playMusicBtn, muteBtn, volumeField, upload);
+        musicDialog.add(layout);
+
+
+        musicSettingsBtn.addClickListener(e -> musicDialog.open());
+        add(musicSettingsBtn, musicDialog);
+
         loadAllProducts();
 
+        UI.getCurrent().getPage().executeJs("""
+            if (!document.getElementById('easterEggDragArea')) {
+                const dragArea = document.createElement('div');
+                dragArea.id = 'easterEggDragArea';
+                dragArea.style.position = 'fixed';
+                dragArea.style.bottom = '20px';
+                dragArea.style.right = '20px';
+                dragArea.style.width = '60px';
+                dragArea.style.height = '60px';
+                dragArea.style.background = 'transparent';
+                dragArea.style.zIndex = '1000';
+                dragArea.style.cursor = 'grab';
+
+                const button = document.createElement('button');
+                button.textContent = '';
+                button.style.display = 'none';
+                button.style.width = '100%';
+                button.style.height = '100%';
+                button.style.position = 'absolute';
+                button.style.top = '0';
+                button.style.left = '0';
+                button.style.backgroundImage = "url('images/esterEgg.png')";
+                button.style.backgroundSize = 'cover';
+                button.style.backgroundColor = 'transparent';
+                button.style.border = 'none';
+                button.style.borderRadius = '50%';
+                button.style.cursor = 'pointer';
+
+                button.addEventListener('click', () => {
+                    window.location.href = '/gif-view';
+                });
+
+                dragArea.appendChild(button);
+                document.body.appendChild(dragArea);
+
+                let isDragging = false;
+                let offsetX = 0;
+                let offsetY = 0;
+                let moved = false;
+
+                dragArea.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    offsetX = e.clientX - dragArea.getBoundingClientRect().left;
+                    offsetY = e.clientY - dragArea.getBoundingClientRect().top;
+                    dragArea.style.cursor = 'grabbing';
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) {
+                        dragArea.style.left = (e.clientX - offsetX) + 'px';
+                        dragArea.style.top = (e.clientY - offsetY) + 'px';
+                        dragArea.style.right = 'auto';
+                        dragArea.style.bottom = 'auto';
+                        moved = true;
+                    }
+                });
+
+                document.addEventListener('mouseup', function() {
+                    if (isDragging && moved) {
+                        button.style.display = 'block';
+                    }
+                    isDragging = false;
+                    moved = false;
+                    dragArea.style.cursor = 'grab';
+                });
+            }
+        """);
+
         setupNavigation();
+    
     
     }
 
@@ -590,6 +756,10 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
             }
             // Then proceed with regular ban status check which will handle other UI elements
             checkBanStatus();
+                
+            registerBtn.setEnabled("Guest".equals(currentUsername));
+            registerBtn.setVisible("Guest".equals(currentUsername));
+            
         }
     }
 

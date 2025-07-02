@@ -22,6 +22,11 @@ import Application.StoreService;
 import Application.TokenService;
 import Application.UserService;
 import Application.DTOs.ClientOrderDTO;
+import Application.DTOs.ConditionDTO;
+import Application.DTOs.ConditionDTO.ConditionType;
+import Application.DTOs.DiscountDTO;
+import Application.DTOs.DiscountDTO.DiscountType;
+import Application.DTOs.DiscountDTO.QualifierType;
 import Application.DTOs.EmployeeInfo;
 import Application.DTOs.ProductDTO;
 import Application.DTOs.StoreDTO;
@@ -305,8 +310,8 @@ public class MarketServiceTest {
         thread2.start();
         
         // Wait for both threads to complete
-        thread1.join(5000);
-        thread2.join(5000);
+        thread1.join();
+        thread2.join();
         
         // Print diagnostic information
         System.out.println("Thread 1 success: " + threadSuccess[0]);
@@ -395,7 +400,8 @@ public class MarketServiceTest {
     }
 
     @Test
-    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {        Response<Void> response = marketService.appointStoreManager(tokenId1, "dontexists", store1.getId());
+    public void givenWrongAppointee_whenAppointingStoreManager_thenErrorOccurs() {
+        Response<Void> response = marketService.appointStoreManager(tokenId1, "dontexists", store1.getId());
         assertTrue(response.errorOccurred());
     }
 
@@ -676,7 +682,5 @@ public class MarketServiceTest {
         Response<Boolean> result = marketService.unbanUser(managerToken, targetId);
         assertTrue(result.errorOccurred());
     }
-
-
 
 }

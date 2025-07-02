@@ -3,8 +3,8 @@ package Application;
 
 
 import Application.utils.Response;
-import Domain.FacadeManager;
 import Domain.ExternalServices.INotificationService;
+import Domain.FacadeManager;
 
 
 
@@ -78,7 +78,8 @@ public class ServiceManager {
                                             facadeManager.getOfferManager(),
                                             facadeManager.getLoginManager(),
                                             facadeManager.getDiscountFacade(),
-                                            facadeManager.getPaymentService());
+                                            facadeManager.getPaymentService(),
+                                            facadeManager.getSupplyService());
         }
         return storeService;
     }
@@ -102,7 +103,7 @@ public class ServiceManager {
     public UserService getUserService() {
         if (userService == null) {
             userService = new UserService(facadeManager.getLoginManager(),
-                                        getTokenService());
+                                        getTokenService(), facadeManager.getShoppingCartFacade());
         }
         return userService;
     }

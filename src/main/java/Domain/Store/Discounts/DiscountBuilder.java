@@ -57,7 +57,7 @@ public class DiscountBuilder {
         }
         discountDTO.setStoreId(storeId);
         
-        Condition cond = conditionBuilder.buildCondition(discountDTO.getCondition());
+        Condition cond = conditionBuilder.buildConditionWithId(discountDTO.getCondition(), UUID.randomUUID().toString());
         
         switch(discountDTO.getType()) {
             case SIMPLE:

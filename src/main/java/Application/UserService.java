@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import Application.DTOs.UserDTO;
 import Application.utils.Response;
 import Application.utils.TradingLogger;
+import Domain.Shopping.IShoppingCartFacade;
+import Domain.User.Guest;
 import Domain.User.LoginManager;
 import Domain.User.Member;
 import Domain.User.User;
@@ -17,12 +19,14 @@ import Domain.User.User;
 @Service
 public class UserService {
     private LoginManager loginManager;
+    private IShoppingCartFacade shoppingCartFacade;
     private TokenService tokenService;
     private static final  String CLASS_NAME = UserService.class.getName();
 
-    public UserService(LoginManager loginManager, TokenService tokenService) {
+    public UserService(LoginManager loginManager, TokenService tokenService, IShoppingCartFacade shoppingCartFacade) {
         this.loginManager = loginManager;
         this.tokenService = tokenService;
+        this.shoppingCartFacade = shoppingCartFacade;
     }
 
     public LoginManager getLoginManager() {
@@ -67,6 +71,12 @@ public class UserService {
         String id = tokenService.extractId(sessionToken);
         try {
             User user = loginManager.exit(id);
+            if (user instanceof Guest){
+                shoppingCartFacade.clearCart(id);
+                TradingLogger.logEvent(CLASS_NAME, "exit", "Guest user " + user.getName() + " has exited and cleared the shopping cart.");
+            } else {
+                TradingLogger.logEvent(CLASS_NAME, "exit", user.getName() + " has exited."); 
+            }
             TradingLogger.logEvent(CLASS_NAME, "exit", user.getName() + " has exited.");
         } catch (NoSuchElementException e) {
             TradingLogger.logError(CLASS_NAME, "exit", "Couldn't find user", id);

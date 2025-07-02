@@ -1,6 +1,9 @@
 package Domain.Store.Discounts;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
@@ -76,7 +79,7 @@ public class DiscountBuilderTest {
         Application.DTOs.ConditionDTO conditionDTO = new Application.DTOs.ConditionDTO();
         dto.setCondition(conditionDTO);
         
-        when(mockConditionBuilder.buildCondition(conditionDTO)).thenReturn(mockCondition);
+        when(mockConditionBuilder.buildConditionWithId(eq(conditionDTO), anyString())).thenReturn(mockCondition);
         
         Discount discount = discountBuilder.buildDiscount(dto, "test-id", TEST_STORE_ID);
         
@@ -99,7 +102,7 @@ public class DiscountBuilderTest {
         Application.DTOs.ConditionDTO conditionDTO = new Application.DTOs.ConditionDTO();
         dto.setCondition(conditionDTO);
         
-        when(mockConditionBuilder.buildCondition(conditionDTO)).thenReturn(mockCondition);
+        when(mockConditionBuilder.buildConditionWithId(eq(conditionDTO), anyString())).thenReturn(mockCondition);
         
         // Test the single-parameter method that generates UUID
         Discount discount = discountBuilder.buildDiscount(dto);
@@ -138,7 +141,7 @@ public class DiscountBuilderTest {
         Application.DTOs.ConditionDTO conditionDTO = new Application.DTOs.ConditionDTO();
         dto.setCondition(conditionDTO);
         
-        when(mockConditionBuilder.buildCondition(any())).thenReturn(mockCondition);
+        when(mockConditionBuilder.buildConditionWithId(any(), anyString())).thenReturn(mockCondition);
         
         Discount discount = discountBuilder.buildDiscount(dto, "and-test-id", TEST_STORE_ID);
         
@@ -169,7 +172,7 @@ public class DiscountBuilderTest {
         Application.DTOs.ConditionDTO conditionDTO = new Application.DTOs.ConditionDTO();
         dto.setCondition(conditionDTO);
         
-        when(mockConditionBuilder.buildCondition(any())).thenReturn(mockCondition);
+        when(mockConditionBuilder.buildConditionWithId(any(), anyString())).thenReturn(mockCondition);
         
         Discount discount = discountBuilder.buildDiscount(dto, "or-test-id", TEST_STORE_ID);
         
@@ -207,7 +210,7 @@ public class DiscountBuilderTest {
         Application.DTOs.ConditionDTO conditionDTO = new Application.DTOs.ConditionDTO();
         dto.setCondition(conditionDTO);
         
-        when(mockConditionBuilder.buildCondition(any())).thenReturn(mockCondition);
+        when(mockConditionBuilder.buildConditionWithId(eq(conditionDTO), anyString())).thenReturn(mockCondition);
         
         Discount discount = discountBuilder.buildDiscount(dto, "xor-test-id", TEST_STORE_ID);
         
@@ -275,7 +278,7 @@ public class DiscountBuilderTest {
         Application.DTOs.ConditionDTO conditionDTO = new Application.DTOs.ConditionDTO();
         dto.setCondition(conditionDTO);
         
-        when(mockConditionBuilder.buildCondition(any())).thenReturn(mockCondition);
+        when(mockConditionBuilder.buildConditionWithId(any(), anyString())).thenReturn(mockCondition);
         
         String newStoreId = "new-store-123";
         Discount discount = discountBuilder.buildDiscount(dto, "test-id", newStoreId);

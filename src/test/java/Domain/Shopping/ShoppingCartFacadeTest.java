@@ -301,7 +301,7 @@ public class ShoppingCartFacadeTest {
         verify(mockBasketRepo, never()).get(any(Pair.class));   
         verify(mockBasketRepo, never()).update(any(Pair.class), any(ShoppingBasket.class));
         verify(mockReceiptRepo, never()).savePurchase(
-            anyString(), anyString(), anyMap(), anyDouble(), anyString()
+            anyString(), anyString(), anyMap(), anyDouble(), anyString(), anyString()
         );
     }
     
@@ -516,16 +516,16 @@ public class ShoppingCartFacadeTest {
     public void testMakeBid_Success() {
         // Arrange
         Auction mockAuction = mock(Auction.class);
-        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString()))
+        when(mockStoreFacade.addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(mockAuction);
 
         // Act
         boolean result = facade.makeBid(AUCTION_ID, CLIENT_ID, BID_PRICE,
-            "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St");
+            "1234567890123456", new Date(), "123", 12345L, "John Doe", "123 Main St", "City", "Country", "12345");
 
         // Assert
         assertTrue("Should return true for successful bid", result);
-        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString());
+        verify(mockStoreFacade).addBid(eq(AUCTION_ID), eq(CLIENT_ID), eq(BID_PRICE), anyString(), any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString());
     }
     
     //
