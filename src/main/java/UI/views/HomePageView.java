@@ -418,7 +418,7 @@ public class HomePageView extends BaseView implements BeforeEnterObserver {
 
         
         NumberField volumeField = new NumberField("Volume (%)");
-        volumeField.setValue(20.0);  // Default 20%
+        volumeField.setValue(10.0);  // Default 20%
         volumeField.setMin(0);
         volumeField.setMax(100);
         volumeField.setStep(1);
